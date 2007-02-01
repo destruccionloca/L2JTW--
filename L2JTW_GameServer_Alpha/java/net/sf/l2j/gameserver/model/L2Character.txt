@@ -1258,8 +1258,6 @@ public abstract class L2Character extends L2Object
 		
 		// Calculate altered Cast Speed due to BSpS/SpS
 		L2ItemInstance weaponInst = this.getActiveWeaponInstance();
-		
-		
         
 		if ((weaponInst != null)&&(skill.isMagic())&&((skill.getTargetType())!=(SkillTargetType.TARGET_SELF))) {
 			if ((weaponInst.getChargedSpiritshot() == L2ItemInstance.CHARGED_BLESSED_SPIRITSHOT)
@@ -1305,19 +1303,7 @@ public abstract class L2Character extends L2Object
 		// to the L2Character AND to all L2PcInstance in the _KnownPlayers of the L2Character
 		broadcastPacket(new MagicSkillUser(this, target, displayId, level, skillTime, reuseDelay));
         
-		  if(skill.getCondition() != 16 || skill.getCondition() != 17)
-              for (int i = 0;i < targets.length;i++)
-                {
-                if (targets[i] instanceof L2Character)
-                {
-                    L2Character targeta = (L2Character) targets[i];
-                    
-                   
-                    broadcastPacket(new MagicSkillLaunched(this, magicId, level, targeta));
-                    
-                
-                }
-                }
+        
       
 		// Send a system message USE_S1 to the L2Character
 		if (this instanceof L2PcInstance) 
@@ -1365,7 +1351,7 @@ public abstract class L2Character extends L2Object
 				_skillCast.cancel(true);
 				_skillCast = null;
 			}
-			/*
+			
 			  if(skill.getCondition() != 16 || skill.getCondition() != 17)
               for (int i = 0;i < targets.length;i++)
                 {
@@ -1379,7 +1365,6 @@ public abstract class L2Character extends L2Object
                 
                 }
                 }
-                */
 			// Create a task MagicUseTask with Medium priority to launch the MagicSkill at the end of the casting time
 			_skillCast = ThreadPoolManager.getInstance().scheduleEffect(new MagicUseTask(targets, skill), skillTime);
 		}

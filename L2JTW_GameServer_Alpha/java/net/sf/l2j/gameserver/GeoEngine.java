@@ -169,6 +169,7 @@ public class GeoEngine extends GeoData
     {
         return canSee((x - L2World.MAP_MIN_X) >> 4,(y - L2World.MAP_MIN_Y) >> 4,z,(tx - L2World.MAP_MIN_X) >> 4,(ty - L2World.MAP_MIN_Y) >> 4,tz);
     }
+    
     private static boolean canSee(int x, int y, double z, int tx, int ty, int tz)
     {
         int dx = (tx - x);
@@ -203,6 +204,7 @@ public class GeoEngine extends GeoData
             {
             	x = next_x;
             	y = next_y;
+
             	if (d > 0)
             	{
             		z += dbl_inc_z;
@@ -210,9 +212,11 @@ public class GeoEngine extends GeoData
             		next_x += inc_x;
             		if (!NLOS(x,y,(int)z,next_x,next_y,tz))
                         return false;
+
             		next_y += inc_y;
             		if (!NLOS(x,y,(int)z,next_x,next_y,tz))
             			return false;
+
             	}
             	else
             	{
@@ -221,6 +225,7 @@ public class GeoEngine extends GeoData
             		next_x += inc_x;
             		if (!NLOS(x,y,(int)z,next_x,next_y,tz))
             			return false;
+
             	}
             }
         }
@@ -233,24 +238,28 @@ public class GeoEngine extends GeoData
             {
             	x = next_x;
             	y = next_y;
+
             	if (d > 0)
             	{
             		z += dbl_inc_z;
             		d += delta_B;
-            		next_y += inc_x; //dont touch it is fine
+            		next_y += inc_y;
             		if (!NLOS(x,y,(int)z,next_x,next_y,tz))
             			return false;
-            		next_x += inc_y; //dont touch it is fine
+
+            		next_x += inc_x;
             		if (!NLOS(x,y,(int)z,next_x,next_y,tz))
             			return false;
+
             	}
             	else
             	{
             		z += inc_z;
             		d += delta_A;
-            		next_x += inc_y; //dont touch it is fine
+            		next_y += inc_y;
             		if (!NLOS(x,y,(int)z,next_x,next_y,tz))
             			return false;
+
             	}
             }
         }
@@ -327,10 +336,10 @@ public class GeoEngine extends GeoData
             	{
             		z += dbl_inc_z;
             		d += delta_B;
-            		next_y += inc_x; //dont touch it is fine
+            		next_y += inc_y;
             		if (!NLOS(x,y,(int)z,next_x,next_y,tz))
             			return false;
-            		next_x += inc_y; //dont touch it is fine
+            		next_x += inc_x;
             		if (!NLOS(x,y,(int)z,next_x,next_y,tz))
             			return false;
             	}
@@ -338,7 +347,7 @@ public class GeoEngine extends GeoData
             	{
             		z += inc_z;
             		d += delta_A;
-            		next_x += inc_y; //dont touch it is fine
+            		next_y += inc_y;
             		if (!NLOS(x,y,(int)z,next_x,next_y,tz))
             			return false;
             	}
@@ -410,10 +419,10 @@ public class GeoEngine extends GeoData
             	{
             		z += dbl_inc_z;
             		d += delta_B;
-            		next_y += inc_x; //dont touch it is fine
+            		next_y += inc_y;
             		if (!NcanMoveNext(x,y,(int)z,next_x,next_y,tz))
             			return new Location((x << 4) + L2World.MAP_MIN_X,(y << 4) + L2World.MAP_MIN_Y,(int)z);
-            		next_x += inc_y; //dont touch it is fine
+            		next_x += inc_x;
             		if (!NcanMoveNext(x,y,(int)z,next_x,next_y,tz))
             			return new Location((x << 4) + L2World.MAP_MIN_X,(y << 4) + L2World.MAP_MIN_Y,(int)z);
             	}
@@ -421,7 +430,7 @@ public class GeoEngine extends GeoData
             	{
             		z += inc_z;
             		d += delta_A;
-            		next_x += inc_y; //dont touch it is fine
+            		next_y += inc_y;
             		if (!NcanMoveNext(x,y,(int)z,next_x,next_y,tz))
             			return new Location((x << 4) + L2World.MAP_MIN_X,(y << 4) + L2World.MAP_MIN_Y,(int)z);
             	}
@@ -430,11 +439,11 @@ public class GeoEngine extends GeoData
         return destiny;
     }
     private static byte sign(int x)
-    {
+    {    	
     	if (x >= 0)
     		return +1;
         else
-        	return -1;  
+        	return -1;
     }
 	
 	//GeoEngine
@@ -740,14 +749,16 @@ public class GeoEngine extends GeoData
 	        if (temph > zmax + 150 || temph < zmin - 150)        
 	        {
 	        	//Just log error - we trust GeoData and spawn NPC on nearlest GeoData Z
-	        	_log.warning("SpawnHeight Error - Couldnt find correct layer to spawn NPC - GoeData or Spawnlist Bug!: zmin: "+zmin+" zmax: "+zmax+" value: "+temph+" SpawnId: "+spawnid+" at: "+geox+" : "+geoy);
+	        	if(Config.DEBUG)
+	        		_log.warning("SpawnHeight Error - Couldnt find correct layer to spawn NPC - GeoData or Spawnlist Bug!: zmin: "+zmin+" zmax: "+zmax+" value: "+temph+" SpawnId: "+spawnid+" at: "+geox+" : "+geoy);
 	        	return temph;
 	        }
 	    }
 	    if (temph > zmax + 600 || temph < zmin - 600) 
 	    {
 	    	//Just log error - we trust GeoData and spawn NPC on Z given by GeoData
-        	_log.warning("SpawnHeight Error - Spawnlist z value is wrong or GeoData error: zmin: "+zmin+" zmax: "+zmax+" value: "+temph+" SpawnId: "+spawnid+" at: "+geox+" : "+geoy);	        
+	    	if(Config.DEBUG)
+	    		_log.warning("SpawnHeight Error - Spawnlist z value is wrong or GeoData error: zmin: "+zmin+" zmax: "+zmax+" value: "+temph+" SpawnId: "+spawnid+" at: "+geox+" : "+geoy);	        
         }
 	    return temph;
 	}

@@ -92,7 +92,7 @@ public abstract class L2Skill
     public static final int SKILL_FAKE_DEX = 9005;
     public static final int SKILL_FAKE_STR = 9006;
 
-    public static boolean CRIT_ATTACK;
+    public static int CRIT_ATTACK;
     public static enum SkillOpType {
         OP_PASSIVE, OP_ACTIVE, OP_TOGGLE
     }
@@ -1232,7 +1232,7 @@ public abstract class L2Skill
 		}
 
 
-        L2Skill.CRIT_ATTACK = false;
+        L2Skill.CRIT_ATTACK = 0;
         
         if (activeChar.isSkillDisabled(this.getId()))
         {
@@ -1256,239 +1256,7 @@ public abstract class L2Skill
             case TARGET_ONE: // The skill can only be used on the L2Character targeted, or on the caster itself
             {
 
-	        		
-                /*
-                if (this.getSkillType() == L2Skill.SkillType.RESURRECT && ((activeChar instanceof L2Attackable)))
 
-                {
-                    
-                    if(activeChar instanceof L2MinionInstance)
-                    {
-                      
-                        if(((L2MinionInstance) activeChar).getLeader().isDead())
-                        
-                            {
-                            DecayTaskManager.getInstance().cancelDecayTask((((L2MinionInstance) activeChar).getLeader()));
-                            if (activeChar instanceof L2Attackable && !(activeChar instanceof L2PcInstance))
-                            activeChar.setTarget(((L2MinionInstance) activeChar).getLeader());
-                            target=(((L2MinionInstance) activeChar).getLeader());
-                            return new L2Character[]{target};
-                            }
-                       
-                        
-                    }
-                    
-                    
-                    
-                    for (L2Object obj : activeChar.getKnownList().getKnownCharactersInRadius(400))// should be looking for faction_id though
-                    {
-                      
-                    if ((obj instanceof L2Attackable && ((L2Attackable) obj).isDead() && obj != activeChar)
-                            ||(obj instanceof L2MinionInstance && ((L2MinionInstance) obj).isDead()))
-                    {
-
-<<<<<<< .mine
-                        
-                        if (obj instanceof L2MinionInstance)
-                        {
-                            if((((L2MinionInstance) activeChar).getNpcId() == ((L2MinionInstance) obj).getNpcId()
-                                 ||(((L2MinionInstance) activeChar).getFactionId() == ((L2MinionInstance) obj).getFactionId()))&&((L2MinionInstance) obj).isDead())
-                            {
-                                DecayTaskManager.getInstance().cancelDecayTask((L2Attackable)obj);
-                                if (activeChar instanceof L2Attackable && !(activeChar instanceof L2PcInstance))
-                                activeChar.setTarget(obj);
-                                target = (L2MinionInstance)obj;
-                                return new L2Character[]{target};
-                            }
-                            
-                        }
-                        if ((((L2Attackable) activeChar).getFactionId() == ((L2Attackable) obj).getFactionId()) && ((L2Attackable) obj).isDead())                            
-                        {
-                            DecayTaskManager.getInstance().cancelDecayTask((L2Attackable)obj);
-                        target = (L2Character)obj; 
-                        if (activeChar instanceof L2Attackable && !(activeChar instanceof L2PcInstance))
-                        activeChar.setTarget(obj);
-                        return new L2Character[]{target};
-                        
-                        }
-                    }
-                    }
-                                       
-                    return null;
-                    
-                    
-                }
-                
-                if (this.getSkillType() == L2Skill.SkillType.HEAL && ((activeChar instanceof L2Attackable) || (activeChar instanceof L2MinionInstance)))
-=======
-        switch (targetType)
-        {
-            // The skill can only be used on the L2Character targeted, or on the caster itself
-            case TARGET_ONE:
-            {
-                // Check for null target or any other invalid target
-                if (target == null
-                    || target.isDead()
-                    || (target == activeChar && !(skillType == SkillType.BUFF
-                        || skillType == SkillType.HEAL || skillType == SkillType.HEAL_PERCENT
-                        || skillType == SkillType.HOT || skillType == SkillType.MANAHEAL
-                        || skillType == SkillType.MANARECHARGE || skillType == SkillType.NEGATE
-                        || skillType == SkillType.CANCEL || skillType == SkillType.REFLECT
-                        || skillType == SkillType.UNBLEED || skillType == SkillType.UNPOISON || skillType == SkillType.SEED
-                        || skillType == SkillType.COMBATPOINTHEAL || skillType == SkillType.MAGE_BANE | skillType == SkillType.WARRIOR_BANE
-                        || skillType == SkillType.BETRAY )))
->>>>>>> .r487
-                {
-                   
-                       
-                        if(activeChar instanceof L2MinionInstance)
-                        {
-                          
-                            if(((L2MinionInstance) activeChar).getLeader().getCurrentHp()<(((L2MinionInstance) activeChar).getLeader().getMaxHp())
-                                    && !((L2MinionInstance) activeChar).getLeader().isDead() && Rnd.get(100)<=66)
-                            
-                                {
-                                activeChar.setTarget(((L2MinionInstance) activeChar).getLeader());
-                                target=(((L2MinionInstance) activeChar).getLeader());
-                                return new L2Character[]{target};
-                                }
-                            
-                            
-                        }
-                    for (L2Object obj : activeChar.getKnownList().getKnownCharactersInRadius(400))// should be looking for faction_id though
-                    {
-                      
-                    if ((obj instanceof L2Attackable && !((L2Attackable) obj).isDead() && obj != activeChar)
-                            ||(obj instanceof L2MinionInstance && !((L2MinionInstance) obj).isDead()))
-                    {
-
-                        
-                        if (obj instanceof L2MinionInstance)
-                        {
-                            if(((L2Attackable) activeChar).getNpcId() == ((L2Attackable) obj).getNpcId()
-                                 ||(((L2Attackable) activeChar).getFactionId() == ((L2Attackable) obj).getFactionId())   )
-                            if (((L2MinionInstance) activeChar).getCurrentHp() > (((L2Attackable) obj).getCurrentHp()))
-                            {
-                                target = (L2Attackable)obj;
-                                if (activeChar instanceof L2Attackable && !(activeChar instanceof L2PcInstance))
-                                activeChar.setTarget(obj);
-                                return new L2Character[]{target};
-                               
-                            }
-                        }
-                        if ((((L2Attackable) activeChar).getFactionId() == ((L2Attackable) obj).getFactionId()))                            
-                        {
-                            //AI should always try to save the dying one.......
-                           
-
-                        if(((L2Attackable) activeChar).getCurrentHp() > (((L2Attackable) obj).getCurrentHp()))
-                        {
-                        target = (L2Character)obj;     
-                        if (activeChar instanceof L2Attackable && !(activeChar instanceof L2PcInstance))
-                        activeChar.setTarget(obj);
-                        return new L2Character[]{target};
-                        }
-                        }
-                    }
-                    }
-                    if  (((L2Attackable) activeChar).getCurrentHp() < (((L2Attackable) activeChar).getMaxHp()*0.8))
-                    {
-                       
-                         target = activeChar;
-                         if (activeChar instanceof L2Attackable && !(activeChar instanceof L2PcInstance))
-                         activeChar.setTarget(activeChar);
-                        return new L2Character[]{target};
-                    }
-                    
-                    return null;
-                
-                }
-                
-                if (this.getSkillType() == L2Skill.SkillType.BUFF && ((activeChar instanceof L2Attackable)||(activeChar instanceof L2MinionInstance)) &&!(activeChar instanceof L2CabaleBufferInstance))
-                    {                                                                     
-                    // monsters should first look for a possible target to heal or buff
-                   
-                    
-                        for (L2Object obj : activeChar.getKnownList().getKnownCharactersInRadius(400))// should be looking for faction_id though
-                        {
-                            
-                            if((obj instanceof L2Attackable|| obj instanceof L2MinionInstance))
-                            {
-                                if (!((L2Attackable)obj).isDead())
-                                {
-                                if(obj instanceof L2MinionInstance&& activeChar instanceof L2MinionInstance)
-                                {
-                                if(((L2MinionInstance) activeChar).getLeader() == obj 
-                                        || ((L2MinionInstance) activeChar).getNpcId() == ((L2MinionInstance) obj).getNpcId()
-                                        || ((L2MinionInstance) activeChar).getFactionId() == ((L2MinionInstance) obj).getFactionId())
-                                {
-                                    if (Rnd.get(100) >= 50)
-                                    {
-                                        if (this.getSkillType() == L2Skill.SkillType.BUFF)
-                                        {
-                                            L2Effect[] effects = ((L2Attackable)obj).getAllEffects();
-                                            for (int i = 0; effects != null && i < effects.length; i++)
-                                            {
-                                                L2Effect effect = effects[i];
-                                                if (effect.getSkill() == this)
-                                                {
-                                                    return null;
-                                                }
-                                            }
-                                        }
-                                        activeChar.setTarget(obj);
-                                        if (activeChar instanceof L2Attackable && !(activeChar instanceof L2PcInstance))
-                                        target = (L2Character)obj;
-                                        return new L2Character[]{target};
-                                    }
-                                }
-                                }
-                            if (((L2Attackable) activeChar).getFactionId() == ((L2Attackable) obj).getFactionId())
-                            {
-                                if (Rnd.get(100) >= 50)
-                                {
-                                    if (this.getSkillType() == L2Skill.SkillType.BUFF)
-                                    {
-                                        L2Effect[] effects = ((L2Attackable)obj).getAllEffects();
-                                        for (int i = 0; effects != null && i < effects.length; i++)
-                                        {
-                                            L2Effect effect = effects[i];
-                                            if (effect.getSkill() == this)
-                                            {
-                                                return null;
-                                            }
-                                        }
-                                    }
-                                    target = (L2Character)obj;
-                                    if (activeChar instanceof L2Attackable && !(activeChar instanceof L2PcInstance))
-                                    activeChar.setTarget(obj);
-                                    return new L2Character[]{target};
-                                }
-                            }
-                            }
-                            }
-                                
-                        }
-                        if (this.getSkillType() == L2Skill.SkillType.BUFF)
-                        {
-                            L2Effect[] effects = ((L2Attackable)activeChar).getAllEffects();
-                            for (int i = 0; effects != null && i < effects.length; i++)
-                            {
-                                L2Effect effect = effects[i];
-                                if (effect.getSkill() == this)
-                                {
-                                    return null;
-                                }
-                            }
-                        }
-                        target = activeChar;
-                        if (activeChar instanceof L2Attackable && !(activeChar instanceof L2PcInstance))
-                        activeChar.setTarget(activeChar);
-                        return new L2Character[]{target};
-                    }
-                    */
-                // automaticly selects caster if no target is selected (only positive skills)
-                
                 if (isPositive() && !(activeChar instanceof L2Attackable) && target == null)
                     target = activeChar;
                 
@@ -1512,7 +1280,7 @@ public abstract class L2Skill
                         activeChar.sendPacket(new SystemMessage(SystemMessage.TARGET_IS_INCORRECT));
                         return null;
                     }
-                    CRIT_ATTACK = false;
+                    //CRIT_ATTACK = 0;
                     if (this.getCondition() == 16 || this.getCondition() == 17)
                     {
                         int critBonus = 0;
@@ -1534,7 +1302,7 @@ public abstract class L2Skill
                         int hitrate = Rnd.get(100);
                         if (hitrate <= critrate)
                          {
-                          CRIT_ATTACK = true;
+                          CRIT_ATTACK = 1;
                           _log.warning("critical True");
                           
                          }

@@ -145,7 +145,7 @@ public class Say2 extends ClientBasePacket
 		if (_type == PETITION_PLAYER && activeChar.isGM()) 
 			_type = PETITION_GM;
 		
-			
+		if (!_text.startsWith("."));
 	if (Config.LOG_CHAT) 
 		{
 			LogRecord record = new LogRecord(Level.INFO, _text);
@@ -231,14 +231,6 @@ public class Say2 extends ClientBasePacket
                 break;
 			case ALL:
 
-				if (!_text.startsWith("."));
-				for (L2PcInstance player : activeChar.getKnownList().getKnownPlayers().values())
-				{
-					
-                    if (player != null && activeChar.isInsideRadius(player, 1250, false, true))
-						player.sendPacket(cs);
-				}
-                activeChar.sendPacket(cs);
 
 				if (_text.startsWith(".")) 
 				{
@@ -274,6 +266,16 @@ public class Say2 extends ClientBasePacket
                         activeChar.broadcastUserInfo();
                         break;
                     }
+                    else
+    				{
+    					for (L2PcInstance player : activeChar.getKnownList().getKnownPlayers().values())
+    					{
+    						
+    	                    if (player != null && activeChar.isInsideRadius(player, 1250, false, true))
+    							player.sendPacket(cs);
+    					}
+    	                activeChar.sendPacket(cs);
+    				}
 					
 					if (st.hasMoreTokens())
 					{
@@ -285,6 +287,16 @@ public class Say2 extends ClientBasePacket
 						else
 							_log.warning("No handler registered for bypass '"+command+"'");
 					}
+				}
+				else
+				{
+					for (L2PcInstance player : activeChar.getKnownList().getKnownPlayers().values())
+					{
+						
+	                    if (player != null && activeChar.isInsideRadius(player, 1250, false, true))
+							player.sendPacket(cs);
+					}
+	                activeChar.sendPacket(cs);
 				}
                 break;
 			case CLAN:

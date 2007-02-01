@@ -100,7 +100,7 @@ public class MagicSkillUser extends ServerBasePacket
 		writeD(_x);
 		writeD(_y);
 		writeD(_z);
-        if (L2Skill.CRIT_ATTACK)
+        if (L2Skill.CRIT_ATTACK ==1)
         writeC(_flags);
         
 		//writeH(0x00); // size of the mighty loop :)

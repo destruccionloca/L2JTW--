@@ -1874,6 +1874,7 @@ public class L2NpcInstance extends L2Character
             case 31168:
             case 31692:
             case 31694:
+            case 31997:
                 switch (playerCabal) 
                 {
                     case SevenSigns.CABAL_DAWN:
@@ -1915,6 +1916,7 @@ public class L2NpcInstance extends L2Character
             case 31169:
             case 31693:
             case 31695:
+            case 31998:
                 switch (playerCabal) 
                 {
                     case SevenSigns.CABAL_DUSK:

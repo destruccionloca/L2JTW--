@@ -1072,17 +1072,17 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
             //-------------------------------------------------------------
             // Melee ...Etc.... 
             
-            _log.warning("AttackableAI: MELEE CHECK Range:"+range+" Dist:"+dist2); 
+            //_log.warning("AttackableAI: MELEE CHECK Range:"+range+" Dist:"+dist2); 
             
         	if (Rnd.nextInt(100)<=((L2Attackable) _actor).getSkillChance())
         	{
-        		_log.warning("AttackableAI: Skill Chance True");
+        		//_log.warning("AttackableAI: Skill Chance True");
         		onSkillCast(_actor);
         		return;
         	}
         	else if (hated.isMoving() && range+40 >= dist2)
         	{
-        		_log.warning("AttackableAI: Chasing Attack");      		
+        		//_log.warning("AttackableAI: Chasing Attack");      		
         		setAttackTarget(hated);
         		_accessor.doAttack(hated);     	 		
         		
@@ -1090,7 +1090,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         	}
         	else if (range+20 >= dist2)
         	{
-        		_log.warning("AttackableAI: Normal Attack");      		
+        		//_log.warning("AttackableAI: Normal Attack");      		
         		setAttackTarget(hated);
         		_accessor.doAttack(hated);     	 		
         		
@@ -1145,24 +1145,24 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         }
     	//-----------------------------------------------------------------
         //Skill List Activate
-        _log.warning("AttackableAI: onSkillCast");
+       // _log.warning("AttackableAI: onSkillCast");
         if (skills != null)
     	for (L2Skill sk : skills)
         {
-    		_log.warning("AttackableAI: CheckSkill");
+    		//_log.warning("AttackableAI: CheckSkill");
     		// If the skill is magic.. and caster is muted...then search for next skill...
     		if (sk.isMagic()&& _actor.isMuted())
     			continue;
-    		_log.warning("AttackableAI: MuteCheck");
+    		//_log.warning("AttackableAI: MuteCheck");
     		// If skill is not prepare..which is not enough mp nor Skill cannot reuse...
 
     		if (_actor.isSkillDisabled(sk.getId())
             || _actor.getCurrentMp() <= _actor.getStat().getMpConsume(sk)
             || sk.isPassive())
     		{
-        		_log.warning(""+_actor.isSkillDisabled(sk.getId()));
-        		_log.warning(""+_actor.getCurrentMp()+" "+_actor.getStat().getMpConsume(sk));
-        		_log.warning(""+sk.isPassive());
+        		//_log.warning(""+_actor.isSkillDisabled(sk.getId()));
+        		//_log.warning(""+_actor.getCurrentMp()+" "+_actor.getStat().getMpConsume(sk));
+        		//_log.warning(""+sk.isPassive());
     			continue;
     		}
     		if (sk.getCastRange()>=distTarget)
@@ -1171,7 +1171,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
     		}
     		//--------------------------------------------------------------------
     		//Positive Skill 
-    		_log.warning("AttackableAI: Skill Pass through");
+    		//_log.warning("AttackableAI: Skill Pass through");
 			 if (sk.getSkillType() == L2Skill.SkillType.RESURRECT && ((_actor instanceof L2Attackable)))
              {
                  

@@ -95,9 +95,9 @@ public class Pdam implements ISkillHandler
             
             boolean soul = (weapon != null && weapon.getChargedSoulshot() == L2ItemInstance.CHARGED_SOULSHOT);
 
-            if (!L2Skill.CRIT_ATTACK) damage = 0;
-            
-            if (L2Skill.CRIT_ATTACK)
+            if (L2Skill.CRIT_ATTACK == 0) damage = 0;
+           _log.warning("CRIT ATTACK="+L2Skill.CRIT_ATTACK);
+            if (L2Skill.CRIT_ATTACK == 1)
             {
             	
                     damage = (int) Formulas.getInstance().calcPhysDam(activeChar, target, skill, shld, true, dual, soul);
@@ -172,7 +172,7 @@ public class Pdam implements ISkillHandler
                        }               
                 if (activeChar instanceof L2PcInstance)
                 {
-                    if (L2Skill.CRIT_ATTACK) activeChar.sendPacket(new SystemMessage(SystemMessage.CRITICAL_HIT));
+                    if (L2Skill.CRIT_ATTACK == 1) activeChar.sendPacket(new SystemMessage(SystemMessage.CRITICAL_HIT));
                     
                     SystemMessage sm = new SystemMessage(SystemMessage.YOU_DID_S1_DMG);
                     sm.addNumber(damage);

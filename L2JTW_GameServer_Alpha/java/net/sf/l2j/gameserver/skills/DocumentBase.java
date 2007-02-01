@@ -105,7 +105,6 @@ abstract class DocumentBase
         tables = new FastMap<String, Number[]>();
     }
 
-
     protected void setTable(String name, Number[] table)
     {
         tables.put(name, table);
@@ -207,7 +206,6 @@ abstract class DocumentBase
         else if (template instanceof L2Skill && self) ((L2Skill) template).attachSelf(lt);
     }
 
-
     protected void attachSkill(Node n, Object template, Condition attachCond)
     {
         NamedNodeMap attrs = n.getAttributes();
@@ -297,7 +295,6 @@ abstract class DocumentBase
     protected Condition parsePlayerCondition(Node n)
     {
         Condition cond = null;
-
         int[] ElementSeeds = new int[5];
         NamedNodeMap attrs = n.getAttributes();
         for (int i = 0; i < attrs.getLength(); i++)
@@ -345,11 +342,9 @@ abstract class DocumentBase
             }
             else if ("hprate".equalsIgnoreCase(a.getNodeName()))
             {
-
                 double rate = getNumber(a.getNodeValue(), null).doubleValue();
                 cond = joinAnd(cond, new ConditionPlayerHpPercentage(rate));
             }
-
             else if ("seed_fire".equalsIgnoreCase(a.getNodeName()))
             {
                 ElementSeeds[0] = getNumber(a.getNodeValue(), null).intValue();
@@ -370,9 +365,16 @@ abstract class DocumentBase
             {
                 ElementSeeds[4] = getNumber(a.getNodeValue(), null).intValue();
             }
-
         }
 
+        // Elemental seed condition processing
+        /*for (int i = 0; i < ElementSeeds.length; i++)
+            if (ElementSeeds[i] > 0)
+            {
+                cond = joinAnd(cond, new ConditionElementSeed(ElementSeeds));
+                break;
+            }
+		*/
         if (cond == null) _log.severe("Unrecognized <player> condition in " + file);
         return cond;
     }

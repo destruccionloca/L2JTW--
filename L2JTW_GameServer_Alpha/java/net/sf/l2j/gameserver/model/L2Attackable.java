@@ -1124,14 +1124,11 @@ public class L2Attackable extends L2NpcInstance
               
               // Count and chance adjustment for high rate servers
               if (dropChance > L2DropData.MAX_CHANCE && !Config.PRECISE_DROP_CALCULATION)
-
               {
-
                   int multiplier = dropChance / L2DropData.MAX_CHANCE;
                   if (min < max) itemCount += Rnd.get(min * multiplier, max * multiplier);
                   else if (min == max) itemCount += min * multiplier;
                   else itemCount += multiplier;
-
 
                   dropChance = dropChance % L2DropData.MAX_CHANCE;
               }
@@ -1252,7 +1249,6 @@ public class L2Attackable extends L2NpcInstance
 
              RewardItem item = calculateRewardItem(player, drop, levelModifier, false);
              if (item == null) continue;
-
                  
              // Check if the autoLoot mode is active
              if (Config.AUTO_LOOT) player.doAutoLoot(this, item); // Give this or these Item(s) to the L2PcInstance that has killed the L2Attackable
@@ -1530,9 +1526,6 @@ public class L2Attackable extends L2NpcInstance
              //int newZ = Math.max(this.getZ(), lastAttacker.getZ()) + 20;
              //Math.max(this.getZ(), lastAttacker.getZ()) + 20; // TODO: temp hack, do somethign nicer when we have geodatas
 
-        	 if (item.getItemId()==0)
-        		 continue;
-
              // Init the dropped L2ItemInstance and add it in the world as a visible object at the position where mob was last
              ditem = ItemTable.getInstance().createItem("Loot", item.getItemId(), item.getCount(), lastAttacker, this);
              ditem.dropMe(this, newX, newY, newZ); 
@@ -1773,9 +1766,7 @@ public class L2Attackable extends L2NpcInstance
         {
             resetAbsorbList(); return;
         }
-
         int maxAbsorbLevel = getAbsorbLevel();
-
         int minAbsorbLevel = 0;
         
         // If this is not a valid L2Attackable, clears the _absorbersList and just return

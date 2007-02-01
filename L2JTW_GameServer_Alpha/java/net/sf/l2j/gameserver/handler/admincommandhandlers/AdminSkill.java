@@ -133,6 +133,7 @@ public class AdminSkill implements IAdminCommandHandler {
 			catch (StringIndexOutOfBoundsException e)
 			{	//Case of empty character name
 				SystemMessage sm = new SystemMessage(614);
+				sm.addString("SYS");
 				sm.addString("移除技能發生錯誤");
 				activeChar.sendPacket(sm);
 			}			

@@ -221,7 +221,6 @@ public class NpcTable
                     
 			        int category = dropData.getInt("category");
 			        
-
 		            npcDat.addDropData(dropDat, category);
 			    }
 
@@ -428,7 +427,6 @@ public class NpcTable
 			// reload the NPC base data
 			con = L2DatabaseFactory.getInstance().getConnection();
 			PreparedStatement st = con.prepareStatement("SELECT " + L2DatabaseFactory.getInstance().safetyString(new String[] {"id", "idTemplate", "name", "serverSideName", "title", "serverSideTitle", "class", "collision_radius", "collision_height", "level", "sex", "type", "attackrange", "hp", "mp", "str", "con", "dex", "int", "wit", "men", "exp", "sp", "patk", "pdef", "matk", "mdef", "atkspd", "aggro", "matkspd", "rhand", "lhand","lrhand","enchlvl", "armor","pant","head","boot","glove", "walkspd", "runspd", "faction_id", "faction_range", "isUndead", "absorb_level", "primary_attack", "skill_chance", "canMove", "ischar", "charclass", "charrace","charhair","charface","charcolor","charhero","charsex","charsoulshot","ischaos","enemyClan","enemyRange","baseShldRate","baseShldDef"}) + " FROM npc WHERE id=?");
-
 			st.setInt(1, id);
 			ResultSet rs = st.executeQuery();
 			fillNpcTable(rs);
