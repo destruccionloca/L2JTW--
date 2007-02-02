@@ -26,6 +26,7 @@ import net.sf.l2j.gameserver.ai.CtrlEvent;
 import net.sf.l2j.gameserver.ai.CtrlIntention;
 import net.sf.l2j.gameserver.handler.ISkillHandler;
 import net.sf.l2j.gameserver.model.L2Character;
+import net.sf.l2j.gameserver.model.L2ItemInstance;
 import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.model.L2World;
@@ -34,7 +35,9 @@ import net.sf.l2j.gameserver.model.actor.instance.L2MonsterInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.base.ClassId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
+import net.sf.l2j.gameserver.skills.Formulas;
 
+import java.util.logging.Logger;
 /** 
  * @author _drunk_ 
  * 
@@ -44,26 +47,30 @@ import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 public class Spoil implements ISkillHandler 
 { 
     //private static Logger _log = Logger.getLogger(Spoil.class.getName()); 
-    protected SkillType[] _skillIds = {SkillType.SPOIL};
-    
+    protected SkillType[] _skillIds = {SkillType.SPOIL, SkillType.SPOILATK};
+    private static Logger _log = Logger.getLogger(Spoil.class.getName());
     public void useSkill(L2Character activeChar, L2Skill skill, @SuppressWarnings("unused") L2Object[] targets)
     { 
+    	
+    	
         if (!(activeChar instanceof L2PcInstance))
 			return;
-
-		L2Object[] targetList = skill.getTargetList(activeChar);
+     
+		//L2Object[] targetList = skill.getTargetList(activeChar);
         
-        if (targetList == null)
-        {
-            return;
-        }
-
-		for (int index = 0; index < targetList.length; index++) 
+        //if (targetList == null)
+        //{
+        //    return;
+        //}
+        
+        
+	
+		for (int index = 0; index < targets.length; index++) 
 		{
-			if (!(targetList[index] instanceof L2MonsterInstance))
+			if (!(targets[index] instanceof L2MonsterInstance))
 				continue;
 			
-			L2MonsterInstance target = (L2MonsterInstance) targetList[index];
+			L2MonsterInstance target = (L2MonsterInstance) targets[index];
 
 			// SPOIL SYSTEM by ootz0rz
 			boolean spoil = false;
@@ -85,7 +92,7 @@ public class Spoil implements ISkillHandler
 				int playerLevel = activeChar.getLevel();
 				int spoilCheck = 0;
 				int spoilLevelANDPlayerLevelDifference = 0;
-				
+				int damage;
 				Random rand = new Random();
 				
 				lvlDifference = mobLevel - playerLevel;
@@ -151,11 +158,27 @@ public class Spoil implements ISkillHandler
 					target.setIsSpoiledBy(activeChar.getObjectId());
 				}
 
-				if (spoil) 
+				if (skill.getSkillType() == SkillType.SPOILATK)   
+	            {   
+					 L2ItemInstance weapon = activeChar.getActiveWeaponInstance();
+					  boolean shld = Formulas.getInstance().calcShldUse(activeChar, target);
+     		          boolean soul = (weapon != null && weapon.getChargedSoulshot() == L2ItemInstance.CHARGED_SOULSHOT);
+
+					  damage = (int) Formulas.getInstance().calcPhysDam(activeChar, target, skill, shld, false, false, soul);
+		            
+	            }
+				
+				if (spoil && !target.isSweepActive()) 
 				{
 					target.setSpoil(true);
-					activeChar.sendPacket(new SystemMessage(SystemMessage.SPOIL_SUCCESS));
+					activeChar.sendPacket(new SystemMessage(612));
 				} 
+				else if(target.isSweepActive())
+				{
+					SystemMessage sm = new SystemMessage(357);
+					activeChar.sendPacket(sm);
+					
+				}
 				else 
 				{
 					SystemMessage sm = new SystemMessage(614);
@@ -165,7 +188,7 @@ public class Spoil implements ISkillHandler
 				}
 				//target.addDamageHate(activeChar, 0, (int)skill.getPower());
 				target.getAI().notifyEvent(CtrlEvent.EVT_ATTACKED, activeChar);
-				activeChar.getAI().setIntention(CtrlIntention.AI_INTENTION_ATTACK, target);
+				//activeChar.getAI().setIntention(CtrlIntention.AI_INTENTION_ATTACK, target);
 			}
 		}
     } 

@@ -95,15 +95,24 @@ public class Pdam implements ISkillHandler
             
             boolean soul = (weapon != null && weapon.getChargedSoulshot() == L2ItemInstance.CHARGED_SOULSHOT);
 
-            if (L2Skill.CRIT_ATTACK == 0) damage = 0;
-           _log.warning("CRIT ATTACK="+L2Skill.CRIT_ATTACK);
-            if (L2Skill.CRIT_ATTACK == 1)
+            if (!L2Skill.CRIT_ATTACK) damage = 0;
+            //_log.warning("CRIT ATTACK="+L2Skill.CRIT_ATTACK);
+            if (L2Skill.CRIT_ATTACK)
             {
             	
                     damage = (int) Formulas.getInstance().calcPhysDam(activeChar, target, skill, shld, true, dual, soul);
             }
             else if (skill.getCondition() != 16 && skill.getCondition() != 17)
             	damage = (int) Formulas.getInstance().calcPhysDam(activeChar, target, skill, shld, false, dual, soul);
+            
+            if (skill.getSkillType() == SkillType.DEATHLINK_PDAM)   
+            {   
+                 double cur = 2*activeChar.getCurrentHp();   
+                 double max = activeChar.getMaxHp();   
+                 if (cur<max)   
+                      damage *= Math.sqrt(max/cur);   
+                 else damage *= Math.pow(max/cur, 4);   
+            }
             if (damage > 5000 && activeChar instanceof L2PcInstance)
             {
                 String name = "";
@@ -172,7 +181,7 @@ public class Pdam implements ISkillHandler
                        }               
                 if (activeChar instanceof L2PcInstance)
                 {
-                    if (L2Skill.CRIT_ATTACK == 1) activeChar.sendPacket(new SystemMessage(SystemMessage.CRITICAL_HIT));
+                    if (L2Skill.CRIT_ATTACK) activeChar.sendPacket(new SystemMessage(SystemMessage.CRITICAL_HIT));
                     
                     SystemMessage sm = new SystemMessage(SystemMessage.YOU_DID_S1_DMG);
                     sm.addNumber(damage);
@@ -299,6 +308,7 @@ public class Pdam implements ISkillHandler
         	activeChar.doDie(null);
         	activeChar.setCurrentHp(0);
         }
+        L2Skill.CRIT_ATTACK =false;
     }
 
     public SkillType[] getSkillIds()

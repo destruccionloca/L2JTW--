@@ -35,7 +35,7 @@ public class L2SkillCharge extends L2Skill {
 			}
 			else
             {
-                SystemMessage sm = new SystemMessage(324);
+                SystemMessage sm = new SystemMessage(1196);
                 caster.sendPacket(sm);
             }
             return;

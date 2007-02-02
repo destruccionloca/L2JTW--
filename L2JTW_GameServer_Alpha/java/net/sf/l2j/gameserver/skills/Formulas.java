@@ -1024,10 +1024,14 @@ public final class Formulas
 		double damage = attacker.getPAtk(target);
 		double defence = target.getPDef(attacker);
 		if (ss) damage *= 2;
-		if (skill != null)
+		if (skill != null && skill.getSkillType() != SkillType.SPOILATK && skill.getSkillType() != SkillType.CHARGEATK)
 		{
 			damage += skill.getPower();
 			//damage += skill.getPower() * 0.7 * attacker.getPAtk(target)/defence;
+		}
+		if(skill !=null && (skill.getSkillType() == SkillType.SPOILATK || skill.getSkillType() == SkillType.CHARGEATK))
+		{
+			damage += attacker.getPAtk(target);
 		}
 		// In C5 summons make 10 % less dmg in PvP.
 		if(attacker instanceof L2Summon && target instanceof L2PcInstance) damage *= 0.9;

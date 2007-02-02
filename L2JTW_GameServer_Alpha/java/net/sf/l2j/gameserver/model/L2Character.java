@@ -1135,12 +1135,12 @@ public abstract class L2Character extends L2Object
 		
 		if (isSkillDisabled(skill.getId()))
 		{
-			if (this instanceof L2PcInstance) 
-            {
-				SystemMessage sm = new SystemMessage(SystemMessage.S1_PREPARED_FOR_REUSE);
-				sm.addSkillName(skill.getId());
-				sendPacket(sm);
-			}
+			//if (this instanceof L2PcInstance) 
+            //{
+				//SystemMessage sm = new SystemMessage(SystemMessage.S1_PREPARED_FOR_REUSE);
+				//sm.addSkillName(skill.getId());
+				//sendPacket(sm);
+			//}
             
 			return;
 		}
@@ -1204,7 +1204,7 @@ public abstract class L2Character extends L2Object
 				skill.getTargetType() == L2Skill.SkillTargetType.TARGET_CLAN || 
 				skill.getTargetType() == L2Skill.SkillTargetType.TARGET_ALLY)
 		{
-			
+			//_log.warning("SKILLID:"+skill.getId());
             target = (L2Character) targets[0];
 			if (this instanceof L2PcInstance && target instanceof L2PcInstance && target.getAI().getIntention() == CtrlIntention.AI_INTENTION_ATTACK)
 			{
@@ -1221,7 +1221,7 @@ public abstract class L2Character extends L2Object
 		} 
         else
 			target = (L2Character) getTarget();
-		
+	
        if(skill.getTargetType() == SkillTargetType.TARGET_AURA)
            target = this;
 		

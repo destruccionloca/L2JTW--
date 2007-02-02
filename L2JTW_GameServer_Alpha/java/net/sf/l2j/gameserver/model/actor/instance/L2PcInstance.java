@@ -6366,7 +6366,7 @@ public final class L2PcInstance extends L2PlayableInstance
             	else
                 {
             		// Send a System Message to the caster
-            		sendPacket(new SystemMessage(SystemMessage.NOT_ENOUGH_ITEMS));
+            		sendPacket(new SystemMessage(113));
             		return;
                 }
             }

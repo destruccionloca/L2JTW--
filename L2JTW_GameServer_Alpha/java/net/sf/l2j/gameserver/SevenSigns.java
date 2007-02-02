@@ -219,7 +219,7 @@ public class SevenSigns
 				for (AutoSpawnInstance spawnInst: _preacherSpawns.values())
 					AutoSpawnHandler.getInstance().setSpawnActive(spawnInst, false);
                 
-				AutoChatHandler.getInstance().setAutoChatActive(false);
+				AutoChatHandler.getInstance().setAutoChatActive(true);
 	        }
 			
 	        if (getSealOwner(SEAL_AVARICE) == getCabalHighestScore() && getSealOwner(SEAL_AVARICE) != CABAL_NULL)

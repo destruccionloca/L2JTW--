@@ -41,6 +41,7 @@ public class L2SkillChargeDmg extends L2Skill
                 return false;
             }
         }
+        _log.warning("check");
         return super.checkCondition(activeChar, false);
     }
     
@@ -55,20 +56,22 @@ public class L2SkillChargeDmg extends L2Skill
         EffectCharge effect = (EffectCharge) caster.getEffect(charge_skill_id);
         if (effect == null || effect.num_charges < this.num_charges)
         {
-            SystemMessage sm = new SystemMessage(614);
-            sm.addString("SYS");
-            sm.addString("¾®»E¤£¨¬");
+            SystemMessage sm = new SystemMessage(113);
+            sm.addSkillName(this.getId());
             caster.sendPacket(sm);
             return;
         }
-        effect.num_charges -= this.num_charges;
+        
         double modifier = 0;
 
         modifier = effect.num_charges*0.333;
-
-           effect.num_charges = 0;
+        
+        effect.num_charges -= this.num_charges;
+        
+           //effect.num_charges = 0;
            caster.updateEffectIcons();
-           effect.exit();
+           if(effect.num_charges < 1)
+        	   effect.exit();
        
 
         boolean ss = false;

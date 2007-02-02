@@ -141,6 +141,14 @@ public class Mdam implements ISkillHandler
             
            int damage = (int) Formulas.getInstance().calcMagicDam(activeChar, target, skill, ss, bss, mcrit);
             
+           if (skill.getSkillType() == SkillType.DEATHLINK)   
+           {   
+                double cur = 2*activeChar.getCurrentHp();   
+                double max = activeChar.getMaxHp();   
+                if (cur<max)   
+                     damage *= Math.sqrt(max/cur);   
+                else damage *= Math.pow(max/cur, 4);   
+           }
 
             
             if (damage > 5000 && activeChar instanceof L2PcInstance)

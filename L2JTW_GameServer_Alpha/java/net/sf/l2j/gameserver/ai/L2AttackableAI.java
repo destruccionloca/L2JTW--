@@ -36,6 +36,7 @@ import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.L2Effect;
 import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2Skill;
+import net.sf.l2j.gameserver.model.L2Skill.SkillTargetType;
 import net.sf.l2j.gameserver.model.actor.instance.L2DoorInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2FestivalMonsterInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2FolkInstance;
@@ -1390,10 +1391,14 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
     	//---------------------------------------------------------------------------------
         //Debuff
              
-             if ((sk.getSkillType() == L2Skill.SkillType.DEBUFF||sk.getSkillType() == L2Skill.SkillType.MUTE) && (sk.getCastRange()>= distTarget || (MostHate.isMoving() && sk.getCastRange()*3>= distTarget)))
+             if ((sk.getSkillType() == L2Skill.SkillType.DEBUFF||sk.getSkillType() == L2Skill.SkillType.MUTE)
+            		 && ((sk.getCastRange()>= distTarget || (MostHate.isMoving() && sk.getCastRange()*3>= distTarget))
+            				 || !(sk.getTargetType() == SkillTargetType.TARGET_ONE)))
              {
+            	// _log.warning("1");
             	 boolean candebuff=true;
                  L2Effect[] effects = (MostHate).getAllEffects();
+                 if(sk.getTargetType() == SkillTargetType.TARGET_ONE)
                  for (int i = 0; effects != null && i < effects.length; i++)
                  {
                      L2Effect effect = effects[i];
@@ -1403,8 +1408,10 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
                     	 break;
                      }
                  }
+                // _log.warning("2");
                  if(candebuff)
                  {
+                //	 _log.warning("3");
                  clientStopMoving(null);
                  _actor.setTarget(MostHate);
                  _accessor.doCast(sk);
@@ -1416,7 +1423,8 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
          //--------------------------------------------------------------------------------
          // Sleep Type
          // Only cast when target is moving or out of attack range or random...probably =_=
-             if ((sk.getSkillType() == L2Skill.SkillType.SLEEP) && (sk.getCastRange()>= distTarget || (MostHate.isMoving() && sk.getCastRange()*3>= distTarget)))
+             if ((sk.getSkillType() == L2Skill.SkillType.SLEEP)&& ((sk.getCastRange()>= distTarget || (MostHate.isMoving() && sk.getCastRange()*3>= distTarget))
+    				 || !(sk.getTargetType() == SkillTargetType.TARGET_ONE)))
              {
             	 boolean cancast=true;
             	 if(MostHate.isMoving()||caster.getPhysicalAttackRange()<distTarget || Rnd.nextInt(5)>1)
@@ -1472,7 +1480,8 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
             		 || sk.getSkillType() == L2Skill.SkillType.BLEED
             		 || sk.getSkillType() == L2Skill.SkillType.POISON
             		 || sk.getSkillType() == L2Skill.SkillType.DOT)
-            		 && (sk.getCastRange()>= distTarget || (MostHate.isMoving() && sk.getCastRange()*3>= distTarget)))
+            		 && ((sk.getCastRange()>= distTarget || (MostHate.isMoving() && sk.getCastRange()*3>= distTarget))
+            				 || !(sk.getTargetType() == SkillTargetType.TARGET_ONE)))
              {
             	 boolean cancast=true;
             	 
@@ -1537,7 +1546,8 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
     		//---------------------------------------------------------------------
             // Rest of the Skill that can be use...
             
-    		if(sk.getCastRange()>= distTarget)
+    		if((sk.getCastRange()>= distTarget)&& ((sk.getCastRange()>= distTarget || (MostHate.isMoving() && sk.getCastRange()*3>= distTarget))
+   				 || !(sk.getTargetType() == SkillTargetType.TARGET_ONE)))
     		{
                 clientStopMoving(null);
                 _actor.setTarget(MostHate);
@@ -1615,7 +1625,8 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         			||sk.getSkillType()==L2Skill.SkillType.SLEEP
         			||sk.getSkillType()==L2Skill.SkillType.PARALYZE
         			||sk.getSkillType()==L2Skill.SkillType.STUN
-        			||sk.getSkillType()==L2Skill.SkillType.MUTE) && sk.getCastRange()>=distTarget)
+        			||sk.getSkillType()==L2Skill.SkillType.MUTE)&& ((sk.getCastRange()>= distTarget || (MostHate.isMoving() && sk.getCastRange()*3>= distTarget))
+           				 || !(sk.getTargetType() == SkillTargetType.TARGET_ONE)))
         	{
    			 L2Effect[] effects = (MostHate).getAllEffects();
              for (int i = 0; effects != null && i < effects.length; i++)
