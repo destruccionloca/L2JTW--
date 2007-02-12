@@ -25,6 +25,7 @@ import java.util.logging.Level;
 import javolution.util.FastList;
 import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.model.L2Skill.SkillType;
+import net.sf.l2j.gameserver.skills.conditions.Condition;
 import net.sf.l2j.gameserver.templates.StatsSet;
 
 import org.w3c.dom.Document;
@@ -81,7 +82,7 @@ final class DocumentSkill extends DocumentBase {
             return tables.get(name)[currentSkill.currentLevel];
         } catch (RuntimeException e)
         {
-            _log.log(Level.SEVERE, "error in table of skill Id "+currentSkill.id, e);
+            _log.log(Level.SEVERE, "error in table: "+name+" of skill Id "+currentSkill.id, e);
             return 0;
         }
 	}
@@ -241,6 +242,8 @@ final class DocumentSkill extends DocumentBase {
 		}
         for (int i=lastLvl; i < lastLvl+enchantLevels1; i++)
         {
+        	//[Nemesiss] Enchtanted skill will default take effects from maxLvL of norm skill
+        	currentSkill.currentLevel = lastLvl-1;
             for (n=first; n != null; n = n.getNextSibling())
             {
                 if ("cond".equalsIgnoreCase(n.getNodeName()))
@@ -275,6 +278,8 @@ final class DocumentSkill extends DocumentBase {
         }
         for (int i=lastLvl+enchantLevels1; i < lastLvl+enchantLevels1+enchantLevels2; i++)
         {
+            //[Nemesiss] Enchtanted skill will default take effects from maxLvL of norm skill
+        	currentSkill.currentLevel = lastLvl-1;
             for (n=first; n != null; n = n.getNextSibling())
             {
                 if ("cond".equalsIgnoreCase(n.getNodeName()))

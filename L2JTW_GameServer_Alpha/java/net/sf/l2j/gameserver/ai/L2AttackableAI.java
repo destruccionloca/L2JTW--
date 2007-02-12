@@ -48,6 +48,7 @@ import net.sf.l2j.gameserver.model.actor.instance.L2MinionInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2BossInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.model.actor.instance.L2PenaltyMonsterInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2RaidBossInstance;
 import net.sf.l2j.gameserver.templates.L2Weapon;
 import net.sf.l2j.gameserver.templates.L2WeaponType;
@@ -1062,6 +1063,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
             			else
             			onSkillCast(_actor);
             			return;
+
                     }
             	}
 

@@ -34,9 +34,9 @@ import javolution.text.TextBuilder;
 
 import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.Announcements;
-import net.sf.l2j.gameserver.ItemTable;
-import net.sf.l2j.gameserver.NpcTable;
-import net.sf.l2j.gameserver.SpawnTable;
+import net.sf.l2j.gameserver.datatables.ItemTable;
+import net.sf.l2j.gameserver.datatables.NpcTable;
+import net.sf.l2j.gameserver.datatables.SpawnTable;
 import net.sf.l2j.gameserver.ThreadPoolManager;
 import net.sf.l2j.gameserver.model.L2Effect;
 import net.sf.l2j.gameserver.model.L2Spawn;

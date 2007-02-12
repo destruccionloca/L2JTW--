@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 
 import net.sf.l2j.gameserver.ThreadPoolManager;
-import net.sf.l2j.gameserver.NpcTable;
+import net.sf.l2j.gameserver.datatables.NpcTable;
 import net.sf.l2j.gameserver.lib.Rnd;
 import net.sf.l2j.gameserver.model.L2Attackable;
 import net.sf.l2j.gameserver.model.L2Character;

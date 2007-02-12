@@ -99,14 +99,10 @@ public class Sweep implements ISkillHandler
 						player.sendPacket(smsg);
 					}
 				}
-	            target.endDecayTask();
             }
-            else
-            {
-            	SystemMessage smsg;
-            	smsg = new SystemMessage(343);
-            	player.sendPacket(smsg);
-            }
+
+            target.endDecayTask();
+
             
     		if (send)
     		{

@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.SevenSigns;
 import net.sf.l2j.gameserver.SevenSignsFestival;
-import net.sf.l2j.gameserver.SkillTable;
+import net.sf.l2j.gameserver.datatables.SkillTable;
 import net.sf.l2j.gameserver.instancemanager.ClanHallManager;
 import net.sf.l2j.gameserver.instancemanager.SiegeManager;
 import net.sf.l2j.gameserver.lib.Rnd;
@@ -44,7 +44,10 @@ import net.sf.l2j.gameserver.model.actor.instance.L2MonsterInstance;
 import net.sf.l2j.gameserver.model.entity.ClanHall;
 import net.sf.l2j.gameserver.model.entity.Siege;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
-import net.sf.l2j.gameserver.skills.ConditionPlayerState.CheckPlayerState;
+import net.sf.l2j.gameserver.skills.conditions.ConditionPlayerState;
+import net.sf.l2j.gameserver.skills.conditions.ConditionUsingItemType;
+import net.sf.l2j.gameserver.skills.conditions.ConditionPlayerState.CheckPlayerState;
+import net.sf.l2j.gameserver.skills.funcs.Func;
 import net.sf.l2j.gameserver.templates.L2Armor;
 import net.sf.l2j.gameserver.templates.L2PcTemplate;
 import net.sf.l2j.gameserver.templates.L2Weapon;
@@ -1750,25 +1753,10 @@ public final class Formulas
 
 	public boolean calcMagicSuccess(L2Character attacker, L2Character target, L2Skill skill)
 	{
-		/* Level difference: 
-		 *  less then 10 : full chance
-		 *  10 - 20      : reduced chance
-		 *  20 and more  : min chance
-		 */
-		int value = target.isRaid() ? 130 : 170; // chance is reduced for RaidBoss
-		int lvlDepend = 6;
+		double lvlDifference = (target.getLevel() - (skill.getMagicLevel() > 0 ? skill.getMagicLevel() : attacker.getLevel()));
+		int rate = Math.round((float)(Math.pow(1.3, lvlDifference) * 100));
 
-		// TODO: Temporary fix for NPC skills with MagicLevel not set
-		// int lvlmodifier = (skill.getMagicLevel() - target.getLevel()) * lvlDepend;
-		int lvlmodifier = ((skill.getMagicLevel() > 0 ? skill.getMagicLevel() : attacker.getLevel()) - target.getLevel())
-			* lvlDepend;
-
-		int rate = value + lvlmodifier;
-
-		if (rate > 99) rate = 99;
-		else if (rate < 1) rate = 1;
-
-		return (Rnd.get(100) < rate);
+		return (Rnd.get(10000) > rate);
 	}
 
 	public boolean calcAltSkillSuccess(L2Character activeChar, L2Character target, L2Skill skill)

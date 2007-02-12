@@ -25,17 +25,17 @@ import javolution.text.TextBuilder;
 import javolution.util.FastList;
 import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.ClientThread;
-import net.sf.l2j.gameserver.HelperBuffTable;
-import net.sf.l2j.gameserver.ItemTable;
-import net.sf.l2j.gameserver.NpcTable;
 import net.sf.l2j.gameserver.Olympiad;
 import net.sf.l2j.gameserver.SevenSigns;
 import net.sf.l2j.gameserver.SevenSignsFestival;
-import net.sf.l2j.gameserver.SkillTable;
-import net.sf.l2j.gameserver.SpawnTable;
 import net.sf.l2j.gameserver.ThreadPoolManager;
 import net.sf.l2j.gameserver.ai.CtrlIntention;
 import net.sf.l2j.gameserver.cache.HtmCache;
+import net.sf.l2j.gameserver.datatables.HelperBuffTable;
+import net.sf.l2j.gameserver.datatables.ItemTable;
+import net.sf.l2j.gameserver.datatables.NpcTable;
+import net.sf.l2j.gameserver.datatables.SkillTable;
+import net.sf.l2j.gameserver.datatables.SpawnTable;
 import net.sf.l2j.gameserver.idfactory.IdFactory;
 import net.sf.l2j.gameserver.instancemanager.CastleManager;
 import net.sf.l2j.gameserver.instancemanager.QuestManager;
@@ -111,6 +111,9 @@ public class L2NpcInstance extends L2Character
     
     /** The busy message for this L2NpcInstance */
     private String _BusyMessage = "";
+    
+    /** True if endDecayTask has already been called */
+    volatile boolean _isDecayed = false;
     
     /** True if a Dwarf has used Spoil on this L2NpcInstance */
     private boolean _IsSpoil = false;
@@ -2282,10 +2285,21 @@ public class L2NpcInstance extends L2Character
         return this.getTemplate().name;
     }
     
+    public boolean isDecayed() {
+    	return _isDecayed;
+    }
+    
+    public void setDecayed(boolean decayed) {
+    	_isDecayed = decayed;
+    }
+    
     public void endDecayTask()
     {
-    	onDecay();
-        DecayTaskManager.getInstance().cancelDecayTask(this);
+    	if (!isDecayed()) {
+    		_isDecayed = true;
+	    	onDecay();
+	        DecayTaskManager.getInstance().cancelDecayTask(this);
+    	}
     }
 }
 

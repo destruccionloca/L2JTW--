@@ -26,10 +26,10 @@ import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.L2Effect;
 import net.sf.l2j.gameserver.model.L2ItemInstance;
 import net.sf.l2j.gameserver.model.L2Skill;
-import net.sf.l2j.gameserver.skills.EffectTemplate;
 import net.sf.l2j.gameserver.skills.Env;
-import net.sf.l2j.gameserver.skills.Func;
-import net.sf.l2j.gameserver.skills.FuncTemplate;
+import net.sf.l2j.gameserver.skills.effects.EffectTemplate;
+import net.sf.l2j.gameserver.skills.funcs.Func;
+import net.sf.l2j.gameserver.skills.funcs.FuncTemplate;
 
 /**
  * This class contains all informations concerning the item (weapon, armor, etc).<BR>
@@ -129,6 +129,9 @@ public abstract class L2Item
 	private final int _referencePrice;
 	private final int _crystalCount;
 	private final boolean _sellable;
+	private final boolean _dropable;
+	private final boolean _destroyable;
+	private final boolean _tradeable;
 	
 	protected final Enum _type;
 	
@@ -174,6 +177,9 @@ public abstract class L2Item
 		_referencePrice = set.getInteger("price");
 		_crystalCount   = set.getInteger("crystal_count", 0);
 		_sellable       = set.getBool("sellable", true);
+		_dropable       = set.getBool("dropable", true);
+		_destroyable	= set.getBool("destroyable", true);
+		_tradeable	= set.getBool("tradeable", true);
 	}
 	
 	/**
@@ -363,6 +369,33 @@ public abstract class L2Item
 		return _sellable;
 	}
     
+	/**
+	 * Returns if the item can dropped
+	 * @return boolean
+	 */
+	public final boolean isDropable()
+	{
+		return _dropable;
+	}
+
+	/**
+	 * Returns if the item can destroy
+	 * @return boolean
+	 */
+	public final boolean isDestroyable()
+	{
+		return _destroyable;
+	}
+
+	/**
+	 * Returns if the item can add to trade
+	 * @return boolean
+	 */
+	public final boolean isTradeable()
+	{
+		return _tradeable;
+	}
+
     /**
      * Returns if item is for hatchling
      * @return boolean

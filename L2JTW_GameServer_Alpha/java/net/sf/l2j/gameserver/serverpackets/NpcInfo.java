@@ -64,8 +64,12 @@ public class NpcInfo extends ServerBasePacket
 		_isSummoned = false;
         collisionHeight = _cha.getTemplate().collisionHeight;
         collisionRadius = _cha.getTemplate().collisionRadius;
+        if (_cha.getTemplate().basePAtkSpd>0 &&  _cha.getPAtkSpd()>0)
         _atkspdMul = _cha.getPAtkSpd()/_cha.getTemplate().basePAtkSpd;
+        else _atkspdMul = 1;
+        if (_cha.getTemplate().baseRunSpd>0 && _cha.getRunSpeed()>0)
         _movespdMul = _cha.getRunSpeed()/_cha.getTemplate().baseRunSpd;
+        else _movespdMul = 1;
         if (_atkspdMul<1) _atkspdMul = 1;
         if (_movespdMul<1) _movespdMul = 1;
         if (cha.getTemplate().serverSideName)

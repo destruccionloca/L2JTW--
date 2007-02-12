@@ -35,14 +35,14 @@ import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.GeoData;
 import net.sf.l2j.gameserver.Olympiad;
 import net.sf.l2j.gameserver.GameTimeController;
-import net.sf.l2j.gameserver.MapRegionTable;
-import net.sf.l2j.gameserver.SkillTable;
 import net.sf.l2j.gameserver.ThreadPoolManager;
-import net.sf.l2j.gameserver.MapRegionTable.TeleportWhereType;
 import net.sf.l2j.gameserver.ai.CtrlEvent;
 import net.sf.l2j.gameserver.ai.CtrlIntention;
 import net.sf.l2j.gameserver.ai.L2AttackableAI;
 import net.sf.l2j.gameserver.ai.L2CharacterAI;
+import net.sf.l2j.gameserver.datatables.MapRegionTable;
+import net.sf.l2j.gameserver.datatables.SkillTable;
+import net.sf.l2j.gameserver.datatables.MapRegionTable.TeleportWhereType;
 import net.sf.l2j.gameserver.handler.ISkillHandler;
 import net.sf.l2j.gameserver.handler.SkillHandler;
 import net.sf.l2j.gameserver.instancemanager.ZoneManager;
@@ -94,8 +94,8 @@ import net.sf.l2j.gameserver.serverpackets.TargetUnselected;
 import net.sf.l2j.gameserver.serverpackets.TeleportToLocation;
 import net.sf.l2j.gameserver.skills.Calculator;
 import net.sf.l2j.gameserver.skills.Formulas;
-import net.sf.l2j.gameserver.skills.Func;
 import net.sf.l2j.gameserver.skills.Stats;
+import net.sf.l2j.gameserver.skills.funcs.Func;
 import net.sf.l2j.gameserver.templates.L2CharTemplate;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
 import net.sf.l2j.gameserver.templates.L2Weapon;
@@ -517,18 +517,20 @@ public abstract class L2Character extends L2Object
             sendPacket(new ActionFailed());
             return;
         }
-        
-        // Get the active weapon instance (always equiped in the right hand)
-        L2ItemInstance weaponInst = getActiveWeaponInstance();
-        
-        // Get the active weapon item corresponding to the active weapon instance (always equiped in the right hand)
-        L2Weapon weaponItem = getActiveWeaponItem();
-        
-        if ((weaponItem!=null && weaponItem.getItemType() == L2WeaponType.ROD))
-        {
-            //  You can't make an attack with a fishing pole.
-            ((L2PcInstance)this).sendPacket(new SystemMessage(1472));
-            getAI().setIntention(CtrlIntention.AI_INTENTION_IDLE);
+
+		
+		// Get the active weapon instance (always equiped in the right hand)
+		L2ItemInstance weaponInst = getActiveWeaponInstance();
+		
+		// Get the active weapon item corresponding to the active weapon instance (always equiped in the right hand)
+		L2Weapon weaponItem = getActiveWeaponItem();
+		
+		if (weaponItem != null && weaponItem.getItemType() == L2WeaponType.ROD)
+		{
+			//	You can't make an attack with a fishing pole.
+			((L2PcInstance)this).sendPacket(new SystemMessage(SystemMessage.CANNOT_ATTACK_WITH_FISHING_POLE));
+			getAI().setIntention(CtrlIntention.AI_INTENTION_IDLE);
+
 
             ActionFailed af = new ActionFailed();
             sendPacket(af);
@@ -1174,11 +1176,11 @@ public abstract class L2Character extends L2Object
             else if (this instanceof L2Summon)
                 ((L2Summon)this).getOwner().rechargeAutoSoulShot(false, true, true);
         }
-        else if (skill.useFishShot())
-        {
-        	if (this instanceof L2PcInstance) 
-        	  ((L2PcInstance)this).rechargeAutoSoulShot(true, false, false);
-        }
+        //else if (skill.useFishShot())
+        //{
+        //	if (this instanceof L2PcInstance) 
+        //	  ((L2PcInstance)this).rechargeAutoSoulShot(true, false, false);
+        //}
         
 		// Get all possible targets of the skill in a table in function of the skill target type
 		L2Object[] targets = skill.getTargetList(this);
@@ -1320,7 +1322,7 @@ public abstract class L2Character extends L2Object
                 }
       
 		// Send a system message USE_S1 to the L2Character
-		if (this instanceof L2PcInstance) 
+		if (this instanceof L2PcInstance && magicId != 1312) 
         {
 			SystemMessage sm = new SystemMessage(SystemMessage.USE_S1);
 			sm.addSkillName(magicId);
@@ -3698,7 +3700,7 @@ public abstract class L2Character extends L2Object
 			{
 				broadcastPacket(new TargetUnselected(this));
 			}
-			if (isAttackingNow() && getAI().getAttackTarget() == _target)
+			/*if (isAttackingNow() && getAI().getAttackTarget() == _target)
 			{
 				abortAttack();
 				
@@ -3724,7 +3726,7 @@ public abstract class L2Character extends L2Object
 					sm.addString("¬I®i¤¤Â_");
 					sendPacket(sm);
 				}
-			}
+			}*/
 		}
 		
 		_target = object;
@@ -4387,6 +4389,10 @@ public abstract class L2Character extends L2Object
 					{
 						int reflectedDamage = (int)((reflectPercent) / 100 * damage);
 						damage -= reflectedDamage;
+						
+						if(reflectedDamage > target.getMaxHp()) // to prevent extreme damage when hitting a low lvl char...
+							reflectedDamage = target.getMaxHp();
+						
 						getStatus().reduceHp(reflectedDamage, null, true);
 
                         /*

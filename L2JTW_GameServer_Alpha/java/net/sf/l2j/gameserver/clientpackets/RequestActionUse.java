@@ -240,7 +240,7 @@ public class RequestActionUse extends ClientBasePacket
 					else if (activeChar.isFishing())
                     {
                         //You can't mount, dismount, break and drop items while fishing
-                        SystemMessage msg = new SystemMessage(1470);
+                        SystemMessage msg = new SystemMessage(SystemMessage.CANNOT_DO_WHILE_FISHING_2);
                         activeChar.sendPacket(msg);
                         msg = null;
                     }
@@ -448,10 +448,11 @@ public class RequestActionUse extends ClientBasePacket
         	}
 
         	L2Skill skill = _skills.get(skillId);
-            
+
         	if (skill == null) 
         	{
-        		_log.warning("Skill " + skillId + " missing from npcskills.sql for a summon id " + activeSummon.getNpcId());
+        		if (Config.DEBUG)
+        			_log.warning("Skill " + skillId + " missing from npcskills.sql for a summon id " + activeSummon.getNpcId());
         		return;
         	}
         	

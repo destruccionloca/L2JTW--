@@ -28,7 +28,7 @@ import javolution.text.TextBuilder;
 import javolution.util.FastList;
 import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.GeoData; 
-import net.sf.l2j.gameserver.SkillTreeTable;
+import net.sf.l2j.gameserver.datatables.SkillTreeTable;
 import net.sf.l2j.gameserver.ai.CtrlEvent;
 import net.sf.l2j.gameserver.instancemanager.ArenaManager;
 import net.sf.l2j.gameserver.instancemanager.CastleManager;
@@ -45,26 +45,26 @@ import net.sf.l2j.gameserver.model.actor.instance.L2PlayableInstance;
 import net.sf.l2j.gameserver.model.base.ClassId;
 import net.sf.l2j.gameserver.model.entity.Castle;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
-import net.sf.l2j.gameserver.skills.Condition;
-import net.sf.l2j.gameserver.skills.EffectCharge;
-import net.sf.l2j.gameserver.skills.EffectTemplate;
 import net.sf.l2j.gameserver.skills.Env;
-import net.sf.l2j.gameserver.skills.Formulas;
-import net.sf.l2j.gameserver.skills.Func;
-import net.sf.l2j.gameserver.skills.FuncTemplate;
-import net.sf.l2j.gameserver.skills.L2SkillChargeAtk;
-import net.sf.l2j.gameserver.skills.L2SkillCharge;
-import net.sf.l2j.gameserver.skills.L2SkillChargeDmg;
-import net.sf.l2j.gameserver.skills.L2SkillCreateItem;
-import net.sf.l2j.gameserver.skills.L2SkillDefault;
-import net.sf.l2j.gameserver.skills.L2SkillDrain;
-import net.sf.l2j.gameserver.skills.L2SkillSeed;
-import net.sf.l2j.gameserver.skills.L2SkillSummon;
-import net.sf.l2j.gameserver.skills.L2SkillElemental; 
-import net.sf.l2j.gameserver.skills.L2SkillCreateItem; 
-import net.sf.l2j.gameserver.skills.L2SkillSummonMob;
+
 import net.sf.l2j.gameserver.skills.Stats;
 import net.sf.l2j.gameserver.taskmanager.DecayTaskManager;
+import net.sf.l2j.gameserver.skills.conditions.Condition;
+import net.sf.l2j.gameserver.skills.effects.EffectCharge;
+import net.sf.l2j.gameserver.skills.effects.EffectTemplate;
+import net.sf.l2j.gameserver.skills.funcs.Func;
+import net.sf.l2j.gameserver.skills.funcs.FuncTemplate;
+import net.sf.l2j.gameserver.skills.l2skills.L2SkillCharge;
+import net.sf.l2j.gameserver.skills.l2skills.L2SkillChargeAtk;
+import net.sf.l2j.gameserver.skills.l2skills.L2SkillChargeDmg;
+import net.sf.l2j.gameserver.skills.l2skills.L2SkillCreateItem;
+import net.sf.l2j.gameserver.skills.l2skills.L2SkillDefault;
+import net.sf.l2j.gameserver.skills.l2skills.L2SkillDrain;
+import net.sf.l2j.gameserver.skills.l2skills.L2SkillSeed;
+import net.sf.l2j.gameserver.skills.l2skills.L2SkillSummon;
+import net.sf.l2j.gameserver.skills.l2skills.L2SkillElemental; 
+import net.sf.l2j.gameserver.skills.l2skills.L2SkillCreateItem; 
+import net.sf.l2j.gameserver.skills.l2skills.L2SkillSummonMob;
 import net.sf.l2j.gameserver.templates.L2WeaponType;
 import net.sf.l2j.gameserver.templates.StatsSet;
 import net.sf.l2j.gameserver.util.Util;
@@ -396,6 +396,7 @@ public abstract class L2Skill
     private final int _magicLevel;
     private final String[] _negateStats;
     private final float _negatePower;
+    private final int _negateId;
     private final int _levelDepend;
 
     // Effecting area of the skill, in radius.
@@ -489,6 +490,7 @@ public abstract class L2Skill
         _power = set.getFloat("power", 0.f);
         _negateStats = set.getString("negateStats", "").split(" ");
         _negatePower = set.getFloat("negatePower", 0.f);
+        _negateId = set.getInteger("negateId", 0);
         _magicLevel = set.getInteger("magicLvl", SkillTreeTable.getInstance().getMinSkillLevel(_id,
                                                                                                _level));
         _levelDepend = set.getInteger("lvlDepend", 0);
@@ -666,6 +668,11 @@ public abstract class L2Skill
     public final float getNegatePower()
     {
         return _negatePower;
+    }
+    
+    public final int getNegateId()
+    {
+    	return _negateId;
     }
     
     public final int getMagicLevel()
@@ -1396,7 +1403,7 @@ public abstract class L2Skill
                         if (obj == activeChar || obj == src) continue;
                     	if (src != null) 
                         {
-                    		if (!GeoData.getInstance().canSeeTarget(activeChar, (L2Character)obj))
+                    		if (!GeoData.getInstance().canSeeTarget(activeChar, obj))
                     			continue;
                             // check if both attacker and target are L2PcInstances and if they are in same party 
                             if (obj instanceof L2PcInstance) 

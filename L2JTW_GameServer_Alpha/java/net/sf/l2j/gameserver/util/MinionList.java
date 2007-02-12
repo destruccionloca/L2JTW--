@@ -37,7 +37,7 @@ import javolution.util.FastList;
 import javolution.util.FastMap;
 import javolution.util.FastSet;
 import net.sf.l2j.Config;
-import net.sf.l2j.gameserver.NpcTable;
+import net.sf.l2j.gameserver.datatables.NpcTable;
 import net.sf.l2j.gameserver.idfactory.IdFactory;
 import net.sf.l2j.gameserver.model.L2MinionData;
 import net.sf.l2j.gameserver.model.actor.instance.L2MinionInstance;
@@ -164,7 +164,7 @@ public class MinionList
          if (_respawnTasks != null)
              for(long deathTime : _respawnTasks.keySet())
              {
-                 int delay = 300000; // respawn delay 5 min
+                 double delay = Config.RAID_MINION_RESPAWN_TIMER;
                  if((current - deathTime) > delay)
                  {
                 	 spawnSingleMinion(_respawnTasks.get(deathTime));

@@ -24,9 +24,9 @@ import java.util.logging.Logger;
 
 import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.ClientThread;
-import net.sf.l2j.gameserver.ItemTable;
 import net.sf.l2j.gameserver.TradeController;
 import net.sf.l2j.gameserver.cache.HtmCache;
+import net.sf.l2j.gameserver.datatables.ItemTable;
 import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2TradeList;
 import net.sf.l2j.gameserver.model.actor.instance.L2FishermanInstance;
@@ -104,7 +104,7 @@ public class RequestBuyItem extends ClientBasePacket
 
         L2Object target = player.getTarget();
         if (!player.isGM() && (target == null								// No target (ie GM Shop)
-        		|| !(target instanceof L2MerchantInstance || target instanceof L2MercManagerInstance)	// Target not a merchant and not mercmanager
+        		|| !(target instanceof L2MerchantInstance || target instanceof L2FishermanInstance || target instanceof L2MercManagerInstance)	// Target not a merchant, fisherman or mercmanager
 			    || !player.isInsideRadius(target, L2NpcInstance.INTERACTION_DISTANCE, false, false) 	// Distance is too far
 			        )) return;
 

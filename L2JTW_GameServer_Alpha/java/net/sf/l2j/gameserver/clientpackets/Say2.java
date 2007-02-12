@@ -30,7 +30,7 @@ import java.sql.PreparedStatement;
 import net.sf.l2j.Base64;
 import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.ClientThread;
-import net.sf.l2j.gameserver.MapRegionTable;
+import net.sf.l2j.gameserver.datatables.MapRegionTable;
 import net.sf.l2j.gameserver.handler.IVoicedCommandHandler;
 import net.sf.l2j.gameserver.handler.VoicedCommandHandler;
 import net.sf.l2j.gameserver.instancemanager.PetitionManager;
