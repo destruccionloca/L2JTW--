@@ -274,12 +274,17 @@ public class L2Attackable extends L2NpcInstance
     public L2Attackable(int objectId, L2NpcTemplate template)
     {
         super(objectId, template);
-        super.setKnownList(new AttackableKnownList(new L2Attackable[] {this}));
+        this.getKnownList(); // init knownlist
         _haveToDrop = true;
         _mustGiveExpSp = true;
     }
 
-    public AttackableKnownList getKnownList() { return (AttackableKnownList)super.getKnownList(); }
+    public AttackableKnownList getKnownList()
+    {
+    	if(super.getKnownList() == null || !(super.getKnownList() instanceof AttackableKnownList))
+    		this.setKnownList(new AttackableKnownList(this));
+    	return (AttackableKnownList)super.getKnownList();
+    }
     
     /**
      * Return the L2Character AI of the L2Attackable and if its null create a new one.<BR><BR>
@@ -317,10 +322,7 @@ public class L2Attackable extends L2NpcInstance
            )
             return false;
         
-        if (target instanceof L2PcInstance)
-            return !((L2PcInstance)target).isInvul();
-        
-        return true;
+            return !target.isInvul();
     }
     
     /**
@@ -350,16 +352,11 @@ public class L2Attackable extends L2NpcInstance
             //if((this.getEffect(L2Effect.EffectType.CONFUSION)!=null) && (attacker.getEffect(L2Effect.EffectType.CONFUSION)!=null))
                 return;
         
-<<<<<<< .mine
         //if ((this instanceof L2MonsterInstance)&&(attacker instanceof L2MonsterInstance))
         //    if((this.getEffect(L2Effect.EffectType.CONFUSION)!=null) && (attacker.getEffect(L2Effect.EffectType.CONFUSION)!=null))
         //        return;
         
-=======	
-        if ((this instanceof L2MonsterInstance)&&(attacker instanceof L2MonsterInstance))
-            if((this.getEffect(L2Effect.EffectType.CONFUSION)!=null) && (attacker.getEffect(L2Effect.EffectType.CONFUSION)!=null))
-                return;
->>>>>>> .r144
+
         */
         if (this.isEventMob) return;
             
@@ -913,7 +910,7 @@ public class L2Attackable extends L2NpcInstance
           
     	AggroInfo ai = getAggroListRP().get(target);
         if (ai == null) return 0;
-    	if (ai.attacker instanceof L2PcInstance && (((L2PcInstance)ai.attacker).getInvisible() == 1 || ((L2PcInstance)ai.attacker).isInvul()))
+    	if (ai.attacker instanceof L2PcInstance && (((L2PcInstance)ai.attacker).getAppearance().getInvisible() || ai.attacker.isInvul()))
     	{
     		//Remove Object Should Use This Method and Can be Blocked While Interating
     		getAggroList().remove(target);            	
@@ -1256,7 +1253,8 @@ public class L2Attackable extends L2NpcInstance
          }
          
          // Check the drop of a cursed weapon
-         CursedWeaponsManager.getInstance().checkDrop(this, player);
+         if (levelModifier>0 && player.getLevel()>20)
+         	CursedWeaponsManager.getInstance().checkDrop(this, player);
 
          // now throw all categorized drops and handle spoil.
     	 for(L2DropCategory cat:npcTemplate.getDropData())

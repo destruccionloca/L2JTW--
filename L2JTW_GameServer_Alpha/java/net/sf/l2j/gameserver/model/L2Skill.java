@@ -30,6 +30,7 @@ import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.GeoData; 
 import net.sf.l2j.gameserver.datatables.SkillTreeTable;
 import net.sf.l2j.gameserver.ai.CtrlEvent;
+import net.sf.l2j.gameserver.datatables.SkillTable;
 import net.sf.l2j.gameserver.instancemanager.ArenaManager;
 import net.sf.l2j.gameserver.instancemanager.CastleManager;
 import net.sf.l2j.gameserver.instancemanager.ZoneManager;
@@ -42,6 +43,7 @@ import net.sf.l2j.gameserver.model.actor.instance.L2PetInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2CabaleBufferInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2MinionInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PlayableInstance;
+import net.sf.l2j.gameserver.model.actor.instance.L2SummonInstance;
 import net.sf.l2j.gameserver.model.base.ClassId;
 import net.sf.l2j.gameserver.model.entity.Castle;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
@@ -105,6 +107,7 @@ public abstract class L2Skill
 
 
 
+
 	public static enum SkillTargetType 
     {
 		TARGET_NONE,
@@ -134,6 +137,7 @@ public abstract class L2Skill
         TARGET_OWNER_PET,
         TARGET_ENEMY_ALLY,
         TARGET_ENEMY_SUMMON, 
+        
 	}
 	
 	public static enum SkillType 
@@ -144,7 +148,7 @@ public abstract class L2Skill
 	    DEATHLINK_PDAM,
 		MDAM,
 		MANAHEAL_PERCENT,
-		MDAM_ELEMENTAL (L2SkillElemental.class),
+		//MDAM_ELEMENTAL (L2SkillElemental.class),
 		DOT,
 		BLEED,
 		POISON,
@@ -223,6 +227,7 @@ public abstract class L2Skill
         WARRIOR_BANE,
         BETRAY,
         SUMMON_TREASURE_KEY,
+        SUMMON_FRIEND,
 		
 		// unimplemented
 		NOTDONE;
@@ -230,6 +235,7 @@ public abstract class L2Skill
 		private final Class<? extends L2Skill> _class;
 		
 		public L2Skill makeSkill(StatsSet set)
+
 
         {
             try
@@ -393,6 +399,7 @@ public abstract class L2Skill
     private final SkillTargetType _targetType;
 
     private final double _power;
+    private final int _effectPoints;
     private final int _magicLevel;
     private final String[] _negateStats;
     private final float _negatePower;
@@ -488,6 +495,7 @@ public abstract class L2Skill
 
         _targetType = set.getEnum("target", SkillTargetType.class);
         _power = set.getFloat("power", 0.f);
+        _effectPoints = set.getInteger("effectPoints", 0);
         _negateStats = set.getString("negateStats", "").split(" ");
         _negatePower = set.getFloat("negatePower", 0.f);
         _negateId = set.getInteger("negateId", 0);
@@ -658,6 +666,11 @@ public abstract class L2Skill
     public final double getPower()
     {
         return _power;
+    }
+    
+    public final int getEffectPoints()
+    {
+        return _effectPoints;
     }
     
     public final String[] getNegateStats()
@@ -1025,6 +1038,7 @@ public abstract class L2Skill
 	              case WEAKNESS:
 	              case SOULSHOT:
 	              case SPIRITSHOT:
+	              case SUMMON_FRIEND:
 	                  
 	            return true;
 	        default:
@@ -1099,7 +1113,7 @@ public abstract class L2Skill
             case MAGE_BANE:
             case WARRIOR_BANE:
             case AGGREMOVE:
-            case MDAM_ELEMENTAL:
+            //case MDAM_ELEMENTAL:
             case AGGREDUCE_CHAR:
             case BETRAY:
                 return true;
@@ -1271,6 +1285,7 @@ public abstract class L2Skill
                 L2PcInstance player = (L2PcInstance)activeChar;
                 EffectCharge e = (EffectCharge)player.getEffect(4271);
                 if(e == null || e.num_charges < this.getConditionValue())
+
                 {
                     SystemMessage sm = new SystemMessage(113);
                     sm.addSkillName(this.getId());
@@ -1305,7 +1320,7 @@ public abstract class L2Skill
                                     || skillType == SkillType.UNBLEED
                                     || skillType == SkillType.UNPOISON
                                     || skillType == SkillType.SEED
-                                    || skillType == SkillType.MDAM_ELEMENTAL
+                                    //|| skillType == SkillType.MDAM_ELEMENTAL
                             )))
                     {
                         activeChar.sendPacket(new SystemMessage(SystemMessage.TARGET_IS_INCORRECT));
@@ -1687,50 +1702,47 @@ public abstract class L2Skill
                         {
                             targetList.add(partyMember);
 
-                            
-                            if (partyMember.getPet() != null)
-                            {
-                                targetList.add(partyMember.getPet());
-                            }
-                        }
-                    }
-                }
-                return targetList.toArray(new L2Character[targetList.size()]);
-            }
-            case TARGET_PARTY_MEMBER:
-            {
-            	
-                if ((target != null
-                        && target == activeChar) 
-                    || (target != null
-                            && activeChar.getParty() != null
-                            && target.getParty() != null
-                            && activeChar.getParty().getPartyLeaderOID() == target.getParty().getPartyLeaderOID())
-                    || (target != null
-                            && activeChar instanceof L2PcInstance
-                            && target instanceof L2Summon
-                            && activeChar.getPet() == target)
-                    || (target != null
-                            && activeChar instanceof L2Summon
-                            && target instanceof L2PcInstance
-                            && activeChar == target.getPet()))
-                {
-                    if (!target.isDead()
-                            && Util.checkIfInRange(getSkillRadius(), activeChar, target, true))
-                    {
-                        // If a target is found, return it in a table else send a system message TARGET_IS_INCORRECT
-                        return new L2Character[]{target};
-                    }
-                    else
-                        return null;
-                }
-                else 
-                {
-                    activeChar.sendPacket(new SystemMessage(SystemMessage.TARGET_IS_INCORRECT));
-                    return null;
-                }
-            }
-//          ======================================================================================================================================================          
+
+							if (partyMember.getPet() != null && !partyMember.getPet().isDead())
+		                    {
+		                        targetList.add(partyMember.getPet());
+		                    }
+						}
+					}
+				}
+				return targetList.toArray(new L2Character[targetList.size()]);
+			}
+			case TARGET_PARTY_MEMBER:
+			{
+				if ((target != null
+						&& target == activeChar) 
+					|| (target != null
+							&& activeChar.getParty() != null
+							&& target.getParty() != null
+							&& activeChar.getParty().getPartyLeaderOID() == target.getParty().getPartyLeaderOID())
+					|| (target != null
+							&& activeChar instanceof L2PcInstance
+							&& target instanceof L2Summon
+							&& activeChar.getPet() == target)
+					|| (target != null
+							&& activeChar instanceof L2Summon
+							&& target instanceof L2PcInstance
+							&& activeChar == target.getPet()))
+				{
+					if (!target.isDead())
+					{
+						// If a target is found, return it in a table else send a system message TARGET_IS_INCORRECT
+						return new L2Character[]{target};
+					}
+					else
+						return null;
+				}
+				else 
+				{
+					activeChar.sendPacket(new SystemMessage(SystemMessage.TARGET_IS_INCORRECT));
+					return null;
+				}
+			}
             case TARGET_CORPSE_ALLY:
             case TARGET_ALLY:
             {
@@ -1739,6 +1751,9 @@ public abstract class L2Skill
                     int radius = getSkillRadius();
                     L2PcInstance player = (L2PcInstance) activeChar;
                     L2Clan clan = player.getClan();
+                    
+                    if (player.isInOlympiadMode())
+                    	return new L2Character[] {player};
                     
                     if (targetType != SkillTargetType.TARGET_CORPSE_ALLY)
                     {
@@ -1788,6 +1803,9 @@ public abstract class L2Skill
                     int radius = getSkillRadius();
                     L2PcInstance player = (L2PcInstance) activeChar;
                     L2Clan clan = player.getClan();
+                    
+                    if (player.isInOlympiadMode())
+                    	return new L2Character[] {player};
                     
                     if (targetType != SkillTargetType.TARGET_CORPSE_CLAN)
                     {   
@@ -2009,47 +2027,7 @@ public abstract class L2Skill
                     return null;
                 }
             }
-            case TARGET_ENEMY_ALLY:
-            {
-                //int charX, charY, charZ, targetX, targetY, targetZ, dx, dy, dz;
-                int radius = getSkillRadius();
-                L2Character newTarget;
-                
-                if (getCastRange() > -1 && target != null)
-                    newTarget = target;
-                else
-                    newTarget = activeChar;
-                
-                if (newTarget != activeChar || this.isSkillTypeOffensive())
-                    targetList.add(newTarget);
-                
-                for (L2Object obj : activeChar.getKnownList().getKnownObjects().values())
-                {
-                    if (obj == newTarget || !Util.checkIfInRange(radius, newTarget, obj, true))
-                            continue;
-                    
-                    if (obj instanceof L2Attackable)
-                    {
-                        target = (L2Character) obj;
-                        if(!target.isAlikeDead())
-                        {
-                            // Don't add this target if this is a PC->PC pvp casting and pvp condition not met
-                            if (activeChar instanceof L2PcInstance && !((L2PcInstance)activeChar).checkPvpSkill(obj, this))
-                                continue;
-                            
-                            // check if both attacker and target are L2PcInstances and if they are in same party or clan
-                            if (   (activeChar instanceof L2PcInstance && obj instanceof L2PcInstance) && 
-                                 (((L2PcInstance)activeChar).getClanId() != ((L2PcInstance)obj).getClanId() ||
-                                 (((L2PcInstance)activeChar).getAllyId() != ((L2PcInstance)obj).getAllyId() &&
-                                 ((((L2PcInstance)activeChar).getParty() != null && ((L2PcInstance)obj).getParty() != null) &&
-                                 ((L2PcInstance)activeChar).getParty().getPartyLeaderOID() != ((L2PcInstance)obj).getParty().getPartyLeaderOID() ))))
-                                continue;
-                            
-                            targetList.add((L2Character)obj);
-                        }
-                    }
-                }
-            }
+           
             case TARGET_CORPSE_PET:
             {
                 if (activeChar instanceof L2PcInstance)
@@ -2077,12 +2055,16 @@ public abstract class L2Skill
 
 
                 int radius = getSkillRadius();
+
                 if (cha != null && cha.getKnownList() != null)
                     for (L2Object obj : cha.getKnownList().getKnownObjects().values())
                     {
                         if (obj == null) continue;
-                    	if (!(obj instanceof L2NpcInstance)) continue;
-                        target = (L2NpcInstance) obj;
+                    	if (obj instanceof L2NpcInstance)
+                    		target = (L2NpcInstance) obj;
+                    	else if (obj instanceof L2SummonInstance)
+                    		target = (L2SummonInstance) obj;
+                    	else continue;
                         
                         if (!GeoData.getInstance().canSeeTarget(activeChar, target))
                 			continue;
@@ -2176,17 +2158,12 @@ public abstract class L2Skill
     {
         if (isPassive()) return _emptyEffectSet;
 
-        if (_effectTemplates == null) return _emptyEffectSet;
+        if (_effectTemplates == null) 
+        	return _emptyEffectSet;
+        
+        if ((effector != effected) && effected.isInvul())
+            return _emptyEffectSet;
 
-        if (effected instanceof L2PcInstance)
-        {
-            L2PcInstance targetplayer = (L2PcInstance) effected;
-            //No effect on invulnerable players unless they cast it themselves.
-            if ((effector != effected) && targetplayer.isInvul())
-            {
-                return _emptyEffectSet;
-            }
-        }
 
         List<L2Effect> effects = new FastList<L2Effect>();
 
@@ -2204,6 +2181,47 @@ public abstract class L2Skill
 
         return effects.toArray(new L2Effect[effects.size()]);
     }
+
+/*
+        List<L2Effect> effects = new FastList<L2Effect>();
+
+        for (EffectTemplate et : _effectTemplatesSelf)
+        {
+            Env env = new Env();
+            env._player = effector;
+            env._target = effector;
+            env._skill = this;
+            L2Effect e = et.getEffect(env);
+            if (e != null)                
+            {
+                //Implements effect charge
+                if (e.getEffectType()== L2Effect.EffectType.CHARGE)
+                {               
+                	env._skill = SkillTable.getInstance().getInfo(8, effector.getSkillLevel(8));
+                    EffectCharge effect = (EffectCharge) env._target.getEffect(L2Effect.EffectType.CHARGE);
+                    if (effect != null) 
+                    {
+                    	int effectcharge = effect.getLevel();
+                        if (effectcharge < _num_charges)
+                        {
+                        	effectcharge++;
+                            effect.addNumCharges(effectcharge);
+                            env._target.updateEffectIcons();
+                            SystemMessage sm = new SystemMessage(614);
+                            sm.addString("Charged to " + effectcharge);
+                            env._target.sendPacket(sm);
+                        }                
+                    }
+                    else effects.add(e);
+                }
+                else effects.add(e);                
+            }
+        }
+        if (effects.size() == 0) return _emptyEffectSet;
+
+        return effects.toArray(new L2Effect[effects.size()]);
+    }
+    */
 
     public final void attach(FuncTemplate f)
     {

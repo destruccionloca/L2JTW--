@@ -70,7 +70,7 @@ public class SQLAccountManager
 			while (_uname.length() == 0)
 			{
 				System.out.print("使用者名稱: ");
-				_uname = _in.readLine();
+				_uname = _in.readLine().toLowerCase();
 			}
 			
 			if (_mode.equals("1"))

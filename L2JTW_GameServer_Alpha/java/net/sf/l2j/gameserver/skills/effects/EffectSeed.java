@@ -19,52 +19,36 @@
 package net.sf.l2j.gameserver.skills.effects;
 
 import net.sf.l2j.gameserver.model.L2Effect;
-import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.skills.Env;
 
 public final class EffectSeed extends L2Effect {
+
+	int _power = 1;
     
-public int num_seeds;
+    public EffectSeed(Env env, EffectTemplate template)
+	{
+		super(env, template);
+	}
+
+	public EffectType getEffectType()
+	{
+		return EffectType.SEED;
+	}
+
+	public boolean onActionTime()
+    {
+    	// just stop this effect
+    	return false;
+    }
     
-public EffectSeed(Env env, EffectTemplate template)
-{
-    super(env, template);
-    num_seeds = 1;
-    env._target.updateEffectIcons();
-    SystemMessage sm = new SystemMessage(614);
+    public int getPower()
+    {
+        return _power;
+    }
 
-    if (this.getSkill().getId() == 1285)
+    public void increasePower()
     {
-        sm.addString("SYS");
-        sm.addString("感受到火的種子效果");
+        _power++;
     }
-    else if (this.getSkill().getId() == 1286)
-    {
-        sm.addString("SYS");
-        sm.addString("感受到水的種子效果");
-    }
-    else if (this.getSkill().getId() == 1287)
-    {
-        sm.addString("SYS");
-        sm.addString("感受到風的種子效果");
-    }
-    else
-    {
-        sm.addString("SYS");
-        sm.addString("感受到種子效果");
-    }
-    getEffected().sendPacket(sm);
 }
 
-public EffectType getEffectType()
-{
-    return EffectType.SEED;
-}
-
-public boolean onActionTime()
-{
-    // just stop this effect
-    return false;
-}
-   
-}

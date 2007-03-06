@@ -35,7 +35,7 @@ import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.model.base.Race;
 import net.sf.l2j.gameserver.skills.conditions.Condition;
-//import net.sf.l2j.gameserver.skills.conditions.ConditionElementSeed;
+import net.sf.l2j.gameserver.skills.conditions.ConditionElementSeed;
 import net.sf.l2j.gameserver.skills.conditions.ConditionGameChance;
 import net.sf.l2j.gameserver.skills.conditions.ConditionGameTime;
 import net.sf.l2j.gameserver.skills.conditions.ConditionLogicAnd;
@@ -393,13 +393,13 @@ abstract class DocumentBase
         }
 
         // Elemental seed condition processing
-        /*for (int i = 0; i < ElementSeeds.length; i++)
+        for (int i = 0; i < ElementSeeds.length; i++)
             if (ElementSeeds[i] > 0)
             {
                 cond = joinAnd(cond, new ConditionElementSeed(ElementSeeds));
                 break;
             }
-		*/
+
         if (cond == null) _log.severe("Unrecognized <player> condition in " + file);
         return cond;
     }

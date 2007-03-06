@@ -30,6 +30,7 @@ import net.sf.l2j.Config;
 import net.sf.l2j.L2DatabaseFactory;
 import net.sf.l2j.gameserver.model.L2DropCategory;
 import net.sf.l2j.gameserver.model.L2DropData;
+import net.sf.l2j.gameserver.model.L2NpcChatData;
 import net.sf.l2j.gameserver.model.L2MinionData;
 import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.model.base.ClassId;
@@ -230,7 +231,52 @@ public class NpcTable
             catch (Exception e) {
 				_log.severe("NPCTable: Error reading NPC drop data: " + e);
 			}
+            //-------------------------------------------------------------------
+            //testing NPC chat system
+			try 
+            {
+			    PreparedStatement statement10 = con.prepareStatement("SELECT " + L2DatabaseFactory.getInstance().safetyString(new String[] {"npc_id", "chat_type","chat_delay","chat_chance","chat_condition", "chat_value1", "chat_condition_end", "chat_value2", "chat_memo"}) + " FROM chatdata ORDER BY npc_id");
+			    ResultSet chatdata = statement10.executeQuery();
+			    L2NpcChatData chatDat = null;
+			    L2NpcTemplate npcDat = null;
+			    int cont=0;
+			    while (chatdata.next())
+			    {
+			        int npc_id = chatdata.getInt("npc_id");
+			        npcDat = _npcs.get(npc_id);
+                    if (npcDat == null)
+                    {
+                        _log.severe("NPCTable: No npc correlating with id : " + npc_id);
+                        continue;
+                    }
+			        chatDat = new L2NpcChatData();
+			        
+			        chatDat.setChatType(chatdata.getInt("chat_type"));
+			        chatDat.setChatChance(chatdata.getInt("chat_chance"));
+			        chatDat.setChatDelay(chatdata.getInt("chat_delay"));
+			        chatDat.setChatCondition1(chatdata.getInt("chat_condition"));
+			        chatDat.setChatValue1(chatdata.getInt("chat_value1"));
+			        chatDat.setChatCondition2(chatdata.getInt("chat_condition_end"));
+			        chatDat.setChatValue2(chatdata.getInt("chat_value2"));
+			        chatDat.setChatMemo(chatdata.getString("chat_memo"));
+                    
+			       			        
+		            npcDat.addChatData(chatDat);
+		            cont++;
+			    }
 
+			    chatdata.close();
+    			statement10.close();
+				_log.config("NPC Chat Data: Loaded " + cont + " Chat Tables.");
+			} 
+            catch (Exception e) {
+				_log.severe("NPCTable: Error reading NPC chat data: " + e);
+			}
+            //---------------------------------------------------------------------
+            
+            
+            
+            
 			try 
 			{
 			    PreparedStatement statement3 = con.prepareStatement("SELECT " + L2DatabaseFactory.getInstance().safetyString(new String[] {"npc_id", "class_id"}) + " FROM skill_learn");

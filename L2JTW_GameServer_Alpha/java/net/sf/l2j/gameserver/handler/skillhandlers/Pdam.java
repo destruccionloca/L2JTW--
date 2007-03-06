@@ -81,6 +81,8 @@ public class Pdam implements ISkillHandler
 
         {
             L2Character target = (L2Character) targets[index];
+            if(target.reflectSkill(skill))
+            	target = activeChar;
             L2ItemInstance weapon = activeChar.getActiveWeaponInstance();
             if (activeChar instanceof L2PcInstance && target instanceof L2PcInstance
                 && target.isAlikeDead() && target.isFakeDeath())
@@ -277,6 +279,12 @@ public class Pdam implements ISkillHandler
 	                	       else 
 	                		      player.setCurrentHp(player.getCurrentHp() - damage);
 	        				}
+	                		
+	                		SystemMessage smsg = new SystemMessage(SystemMessage.S1_GAVE_YOU_S2_DMG);
+	                		smsg.addString(activeChar.getName());
+	                		smsg.addNumber(damage);
+	                		player.sendPacket(smsg);
+	                		
         				}
         				else
         					target.reduceCurrentHp(damage, activeChar);

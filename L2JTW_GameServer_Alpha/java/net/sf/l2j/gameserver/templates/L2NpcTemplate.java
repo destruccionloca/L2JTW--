@@ -26,6 +26,7 @@ import javolution.util.FastMap;
 import net.sf.l2j.gameserver.model.L2DropData;
 import net.sf.l2j.gameserver.model.L2DropCategory;
 import net.sf.l2j.gameserver.model.L2MinionData;
+import net.sf.l2j.gameserver.model.L2NpcChatData;
 import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.model.base.ClassId;
 import net.sf.l2j.gameserver.model.quest.Quest;
@@ -102,6 +103,7 @@ public final class L2NpcTemplate extends L2CharTemplate
 	/** The table containing all Item that can be dropped by L2NpcInstance using this L2NpcTemplate*/
 	private final FastList<L2DropCategory> _categories = new FastList<L2DropCategory>();
 	
+	private final List<L2NpcChatData> _chatdata = new FastList<L2NpcChatData>();
 	/** The table containing all Minions that must be spawn with the L2NpcInstance using this L2NpcTemplate*/
 	private final List<L2MinionData>  _minions     = new FastList<L2MinionData>(0);
 	
@@ -212,6 +214,19 @@ public final class L2NpcTemplate extends L2CharTemplate
         
 		return _teachInfo.contains(classId);
 	}
+	//-----------------------------------------------------------------------
+	// Npc Chat Data
+	// Under construction...
+	// By ShanSoft
+	
+	public void addChatData(L2NpcChatData chatdata)
+	{
+
+    		_chatdata.add(chatdata);
+    	
+	}
+	
+	//-----------------------------------------------------------------------
 	
 	// add a drop to a given category.  If the category does not exist, create it.
     public void addDropData(L2DropData drop, int categoryType)
@@ -279,6 +294,8 @@ public final class L2NpcTemplate extends L2CharTemplate
 	{
 		return _categories;
 	}	
+	
+	
 
     /**
      * Return the list of all possible item drops of this L2NpcTemplate.<BR>
@@ -315,6 +332,11 @@ public final class L2NpcTemplate extends L2CharTemplate
 		return _minions;
 	}
 
+	public List<L2NpcChatData> getChatData()
+	{
+		return _chatdata;
+	}
+	
     public Map<Integer, L2Skill> getSkills()
 	{
 		return _skills;

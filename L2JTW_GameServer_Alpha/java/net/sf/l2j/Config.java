@@ -227,12 +227,25 @@ public final class Config
     public static int ALT_CLAN_JOIN_DAYS;
     /** Number of days before creating a new clan */
     public static int ALT_CLAN_CREATE_DAYS;
+    /** Number of days it takes to dissolve a clan */
+    public static int ALT_CLAN_DISSOLVE_DAYS;
+    /** Number of days before joining a new alliance when clan voluntarily leave an alliance */
+    public static int ALT_ALLY_JOIN_DAYS_WHEN_LEAVED;
+    /** Number of days before joining a new alliance when clan was dismissed from an alliance */
+    public static int ALT_ALLY_JOIN_DAYS_WHEN_DISMISSED;
+    /** Number of days before accepting a new clan for alliance when clan was dismissed from an alliance */
+    public static int ALT_ACCEPT_CLAN_DAYS_WHEN_DISMISSED;
+    /** Number of days before creating a new alliance when dissolved an alliance */
+    public static int ALT_CREATE_ALLY_DAYS_WHEN_DISSOLVED;
     
     /** Alternative gaming - all new characters always are newbies. */
     public static boolean ALT_GAME_NEW_CHAR_ALWAYS_IS_NEWBIE;
     
     /** Alternative gaming - clan members with see privilege can also withdraw from clan warehouse. */
     public static boolean ALT_MEMBERS_CAN_WITHDRAW_FROM_CLANWH;
+    
+    /** Maximum number of clans in ally */
+    public static int ALT_MAX_NUM_OF_CLANS_IN_ALLY;
     
     /** Enable Rate Hp  */
     public static boolean ENABLE_RATE_HP;
@@ -528,6 +541,10 @@ public final class Config
     public static boolean         ALLOW_FREIGHT;
     /** Allow warehouse ? */
     public static boolean         ALLOW_WAREHOUSE;
+    /** Allow warehouse cache? */
+    public static boolean         WAREHOUSE_CACHE;
+    /** How long store WH datas */
+    public static int             WAREHOUSE_CACHE_TIME;
     /** Allow wear ? (try on in shop) */
     public static boolean 	      ALLOW_WEAR;
     /** Duration of the try on after which items are taken back */
@@ -844,7 +861,10 @@ public final class Config
     public static double   RAID_DEFENCE_MULTIPLIER;
     /** Raid Boss Minin Spawn Timer */
     public static double   RAID_MINION_RESPAWN_TIMER;
-    
+    /** Mulitplier for Raid boss minimum time respawn */
+    public static float   RAID_MIN_RESPAWN_MULTIPLIER;
+    /** Mulitplier for Raid boss maximum time respawn */
+    public static float   RAID_MAX_RESPAWN_MULTIPLIER;  
     /** Amount of adenas when starting a new character */
     public static int STARTING_ADENA;
     
@@ -1112,6 +1132,8 @@ public final class Config
                 COORD_SYNCHRONIZE               = Integer.parseInt(optionsSettings.getProperty("CoordSynchronize", "-1"));
              
                 ALLOW_WAREHOUSE                 = Boolean.valueOf(optionsSettings.getProperty("AllowWarehouse", "True"));
+                WAREHOUSE_CACHE                 = Boolean.valueOf(optionsSettings.getProperty("WarehouseCache", "False"));
+                WAREHOUSE_CACHE_TIME            = Integer.parseInt(optionsSettings.getProperty("WarehouseCacheTime", "15"));
                 ALLOW_FREIGHT                   = Boolean.valueOf(optionsSettings.getProperty("AllowFreight", "True"));
                 ALLOW_WEAR                      = Boolean.valueOf(optionsSettings.getProperty("AllowWear", "False"));
                 WEAR_DELAY                      = Integer.parseInt(optionsSettings.getProperty("WearDelay", "5"));
@@ -1337,7 +1359,9 @@ public final class Config
                 RAID_MP_REGEN_MULTIPLIER  = Double.parseDouble(otherSettings.getProperty("RaidMpRegenMultiplier", "100")) /100;    
                 RAID_DEFENCE_MULTIPLIER  = Double.parseDouble(otherSettings.getProperty("RaidDefenceMultiplier", "100")) /100;    
                 RAID_MINION_RESPAWN_TIMER  = Integer.parseInt(otherSettings.getProperty("RaidMinionRespawnTime", "300000"));                
-                
+                RAID_MIN_RESPAWN_MULTIPLIER = Float.parseFloat(otherSettings.getProperty("RaidMinRespawnMultiplier", "1.0"));
+                RAID_MAX_RESPAWN_MULTIPLIER = Float.parseFloat(otherSettings.getProperty("RaidMaxRespawnMultiplier", "1.0"));
+              
 	            STARTING_ADENA      = Integer.parseInt(otherSettings.getProperty("StartingAdena", "100"));
 	            UNSTUCK_INTERVAL    = Integer.parseInt(otherSettings.getProperty("UnstuckInterval", "300"));
 
@@ -1515,6 +1539,8 @@ public final class Config
 
                 ALT_MEMBERS_CAN_WITHDRAW_FROM_CLANWH                = Boolean.parseBoolean(altSettings.getProperty("AltMembersCanWithdrawFromClanWH", "False"));
 
+                ALT_MAX_NUM_OF_CLANS_IN_ALLY                        = Integer.parseInt(altSettings.getProperty("AltMaxNumOfClansInAlly", "3"));
+
                 DWARF_RECIPE_LIMIT                                  = Integer.parseInt(altSettings.getProperty("DwarfRecipeLimit","50"));
                 COMMON_RECIPE_LIMIT                                 = Integer.parseInt(altSettings.getProperty("CommonRecipeLimit","50"));
 
@@ -1529,7 +1555,12 @@ public final class Config
                 ALT_CLAN_JOIN_DAYS          = Integer.parseInt(altSettings.getProperty("DaysBeforeJoinAClan", "5"));
                 ALT_CLAN_CREATE_DAYS        = Integer.parseInt(altSettings.getProperty("DaysBeforeCreateAClan", "10"));
 
-                
+                ALT_CLAN_DISSOLVE_DAYS      = Integer.parseInt(altSettings.getProperty("DaysToPassToDissolveAClan", "7"));
+                ALT_ALLY_JOIN_DAYS_WHEN_LEAVED       = Integer.parseInt(altSettings.getProperty("DaysBeforeJoinAllyWhenLeaved", "1"));
+                ALT_ALLY_JOIN_DAYS_WHEN_DISMISSED    = Integer.parseInt(altSettings.getProperty("DaysBeforeJoinAllyWhenDismissed", "1"));
+                ALT_ACCEPT_CLAN_DAYS_WHEN_DISMISSED  = Integer.parseInt(altSettings.getProperty("DaysBeforeAcceptNewClanWhenDismissed", "1"));
+                ALT_CREATE_ALLY_DAYS_WHEN_DISSOLVED  = Integer.parseInt(altSettings.getProperty("DaysBeforeCreateNewAllyWhenDissolved", "10"));
+
                 ALT_OLY_START_TIME                                  = Integer.parseInt(altSettings.getProperty("AltOlyStartTime", "20"));
                 ALT_OLY_MIN                                         = Integer.parseInt(altSettings.getProperty("AltOlyMin","00"));
                 ALT_OLY_CPERIOD                                     = Long.parseLong(altSettings.getProperty("AltOlyCPeriod","14100000"));

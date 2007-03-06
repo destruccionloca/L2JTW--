@@ -76,6 +76,7 @@ import net.sf.l2j.gameserver.handler.admincommandhandlers.AdminEventEngine;
 import net.sf.l2j.gameserver.handler.admincommandhandlers.AdminExpSp;
 import net.sf.l2j.gameserver.handler.admincommandhandlers.AdminEncArmor;
 import net.sf.l2j.gameserver.handler.admincommandhandlers.AdminFightCalculator;
+import net.sf.l2j.gameserver.handler.admincommandhandlers.AdminGeoEditor;
 import net.sf.l2j.gameserver.handler.admincommandhandlers.AdminGm;
 import net.sf.l2j.gameserver.handler.admincommandhandlers.AdminGmChat;
 import net.sf.l2j.gameserver.handler.admincommandhandlers.AdminGeodata;
@@ -141,6 +142,7 @@ import net.sf.l2j.gameserver.handler.itemhandlers.SpiritShot;
 import net.sf.l2j.gameserver.handler.itemhandlers.SummonItems;
 import net.sf.l2j.gameserver.handler.itemhandlers.WorldMap;
 //import net.sf.l2j.gameserver.handler.skillhandlers.Charge;
+//import net.sf.l2j.gameserver.handler.skillhandlers.BalanceLife;
 import net.sf.l2j.gameserver.handler.skillhandlers.CombatPointHeal;
 import net.sf.l2j.gameserver.handler.skillhandlers.Continuous;
 import net.sf.l2j.gameserver.handler.skillhandlers.Craft;
@@ -158,6 +160,7 @@ import net.sf.l2j.gameserver.handler.skillhandlers.Resurrect;
 import net.sf.l2j.gameserver.handler.skillhandlers.SiegeFlag;
 import net.sf.l2j.gameserver.handler.skillhandlers.Spoil;
 import net.sf.l2j.gameserver.handler.skillhandlers.SummonTreasureKey; 
+import net.sf.l2j.gameserver.handler.skillhandlers.SummonFriend;
 import net.sf.l2j.gameserver.handler.skillhandlers.StrSiegeAssault;
 import net.sf.l2j.gameserver.handler.skillhandlers.Sweep;
 import net.sf.l2j.gameserver.handler.skillhandlers.TakeCastle;
@@ -404,11 +407,13 @@ public class GameServer
 		_skillHandler.registerSkillHandler(new ManaHeal());
 		//_skillHandler.registerSkillHandler(new Charge());
 		_skillHandler.registerSkillHandler(new Manadam());
+		//_skillHandler.registerSkillHandler(new BalanceLife());
 		_skillHandler.registerSkillHandler(new Continuous());
 		_skillHandler.registerSkillHandler(new Resurrect());
         _skillHandler.registerSkillHandler(new Spoil());
         _skillHandler.registerSkillHandler(new Sweep());
         _skillHandler.registerSkillHandler(new StrSiegeAssault());
+        _skillHandler.registerSkillHandler(new SummonFriend());
         _skillHandler.registerSkillHandler(new SummonTreasureKey()); 
         _skillHandler.registerSkillHandler(new Disablers());
 		_skillHandler.registerSkillHandler(new Recall());
@@ -475,7 +480,7 @@ public class GameServer
         _adminCommandHandler.registerAdminCommandHandler(new AdminZone());
         _adminCommandHandler.registerAdminCommandHandler(new AdminCTFEngine());
         _adminCommandHandler.registerAdminCommandHandler(new AdminCursedWeapons());
-
+        _adminCommandHandler.registerAdminCommandHandler(new AdminGeoEditor());
 
         //_adminCommandHandler.registerAdminCommandHandler(new AdminRadar());
         _log.config("AdminCommandHandler: Loaded " + _adminCommandHandler.size() + " handlers.");

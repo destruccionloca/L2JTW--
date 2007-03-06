@@ -434,9 +434,9 @@ public class PacketHandler
             case 0x85:
                 msg = new AllyDismiss(data, client);
                 break;
-//			case 0x86:
-//				// RequestDismissAlly
-//				break;
+			case 0x86:
+                msg = new RequestDismissAlly(data, client);
+				break;
 			case 0x87:
 				msg = new RequestSetAllyCrest(data, client);
 				break;
@@ -627,6 +627,7 @@ public class PacketHandler
             case 0xce: // MSN dialogs so that you dont see them in the console.
 				break;
             case 0xcf: //record video
+            	msg = new RequestRecordInfo(data, client);
                 break;
                 
             case 0xd0: // Request auto ss and (b)sps.

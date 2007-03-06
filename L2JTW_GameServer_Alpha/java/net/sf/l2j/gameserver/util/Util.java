@@ -33,6 +33,7 @@ import java.util.Collection;
 
 import net.sf.l2j.gameserver.ThreadPoolManager;
 import net.sf.l2j.gameserver.model.L2Object;
+import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 
 /**
@@ -158,6 +159,13 @@ public final class Util
     public static boolean checkIfInRange(int range, L2Object obj1, L2Object obj2, boolean includeZAxis)
     {
         if (obj1 == null || obj2 == null) return false;
+        if (range == -1) return true; // not limited
+        
+        int rad = 0;
+        if(obj1 instanceof L2Character)
+        	rad += ((L2Character)obj1).getTemplate().collisionRadius;
+        if(obj2 instanceof L2Character)
+        	rad += ((L2Character)obj2).getTemplate().collisionRadius;
         
         double dx = obj1.getX() - obj2.getX();
         double dy = obj1.getY() - obj2.getY();
@@ -165,14 +173,17 @@ public final class Util
         if (includeZAxis)
         {
         	double dz = obj1.getZ() - obj2.getZ();
-            return (dx*dx + dy*dy + dz*dz) <= range * range;
+        	double d = dx*dx + dy*dy +dz*dz;
+        	
+            return d <= range*range + 2*range*rad + rad*rad;
         }
         else
         {
-            return (dx*dx + dy*dy) <= range * range;
+        	double d = dx*dx + dy*dy;
+        	
+            return d <= range*range + 2*range*rad +rad*rad;
         }
     }
-
     public static double convertHeadingToDegree(int heading)
     {
     	if (heading == 0) return 360;
@@ -235,11 +246,24 @@ public final class Util
         if (numPlaces <= 1)
             return Math.round(val);
         
-        float exponent = 10;
-        
-        for (int i = 1; i < numPlaces; i++)
-            exponent *= 10;
+        float exponent = (float) Math.pow(10, numPlaces);
         
         return (Math.round(val * exponent) / exponent);
     }
+
+	public static boolean isAlphaNumeric(String text)
+	{
+		boolean result = true;
+		char[] chars = text.toCharArray();
+		for (int i = 0; i < chars.length; i++)
+		{
+			if (!Character.isLetterOrDigit(chars[i]))
+			{
+				result = false;
+				break;
+			}
+		}
+		return result;
+	}
+	
 }

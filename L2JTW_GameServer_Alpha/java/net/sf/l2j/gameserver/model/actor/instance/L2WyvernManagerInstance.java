@@ -1,5 +1,9 @@
 package net.sf.l2j.gameserver.model.actor.instance;
 
+import net.sf.l2j.gameserver.datatables.SkillTable;
+import net.sf.l2j.gameserver.serverpackets.ActionFailed;
+import net.sf.l2j.gameserver.serverpackets.MyTargetSelected;
+import net.sf.l2j.gameserver.serverpackets.NpcHtmlMessage;
 import net.sf.l2j.gameserver.serverpackets.Ride;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
@@ -14,42 +18,83 @@ public class L2WyvernManagerInstance extends L2CastleChamberlainInstance
 
     public void onBypassFeedback(L2PcInstance player, String command)
     {
-        int condition = validateCondition(player);
-        if (condition <= Cond_All_False)
-            return;
-        if (condition == Cond_Busy_Because_Of_Siege)
-            return;
-
         if (command.startsWith("RideWyvern"))
         {
-            if(player.isMounted() || player.getPet() != null)
+        	if(player.getPet() == null) 
+        	{   
+        		if(player.isMounted())
+        		{
+        			SystemMessage sm = new SystemMessage(614);
+                    sm.addString("SYS");
+                    sm.addString("已經有使魔召喚.");
+        			player.sendPacket(sm);
+        			return;
+        		}
+        		else
+        		{
+        			SystemMessage sm = new SystemMessage(614);
+                    sm.addString("SYS");
+                    sm.addString("使魔召喚.");
+        			player.sendPacket(sm);
+        			return;
+        		}
+        	}            
+        	else if ((player.getPet().getNpcId()==12526) || (player.getPet().getNpcId()==12527) || (player.getPet().getNpcId()==12528))
             {
-                SystemMessage sm = new SystemMessage(614);
+        		if (player.getInventory().getItemByItemId(1460) != null && player.getInventory().getItemByItemId(1460).getCount() >= 10)
+        		{
+        			if (player.getPet().getLevel() < 55)
+        			{
+        				SystemMessage sm = new SystemMessage(614);
+                        sm.addString("SYS");
+                        sm.addString("座龍尚未達到需求的等級");
+                		player.sendPacket(sm);
+                		return;                
+        			}
+        			else
+        			{
+        				player.getPet().unSummon(player);
+        				player.getInventory().destroyItemByItemId("Wyvern", 1460, 10, player, player.getTarget());
+        				Ride mount = new Ride(player.getObjectId(), Ride.ACTION_MOUNT, 12621);
+        				player.sendPacket(mount);
+        				player.broadcastPacket(mount);
+        				player.setMountType(mount.getMountType());
+        				player.addSkill(SkillTable.getInstance().getInfo(4289, 1));
+        				SystemMessage sm = new SystemMessage(614);
+                        sm.addString("SYS");
+                        sm.addString("使魔召喚.");
+                		player.sendPacket(sm);
+                		return;
+        			}
+        		}
+        		else
+        		{
+        			SystemMessage sm = new SystemMessage(614);
+                    sm.addString("SYS");
+                    sm.addString("需要10個B級-結晶");
+            		player.sendPacket(sm);
+            		return;
+        		}
+            }
+
+        	else
+        	{
+        		SystemMessage sm = new SystemMessage(614);
                 sm.addString("SYS");
-                sm.addString("已經有使魔召喚.");
-                player.sendPacket(sm);
-                return;
-            }
-            
-            // Wyvern requires 100B crystal for ride...
-            if(player.getInventory().getItemByItemId(1460) != null &&
-                    player.getInventory().getItemByItemId(1460).getCount() >= 100)
-            {
-                player.getInventory().destroyItemByItemId("Wyvern", 1460, 100, player, player.getTarget());
-                Ride mount = new Ride(player.getObjectId(), Ride.ACTION_MOUNT, 12621);
-                player.sendPacket(mount);
-                player.broadcastPacket(mount);
-                player.setMountType(mount.getMountType());
-            }
-            else
-            {
-                player.sendMessage("需要100個B級結晶使用飛龍");
-            }
+                sm.addString("使魔反召喚.");
+        		player.sendPacket(sm);
+        		return;
+        	}
         }
     }
-    
-    /*
-         Micht : 06/06/17 : unused
+    public void onAction(L2PcInstance player)
+    {
+    	player.sendPacket(new ActionFailed());
+    	player.setTarget(this);
+    	player.sendPacket(new MyTargetSelected(getObjectId(), -15));
+    	if (isInsideRadius(player, INTERACTION_DISTANCE, false, false))
+    		showMessageWindow(player);
+    }
     private void showMessageWindow(L2PcInstance player)
     {
         player.sendPacket( new ActionFailed() );
@@ -61,12 +106,10 @@ public class L2WyvernManagerInstance extends L2CastleChamberlainInstance
             if (condition == Cond_Owner)                                     // Clan owns castle
                 filename = "data/html/wyvernmanager/wyvernmanager.htm";      // Owner message window
         }
-        
         NpcHtmlMessage html = new NpcHtmlMessage(1);
         html.setFile(filename);
         html.replace("%objectId%", String.valueOf(getObjectId()));
         html.replace("%npcname%", getName());
         player.sendPacket(html);
     } 
-    */
 }

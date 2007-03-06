@@ -25,6 +25,7 @@ import net.sf.l2j.gameserver.instancemanager.SiegeManager;
 import net.sf.l2j.gameserver.serverpackets.ActionFailed;
 import net.sf.l2j.gameserver.serverpackets.ItemList;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
+import net.sf.l2j.gameserver.serverpackets.SystemMessage; 
 
 /**
  * @author NightMarez
@@ -61,7 +62,10 @@ public final class L2ObservationInstance extends L2FolkInstance
                                                          Integer.parseInt(st.nextToken()))) doObserve(
                                                                                                       player,
                                                                                                       val);
-            else player.sendMessage("只有攻城戰期間可以使用");
+
+            else player.sendPacket(new SystemMessage(SystemMessage.ONLY_VIEW_SIEGE)); 
+
+
         }
         else if (command.startsWith("observe"))
         {

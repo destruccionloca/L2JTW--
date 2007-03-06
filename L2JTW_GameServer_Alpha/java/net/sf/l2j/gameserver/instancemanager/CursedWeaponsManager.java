@@ -257,9 +257,15 @@ public class CursedWeaponsManager
 						_log.info("PROBLEM : Player "+playerId+" owns the cursed weapon "+itemId+" but he shouldn't.");
 						
 						// Delete the item
-						statement = con.prepareStatement("DELETE FROM items WHERE owner_id=? AND item_id=?");
+						statement = con.prepareStatement("DELETE FROM items WHERE playerId=? AND itemId=?");
 						statement.setInt(1, playerId);
 						statement.setInt(2, itemId);
+						
+						statement = con.prepareStatement("DELETE FROM cursed_weapons WHERE owner_id=? AND item_id=?");
+						statement.setInt(1, playerId);
+						statement.setInt(2, itemId);
+						
+						
 						if (statement.executeUpdate() != 1)
 						{
 							_log.warning("Error while deleting cursed weapon "+itemId+" from userId "+playerId);

@@ -67,11 +67,16 @@ public class L2MonsterInstance extends L2Attackable
     public L2MonsterInstance(int objectId, L2NpcTemplate template)
     {
         super(objectId, template);
-        super.setKnownList(new MonsterKnownList(new L2MonsterInstance[] {this}));
+		this.getKnownList();	// init knownlist
         minionList  = new MinionList(this);
     }   
 
-    public final MonsterKnownList getKnownList() { return (MonsterKnownList)super.getKnownList(); }
+    public final MonsterKnownList getKnownList()
+    {
+    	if(super.getKnownList() == null || !(super.getKnownList() instanceof MonsterKnownList))
+    		this.setKnownList(new MonsterKnownList(this));
+    	return (MonsterKnownList)super.getKnownList();
+    }
         
     /**
      * Return True if the attacker is not another L2MonsterInstance.<BR><BR>
@@ -211,30 +216,12 @@ public class L2MonsterInstance extends L2Attackable
         if (minionMaintainTask != null)
             minionMaintainTask.cancel(true); // doesn't do it?
         
-        if (getTemplate().npcId == 12535) {
-            try {
-                L2NpcTemplate BaiumSpawn = NpcTable.getInstance().getTemplate(12372);
-                L2Spawn Baium = new L2Spawn(BaiumSpawn);
-                
-                Baium.setAmount(1);
-                //Baium.setRespawnDelay(604800);
-                Baium.setRespawnDelay(1);
-                Baium.setLocx(getX());
-                Baium.setLocy(getY());
-                Baium.setLocz(getZ());
-                Baium.setHeading(getHeading());
-                Baium.doSpawn();
 
-            }
-            catch (Exception e) {
-                _log.warning("RaidBoss: Error while spawning Baium: " + e);
-            }
+        if (this instanceof L2RaidBossInstance)
+        	DeleteSpawnedMinions();
+        
+        super.doDie(killer);
 
-            this.deleteMe();
-            return;
-        }
-        else
-            super.doDie(killer);
     }
     
     public List<L2MinionInstance> getSpawnedMinions()
@@ -282,15 +269,21 @@ public class L2MonsterInstance extends L2Attackable
             if (minionMaintainTask != null)
                 minionMaintainTask.cancel(true);
             
-            for (L2MinionInstance minion : getSpawnedMinions())
-            {
-                if (minion == null) continue;
-                minion.deleteMe();
-                
-                getSpawnedMinions().remove(minion);
-            }
-            minionList.clearRespawnList();
+            DeleteSpawnedMinions();
         }
         super.deleteMe();
+    }
+    
+    public void DeleteSpawnedMinions()
+    {
+        for(L2MinionInstance minion : getSpawnedMinions())
+        {
+        	if (minion == null) continue;
+        	minion.abortAttack();
+        	minion.abortCast();
+        	minion.deleteMe();
+        	getSpawnedMinions().remove(minion);
+        }
+    	minionList.clearRespawnList();
     }
 }

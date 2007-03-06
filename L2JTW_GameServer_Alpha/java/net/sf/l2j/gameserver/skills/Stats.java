@@ -41,6 +41,7 @@ public enum Stats
 	REGENERATE_MP_RATE	("regMp"),
     RECHARGE_MP_RATE	("gainMp"),
     HEAL_HP_RATE	 	("gainHp"),
+	
 	// Atk & Def
 	POWER_DEFENCE 		("pDef"),
 	MAGIC_DEFENCE		("mDef"),
@@ -51,6 +52,10 @@ public enum Stats
 	MAGIC_REUSE_RATE 	("mReuse"), // how fast spells becomes ready to reuse
 	SHIELD_DEFENCE 		("sDef"),
 	CRITICAL_DAMAGE 	("cAtk"),
+	PVP_PHYSICAL_DMG    ("pvpPhysDmg"),
+	PVP_MAGICAL_DMG     ("pvpMagicalDmg"),
+	PVP_PHYS_SKILL_DMG  ("pvpPhysSkillsDmg"),
+	
 	// Atk & Def rates
 	EVASION_RATE 		("rEvas"),
 	SHIELD_RATE 		("rShld"),
@@ -58,11 +63,13 @@ public enum Stats
 	MCRITICAL_RATE 		("mCritRate"),
     EXPSP_RATE 			("rExp"),
 	ATTACK_CANCEL		("cancel"),
+	
 	// Accuracy and range
 	ACCURACY_COMBAT 	("accCombat"),
 	POWER_ATTACK_RANGE 	("pAtkRange"),
 	MAGIC_ATTACK_RANGE 	("mAtkRange"),
     POWER_ATTACK_ANGLE 	("pAtkAngle"),
+    ATTACK_COUNT_MAX    ("atkCountMax"),
 	// Run speed,
 	// walk & escape speed are calculated proportionally,
 	// magic speed is a buff
@@ -118,7 +125,8 @@ public enum Stats
 	EARTH_RES 		("earthRes"),
 	HOLY_RES 		("holyRes"),
 	DARK_RES 		("darkRes"),
-
+	CANCEL_RES      ("cancelRes"), // Resistance for cancel type skills
+	
 
 	NONE_WPN_RES 	("noneWpnRes"), // Shields!!!
 	SWORD_WPN_RES 	("swordWpnRes"),
@@ -132,6 +140,8 @@ public enum Stats
 	DUALFIST_WPN_RES("dualFistWpnRes"),
 	
 	REFLECT_DAMAGE_PERCENT 	("reflectDam"),
+	REFLECT_SKILL_MAGIC     ("reflectSkillMagic"),
+	REFLECT_SKILL_PHYSIC    ("reflectSkillPhysic"),
 	ABSORB_DAMAGE_PERCENT 	("absorbDam"),
     TRANSFER_DAMAGE_PERCENT ("transDam"),
     REFLECT_STANCE			("reflectStance"),

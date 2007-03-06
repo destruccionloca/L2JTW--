@@ -33,6 +33,7 @@ import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2Character.AIAccessor;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.model.actor.instance.L2StaticObjectInstance;
 import net.sf.l2j.gameserver.model.actor.knownlist.ObjectKnownList.KnownListAsynchronousUpdateTask;
 
 public class L2PlayerAI extends L2CharacterAI
@@ -193,7 +194,7 @@ public class L2PlayerAI extends L2CharacterAI
             }
             return;
         }
-        if (maybeMoveToPawn(target, _actor.getPhysicalAttackRange()+_actor.getTemplate().collisionRadius+target.getTemplate().collisionRadius)) return;
+        if (maybeMoveToPawn(target, _actor.getPhysicalAttackRange())) return;
 
         _accessor.doAttack(target);
         return;
@@ -216,7 +217,7 @@ public class L2PlayerAI extends L2CharacterAI
         }
 
         if (target != null) 
-        	if (maybeMoveToPawn(target, _actor.getMagicalAttackRange(_skill)+_actor.getTemplate().collisionRadius+target.getTemplate().collisionRadius)) return;
+        	if (maybeMoveToPawn(target, _actor.getMagicalAttackRange(_skill))) return;
         
         if (_skill.getSkillTime() > 50) clientStopMoving(null);
 
@@ -254,7 +255,7 @@ public class L2PlayerAI extends L2CharacterAI
         L2Object target = getTarget();
         if (checkTargetLost(target)) return;
         if (maybeMoveToPawn(target, 36)) return;
-        ((L2PcInstance.AIAccessor) _accessor).doInteract((L2Character) target);
+        if (!(target instanceof L2StaticObjectInstance)) ((L2PcInstance.AIAccessor) _accessor).doInteract((L2Character) target);
         setIntention(AI_INTENTION_IDLE);
         return;
     }

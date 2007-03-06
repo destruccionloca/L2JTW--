@@ -374,6 +374,8 @@ public final class Formulas
 			{
 				env.value *= DEXbonus[p.getDEX()];
 				env.value *= 10;
+				if(env.value > 500)
+					env.value = 500;
 			}
 		}
 	}
@@ -1203,6 +1205,12 @@ public final class Formulas
            }  
 
 
+		
+		// Dmg bonusses in PvP fight
+		if(attacker instanceof L2PcInstance && target instanceof L2PcInstance)
+			damage *= attacker.calcStat(Stats.PVP_PHYSICAL_DMG, 1, null, null);
+		
+
 		return damage;
 	}
 
@@ -1287,6 +1295,14 @@ public final class Formulas
 		}
 		else if (mcrit) damage *= 4;
 
+		// Pvp bonusses for dmg
+		if(attacker instanceof L2PcInstance && target instanceof L2PcInstance)
+		{
+			if(skill.isMagic())
+				damage *= attacker.calcStat(Stats.PVP_MAGICAL_DMG, 1, null, null);
+			else
+				damage *= attacker.calcStat(Stats.PVP_PHYS_SKILL_DMG, 1, null, null);
+		}
 		return damage;
 	}
 
@@ -1351,7 +1367,8 @@ public final class Formulas
 
 
     /** Calculate delay (in milliseconds) before next ATTACK */
-    public final int calcPAtkSpd(@SuppressWarnings("unused") L2Character attacker, @SuppressWarnings("unused") L2Character target, double rate)
+   /*
+	public final int calcPAtkSpd(@SuppressWarnings("unused") L2Character attacker, @SuppressWarnings("unused") L2Character target, double rate)
     {
 //  will fix freeze at >1800 atkspd, optimum calcation between 0 to 1700
         if (L2Character._isNPC)
@@ -1360,9 +1377,19 @@ public final class Formulas
     return (int)(((Math.pow(rate, 2)-4000*rate + 4074102.5641)/1900+15)*0.80);
     
     }
+	*/
 
-
-
+    public final int calcPAtkSpd(@SuppressWarnings("unused")
+    		L2Character attacker, @SuppressWarnings("unused")
+    		L2Character target, double rate)
+    		{
+    			// measured Oct 2006 by Tank6585, formula by Sami
+    	if (L2Character._isNPC)
+    	    return (int)(((Math.pow(rate, 2)-4000*rate + 4074102.5641)/1900+15));
+    	
+    			if(rate < 2) return 2700;
+    		    else return (int)(460000/rate);
+    		}
 
 	/** Calculate delay (in milliseconds) for skills cast */
 	public final int calcMAtkSpd(L2Character attacker, @SuppressWarnings("unused")
@@ -1635,6 +1662,8 @@ public final class Formulas
 			case FEAR:
 			case CONFUSION:
 				return (int) target.calcStat(Stats.CONFUSION_RES, 0, target, null);
+			case CANCEL:
+				return (int) target.calcStat(Stats.CONFUSION_RES, 0, target, null);
 			default:
 				return 0;
 		}
@@ -1836,41 +1865,11 @@ public final class Formulas
 				chance = 100;
 				break;
 		}
-		if (Rnd.get(120) > chance)
-		{
+		if (Rnd.get(120) > chance)		
 			return false;
-		}
-
 		return true;
 	}
 	
-    public int calculateEnchantSkillSuccessRate(int skillLvl, int playerLvl)
-    {
-    	// source: forums
-    	// +5 82 % at lvl 77
-    	// +3 88 % at lvl 77
-    	// lvl 76 pretty safe up to +3 (+4 40 %)
-    	// lvl 77 pretty safe up to +6 (+7 ~40 %)
-    	// lvl 78 pretty safe up to +8 
-    	
-    	if (skillLvl > 140) skillLvl = skillLvl - 140;
-    	else skillLvl = skillLvl - 100;
-    	if (skillLvl < 1) return 0;
-    	if (playerLvl < 75) return 0;
-
-    	// 78, 79 and 80 lvl have the same successRate
-    	if(playerLvl > 78) playerLvl = 78;
-    	
-    	// linear approx, although the formula isn't linear
-    	int successRate = 75 - skillLvl * 7;   
-        successRate += (playerLvl - 75) * 20;         	
-   
-        if (successRate < 1) successRate = 1;
-        if (successRate > 100) successRate = 100;
-       	
-    	return successRate;
-    }
-    
     public double calcManaDam(L2Character attacker, L2Character target, L2Skill skill,
 			boolean ss, boolean bss)
     {

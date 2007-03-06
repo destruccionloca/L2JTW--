@@ -114,7 +114,7 @@ public class EnterWorld extends ClientBasePacket
             if (Config.GM_STARTUP_INVISIBLE 
                     && (!Config.ALT_PRIVILEGES_ADMIN && activeChar.getAccessLevel() >= Config.GM_GODMODE
                       || Config.ALT_PRIVILEGES_ADMIN && AdminCommandHandler.getInstance().checkPrivileges(activeChar, "admin_invisible")))
-                activeChar.setInvisible();
+                activeChar.getAppearance().setInvisible();
 
             if (Config.GM_STARTUP_SILENCE 
                     && (!Config.ALT_PRIVILEGES_ADMIN && activeChar.getAccessLevel() >= Config.GM_MENU
@@ -129,9 +129,9 @@ public class EnterWorld extends ClientBasePacket
             if (Config.GM_NAME_COLOR_ENABLED)
             {
                 if (activeChar.getAccessLevel() >= 100)
-                    activeChar.setNameColor(Config.ADMIN_NAME_COLOR);
+                    activeChar.getAppearance().setNameColor(Config.ADMIN_NAME_COLOR);
                 else if (activeChar.getAccessLevel() >= 75)
-                    activeChar.setNameColor(Config.GM_NAME_COLOR);
+                    activeChar.getAppearance().setNameColor(Config.GM_NAME_COLOR);
             }
         }
         
@@ -263,6 +263,7 @@ public class EnterWorld extends ClientBasePacket
 		
         notifyFriends(activeChar);
 		notifyClanMembers(activeChar);
+		notifySponsorOrApprentice(activeChar);
 
 		activeChar.onPlayerEnter();
         
@@ -271,7 +272,12 @@ public class EnterWorld extends ClientBasePacket
             activeChar.teleToLocation(MapRegionTable.TeleportWhereType.Town);
             activeChar.sendMessage("因在奧林匹亞競技場內所以將傳送至最近的村莊");
         }
-        
+
+		if (activeChar.getClanJoinExpiryTime() > System.currentTimeMillis())
+		{
+			activeChar.sendPacket(new SystemMessage(SystemMessage.CLAN_MEMBERSHIP_TERMINATED));
+		}
+
         if(Config.GAMEGUARD_ENFORCE)
             activeChar.sendPacket(new GameGuardQuery());
         
@@ -332,16 +338,38 @@ public class EnterWorld extends ClientBasePacket
 			clan.getClanMember(activeChar.getName()).setPlayerInstance(activeChar);
 			SystemMessage msg = new SystemMessage(SystemMessage.CLAN_MEMBER_S1_LOGGED_IN);
 			msg.addString(activeChar.getName());
-
-			L2PcInstance[] clanMembers = clan.getOnlineMembers(activeChar.getName());
-            PledgeShowMemberListUpdate ps = new PledgeShowMemberListUpdate(activeChar);
-			for (int i = 0; i < clanMembers.length; i++)
-			{
-				clanMembers[i].sendPacket(ps);
-				clanMembers[i].sendPacket(msg);
-			}
-			ps = null;
+			clan.broadcastToOtherOnlineMembers(msg, activeChar);
 			msg = null;
+			clan.broadcastToOtherOnlineMembers(new PledgeShowMemberListUpdate(activeChar), activeChar);
+		}
+	}
+	
+	/**
+	 * @param activeChar
+	 */
+	private void notifySponsorOrApprentice(L2PcInstance activeChar)
+	{
+		if (activeChar.getSponsor() != 0)
+		{
+			L2PcInstance sponsor = (L2PcInstance)L2World.getInstance().findObject(activeChar.getSponsor());
+			
+			if (sponsor != null)
+			{
+				SystemMessage msg = new SystemMessage(SystemMessage.YOUR_APPRENTICE_S1_HAS_LOGGED_IN);
+				msg.addString(activeChar.getName());
+				sponsor.sendPacket(msg);
+			}
+		}
+		else if (activeChar.getApprentice() != 0)
+		{
+			L2PcInstance apprentice = (L2PcInstance)L2World.getInstance().findObject(activeChar.getApprentice());
+			
+			if (apprentice != null)
+			{
+				SystemMessage msg = new SystemMessage(SystemMessage.YOUR_SPONSOR_S1_HAS_LOGGED_IN);
+				msg.addString(activeChar.getName());
+				apprentice.sendPacket(msg);
+			}
 		}
 	}
 

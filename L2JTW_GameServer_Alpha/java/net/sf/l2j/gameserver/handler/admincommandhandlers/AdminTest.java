@@ -36,12 +36,10 @@ import net.sf.l2j.gameserver.SelectorThread;
 import net.sf.l2j.gameserver.ThreadPoolManager;
 import net.sf.l2j.gameserver.Universe;
 import net.sf.l2j.gameserver.handler.IAdminCommandHandler;
-import net.sf.l2j.gameserver.idfactory.IdFactory;
 import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.L2World;
-import net.sf.l2j.gameserver.model.waypoint.WayPointNode;
 import net.sf.l2j.gameserver.serverpackets.MagicSkillUser;
 
 /**
@@ -91,22 +89,8 @@ public class AdminTest implements IAdminCommandHandler
             {
                 activeChar.sendMessage("指令為 //skill_test <ID>");
             }
-            
-        }
-        else if (command.startsWith("admin_test hash "))
-        {
-            try
-            {
-                int count = Integer.parseInt(command.substring("admin_test hash ".length()));
-                testHashMap(activeChar, count);
-            }
-            catch (NumberFormatException e)
-            {
-                activeChar.sendMessage("指令為 //test hash <Number>");
-            }
-            catch (StringIndexOutOfBoundsException e)
-            { }
-        }
+
+        }        
         else if (command.startsWith("admin_test uni flush"))
         {
             Universe.getInstance().flush();
@@ -116,11 +100,7 @@ public class AdminTest implements IAdminCommandHandler
         {
             activeChar.sendMessage("世界地圖大小為: "+Universe.getInstance().size());
         }
-        else if (command.equals("admin_test hash"))
-        {
-            testHashMap(activeChar);
-        }
-                else if (command.equals("admin_mp on"))
+        else if (command.equals("admin_mp on"))
         {
             SelectorThread.startPacketMonitor();
             activeChar.sendMessage("封包監視啟動");
@@ -164,57 +144,6 @@ public class AdminTest implements IAdminCommandHandler
         }
         player.broadcastPacket(new MagicSkillUser(activeChar, player, id, 1, 1, 1));
         
-    }
-
-    private void testHashMap(L2PcInstance activeChar) { testHashMap(activeChar, 1); }
-
-    /**
-     * @param activeChar
-     */
-    private void testHashMap(L2PcInstance activeChar, int objectCount)
-    {
-        WayPointNode[] nodes    = new WayPointNode[objectCount];
-        for (int i = 0; i < objectCount; i++)
-        {
-            nodes[i]    = new WayPointNode(IdFactory.getInstance().getNextId());
-            nodes[i].setXYZ(0, 0, 0);
-        }
-        long start = 0, end = 0;//System.out.println(System.currentTimeMillis());
-        start               = System.currentTimeMillis();
-        for (WayPointNode node : nodes)
-        {
-            L2World.getInstance().addVisibleObject(node, L2World.getInstance().getRegion(0, 0), null);
-        }
-        end                 = System.currentTimeMillis();
-        long timeStore      = new Long(end - start);//System.out.println(System.currentTimeMillis());
-        
-        start               = System.currentTimeMillis();
-        for (WayPointNode node : nodes)
-        {
-            L2World.getInstance().findObject(node.getObjectId());
-        }
-        end                 = System.currentTimeMillis();
-        long timeFind       = (end - start);
-
-        start               = System.currentTimeMillis();
-        for (WayPointNode node : nodes)
-        {
-            L2World.getInstance().removeVisibleObject(node, L2World.getInstance().getRegion(0, 0));
-        }
-        end                 = System.currentTimeMillis();
-        long timeRemove     = (end - start);
-        
-        for (int i = 0; i < objectCount; i++)
-        {
-            IdFactory.getInstance().releaseId(nodes[i].getObjectId());
-        }
-        
-        nodes   = null;
-        
-        activeChar.sendMessage("測試地圖在 " + objectCount + " 個物件.");
-        activeChar.sendMessage("世界物件輸入:     " + timeStore + " ms.");
-        activeChar.sendMessage("世界物件收到: " + timeFind + " ms.");
-        activeChar.sendMessage("世界物件移除:  " + timeRemove + " ms.");
     }
 
     /* (non-Javadoc)

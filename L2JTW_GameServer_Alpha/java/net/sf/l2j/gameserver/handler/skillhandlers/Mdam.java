@@ -62,7 +62,7 @@ public class Mdam implements ISkillHandler
 
         L2ItemInstance weaponInst = activeChar.getActiveWeaponInstance();
 
-    
+
 
 		if (weaponInst != null) 
 
@@ -102,6 +102,9 @@ public class Mdam implements ISkillHandler
         {
             L2Character target = (L2Character) targets[index];
 
+            if(target.reflectSkill(skill))
+            	target = activeChar;
+            
             if (activeChar instanceof L2PcInstance && target instanceof L2PcInstance
                 && target.isAlikeDead() && target.isFakeDeath())
             {

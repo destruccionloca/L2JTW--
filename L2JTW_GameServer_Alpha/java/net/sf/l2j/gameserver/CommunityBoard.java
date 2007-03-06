@@ -1334,11 +1334,12 @@ public class CommunityBoard
 				
 				if (player != null)
 				{
-				    String sex = "男";
+				    /*String sex = "男";
 				    if (player.getSex() == 1)
 				    {
 				        sex = "女";
 				    }
+				    */
 				    String levelApprox = "新手";
 				    if (player.getLevel() >= 60)
 				        levelApprox = "高級";
@@ -1346,7 +1347,7 @@ public class CommunityBoard
 				        levelApprox = "中級";
 				    else if (player.getLevel() >= 20)
 				        levelApprox = "初級";
-				    htmlCode.append("<table border=0><tr><td>"+player.getName()+" ("+sex+" "+player.getTemplate().className+"):</td></tr>");
+				    htmlCode.append("<table border=0><tr><td>"+player.getName()+" ("+player.getTemplate().className+"):</td></tr>");
 				    htmlCode.append("<tr><td>等級: "+levelApprox+"</td></tr>");
 				    htmlCode.append("<tr><td><br></td></tr>");
 				    

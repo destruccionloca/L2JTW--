@@ -31,6 +31,7 @@ import java.util.StringTokenizer;
 import javolution.util.FastList;
 import net.sf.l2j.Config;
 import net.sf.l2j.L2DatabaseFactory;
+import net.sf.l2j.gameserver.Announcements;
 import net.sf.l2j.gameserver.ThreadPoolManager;
 import net.sf.l2j.gameserver.datatables.ClanTable;
 import net.sf.l2j.gameserver.datatables.MapRegionTable;
@@ -51,6 +52,7 @@ import net.sf.l2j.gameserver.model.actor.instance.L2ControlTowerInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.serverpackets.SiegeInfo;
+import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.skills.Stats;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
 import net.sf.l2j.gameserver.templates.StatsSet;
@@ -400,9 +402,14 @@ public class Siege
         {
             if (getAttackerClans().size() <= 0)
             {
-                if (getCastle().getOwnerId() <= 0) announceToPlayer("因無人參戰 "
-                    + getCastle().getName() + " 攻城戰取消.", false);
-                else announceToPlayer("因無人參戰 " + getCastle().getName() + " 攻城戰取消.", false);
+
+                SystemMessage sm;
+                if (getCastle().getOwnerId() <= 0) 
+            		sm = new SystemMessage(SystemMessage.SIEGE_OF_S1_HAS_BEEN_CANCELED_DUE_TO_LACK_OF_INTEREST);
+                else
+                    sm = new SystemMessage(SystemMessage.S1_SIEGE_WAS_CANCELED_BECAUSE_NO_CLANS_PARTICIPATED);
+                sm.addString(getCastle().getName());
+                Announcements.getInstance().announceToAll(sm);  
                 return;
             }
 
@@ -879,11 +886,12 @@ public class Siege
         else if (player.getClan() == null
             || player.getClan().getLevel() < SiegeManager.getInstance().getSiegeClanMinLevel()) player.sendMessage("只有血盟等級 "
             + SiegeManager.getInstance().getSiegeClanMinLevel()
-            + " 或者更高才可以參加攻城戰.");
-        else if (player.getClan().getHasCastle() > 0) player.sendMessage("無法申請攻城戰,該署血盟已有城堡.");
-        else if (player.getClan().getClanId() == getCastle().getOwnerId()) player.sendMessage("城堡擁有血盟自動申請為守城方.");
-        else if (SiegeManager.getInstance().checkIsRegistered(player.getClan(), getCastle().getCastleId())) player.sendMessage("已申請攻城戰.");
 
+            + "  或者更高才可以參加攻城戰");
+        else if (player.getClan().getHasCastle() > 0) player.sendMessage("無法申請攻城戰,該署血盟已有城堡.");
+        else if (player.getClan().getClanId() == getCastle().getOwnerId())
+            player.sendPacket(new SystemMessage(SystemMessage.CLAN_THAT_OWNS_CASTLE_IS_AUTOMATICALLY_REGISTERED_DEFENDING));
+        else if (SiegeManager.getInstance().checkIsRegistered(player.getClan(), getCastle().getCastleId())) player.sendMessage("已申請攻城戰.");
         else return true;
 
         return false;

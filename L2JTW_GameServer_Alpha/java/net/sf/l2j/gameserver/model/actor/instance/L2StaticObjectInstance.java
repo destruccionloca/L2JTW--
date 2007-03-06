@@ -33,7 +33,8 @@ import net.sf.l2j.gameserver.model.actor.knownlist.NullKnownList;
 import net.sf.l2j.gameserver.serverpackets.MyTargetSelected;
 import net.sf.l2j.gameserver.serverpackets.NpcHtmlMessage;
 import net.sf.l2j.gameserver.serverpackets.ShowMiniMap;
-import net.sf.l2j.util.L2ObjectSet;
+import net.sf.l2j.gameserver.serverpackets.ShowTownMap;
+
 
 
 /**
@@ -47,7 +48,10 @@ public class L2StaticObjectInstance extends L2Object
     public static final int INTERACTION_DISTANCE = 150;
 
     private int _staticObjectId;
-    private int _type = -1;         // 0 - signs, 1 - throne    
+    private int _type = -1;         // 0 - map signs, 1 - throne , 2 - arena signs
+    private int _x;
+    private int _y;
+    private String _texture;
     
     /**
      * @return Returns the StaticObjectId.
@@ -68,7 +72,7 @@ public class L2StaticObjectInstance extends L2Object
     public L2StaticObjectInstance(int objectId)
     {
         super(objectId);
-        setKnownList(new NullKnownList(new L2StaticObjectInstance[] {this}));
+        setKnownList(new NullKnownList(this));
     }
     
     public int getType()
@@ -79,6 +83,23 @@ public class L2StaticObjectInstance extends L2Object
     public void setType(int type)
     {
         _type = type;
+    }
+
+    public void setMap(String texture, int x, int y)
+    {
+        _texture = "town_map."+texture;
+        _x = x;
+        _y = y;
+    }
+
+    private int getMapX()
+    {
+	return _x;
+    }
+
+    private int getMapY()
+    {
+	return _y;
     }
     
 	public final double getDistance(int x, int y)
@@ -96,9 +117,45 @@ public class L2StaticObjectInstance extends L2Object
      */
     public void onAction(L2PcInstance player)
     {
-        player.setTarget(this);
-        MyTargetSelected my = new MyTargetSelected(getObjectId(), 2);
-        player.sendPacket(my);
+
+	if(_type < 0) _log.info("L2StaticObjectInstance: StaticObject with invalid type! StaticObjectId: "+getStaticObjectId());
+        // Check if the L2PcInstance already target the L2NpcInstance
+        if (this != player.getTarget())
+        {
+            // Set the target of the L2PcInstance player
+            player.setTarget(this);
+            player.sendPacket(new MyTargetSelected(getObjectId(), 0));
+
+        } else {
+
+            MyTargetSelected my = new MyTargetSelected(getObjectId(), 0);
+            player.sendPacket(my);
+
+            // Calculate the distance between the L2PcInstance and the L2NpcInstance
+            if (!player.isInsideRadius(this, INTERACTION_DISTANCE, false, false))
+            {
+                    // Notify the L2PcInstance AI with AI_INTENTION_INTERACT
+                    player.getAI().setIntention(CtrlIntention.AI_INTENTION_INTERACT, this);
+                    
+                    // Send a Server->Client packet ActionFailed (target is out of interaction range) to the L2PcInstance player
+                    player.sendPacket(new ActionFailed());
+            } else {
+			if(_type == 2) {
+				String filename = "data/html/signboard.htm";
+				String content = HtmCache.getInstance().getHtm(filename);
+				NpcHtmlMessage html = new NpcHtmlMessage(getObjectId());
+
+				if (content == null) html.setHtml("<html><head><body>Signboard is missing:<br>"+filename+"</body></html>");
+				else html.setHtml(content);
+
+				player.sendPacket(html);
+				player.sendPacket(new ActionFailed());
+			} else if(_type == 0) player.sendPacket(new ShowTownMap(_texture, getMapX(), getMapY()));
+                    // Send a Server->Client ActionFailed to the L2PcInstance in order to avoid that the client wait another packet
+                    player.sendPacket(new ActionFailed());
+            }
+        }
+
         
     	if (getDistance(player.getX(), player.getY()) > (double)INTERACTION_DISTANCE) 
     		player.getAI().setIntention(CtrlIntention.AI_INTENTION_INTERACT, this);

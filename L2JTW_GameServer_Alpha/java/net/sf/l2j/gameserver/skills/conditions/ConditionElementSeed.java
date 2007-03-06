@@ -16,21 +16,22 @@
  *
  * http://www.gnu.org/copyleft/gpl.html
  */
-/*
- package net.sf.l2j.gameserver.skills;
-*/
+package net.sf.l2j.gameserver.skills.conditions;
+
+import net.sf.l2j.gameserver.skills.Env;
+import net.sf.l2j.gameserver.skills.effects.EffectSeed;
+
 
 /**
  * @author Advi
  *
  */
-/*
 public class ConditionElementSeed extends Condition
 {
     static int[] seedSkills = {1285, 1286, 1287};
     final int[] _requiredSeeds;
     
-    ConditionElementSeed(int[] seeds)
+    public ConditionElementSeed(int[] seeds)
     {
         _requiredSeeds = seeds;
 //        if (Config.DEVELOPER) System.out.println("Required seeds: " + _requiredSeeds[0] + ", " + _requiredSeeds[1] + ", " + _requiredSeeds[2]+ ", " + _requiredSeeds[3]+ ", " + _requiredSeeds[4]);
@@ -85,4 +86,3 @@ public class ConditionElementSeed extends Condition
         return true;
     }
 }
-*/

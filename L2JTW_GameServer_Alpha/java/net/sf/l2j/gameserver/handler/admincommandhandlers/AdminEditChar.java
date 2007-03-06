@@ -80,8 +80,9 @@ public class AdminEditChar implements IAdminCommandHandler
 
 	public boolean useAdminCommand(String command, L2PcInstance activeChar) 
     {
-        if (!((checkLevel(activeChar.getAccessLevel()) || checkLevel2(activeChar.getAccessLevel())) && activeChar.isGM())) 
-            return false;
+        if (!Config.ALT_PRIVILEGES_ADMIN)
+        	if (!((checkLevel(activeChar.getAccessLevel()) || checkLevel2(activeChar.getAccessLevel())) && activeChar.isGM()))
+        		return false;
         
 		if (command.equals("admin_current_player"))
 		{
@@ -306,7 +307,7 @@ public class AdminEditChar implements IAdminCommandHandler
                 } else {
                     return false;
                 }
-                player.changeSex();
+                player.getAppearance().setSex(player.getAppearance().getSex()? false : true);
                 SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);
                 sm.addString("SYS");
                 sm.addString("性別被GM修改");
@@ -327,7 +328,7 @@ public class AdminEditChar implements IAdminCommandHandler
                 } else {
                     return false;
                 }
-                player.setNameColor(Integer.decode("0x"+val));
+                player.getAppearance().setNameColor(Integer.decode("0x"+val));
                 player.sendMessage("名子顏色被GM修改");
                 player.broadcastUserInfo();
             }

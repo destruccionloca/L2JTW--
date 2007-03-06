@@ -98,7 +98,7 @@ public class UserInfo extends ServerBasePacket
         writeD(_cha.getObjectId());
         writeS(_cha.getName());
         writeD(_cha.getRace().ordinal());
-        writeD(_cha.getSex());
+        writeD(_cha.getAppearance().getSex()? 1 : 0);
 
         if (_cha.getClassIndex() == 0) writeD(_cha.getClassId().getId());
         else writeD(_cha.getBaseClass());
@@ -121,7 +121,7 @@ public class UserInfo extends ServerBasePacket
 
         writeD(0x28); // unknown
 
-        writeD(_cha.getInventory().getPaperdollObjectId(Inventory.PAPERDOLL_UNDER));
+        writeD(_cha.getInventory().getPaperdollObjectId(Inventory.PAPERDOLL_DHAIR));
         writeD(_cha.getInventory().getPaperdollObjectId(Inventory.PAPERDOLL_REAR));
         writeD(_cha.getInventory().getPaperdollObjectId(Inventory.PAPERDOLL_LEAR));
         writeD(_cha.getInventory().getPaperdollObjectId(Inventory.PAPERDOLL_NECK));
@@ -140,7 +140,7 @@ public class UserInfo extends ServerBasePacket
         writeD(_cha.getInventory().getPaperdollObjectId(Inventory.PAPERDOLL_LRHAND));
         writeD(_cha.getInventory().getPaperdollObjectId(Inventory.PAPERDOLL_HAIR));
 
-        writeD(_cha.getInventory().getPaperdollItemId(Inventory.PAPERDOLL_UNDER));
+        writeD(_cha.getInventory().getPaperdollItemId(Inventory.PAPERDOLL_DHAIR));
         writeD(_cha.getInventory().getPaperdollItemId(Inventory.PAPERDOLL_REAR));
         writeD(_cha.getInventory().getPaperdollItemId(Inventory.PAPERDOLL_LEAR));
         writeD(_cha.getInventory().getPaperdollItemId(Inventory.PAPERDOLL_NECK));
@@ -197,13 +197,13 @@ public class UserInfo extends ServerBasePacket
             writeF(_cha.getBaseTemplate().collisionHeight);
         }
 
-        writeD(_cha.getHairStyle());
-        writeD(_cha.getHairColor());
-        writeD(_cha.getFace());
+        writeD(_cha.getAppearance().getHairStyle());
+        writeD(_cha.getAppearance().getHairColor());
+        writeD(_cha.getAppearance().getFace());
         writeD((_cha.getAccessLevel() > 0) ? 1 : 0); // builder level 
 
         String title = _cha.getTitle();
-        if (_cha.getInvisible() == 1 && _cha.isGM()) title = "Invisible";
+        if (_cha.getAppearance().getInvisible()&& _cha.isGM()) title = "Invisible";
         if (_cha.getPoly().isMorphed())
             title += " - " + NpcTable.getInstance().getTemplate(_cha.getPoly().getPolyId()).name;
         writeS(title);
@@ -257,7 +257,7 @@ public class UserInfo extends ServerBasePacket
         writeD(_cha.GetFishx()); //fishing x  
         writeD(_cha.GetFishy()); //fishing y
         writeD(_cha.GetFishz()); //fishing z
-        writeD(_cha.getNameColor());
+        writeD(_cha.getAppearance().getNameColor());
         
 		//new c5 
        	writeC(_cha.isRunning() ? 0x01 : 0x00); //changes the Speed display on Status Window 
@@ -269,10 +269,8 @@ public class UserInfo extends ServerBasePacket
         writeD(_cha.getPledgeClass()); //changes the text above CP on Status Window
         writeD(0x00); // ??
         
-        writeD(_cha.getTitleColor());
-        
-        writeD(0x00); // ??
-        
+        writeD(_cha.getAppearance().getTitleColor());
+
         if (_cha.isCursedWeaponEquiped())
         	writeD(CursedWeaponsManager.getInstance().getLevel(_cha.getCursedWeaponEquipedId()));
         else

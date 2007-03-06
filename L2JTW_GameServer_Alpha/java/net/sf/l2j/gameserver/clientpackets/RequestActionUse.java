@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.ClientThread;
 import net.sf.l2j.gameserver.ai.CtrlIntention;
+import net.sf.l2j.gameserver.datatables.SkillTable;
 import net.sf.l2j.gameserver.instancemanager.CastleManager;
 import net.sf.l2j.gameserver.model.L2CharPosition;
 import net.sf.l2j.gameserver.model.L2ManufactureList;
@@ -158,8 +159,13 @@ public class RequestActionUse extends ClientBasePacket
 
                     if (target.isAutoAttackable(activeChar) || _ctrlPressed)
                     {
-                    	// AI doesn't support attacking other than doors at the moment
-                        if ((pet.getNpcId() != L2Summon.SIEGE_GOLEM_ID) || (target instanceof L2DoorInstance))
+                    	if (target instanceof L2DoorInstance) 
+                    	{
+                    		if(((L2DoorInstance)target).isAttackable(activeChar))
+                    			pet.getAI().setIntention(CtrlIntention.AI_INTENTION_ATTACK, target);
+                    	}
+                    	// siege golem AI doesn't support attacking other than doors at the moment
+                    	else if (pet.getNpcId() != L2Summon.SIEGE_GOLEM_ID)
                             pet.getAI().setIntention(CtrlIntention.AI_INTENTION_ATTACK, target);
                     }
 				}
@@ -265,6 +271,7 @@ public class RequestActionUse extends ClientBasePacket
                 }
                 else if (activeChar.isMounted())
                 {
+                	if (activeChar.isFlying())activeChar.removeSkill(SkillTable.getInstance().getInfo(4289, 1));
 					Ride dismount = new Ride(activeChar.getObjectId(), Ride.ACTION_DISMOUNT, 0);
                     activeChar.broadcastPacket(dismount);
                     activeChar.setMountType(0);

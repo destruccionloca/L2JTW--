@@ -92,7 +92,7 @@ import net.sf.l2j.gameserver.model.L2WorldRegion;
  * L2Character :<BR><BR>
  * <li>L2Attackable</li>
  * <li>L2BoxInstance</li>
- * <li>L2FolkInstance</li>adasdad
+ * <li>L2FolkInstance</li>
  * 
  * @version $Revision: 1.32.2.7.2.24 $ $Date: 2005/04/11 10:06:09 $
  */
@@ -126,6 +126,21 @@ public class L2NpcInstance extends L2Character
     private boolean _IsInTown = false;
 
     private int _isSpoiledBy = 0;
+    
+    
+    
+    
+    
+    
+    
+    
+    //-----------------------------------------------------
+    // L2NpcInstance act like L2Attackable
+    public void startAttackableAI()
+    {
+    	
+    }
+    
     
     /** Task launching the function onRandomAnimation() */
     public class RandomAnimationTask implements Runnable
@@ -196,9 +211,9 @@ public class L2NpcInstance extends L2Character
         // Call the L2Character constructor to set the _template of the L2Character, copy skills from template to object 
         // and link _calculators to NPC_STD_CALCULATOR
         super(objectId, template);
-        super.setKnownList(new NpcKnownList(new L2NpcInstance[] {this}));
-        super.setStat(new NpcStat(this));
-        super.setStatus(new NpcStatus(this));
+        this.getKnownList();	// init knownlist
+        this.getStat();			// init stats
+        this.getStatus();		// init status
         
         if (template == null)
         {
@@ -214,9 +229,26 @@ public class L2NpcInstance extends L2Character
             startRandomAnimation();
     }
 
-    public NpcKnownList getKnownList() { return (NpcKnownList)super.getKnownList(); }
-    public NpcStat getStat() { return (NpcStat)super.getStat(); }
-    public NpcStatus getStatus() { return (NpcStatus)super.getStatus(); }
+    public NpcKnownList getKnownList()
+    {
+    	if(super.getKnownList() == null || !(super.getKnownList() instanceof NpcKnownList))
+    		this.setKnownList(new NpcKnownList(this));
+    	return (NpcKnownList)super.getKnownList();
+    }
+    
+    public NpcStat getStat()
+    {
+    	if(super.getStat() == null || !(super.getStat() instanceof NpcStat))
+    		this.setStat(new NpcStat(this));
+    	return (NpcStat)super.getStat();
+    }
+    
+    public NpcStatus getStatus()
+    {
+    	if(super.getStatus() == null || !(super.getStatus() instanceof NpcStatus))
+    		this.setStatus(new NpcStatus(this));
+    	return (NpcStatus)super.getStatus();
+    }
     
     /**
      * Check if the server allow Random Animation.<BR><BR>
@@ -1121,7 +1153,7 @@ public class L2NpcInstance extends L2Character
 
             	try
             	{
-            		MultiSellList multisell=new MultiSellList(Integer.parseInt(command.substring(9).trim()));
+            		MultiSellList multisell=new MultiSellList(Integer.parseInt(command.substring(9).trim()), this);
             		
             		if(multisell!=null) 
             			player.sendPacket(multisell);
@@ -1133,7 +1165,7 @@ public class L2NpcInstance extends L2Character
     		}
             else if (command.startsWith("exc_multisell"))
             {
-                player.sendPacket(new MultiSellList(Integer.parseInt(command.substring(13).trim()), true, player));
+                player.sendPacket(new MultiSellList(Integer.parseInt(command.substring(13).trim()), this, true, player));
             }
             else if (command.startsWith("npcfind_byid"))
             {
@@ -1185,6 +1217,7 @@ public class L2NpcInstance extends L2Character
         ThreadPoolManager.getInstance().scheduleGeneral(new RandomAnimationTask(), interval);
     }
     
+
     /**
      * Return null (regular NPCs don't have weapons instancies).<BR><BR>
      */

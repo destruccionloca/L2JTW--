@@ -29,6 +29,7 @@ import net.sf.l2j.gameserver.GameTimeController;
 import net.sf.l2j.gameserver.GeoData;
 import net.sf.l2j.gameserver.Territory;
 import net.sf.l2j.gameserver.ThreadPoolManager;
+import net.sf.l2j.gameserver.datatables.NpcTable;
 import net.sf.l2j.gameserver.lib.Rnd;
 import net.sf.l2j.gameserver.model.L2Attackable;
 import net.sf.l2j.gameserver.model.L2CharPosition;
@@ -50,9 +51,16 @@ import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PenaltyMonsterInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2RaidBossInstance;
+import net.sf.l2j.gameserver.templates.L2NpcTemplate;
 import net.sf.l2j.gameserver.templates.L2Weapon;
 import net.sf.l2j.gameserver.templates.L2WeaponType;
 import net.sf.l2j.gameserver.taskmanager.DecayTaskManager;
+import net.sf.l2j.gameserver.model.L2NpcChatData;
+
+import net.sf.l2j.gameserver.clientpackets.Say2;
+import net.sf.l2j.gameserver.serverpackets.SocialAction;
+import net.sf.l2j.gameserver.serverpackets.SystemMessage;
+import net.sf.l2j.gameserver.serverpackets.CreatureSay;
 
 /**
  * This class manages AI of L2Attackable.<BR><BR>
@@ -81,6 +89,9 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 
     private int enemyRange;
     
+    private boolean canchat;
+    private int npcchat_delay = 0;
+    private int radius=0;
     private static final int RANDOM_BUFF_RATE = 20;
 
     /**
@@ -139,8 +150,105 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
      */
     private boolean autoAttackCondition(L2Character target)
     {
+    	
+
+    	
         L2Attackable me = (L2Attackable) _actor;
 
+        L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(((L2NpcInstance)_actor).getTemplate().npcId);
+        //_log.warning("Chatdata Get:"+((L2NpcInstance)_actor).getTemplate().npcId);
+       // _log.warning("TIME:"+GameTimeController.getGameTicks()+" NPCTIME:"+npcchat_delay);
+        if (GameTimeController.getGameTicks() > npcchat_delay)
+        for(L2NpcChatData chats: npcData.getChatData())
+    	{
+        	npcchat_delay=0;
+        	if(Rnd.nextInt(100)>=chats.getChatChance())
+        	{
+        		_log.warning("fail");
+        	continue;
+        	}
+        	
+        	//condition check
+        	//-------------------------------------------------
+        	if (chats.getChatCondition1()==0)
+        	{
+        		canchat = true;
+        	}
+        	if (chats.getChatCondition1()==1)
+        	{
+        		double hppercent= _actor.getCurrentHp()/_actor.getMaxHp()*100;
+    			if (hppercent<chats.getChatValue1())
+    				canchat = true;
+        	}
+        	if (chats.getChatCondition1()==2)
+        	{
+        		double mppercent= _actor.getCurrentMp()/_actor.getMaxMp()*100;
+    			if (mppercent<chats.getChatValue1())
+    				canchat = true;
+        	}
+        	if (chats.getChatCondition1()==3)
+        	{
+        		
+	        		if(target instanceof L2NpcInstance)
+	        			canchat=true;
+        	}
+        	if (chats.getChatCondition1()==4)
+        	{
+        	
+	        		if(target instanceof L2PcInstance)
+	        			canchat=true;
+        	}
+        	_log.warning("check:"+canchat);
+        	//condition where Dont chat
+        	//-------------------------------------------------
+        	if (chats.getChatCondition2()==1)
+        	{
+        		double hppercent= _actor.getCurrentHp()/_actor.getMaxHp()*100;
+    			if (hppercent<chats.getChatValue2())
+    				canchat = false;
+        	}
+        	if (chats.getChatCondition2()==2)
+        	{
+        		double mppercent= _actor.getCurrentMp()/_actor.getMaxMp()*100;
+    			if (mppercent<chats.getChatValue2())
+    				canchat = false;
+        	}
+        	if (chats.getChatCondition2()==3)
+        	{
+	        		if(target instanceof L2NpcInstance)
+	        			canchat=false;
+        	}
+        	if (chats.getChatCondition2()==4)
+        	{
+	        		if(target instanceof L2PcInstance)
+	        			canchat=false;
+        	}
+        	
+        	
+        	//-------------------------------------------------
+    		if (canchat)
+    		{
+    			npcchat_delay=chats.getChatDelay()*10+GameTimeController.getGameTicks();
+    			CreatureSay cs = new CreatureSay(_actor.getObjectId(), chats.getChatType(), ((L2NpcInstance)_actor).getTemplate().name, chats.getChatMemo());
+    			 
+    			if(chats.getChatType()==0)
+    				radius=1000;
+    			else if(chats.getChatType()==1||chats.getChatType()==10||chats.getChatType()==17)
+    				radius=100000;
+    			else
+    				radius=1000;
+    			
+    			canchat=false;
+    			for (L2Object obj : _actor.getKnownList().getKnownCharactersInRadius(radius))
+                 {
+    				if(obj instanceof L2PcInstance)
+    	            ((L2PcInstance)obj).sendPacket(cs);
+                 }
+    	        break;
+    		}
+
+    	}
+        
         // Check if the target isn't a Folk or a Door
         if (target instanceof L2FolkInstance || target instanceof L2DoorInstance) return false;
 
@@ -167,12 +275,13 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         	return false;
         
 
+        // Check if the target isn't invulnerable
+        if (target.isInvul())
+            return false;
+        
         // Check if the target is a L2PcInstance
         if (target instanceof L2PcInstance)
         {
-            // Check if the target isn't invulnerable
-            if (((L2PcInstance)target).isInvul())
-                return false;
             // Don't take the aggro if the GM has the access level below or equal to GM_DONT_TAKE_AGGRO
             if (((L2PcInstance)target).isGM() && ((L2PcInstance)target).getAccessLevel() <= Config.GM_DONT_TAKE_AGGRO)
                 return false;
@@ -622,6 +731,105 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
      */
     private void thinkAttack()
     {
+    	
+    	
+    	
+    	 L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(((L2NpcInstance)_actor).getTemplate().npcId);
+         //_log.warning("Chatdata Get:"+((L2NpcInstance)_actor).getTemplate().npcId);
+        // _log.warning("TIME:"+GameTimeController.getGameTicks()+" NPCTIME:"+npcchat_delay);
+         if (GameTimeController.getGameTicks() > npcchat_delay)
+         for(L2NpcChatData chats: npcData.getChatData())
+     	{
+         	npcchat_delay=0;
+         	if(Rnd.nextInt(100)>=chats.getChatChance())
+         	{
+         		_log.warning("fail");
+         	continue;
+         	}
+         	
+         	//condition check
+         	//-------------------------------------------------
+         	if (chats.getChatCondition1()==0)
+         	{
+         		canchat = true;
+         	}
+         	if (chats.getChatCondition1()==1)
+         	{
+         		double hppercent= _actor.getCurrentHp()/_actor.getMaxHp()*100;
+     			if (hppercent<chats.getChatValue1())
+     				canchat = true;
+         	}
+         	if (chats.getChatCondition1()==2)
+         	{
+         		double mppercent= _actor.getCurrentMp()/_actor.getMaxMp()*100;
+     			if (mppercent<chats.getChatValue1())
+     				canchat = true;
+         	}
+         	if (chats.getChatCondition1()==3)
+         	{
+         		
+ 	        		if(_actor.getTarget() instanceof L2NpcInstance)
+ 	        			canchat=true;
+         	}
+         	if (chats.getChatCondition1()==4)
+         	{
+         	
+ 	        		if(_actor.getTarget() instanceof L2PcInstance)
+ 	        			canchat=true;
+         	}
+         	_log.warning("check:"+canchat);
+         	//condition where Dont chat
+         	//-------------------------------------------------
+         	if (chats.getChatCondition2()==1)
+         	{
+         		double hppercent= _actor.getCurrentHp()/_actor.getMaxHp()*100;
+     			if (hppercent<chats.getChatValue2())
+     				canchat = false;
+         	}
+         	if (chats.getChatCondition2()==2)
+         	{
+         		double mppercent= _actor.getCurrentMp()/_actor.getMaxMp()*100;
+     			if (mppercent<chats.getChatValue2())
+     				canchat = false;
+         	}
+         	if (chats.getChatCondition2()==3)
+         	{
+ 	        		if(_actor.getTarget() instanceof L2NpcInstance)
+ 	        			canchat=false;
+         	}
+         	if (chats.getChatCondition2()==4)
+         	{
+ 	        		if(_actor.getTarget() instanceof L2PcInstance)
+ 	        			canchat=false;
+         	}
+         	
+         	
+         	//-------------------------------------------------
+     		if (canchat)
+     		{
+     			npcchat_delay=chats.getChatDelay()*10+GameTimeController.getGameTicks();
+     			CreatureSay cs = new CreatureSay(_actor.getObjectId(), chats.getChatType(), ((L2NpcInstance)_actor).getTemplate().name, chats.getChatMemo());
+     			 
+     			if(chats.getChatType()==0)
+     				radius=1000;
+     			else if(chats.getChatType()==1||chats.getChatType()==10||chats.getChatType()==17)
+     				radius=100000;
+     			else
+     				radius=1000;
+     			
+     			canchat=false;
+     			for (L2Object obj : _actor.getKnownList().getKnownCharactersInRadius(radius))
+                  {
+     				if(obj instanceof L2PcInstance)
+     	            ((L2PcInstance)obj).sendPacket(cs);
+                  }
+     	        break;
+     		}
+
+     	}
+         
+    	
+    	
         if(_actor.isAttackingDisabled()) return;
         
         if (_attack_timeout < GameTimeController.getGameTicks())
