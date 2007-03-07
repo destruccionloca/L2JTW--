@@ -24,6 +24,7 @@ import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.instancemanager.SiegeManager;
 import net.sf.l2j.gameserver.serverpackets.ActionFailed;
 import net.sf.l2j.gameserver.serverpackets.ItemList;
+import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage; 
 
@@ -64,6 +65,7 @@ public final class L2ObservationInstance extends L2FolkInstance
                                                                                                       val);
 
             else player.sendPacket(new SystemMessage(SystemMessage.ONLY_VIEW_SIEGE)); 
+
 
 
         }

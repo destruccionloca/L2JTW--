@@ -156,9 +156,9 @@ public abstract class L2Character extends L2Object
 	private L2CharTemplate _Template;                       // The link on the L2CharTemplate object containing generic and static properties of this L2Character type (ex : Max HP, Speed...)
 	private String _Title;
 	private String _aiClass = "default";
-	private double _hpUpdateIncCheck = .0;
-	private double _hpUpdateDecCheck = .0;
-	private double _hpUpdateInterval = .0;
+	private double _hpUpdateIncCheck;
+	private double _hpUpdateDecCheck;
+	private double _hpUpdateInterval;
 	
 	// =========================================================
 
@@ -390,26 +390,38 @@ public abstract class L2Character extends L2Object
 	}
 
 	/**
-	 * * Returns true if hp update should be done, false if not
+	 * Returns true if status update should be done, false if not
 	 * @return boolean
 	 */
-	protected boolean needHpUpdate(int barPixels)
+	private boolean needStatusUpdate()
 	{
+		if (!(this instanceof L2MonsterInstance))
+			return true;
+
 		double currentHp = getCurrentHp();
 
-	    if (currentHp <= .0 || getMaxHp() < barPixels)
+	    if (currentHp <= 0.00 || getMaxHp() < 352)
 	        return true;
 
-	    if (currentHp < _hpUpdateDecCheck || currentHp > _hpUpdateIncCheck)
- 	    {
-	        _hpUpdateDecCheck = Double.MAX_VALUE;
-	        _hpUpdateIncCheck = Double.MAX_VALUE;
-	        _hpUpdateDecCheck -= (_hpUpdateDecCheck-currentHp)/_hpUpdateInterval*_hpUpdateInterval;
-	        _hpUpdateIncCheck -= (_hpUpdateDecCheck-currentHp)/_hpUpdateInterval*_hpUpdateInterval-_hpUpdateInterval;
-	        return true;
- 	    }
+	    boolean needUpdate = false;
 
-	    return false;
+/*	    if (currentHp > getMaxHp())
+	        currentHp = getMaxHp();*/
+
+	    if (currentHp < _hpUpdateDecCheck)
+	    {
+	        needUpdate = true;
+	        _hpUpdateDecCheck -= _hpUpdateInterval;
+	        _hpUpdateIncCheck -= _hpUpdateInterval;
+	    }
+	    else if (currentHp > _hpUpdateIncCheck)
+	    {
+	        needUpdate = true;
+	        _hpUpdateDecCheck += _hpUpdateInterval;
+	        _hpUpdateIncCheck += _hpUpdateInterval;
+	    }
+
+	    return needUpdate;
 	}
 
 	/**
@@ -430,7 +442,7 @@ public abstract class L2Character extends L2Object
 	{
 		if (getStatus().getStatusListener() == null || getStatus().getStatusListener().isEmpty()) return;
 
-		if (!needHpUpdate(352))
+		if (!needStatusUpdate())
 			return;
 
 		// Create the Server->Client packet StatusUpdate with current HP and MP
@@ -697,7 +709,7 @@ public abstract class L2Character extends L2Object
             hitted = doAttackHitByBow(attack, target, sAtk);
         else if (weaponItem.getItemType() == L2WeaponType.POLE)
             hitted = doAttackHitByPole(attack);
-        else if (weaponItem.getItemType() == L2WeaponType.DUAL || weaponItem.getItemType() == L2WeaponType.DUALFIST)
+        else if (isUsingDualWeapon() || weaponItem.getItemType() == L2WeaponType.DUAL || weaponItem.getItemType() == L2WeaponType.DUALFIST)
             hitted = doAttackHitByDual(attack, target);
         else
             hitted = doAttackHitSimple(attack, target);
@@ -874,51 +886,69 @@ public abstract class L2Character extends L2Object
 		boolean miss2 = Formulas.getInstance().calcHitMiss(this, target);
 
 		// Check if hit 1 isn't missed
-		if (!miss1)
-		{
-			// Calculate if shield defense is efficient against hit 1
-			shld1 = Formulas.getInstance().calcShldUse(this, target);
-
-			// Calculate if hit 1 is critical
-			crit1 = Formulas.getInstance().calcCrit(getStat().getCriticalHit(target, null));
-
-			// Calculate physical damages of hit 1
-			damage1 = (int)Formulas.getInstance().calcPhysDam(this, target, null, shld1, crit1, true, attack._soulshot);
-			damage1 /= 2;
-		}
-
-		// Check if hit 2 isn't missed
-		if (!miss2)
-		{
-			// Calculate if shield defense is efficient against hit 2
-			shld2 = Formulas.getInstance().calcShldUse(this, target);
-
-			// Calculate if hit 2 is critical
-			crit2 = Formulas.getInstance().calcCrit(getStat().getCriticalHit(target, null));
-
-			// Calculate physical damages of hit 2
-			damage2 = (int)Formulas.getInstance().calcPhysDam(this, target, null, shld2, crit2, true, attack._soulshot);
-			damage2 /= 2;
-		}
-
-        if (this instanceof L2Attackable && ((L2Attackable)this).getTemplate().charsoulshot >0)
+        if (!miss1)
         {
+            // Calculate if shield defense is efficient against hit 1
+            shld1 = Formulas.getInstance().calcShldUse(this, target);
             
-            Broadcast.toSelfAndKnownPlayersInRadius(this, new MagicSkillUser(this, this, 2154, 1, 0, 0), 360000);
+            // Calculate if hit 1 is critical
+            crit1 = Formulas.getInstance().calcCrit(getStat().getCriticalHit(target, null));
+            
+            // Calculate physical damages of hit 1
+            if (this instanceof L2Attackable && ((L2Attackable)this).getTemplate().charsoulshot >0)
+             {
+                damage1 = (int)Formulas.getInstance().calcPhysDam(this, target, null, shld1, crit1, true, true);
+                damage1 /= 2;
+             }
+            else
+            {
+            damage1 = (int)Formulas.getInstance().calcPhysDam(this, target, null, shld1, crit1, true, attack._soulshot);
+            damage1 /= 2;
+            }
+        }
         
-           ThreadPoolManager.getInstance().scheduleAi(new HitTask(target, damage1, crit1, miss1, true, shld1), 650);
-           
-           // Create a new hit task with Medium priority for hit 2 with a higher delay
-           ThreadPoolManager.getInstance().scheduleAi(new HitTask(target, damage2, crit2, miss2, true, shld2), 1250);
-        }
-        else
+        // Check if hit 2 isn't missed
+        if (!miss2)
         {
-       // Create a new hit task with Medium priority for hit 1
-       ThreadPoolManager.getInstance().scheduleAi(new HitTask(target, damage1, crit1, miss1, attack._soulshot, shld1), 650);
-       
-       // Create a new hit task with Medium priority for hit 2 with a higher delay
-       ThreadPoolManager.getInstance().scheduleAi(new HitTask(target, damage2, crit2, miss2, attack._soulshot, shld2), 1250);
+            // Calculate if shield defense is efficient against hit 2
+            shld2 = Formulas.getInstance().calcShldUse(this, target);
+            
+            // Calculate if hit 2 is critical
+            crit2 = Formulas.getInstance().calcCrit(getStat().getCriticalHit(target, null));
+            
+            // Calculate physical damages of hit 2
+            if (this instanceof L2Attackable && ((L2Attackable)this).getTemplate().charsoulshot >0)
+            {
+                damage2 = (int)Formulas.getInstance().calcPhysDam(this, target, null, shld2, crit2, true, true);
+                damage2 /= 2;
+            }
+            else
+            {
+            damage2 = (int)Formulas.getInstance().calcPhysDam(this, target, null, shld2, crit2, true, attack._soulshot);
+            damage2 /= 2;
+            }
         }
+         if (this instanceof L2Attackable && ((L2Attackable)this).getTemplate().charsoulshot >0)
+         {
+             
+             Broadcast.toSelfAndKnownPlayersInRadius(this, new MagicSkillUser(this, this, 2154, 1, 0, 0), 360000);
+         
+            ThreadPoolManager.getInstance().scheduleAi(new HitTask(target, damage1, crit1, miss1, true, shld1), 650);
+            
+            // Create a new hit task with Medium priority for hit 2 with a higher delay
+            ThreadPoolManager.getInstance().scheduleAi(new HitTask(target, damage2, crit2, miss2, true, shld2), 1250);
+         }
+         else
+         {
+        // Create a new hit task with Medium priority for hit 1
+        ThreadPoolManager.getInstance().scheduleAi(new HitTask(target, damage1, crit1, miss1, attack._soulshot, shld1), 650);
+        
+        // Create a new hit task with Medium priority for hit 2 with a higher delay
+        ThreadPoolManager.getInstance().scheduleAi(new HitTask(target, damage2, crit2, miss2, attack._soulshot, shld2), 1250);
+         }
+        // Add those hits to the Server-Client packet Attack
+        attack.addHit(target, damage1, miss1, crit1, shld1);
+        attack.addHit(target, damage2, miss2, crit2, shld2);
 
 		// Return true if hit 1 or hit 2 isn't missed
 		return (!miss1 || !miss2);
@@ -1596,11 +1626,11 @@ public abstract class L2Character extends L2Object
 	public final boolean isAlikeDead() { return isFakeDeath() || !(getCurrentHp() > 0.5); }
 
 	/** Return True if the L2Character can't use its skills (ex : stun, sleep...). */
-	public final boolean isAllSkillsDisabled() { return _allSkillsDisabled || isStunned() || isSleeping() || isParalyzed(); }
-
+	public final boolean isAllSkillsDisabled() { return _allSkillsDisabled || isStunned() || isSleeping() || isParalyzed() || _castEndTime > GameTimeController.getGameTicks(); }
+	
 	/** Return True if the L2Character can't attack (stun, sleep, attackEndTime, fakeDeath, paralyse). */
-	public final boolean isAttackingDisabled() { return isStunned() || isSleeping() || _attackEndTime > GameTimeController.getGameTicks() || isFakeDeath() || isParalyzed(); }
-
+	public final boolean isAttackingDisabled() { return isStunned() || isSleeping() || _attackEndTime > GameTimeController.getGameTicks() || isFakeDeath() || isParalyzed() || _castEndTime > GameTimeController.getGameTicks(); }
+	
 	public final Calculator[] getCalculators() { return _Calculators; }
 
 	public final boolean isConfused() { return _IsConfused; }
@@ -1629,9 +1659,9 @@ public abstract class L2Character extends L2Object
 	public final boolean isPsychicalMuted() { return _IsPsychicalMuted; }
     public final void setIsPsychicalMuted(boolean value) { _IsPsychicalMuted = value; }
 
-	/** Return True if the L2Character can't move (stun, root, sleep, overload, paralyzed). */
-	public final boolean isMovementDisabled() { return isStunned() || isRooted() || isSleeping() || isOverloaded() || isParalyzed() || isImobilised() || isFakeDeath(); }
-
+    /** Return True if the L2Character can't move (stun, root, sleep, overload, paralyzed). */
+	public final boolean isMovementDisabled() { return isStunned() || isRooted() || isSleeping() || isOverloaded() || isParalyzed() || isImobilised() || isFakeDeath() || _attackEndTime > GameTimeController.getGameTicks() || _castEndTime > GameTimeController.getGameTicks();  }
+	
 	/** Return True if the L2Character can be controlled by the player (confused, affraid). */
 	public final boolean isOutOfControl() { return isConfused() || isAffraid(); }
 
