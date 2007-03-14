@@ -136,7 +136,11 @@ public class L2PlayerAI extends L2CharacterAI
                  */
 
 
-                if (cmd != null) setIntention(cmd.intention, cmd.arg0, cmd.arg1);
+                if (cmd != null && cmd.intention != AI_INTENTION_CAST) // previous state shouldn't be casting 
+                {
+                	setIntention(cmd.intention, cmd.arg0, cmd.arg1);
+                }
+                
                 else setIntention(AI_INTENTION_IDLE);
 
 

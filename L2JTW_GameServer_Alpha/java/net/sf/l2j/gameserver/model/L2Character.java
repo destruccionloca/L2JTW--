@@ -1397,9 +1397,8 @@ public abstract class L2Character extends L2Object
 				sendPacket(sg);
 			}
 
-			// Disable all skills during the casting time and create a task EnableAllSkills with Medium priority to enable all skills at the end of the cating time
+			// Disable all skills during the casting 
 			disableAllSkills();
-			ThreadPoolManager.getInstance().scheduleAi(new EnableAllSkills(skill), skillTime);
 
 			if (_skillCast != null)
 			{
@@ -1760,27 +1759,6 @@ public abstract class L2Character extends L2Object
 	/** Set the L2Character movement type to walk and send Server->Client packet ChangeMoveType to all others L2PcInstance. */
 	public final void setWalking() { if (isRunning()) setIsRunning(false); }
 
-	/** Task lauching the function enableAllSkills() */
-	class EnableAllSkills implements Runnable
-	{
-		L2Skill _skill;
-
-		public EnableAllSkills(L2Skill skill)
-		{
-			_skill = skill;
-		}
-
-		public void run()
-		{
-			try
-			{
-				enableAllSkills();
-			} catch (Throwable e) {
-				_log.log(Level.SEVERE, "", e);
-			}
-		}
-	}
-
 	/** Task lauching the function enableSkill() */
 	class EnableSkill implements Runnable
 	{
@@ -1860,6 +1838,7 @@ public abstract class L2Character extends L2Object
 		{
 			try
 			{
+				enableAllSkills();
 				onMagicUseTimer(_targets, _skill);
 				_skillCast = null;
 			}
@@ -3506,6 +3485,7 @@ public abstract class L2Character extends L2Object
 			}
 			// cancels the skill hit scheduled task
 			enableAllSkills();                                      // re-enables the skills
+			if (this instanceof L2PcInstance) getAI().notifyEvent(CtrlEvent.EVT_FINISH_CASTING); // setting back previous intention
 			broadcastPacket(new MagicSkillCanceld(getObjectId()));  // broadcast packet to stop animations client-side
 			sendPacket(new ActionFailed());                         // send an "action failed" packet to the caster
 		}
