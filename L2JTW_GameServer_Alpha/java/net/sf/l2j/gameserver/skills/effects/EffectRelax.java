@@ -70,6 +70,7 @@ class EffectRelax extends L2Effect
 				getEffected().sendPacket(sm);
 				//if (getEffected() instanceof L2PcInstance)
 					//((L2PcInstance)getEffected()).standUp();
+
                 retval = false;
 			}
 		}

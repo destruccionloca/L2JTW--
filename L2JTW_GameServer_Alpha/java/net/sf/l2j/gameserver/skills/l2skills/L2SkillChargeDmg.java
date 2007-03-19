@@ -46,8 +46,8 @@ public class L2SkillChargeDmg extends L2Skill
         charge_skill_id = 4271;
     }
 
-
     public boolean checkCondition(L2Character activeChar)
+
 
     {
         if (activeChar instanceof L2PcInstance)
@@ -62,6 +62,8 @@ public class L2SkillChargeDmg extends L2Skill
                 return false;
             }
         }
+
+
         return super.checkCondition(activeChar, false);
     }
     
@@ -83,6 +85,8 @@ public class L2SkillChargeDmg extends L2Skill
         }
         
 
+
+
         double modifier = 0;
 
         modifier = effect.num_charges*0.333;
@@ -99,6 +103,7 @@ public class L2SkillChargeDmg extends L2Skill
         
         L2ItemInstance weaponInst = caster.getActiveWeaponInstance();
         
+
 
 
         for(int index = 0;index < targets.length;index++)

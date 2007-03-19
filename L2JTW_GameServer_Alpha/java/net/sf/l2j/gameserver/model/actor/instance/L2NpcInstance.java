@@ -76,6 +76,7 @@ import net.sf.l2j.gameserver.serverpackets.SocialAction;
 import net.sf.l2j.gameserver.serverpackets.StatusUpdate;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.serverpackets.ValidateLocation;
+import net.sf.l2j.gameserver.skills.Stats;
 import net.sf.l2j.gameserver.taskmanager.DecayTaskManager;
 import net.sf.l2j.gameserver.templates.L2HelperBuff;
 import net.sf.l2j.gameserver.templates.L2Item;
@@ -699,15 +700,16 @@ public class L2NpcInstance extends L2Character
             html1.append("<font color=\"LEVEL\">戰鬥資料</font>");
             html1.append("<table border=\"0\" width=\"100%\">");
 
-            html1.append("<tr><td>目前HP</td><td>"+(int)getCurrentHp()+"</td><td>目前MP</td><td>"+(int)getCurrentMp()+"</td></tr>");
-            html1.append("<tr><td>最大HP</td><td>"+(int)((getMaxHp()/getTemplate().rateHp))+"*"+getTemplate().rateHp+"</td><td>最大MP</td><td>"+getMaxMp()+"</td></tr>");
-            html1.append("<tr><td>物攻</td><td>"+getPAtk(null)+"</td><td>魔攻</td><td>"+getMAtk(null,null)+"</td></tr>");
+            html1.append("<tr><td>目前HP</td><td>"+getCurrentHp()+"</td><td>目前MP</td><td>"+getCurrentMp()+"</td></tr>");
+            html1.append("<tr><td>最大HP</td><td>"+(int)(getMaxHp()/getStat().calcStat(Stats.MAX_HP , 1, this, null))+"*"+getStat().calcStat(Stats.MAX_HP , 1, this, null)+"</td><td>最大MP</td><td>"+getMaxMp()+"</td></tr>");
+			html1.append("<tr><td>物攻</td><td>"+getPAtk(null)+"</td><td>魔攻</td><td>"+getMAtk(null,null)+"</td></tr>");
             html1.append("<tr><td>物防</td><td>"+getPDef(null)+"</td><td>魔防</td><td>"+getMDef(null,null)+"</td></tr>");
             html1.append("<tr><td>命中</td><td>"+getAccuracy()+"</td><td>迴避</td><td>"+getEvasionRate(null)+"</td></tr>");
             html1.append("<tr><td>致命</td><td>"+getCriticalHit(null,null)+"</td><td>移動</td><td>"+getRunSpeed()+"</td></tr>");
             html1.append("<tr><td>攻速</td><td>"+getPAtkSpd()+"</td><td>施展</td><td>"+getMAtkSpd()+"</td></tr>");
             html1.append("<tr><td>種族</td><td>"+getTemplate().race+"</td><td></td><td></td></tr>");
             html1.append("</table>");
+
             
             html1.append("<font color=\"LEVEL\">基本屬性</font>");
             html1.append("<table border=\"0\" width=\"100%\">");
@@ -751,13 +753,17 @@ public class L2NpcInstance extends L2Character
             
             html1.append("<br><center><font color=\"LEVEL\">[戰鬥狀態]</font></center>");
             html1.append("<table border=0 width=\"100%\">");
-            html1.append("<tr><td>最大HP</td><td>"+(int)(getMaxHp()/getTemplate().rateHp)+"*"+getTemplate().rateHp+"</td><td>最大MP</td><td>"+getMaxMp()+"</td></tr>");
-            html1.append("<tr><td>物攻</td><td>"+getPAtk(null)+"</td><td>魔攻</td><td>"+getMAtk(null,null)+"</td></tr>");
+
+
+			html1.append("<tr><td>MAX-HP</td><td>"+(int)(getMaxHp()/(int) getStat().calcStat(Stats.MAX_HP , 1, this, null))+"*"+(int) getStat().calcStat(Stats.MAX_HP , 1, this, null)+"</td><td>MaAX-MP</td><td>"+getMaxMp()+"</td></tr>");
+			html1.append("<tr><td>物攻</td><td>"+getPAtk(null)+"</td><td>魔攻</td><td>"+getMAtk(null,null)+"</td></tr>");
             html1.append("<tr><td>物防</td><td>"+getPDef(null)+"</td><td>魔防</td><td>"+getMDef(null,null)+"</td></tr>");
             html1.append("<tr><td>命中</td><td>"+getAccuracy()+"</td><td>迴避</td><td>"+getEvasionRate(null)+"</td></tr>");
             html1.append("<tr><td>致命</td><td>"+getCriticalHit(null,null)+"</td><td>移動</td><td>"+getRunSpeed()+"</td></tr>");
             html1.append("<tr><td>攻速</td><td>"+getPAtkSpd()+"</td><td>施展</td><td>"+getMAtkSpd()+"</td></tr>");
             html1.append("<tr><td>種族</td><td>"+getTemplate().race+"</td><td></td><td></td></tr>");
+
+
             html1.append("</table>");
 
             html1.append("<br><center><font color=\"LEVEL\">[基本能力]</font></center>");
@@ -1473,7 +1479,8 @@ public class L2NpcInstance extends L2Character
         QuestState[] awaits = player.getQuestsForTalk(getTemplate().npcId);
         Quest[] starts = getTemplate().getStartQuests();
         
-        
+        // Quests are limited between 1 and 999 because those are the quests that are supported by the client. 
+        // By limitting them there, we are allowed to create custom quests at higher IDs without interfering 
         if (awaits != null) 
         {
             for (QuestState x : awaits) 
@@ -2204,7 +2211,8 @@ public class L2NpcInstance extends L2Character
      */
     public int getExpReward()
     {
-        return (int)(getTemplate().rewardExp * getTemplate().rateHp * Config.RATE_XP);
+    	double rateXp = getStat().calcStat(Stats.MAX_HP , 1, this, null);
+        return (int)(getTemplate().rewardExp * rateXp * Config.RATE_XP);
     }
     
     /**
@@ -2212,7 +2220,8 @@ public class L2NpcInstance extends L2Character
      */
     public int getSpReward()
     {
-        return (int)(getTemplate().rewardSp * getTemplate().rateHp * Config.RATE_SP);
+    	double rateSp = getStat().calcStat(Stats.MAX_HP , 1, this, null);
+        return (int)(getTemplate().rewardSp * rateSp * Config.RATE_SP);
     }
     
     /**

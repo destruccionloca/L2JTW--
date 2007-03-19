@@ -87,6 +87,13 @@ public class Spoil implements ISkillHandler
 
 
 				}
+				else 
+				{
+					SystemMessage sm = new SystemMessage(SystemMessage.S1_WAS_UNAFFECTED_BY_S2);
+					sm.addString(target.getName());
+					sm.addSkillName(skill.getDisplayId());
+					activeChar.sendPacket(sm);
+				}				
 				target.getAI().notifyEvent(CtrlEvent.EVT_ATTACKED, activeChar);
 				//activeChar.getAI().setIntention(CtrlIntention.AI_INTENTION_ATTACK, target);
 			}

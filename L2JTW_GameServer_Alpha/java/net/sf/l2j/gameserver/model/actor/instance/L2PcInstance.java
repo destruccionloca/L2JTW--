@@ -277,6 +277,23 @@ public final class L2PcInstance extends L2PlayableInstance
 	}
 	
 	private Connection _connection;
+	private boolean _isConnected = true;
+
+	private String _accountName;
+	private long _deleteTimer;
+	
+	private boolean _isOnline = false;
+	private long _onlineTime;
+	private long _onlineBeginTime;
+	private long _lastAccess;
+	private long _uptime;
+	
+	protected int _baseClass;
+	protected int _activeClass;
+	protected int _classIndex = 0;
+
+	/** The list of sub-classes this character has. */
+    private Map<Integer, SubClass> _subClasses; 
 	
 	private PcAppearance _appearance;
 	
@@ -304,17 +321,64 @@ public final class L2PcInstance extends L2PlayableInstance
 	/** The PvP Flag state of the L2PcInstance (0=White, 1=Purple) */
 	private byte _pvpFlag;
 	
+	private final int _baseLoad;
+	private int _curWeightPenalty = 0;
+	
+	/** After moving, zones are checked */
 	private boolean _inPvpZone;
 	private boolean _inMotherTreeZone;
 	private boolean _inClanHall;
-
-    /** L2PcInstance's pledge class (knight, Baron, etc.)*/
-    private int _pledgeClass = 0;
-    private int _pledgeType = 0;
-
-    /** Level at which the player joined the clan as an academy member*/
-    private int _lvlJoinedAcademy = 0; 
+	
+    private boolean _inJail = false;
+    private long _jailTimer = 0;
+    private ScheduledFuture _jailTask;
     
+    private boolean _isIn7sDungeon = false;
+    
+    /** Olympiad */
+    private boolean _inOlympiadMode = false;
+    private int _olympiadGameId = -1;
+    private int _olympiadSide = -1;
+    
+	/** Boat */
+	private boolean _inBoat;
+    private L2BoatInstance _boat;
+    private Point3D _inBoatPosition;
+    
+	private int _mountType;
+    /** Store object used to summon the strider you are mounting **/
+	private int _mountObjectID = 0;
+
+	public int _telemode = 0;
+	
+	public boolean _exploring = false;
+
+	private boolean _isSilentMoving = false;
+	
+	private boolean _inCrystallize;
+	
+	private boolean _inCraftMode;
+
+	/** The table containing all L2RecipeList of the L2PcInstance */
+	private Map<Integer, L2RecipeList> _dwarvenRecipeBook = new FastMap<Integer, L2RecipeList>(); 
+	private Map<Integer, L2RecipeList> _commonRecipeBook = new FastMap<Integer, L2RecipeList>(); 
+
+		/** True if the L2PcInstance is sitting */
+	private boolean _waitTypeSitting;
+	
+	/** True if the L2PcInstance is using the relax skill */
+	private boolean _relax;
+
+	/** Location before entering Observer Mode */
+	private int _obsX;
+	private int _obsY;
+	private int _obsZ;
+	private boolean _observerMode = false;
+	
+	/** Stored from last ValidatePosition **/
+	public Point3D _lastClientPosition = new Point3D(0, 0, 0);
+	public Point3D _lastServerPosition = new Point3D(0, 0, 0);
+
 	/** The number of recommandation obtained by the L2PcInstance */
 	private int _recomHave; // how much I was recommended by others
 	
@@ -329,28 +393,30 @@ public final class L2PcInstance extends L2PlayableInstance
 	/** The random number of the L2PcInstance */
 	//private static final Random _rnd = new Random();
 	
-	private final int _baseLoad;
-	private int _curWeightPenalty = 0;
-	
-	private long _deleteTimer;
 	private PcInventory _inventory = new PcInventory(this);
 	private PcWarehouse _warehouse;
 	private PcFreight _freight = new PcFreight(this);
 	
-	/** True if the L2PcInstance is sitting */
-	private boolean _waitTypeSitting;
-	
-	/** True if the L2PcInstance is using the relax skill */
-	private boolean _relax;
-	
-	/** True if the L2PcInstance is in a boat */
-	private boolean _inBoat;
-	
-	/** Last NPC Id talked on a quest */
-	private int _questNpcObject = 0; 
+	/** The Private Store type of the L2PcInstance (STORE_PRIVATE_NONE=0, STORE_PRIVATE_SELL=1, sellmanage=2, STORE_PRIVATE_BUY=3, buymanage=4, STORE_PRIVATE_MANUFACTURE=5) */
+	private int _privatestore;
+
+	private TradeList _activeTradeList;
+	private ItemContainer _activeWarehouse;
+	private L2ManufactureList _createList;
+	private TradeList _sellList;
+	private TradeList _buyList;
 	
 	/** True if the L2PcInstance is newbie */
 	private boolean _newbie;
+	
+	private boolean _noble = false;
+	private boolean _hero = false;
+
+	/** The L2FolkInstance corresponding to the last Folk wich one the player talked. */
+	private L2FolkInstance _lastFolkNpc = null;
+
+	/** Last NPC Id talked on a quest */
+	private int _questNpcObject = 0; 
 	
 	/** The table containing all Quests began by the L2PcInstance */
 	private Map<String, QuestState> _quests = new FastMap<String, QuestState>();
@@ -361,17 +427,9 @@ public final class L2PcInstance extends L2PlayableInstance
 	/** The list containing all macroses of this L2PcInstance */
 	private MacroList _macroses = new MacroList(this);
 
-	private TradeList _activeTradeList;
-	private ItemContainer _activeWarehouse;
-	private L2ManufactureList _createList;
-	private TradeList _sellList;
-	private TradeList _buyList;
-	
 	private List<L2PcInstance> _SnoopListener = new FastList<L2PcInstance>();
 	private List<L2PcInstance> _SnoopedPlayer = new FastList<L2PcInstance>();
 	
-	/** The Private Store type of the L2PcInstance (STORE_PRIVATE_NONE=0, STORE_PRIVATE_SELL=1, sellmanage=2, STORE_PRIVATE_BUY=3, buymanage=4, STORE_PRIVATE_MANUFACTURE=5) */
-	private int _privatestore;
 	private ClassId _skillLearningClassId;
 	
 	// hennas
@@ -396,9 +454,7 @@ public final class L2PcInstance extends L2PlayableInstance
 	private boolean _partyMatchingShowClass;
 	private String _partyMatchingMemo;
 	
-	private L2Party _party;
-	// clan related attributes
-	
+	// Clan related attributes
 	/** The Clan Identifier of the L2PcInstance */
 	private int _clanId;
 	
@@ -411,11 +467,20 @@ public final class L2PcInstance extends L2PlayableInstance
 
 	private long _clanJoinExpiryTime;
 	private long _clanCreateExpiryTime;
-
-	private long _onlineTime;
-	private long _onlineBeginTime;
 	
-	//GM Stuff
+	private int _powerGrade = 0;
+	private int _clanPrivileges = 0;
+	
+    /** L2PcInstance's pledge class (knight, Baron, etc.)*/
+    private int _pledgeClass = 0;
+    private int _pledgeType = 0;
+
+    /** Level at which the player joined the clan as an academy member*/
+    private int _lvlJoinedAcademy = 0; 
+    
+	private int _wantsPeace = 0;
+
+	//GM related variables
 	private boolean _isGm;
 	private int _accessLevel;
 	
@@ -426,7 +491,7 @@ public final class L2PcInstance extends L2PlayableInstance
 	private boolean _tradeRefusal = false;       // Trade refusal
 	private boolean _exchangeRefusal = false;   // Exchange refusal
 	
-	public boolean _exploring = false;
+	private L2Party _party;
 	
 	// this is needed to find the inviting player for Party response
 	// there can only be one active party request at once
@@ -441,18 +506,9 @@ public final class L2PcInstance extends L2PlayableInstance
 	/** The fists L2Weapon of the L2PcInstance (used when no weapon is equiped) */
 	private L2Weapon _fistsWeaponItem;
 	
-	private long _uptime;
-	private String _accountName;
-	
 	private final Map<Integer, String> _chars = new FastMap<Integer, String>();
 	
 	public byte _updateKnownCounter = 0;
-	
-	/** The table containing all L2RecipeList of the L2PcInstance */
-	private Map<Integer, L2RecipeList> _dwarvenRecipeBook = new FastMap<Integer, L2RecipeList>(); 
-	private Map<Integer, L2RecipeList> _commonRecipeBook = new FastMap<Integer, L2RecipeList>(); 
-	
-	private int _mountType;
 	
 	/** The current higher Expertise of the L2PcInstance (None=0, D=1, C=2, B=3, A=4, S=5)*/
 	private int _expertiseIndex; // index in EXPERTISE_LEVELS
@@ -460,27 +516,12 @@ public final class L2PcInstance extends L2PlayableInstance
 	
 	private L2ItemInstance _activeEnchantItem = null;
 	
-	private boolean _isOnline = false;
-    private boolean _isIn7sDungeon = false;
-	
 	protected boolean _inventoryDisable = false;
 	
 	protected Map<Integer, L2CubicInstance> _cubics = new FastMap<Integer, L2CubicInstance>();
 	
-	/** The L2FolkInstance corresponding to the last Folk wich one the player talked. */
-	private L2FolkInstance _lastFolkNpc = null;
-	
-	private boolean _isSilentMoving = false;
-	
 	/** Active shots. A FastSet variable would actually suffice but this was changed to fix threading stability... */
 	protected Map<Integer, Integer> _activeSoulShots = new FastMap<Integer, Integer>().setShared(true);
-	private int _clanPrivileges = 0;
-	
-	/** Location before entering Observer Mode */
-	private int _obsX;
-	private int _obsY;
-	private int _obsZ;
-	private boolean _observerMode = false;
 	
 	/** Event parameters */
 	public int eventX;
@@ -494,6 +535,7 @@ public final class L2PcInstance extends L2PlayableInstance
 	public boolean eventSitForced = false;
 	public boolean atEvent = false;
 	
+
 	/** CTF Engine parameters */
 	public String _teamNameCTF,
 				  _teamNameHaveFlagCTF,
@@ -504,8 +546,9 @@ public final class L2PcInstance extends L2PlayableInstance
 				   _haveFlagCTF = false;
 	public Future _posCheckerCTF = null;
 	
-	public int _telemode = 0;
+
 	
+
 	/** new loto ticket **/
 	public int _loto[] = new int[5];
 	//public static int _loto_nums[] = {0,1,2,3,4,5,6,7,8,9,};
@@ -513,30 +556,13 @@ public final class L2PcInstance extends L2PlayableInstance
 	public int _race[] = new int[2];
 	
 	private final BlockList _blockList = new BlockList();
-	private boolean _isConnected = true;
-	
-	private boolean _hero = false;
-	private int _team = 0;
-	private int _wantsPeace = 0;
-	
-	private boolean _noble = false;
-    private boolean _inOlympiadMode = false;
-    private int _olympiadGameId = -1;
-    private int _olympiadSide = -1;
 
+	private int _team = 0;
+	
     /** lvl of alliance with ketra orcs or varka silenos, used in quests and aggro checks 
      *  [-5,-1] varka, 0 neutral, [1,5] ketra 
      * */
     private int _alliedVarkaKetra = 0;
-    
-	/** The list of sub-classes this character has. */
-    private Map<Integer, SubClass> _subClasses; 
-	protected int _baseClass;
-	protected int _activeClass;
-	protected int _classIndex = 0;
-	
-	private long _lastAccess; 
-	private int _boatId;
     
     private L2Fishing _fishCombat;
     private boolean _fishing = false;
@@ -546,19 +572,11 @@ public final class L2PcInstance extends L2PlayableInstance
     
     private ScheduledFuture _taskRentPet;
     private ScheduledFuture _taskWater;
-    private L2BoatInstance _boat;
-    private Point3D _inBoatPosition;
-	
-	/** Stored from last ValidatePosition **/
-	public Point3D _lastClientPosition = new Point3D(0, 0, 0);
-	public Point3D _lastServerPosition = new Point3D(0, 0, 0);
 	
 	/** Bypass validations */
 	private List<String> _validBypass = new FastList<String>();
 	private List<String> _validBypass2 = new FastList<String>();
 	
-	private boolean _inCrystallize;
-	private boolean _inCraftMode;
 
     /** Current skill in use */
     private SkillDat _currentSkill;
@@ -566,18 +584,11 @@ public final class L2PcInstance extends L2PlayableInstance
     /** Skills queued because a skill is already in progress */
     private SkillDat _queuedSkill;
 	
-   	/** Store object used to summon the strider you are mounting **/
-	private int _mountObjectID = 0;
-    
-    private boolean _inJail = false;
-    private long _jailTimer = 0;
-    
+
+
     /* Flag to disable equipment/skills while wearing formal wear **/
     //private boolean _IsWearingFormalWear = false;
     
-    private ScheduledFuture _jailTask;
-	private int _powerGrade = 0;
-	
 	private int _cursedWeaponEquipedId = 0;
 
 	private int _ReviveRequested = 0;
@@ -7909,16 +7920,6 @@ public final class L2PcInstance extends L2PlayableInstance
 		}
 		update.set(Calendar.HOUR_OF_DAY,13);
 		_lastRecomUpdate = update.getTimeInMillis();
-	}
-	
-	public int getBoatId()
-	{
-		return _boatId;
-	}
-	
-	public void setBoatId(int boatId)
-	{
-		_boatId = boatId;
 	}
 	
 	public void doRevive()

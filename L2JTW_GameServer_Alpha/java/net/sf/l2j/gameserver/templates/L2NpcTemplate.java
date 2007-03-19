@@ -97,7 +97,6 @@ public final class L2NpcTemplate extends L2CharTemplate
 
 	/** fixed skills*/
 	public int     race;
-	public double  rateHp;
 	
 	
 	/** The table containing all Item that can be dropped by L2NpcInstance using this L2NpcTemplate*/
@@ -183,7 +182,6 @@ public final class L2NpcTemplate extends L2CharTemplate
 		//else
 		//	race = r.intern();
 		race = 0;
-		rateHp = 1;
 		npcStatsSet = set;
 		_teachInfo = null;
 	}
@@ -371,9 +369,5 @@ public final class L2NpcTemplate extends L2CharTemplate
 	public void setRace(int newrace)
 	{
 	    race = newrace;
-	}
-	public void setRateHp(double newrate)
-	{
-	    rateHp = newrate;
 	}
 }

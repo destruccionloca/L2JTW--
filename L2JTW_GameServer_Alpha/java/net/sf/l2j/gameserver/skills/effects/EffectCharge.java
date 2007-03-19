@@ -28,6 +28,7 @@ import net.sf.l2j.gameserver.skills.Env;
 
 public class EffectCharge extends L2Effect
 {
+
     public int num_charges;
     public EffectCharge(Env env, EffectTemplate template)
     {
@@ -37,6 +38,7 @@ public class EffectCharge extends L2Effect
         env._target.updateEffectIcons();
         SystemMessage sm = new SystemMessage(323);
         sm.addNumber(num_charges);
+
         getEffected().sendPacket(sm);
     }
 
