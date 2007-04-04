@@ -286,7 +286,6 @@ public class AdminFightCalculator implements IAdminCommandHandler {
 
 
 
-
 		NpcHtmlMessage adminReply = new NpcHtmlMessage(5);
 		
 		TextBuilder replyMSG = new TextBuilder();

@@ -28,10 +28,10 @@ import javolution.util.FastList;
 import net.sf.l2j.gameserver.GameTimeController;
 import net.sf.l2j.gameserver.datatables.SkillTable;
 import net.sf.l2j.gameserver.ThreadPoolManager;
+import net.sf.l2j.gameserver.serverpackets.ExOlympiadSpelledInfo;
 import net.sf.l2j.gameserver.serverpackets.MagicEffectIcons;
 import net.sf.l2j.gameserver.serverpackets.PartySpelled;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
-import net.sf.l2j.gameserver.serverpackets.ExOlympiadSpelledInfo;
 import net.sf.l2j.gameserver.skills.Env;
 import net.sf.l2j.gameserver.skills.effects.EffectTemplate;
 import net.sf.l2j.gameserver.skills.funcs.Func;
@@ -56,7 +56,8 @@ public abstract class L2Effect
     public static enum EffectType {
 
         BUFF, BUFF_SELF, CHARGE_SELF, CHARGE, DMG_OVER_TIME, HEAL_OVER_TIME, COMBAT_POINT_HEAL_OVER_TIME, MANA_DMG_OVER_TIME, MANA_HEAL_OVER_TIME, RELAXING, STUN, ROOT, SLEEP, HATE, FAKE_DEATH, CONFUSION, CONFUSE_MOB_ONLY, MUTE, FEAR, SILENT_MOVE, SEED, PARALYZE, STUN_SELF
-        ,SLAM, CANCEL_TARGET,CANCEL_TARGET_DISARM,CANCEL_TARGET_SHOCK,BLUFF,CURSE_DOOM,SOULSHOT, PSYCHICAL_MUTE, REMOVE_TARGET, TARGET_ME, BETRAY,SILENCE_MAGIC_PHYSICAL, ROTATE,PETRIFICATION // for bluff skill
+        ,SLAM, CANCEL_TARGET,CANCEL_TARGET_DISARM,CANCEL_TARGET_SHOCK,BLUFF,CURSE_DOOM,SOULSHOT, PSYCHICAL_MUTE, REMOVE_TARGET, TARGET_ME, BETRAY,SILENCE_MAGIC_PHYSICAL, ROTATE,PETRIFICATION, NOBLESSE_BLESSING
+
 
 
     }

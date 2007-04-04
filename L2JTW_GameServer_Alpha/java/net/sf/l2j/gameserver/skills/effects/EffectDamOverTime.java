@@ -20,8 +20,8 @@ package net.sf.l2j.gameserver.skills.effects;
 import net.sf.l2j.gameserver.skills.Env;
 import net.sf.l2j.gameserver.model.L2Attackable;
 import net.sf.l2j.gameserver.model.L2Effect;
-import net.sf.l2j.gameserver.model.L2Skill.SkillType;
 import net.sf.l2j.gameserver.model.L2Skill.SkillTargetType;
+import net.sf.l2j.gameserver.model.L2Skill.SkillType;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
 class EffectDamOverTime extends L2Effect

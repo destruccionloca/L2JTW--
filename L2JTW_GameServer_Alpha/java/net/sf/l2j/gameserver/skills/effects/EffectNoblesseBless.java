@@ -19,42 +19,42 @@
 package net.sf.l2j.gameserver.skills.effects;
 
 import net.sf.l2j.gameserver.model.L2Effect;
-import net.sf.l2j.gameserver.model.actor.instance.L2DoorInstance;
-import net.sf.l2j.gameserver.serverpackets.StatusUpdate;
+import net.sf.l2j.gameserver.model.actor.instance.L2PlayableInstance;
 import net.sf.l2j.gameserver.skills.Env;
 
+/**
+ * @author earendil
+ *
+ * TODO To change the template for this generated type comment go to
+ * Window - Preferences - Java - Code Style - Code Templates
+ */
+final class EffectNoblesseBless extends L2Effect {
 
-class EffectHealOverTime extends L2Effect
-{		
-	public EffectHealOverTime(Env env, EffectTemplate template)
+	public EffectNoblesseBless(Env env, EffectTemplate template)
 	{
 		super(env, template);
 	}
 
 	public EffectType getEffectType()
 	{
-		return EffectType.HEAL_OVER_TIME;
+		return EffectType.NOBLESSE_BLESSING;
 	}
-
-	public boolean onActionTime()
-	{	
-		if(getEffected().isDead())
-			return false;
-		
-		if(getEffected() instanceof L2DoorInstance)
-			return false;
-		
-		double hp = getEffected().getCurrentHp(); 
-		double maxhp = getEffected().getMaxHp();
-		hp += calc(); 
-		if(hp > maxhp)
-		{
-			hp = maxhp;
-		}
-		getEffected().setCurrentHp(hp); 
-		StatusUpdate suhp = new StatusUpdate(getEffected().getObjectId()); 
-		suhp.addAttribute(StatusUpdate.CUR_HP, (int)hp); 
-		getEffected().sendPacket(suhp);
-		return true;
+	
+	/** Notify started */
+	public void onStart() {
+		if (getEffected() instanceof L2PlayableInstance)
+			((L2PlayableInstance)getEffected()).startNoblesseBlessing();
 	}
+	
+	/** Notify exited */
+	public void onExit() {
+		if (getEffected() instanceof L2PlayableInstance)
+			((L2PlayableInstance)getEffected()).stopNoblesseBlessing(this);
+	}
+	
+    public boolean onActionTime()
+    {
+    	// just stop this effect
+    	return false;
+    }
 }

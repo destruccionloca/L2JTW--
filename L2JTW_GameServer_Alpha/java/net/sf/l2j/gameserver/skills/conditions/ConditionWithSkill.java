@@ -15,40 +15,27 @@
  *
  * http://www.gnu.org/copyleft/gpl.html
  */
-package net.sf.l2j.gameserver.skills.effects;
+package net.sf.l2j.gameserver.skills.conditions;
 
-import net.sf.l2j.gameserver.model.L2Effect;
 import net.sf.l2j.gameserver.skills.Env;
 
 /**
- * @author -Nemesiss-
  *
+ * @author  Steuf
  */
-public class EffectRemoveTarget extends L2Effect
+public class ConditionWithSkill extends Condition
 {
-    public EffectRemoveTarget(Env env, EffectTemplate template)
-    {
-        super(env, template);
-    }
-
-    public EffectType getEffectType()
-    {
-        return EffectType.REMOVE_TARGET;
-    }
-    
-    /** Notify started */
-    public void onStart() {
-        getEffected().setTarget(null);
-    }
-    
-    /** Notify exited */
-    public void onExit() {
-        //nothing
-    }
-    
-    public boolean onActionTime()
-    {        
-    	//nothing
-        return false;
-    }
+	final boolean _skill;
+	
+	public ConditionWithSkill(boolean skill)
+	{
+		_skill = skill;
+	}
+	
+	public boolean testImpl(Env env)
+	{		
+		if (!_skill && env._skill != null)
+			return false;
+		return true;
+	}
 }

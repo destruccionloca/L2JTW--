@@ -29,12 +29,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javolution.util.FastList;
-import javolution.util.FastTable;
 import javolution.util.FastMap;
+import javolution.util.FastTable;
 import net.sf.l2j.Config;
+import net.sf.l2j.gameserver.GameTimeController;
 import net.sf.l2j.gameserver.GeoData;
 import net.sf.l2j.gameserver.Olympiad;
-import net.sf.l2j.gameserver.GameTimeController;
 import net.sf.l2j.gameserver.ThreadPoolManager;
 import net.sf.l2j.gameserver.ai.CtrlEvent;
 import net.sf.l2j.gameserver.ai.CtrlIntention;
@@ -60,7 +60,9 @@ import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2MinionInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2RaidBossInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2SiegeGuardInstance;
+import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance.SkillDat;
 import net.sf.l2j.gameserver.model.actor.instance.L2PetInstance;
+import net.sf.l2j.gameserver.model.actor.instance.L2PlayableInstance;
 import net.sf.l2j.gameserver.model.actor.knownlist.CharKnownList;
 import net.sf.l2j.gameserver.model.actor.knownlist.ObjectKnownList.KnownListAsynchronousUpdateTask;
 import net.sf.l2j.gameserver.model.actor.stat.CharStat;
@@ -156,9 +158,9 @@ public abstract class L2Character extends L2Object
 	private L2CharTemplate _Template;                       // The link on the L2CharTemplate object containing generic and static properties of this L2Character type (ex : Max HP, Speed...)
 	private String _Title;
 	private String _aiClass = "default";
-	private double _hpUpdateIncCheck;
-	private double _hpUpdateDecCheck;
-	private double _hpUpdateInterval;
+	private double _hpUpdateIncCheck = .0;
+	private double _hpUpdateDecCheck = .0;
+	private double _hpUpdateInterval = .0;
 	
 	// =========================================================
 
@@ -233,7 +235,10 @@ public abstract class L2Character extends L2Object
 			_Calculators = new Calculator[Stats.NUM_STATS];
 			Formulas.getInstance().addFuncsToNewCharacter(this);
 		}
-
+	}
+	
+	protected void initCharStatusUpdateValues()
+	{
 		_hpUpdateInterval = getMaxHp()/352.0; // MAX_HP div MAX_HP_BAR_PX
 		_hpUpdateIncCheck = getMaxHp();
 		_hpUpdateDecCheck = getMaxHp()-_hpUpdateInterval;
@@ -390,38 +395,36 @@ public abstract class L2Character extends L2Object
 	}
 
 	/**
-	 * Returns true if status update should be done, false if not
+	 * Returns true if hp update should be done, false if not
 	 * @return boolean
 	 */
-	private boolean needStatusUpdate()
+	protected boolean needHpUpdate(int barPixels)
 	{
-		if (!(this instanceof L2MonsterInstance))
-			return true;
-
 		double currentHp = getCurrentHp();
 
-	    if (currentHp <= 0.00 || getMaxHp() < 352)
+	    if (currentHp <= 1.0 || getMaxHp() < barPixels)
 	        return true;
 
-	    boolean needUpdate = false;
-
-/*	    if (currentHp > getMaxHp())
-	        currentHp = getMaxHp();*/
-
-	    if (currentHp < _hpUpdateDecCheck)
+	    if (currentHp <= _hpUpdateDecCheck || currentHp >= _hpUpdateIncCheck)
 	    {
-	        needUpdate = true;
-	        _hpUpdateDecCheck -= _hpUpdateInterval;
-	        _hpUpdateIncCheck -= _hpUpdateInterval;
-	    }
-	    else if (currentHp > _hpUpdateIncCheck)
-	    {
-	        needUpdate = true;
-	        _hpUpdateDecCheck += _hpUpdateInterval;
-	        _hpUpdateIncCheck += _hpUpdateInterval;
+	    	if (currentHp == getMaxHp())
+	    	{
+	    		_hpUpdateIncCheck = getMaxHp();
+	    		_hpUpdateDecCheck = _hpUpdateIncCheck - _hpUpdateInterval;
+	    	}
+	    	else
+	    	{
+	    		double doubleMulti = currentHp / _hpUpdateInterval;
+		    	int intMulti = (int)doubleMulti;
+
+	    		_hpUpdateDecCheck = _hpUpdateInterval * (doubleMulti < intMulti ? intMulti-- : intMulti);
+	    		_hpUpdateIncCheck = _hpUpdateDecCheck + _hpUpdateInterval;
+	    	}
+
+	    	return true;
 	    }
 
-	    return needUpdate;
+	    return false;
 	}
 
 	/**
@@ -442,8 +445,11 @@ public abstract class L2Character extends L2Object
 	{
 		if (getStatus().getStatusListener() == null || getStatus().getStatusListener().isEmpty()) return;
 
-		if (!needStatusUpdate())
+		if (!needHpUpdate(352))
 			return;
+		
+		if (Config.DEBUG)
+			_log.fine("Broadcast Status Update for " + getObjectId() + "(" + getName() + "). HP: " + getCurrentHp());
 
 		// Create the Server->Client packet StatusUpdate with current HP and MP
 		StatusUpdate su = new StatusUpdate(getObjectId());
@@ -1171,13 +1177,15 @@ public abstract class L2Character extends L2Object
 
 		if (isSkillDisabled(skill.getId()))
 		{
-			//if (this instanceof L2PcInstance)
-            //{
-			//	SystemMessage sm = new SystemMessage(SystemMessage.S1_PREPARED_FOR_REUSE);
-			//	sm.addSkillName(skill.getId());
-			//	sendPacket(sm);
-			//}
 
+			/*
+			if (this instanceof L2PcInstance)
+            {
+				SystemMessage sm = new SystemMessage(SystemMessage.S1_PREPARED_FOR_REUSE);
+				sm.addSkillName(skill.getId(),skill.getLevel());
+				sendPacket(sm);
+			}
+			*/
 			return;
 		}
 
@@ -1364,7 +1372,7 @@ public abstract class L2Character extends L2Object
 		if (this instanceof L2PcInstance && magicId != 1312)
         {
 			SystemMessage sm = new SystemMessage(SystemMessage.USE_S1);
-			sm.addSkillName(magicId);
+			sm.addSkillName(magicId,skill.getLevel());
 			sendPacket(sm);
 		}
 
@@ -1462,8 +1470,12 @@ public abstract class L2Character extends L2Object
 		// Stop HP/MP/CP Regeneration task
 		getStatus().stopHpMpRegeneration();
 
-		// Stop all active skills effects in progress on the L2Character
-		stopAllEffects();
+		// Stop all active skills effects in progress on the L2Character, 
+		// if the Character isn't a Noblesse Blessed L2PlayableInstance and killed by a raid boss
+		if (this instanceof L2PlayableInstance && ((L2PlayableInstance)this).isNoblesseBlessed())
+			((L2PlayableInstance)this).stopNoblesseBlessing(null);
+		else
+			stopAllEffects();
 
 		// Send the Server->Client packet StatusUpdate with current HP and MP to all other L2PcInstance to inform
 		broadcastStatusUpdate();
@@ -1712,7 +1724,7 @@ public abstract class L2Character extends L2Object
 	public final void setIsTeleporting(boolean value) { _IsTeleporting = value; }
 	public void setIsInvul(boolean b){_isInvul = b;}
 	public boolean isInvul(){return _isInvul  || _IsTeleporting;}
-	public boolean isUndead() { return false; }
+	public boolean isUndead() { return _Template.isUndead; }
 
 	public CharKnownList getKnownList()
 	{
@@ -2510,6 +2522,12 @@ public abstract class L2Character extends L2Object
 			removeEffect(effect);
 
 		setIsFakeDeath(false);
+		// if this is a player instance, start the grace period for this character (grace from mobs only)!
+		if (this instanceof L2PcInstance)
+		{
+			((L2PcInstance) this).setRecentFakeDeath(true);
+		}
+
 		ChangeWaitType revive = new ChangeWaitType(this,ChangeWaitType.WT_STOP_FAKEDEATH);
 		broadcastPacket(revive);
 		getAI().notifyEvent(CtrlEvent.EVT_THINK, null);
@@ -4997,9 +5015,10 @@ public abstract class L2Character extends L2Object
 			boolean isSendStatus = false;
 
 			// Consume MP of the L2Character and Send the Server->Client packet StatusUpdate with current HP and MP to all other L2PcInstance to inform
-			if (getStat().getMpConsume(skill) > 0)
+			double mpConsume = getStat().getMpConsume(skill);
+			if (mpConsume > 0)
 			{
-				getStatus().reduceMp(calcStat(Stats.MP_CONSUME_RATE,getStat().getMpConsume(skill),null,null));
+				getStatus().reduceMp(calcStat(Stats.MP_CONSUME_RATE,mpConsume,null,null));
 				su.addAttribute(StatusUpdate.CUR_MP, (int) getCurrentMp());
 				isSendStatus = true;
 			}

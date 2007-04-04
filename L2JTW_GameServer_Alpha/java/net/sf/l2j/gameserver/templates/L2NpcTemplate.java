@@ -23,8 +23,8 @@ import java.util.Map;
 
 import javolution.util.FastList;
 import javolution.util.FastMap;
-import net.sf.l2j.gameserver.model.L2DropData;
 import net.sf.l2j.gameserver.model.L2DropCategory;
+import net.sf.l2j.gameserver.model.L2DropData;
 import net.sf.l2j.gameserver.model.L2MinionData;
 import net.sf.l2j.gameserver.model.L2NpcChatData;
 import net.sf.l2j.gameserver.model.L2Skill;
@@ -74,7 +74,6 @@ public final class L2NpcTemplate extends L2CharTemplate
     public final int     glove;
 	public final String  factionId;
 	public final int     factionRange;
-	public final boolean isUndead;
     public final int     absorb_level;
     public final int     primary_attack;
     public final int     skill_chance;
@@ -109,8 +108,9 @@ public final class L2NpcTemplate extends L2CharTemplate
 	private List<ClassId>             _teachInfo;
 	private Map<Integer, L2Skill> _skills;
 	private Map<Stats, Integer> _resists;
-	private Quest[]                   _questsStart;
-
+	// contains a list of quests for each event type (questStart, questAttack, questKill, etc)
+	private Map<Quest.QuestEventType, Quest[]> _questEvents;
+	
 	/**
 	 * Constructor of L2Character.<BR><BR>
 	 * 
@@ -170,7 +170,6 @@ public final class L2NpcTemplate extends L2CharTemplate
 		else
 			factionId = f.intern();
 		factionRange  = set.getInteger("factionRange");
-		isUndead      = (set.getInteger("isUndead", 0) == 1);
         absorb_level  = set.getInteger("absorb_level", 0);
         
         primary_attack = set.getInteger("primary_attack");
@@ -185,7 +184,7 @@ public final class L2NpcTemplate extends L2CharTemplate
 		npcStatsSet = set;
 		_teachInfo = null;
 	}
-    
+	
     public void addTeachInfo(ClassId classId)
 	{
 		if (_teachInfo == null)
@@ -340,10 +339,15 @@ public final class L2NpcTemplate extends L2CharTemplate
 		return _skills;
 	}
 	    
-	public void addStartQuests(Quest q) {
-		if (_questsStart == null) {
-			_questsStart = new Quest[]{q};
+    public void addQuestEvent(Quest.QuestEventType EventType, Quest q)
+    {
+    	if (_questEvents == null) 
+    		_questEvents = new FastMap<Quest.QuestEventType, Quest[]>();
+    		
+		if (_questEvents.get(EventType) == null) {
+			_questEvents.put(EventType, new Quest[]{q});
 		} else {
+			Quest[] _questsStart = _questEvents.get(EventType);
 			int len = _questsStart.length;
 			Quest[] tmp = new Quest[len+1];
 			for (int i=0; i < len; i++) {
@@ -354,12 +358,14 @@ public final class L2NpcTemplate extends L2CharTemplate
 				tmp[i] = _questsStart[i];
 	        }
 			tmp[len] = q;
-			_questsStart = tmp;
+			_questEvents.put(EventType, tmp);
 	    }
-	}
-	
-	public Quest[] getStartQuests() {
-		return _questsStart;
+    }
+    	
+	public Quest[] getEventQuests(Quest.QuestEventType EventType) {
+		if (_questEvents == null)
+			return null;
+		return _questEvents.get(EventType);
 	}
 	
 	public StatsSet getStatsSet()

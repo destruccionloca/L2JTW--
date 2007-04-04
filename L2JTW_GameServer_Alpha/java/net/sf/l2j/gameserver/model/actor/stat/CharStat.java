@@ -151,7 +151,13 @@ public class CharStat
 		if (_ActiveChar == null)
 			return 1;
 
-		return (int) calcStat(Stats.CRITICAL_RATE, _ActiveChar.getTemplate().baseCritRate, target, skill);
+		int criticalHit = (int) calcStat(Stats.CRITICAL_RATE, _ActiveChar.getTemplate().baseCritRate, target, skill);
+		
+		// Set a cap of Critical Hit at 500
+		if(criticalHit > 500)
+			criticalHit = 500;
+		
+		return criticalHit;
 	}
 
 	/** Return the DEX of the L2Character (base+modifier). */
@@ -662,12 +668,10 @@ public class CharStat
 	{
     	if (skill == null)
     		return 1;
-    	
 		int mpconsume = skill.getMpConsume();
 		if (skill.isDance() && _ActiveChar != null && _ActiveChar.getDanceCount() > 0)
 			mpconsume += _ActiveChar.getDanceCount() * skill.getNextDanceMpCost();
-
-		return (int) calcStat(Stats.MP_CONSUME, mpconsume, null, null);
+		return (int) calcStat(Stats.MP_CONSUME, mpconsume, null, skill);
 	}
 
 	/** Return the mpInitialConsume. */
@@ -676,6 +680,6 @@ public class CharStat
     	if (skill == null)
     		return 1;
     	
-		return (int) calcStat(Stats.MP_CONSUME, skill.getMpInitialConsume(), null, null);
+		return (int) calcStat(Stats.MP_CONSUME, skill.getMpInitialConsume(), null, skill);
 	}
 }

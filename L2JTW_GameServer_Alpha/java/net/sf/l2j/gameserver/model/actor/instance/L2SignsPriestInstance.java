@@ -21,7 +21,6 @@ package net.sf.l2j.gameserver.model.actor.instance;
 import java.util.StringTokenizer;
 
 import javolution.text.TextBuilder;
-
 import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.SevenSigns;
 import net.sf.l2j.gameserver.cache.HtmCache;
@@ -162,6 +161,14 @@ public class L2SignsPriestInstance extends L2FolkInstance
                                     return;
                                 }
                             }
+                            /*if (!getPlayerAllyHasCastle(player))
+                            {
+                            	if (cabal == SevenSigns.CABAL_DAWN)
+                            	{
+                            		player.sendMessage("You must be a member of a castle-owning clan to join the Lords Of Dawn.");
+                            		return;
+                            	}
+                            }*/
                             else
                             {
                                 /*

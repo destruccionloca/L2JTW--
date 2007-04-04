@@ -44,8 +44,8 @@ import net.sf.l2j.gameserver.lib.Rnd;
 import net.sf.l2j.gameserver.model.L2Attackable;
 import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.L2Clan;
-import net.sf.l2j.gameserver.model.L2DropData;
 import net.sf.l2j.gameserver.model.L2DropCategory;
+import net.sf.l2j.gameserver.model.L2DropData;
 import net.sf.l2j.gameserver.model.L2ItemInstance;
 import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2PetDataTable;
@@ -215,6 +215,7 @@ public class L2NpcInstance extends L2Character
         this.getKnownList();	// init knownlist
         this.getStat();			// init stats
         this.getStatus();		// init status
+        super.initCharStatusUpdateValues(); // init status upadte values
         
         if (template == null)
         {
@@ -846,7 +847,7 @@ public class L2NpcInstance extends L2Character
         } 
         else 
         {
-            if (isBusy())
+            if (isBusy() && getBusyMessage().length()>0)
             {
                 player.sendPacket( new ActionFailed() );
                 
@@ -876,8 +877,8 @@ public class L2NpcInstance extends L2Character
                     	)
                     {
                         int exchangeItem = L2PetDataTable.getWyvernItemId();
-                        if (!player.reduceAdena("PetUpate", 20000000, this, true)) return;
-                        player.getInventory().destroyItem("PetUpate", summon.getControlItemId(), 1, player, this);
+                        if (!player.reduceAdena("PetUpdate", 20000000, this, true)) return;
+                        player.getInventory().destroyItem("PetUpdate", summon.getControlItemId(), 1, player, this);
                         
                         L2NpcTemplate template1 = NpcTable.getInstance().getTemplate(629);
 
@@ -1408,7 +1409,7 @@ public class L2NpcInstance extends L2Character
             if (q != null) 
             {
                 // check for start point
-                Quest[] qlst = getTemplate().getStartQuests();
+                Quest[] qlst = getTemplate().getEventQuests(Quest.QuestEventType.QUEST_START);
                 
                 if (qlst != null && qlst.length > 0) 
                 {
@@ -1477,7 +1478,7 @@ public class L2NpcInstance extends L2Character
         List<Quest> options = new FastList<Quest>();
         
         QuestState[] awaits = player.getQuestsForTalk(getTemplate().npcId);
-        Quest[] starts = getTemplate().getStartQuests();
+        Quest[] starts = getTemplate().getEventQuests(Quest.QuestEventType.QUEST_START);
         
         // Quests are limited between 1 and 999 because those are the quests that are supported by the client. 
         // By limitting them there, we are allowed to create custom quests at higher IDs without interfering 
@@ -1879,6 +1880,28 @@ public class L2NpcInstance extends L2Character
     {
         showChatWindow(player, 0);
     }
+    
+    /**
+     * Returns true if html exists
+     * @param player
+     * @param type
+     * @return boolean
+     */
+    private boolean showPkDenyChatWindow(L2PcInstance player, String type)
+    {
+    	String html = HtmCache.getInstance().getHtm("data/html/" + type + "/" + getNpcId() + "-pk.htm");
+
+    	if (html != null)
+    	{
+    		NpcHtmlMessage pkDenyMsg = new NpcHtmlMessage(getObjectId());
+    		pkDenyMsg.setHtml(html);
+    		player.sendPacket(pkDenyMsg);
+    		player.sendPacket(new ActionFailed());
+    		return true;
+    	}
+
+    	return false;
+    }
 
     /**
      * Open a chat window on client with the text of the L2NpcInstance.<BR><BR>
@@ -1894,8 +1917,33 @@ public class L2NpcInstance extends L2Character
      */
     public void showChatWindow(L2PcInstance player, int val)
     {
+    	if (player.getKarma() > 0)
+        {	
+			if (this instanceof L2MerchantInstance && !Config.ALT_GAME_KARMA_PLAYER_CAN_SHOP)
+			{
+				if (showPkDenyChatWindow(player, "merchant"))
+					return;
+			}
+			else if (this instanceof L2TeleporterInstance && !Config.ALT_GAME_KARMA_PLAYER_CAN_USE_GK)
+			{
+				if (showPkDenyChatWindow(player, "teleporter"))
+					return;
+			}
+			else if (this instanceof L2WarehouseInstance)
+			{
+				if (showPkDenyChatWindow(player, "warehouse") && !Config.ALT_GAME_KARMA_PLAYER_CAN_USE_WAREHOUSE)
+					return;
+			}
+			else if (this instanceof L2FishermanInstance && !Config.ALT_GAME_KARMA_PLAYER_CAN_SHOP)
+			{
+				if (showPkDenyChatWindow(player, "fisherman"))
+					return;
+			}
+        }
+    	
     	if (getTemplate().type == "L2Auctioneer" && val==0)
             return;
+
         int npcId = getTemplate().npcId;
         
         /* For use with Seven Signs implementation */
@@ -2001,16 +2049,24 @@ public class L2NpcInstance extends L2Character
             case 31102: //
                 if (isSealValidationPeriod) 
                 {
-                    if (compWinner == SevenSigns.CABAL_DAWN && (playerCabal != SevenSigns.CABAL_DAWN || sealAvariceOwner != SevenSigns.CABAL_DAWN)) 
-                        player.sendPacket(new SystemMessage(SystemMessage.CAN_BE_USED_BY_DAWN));
-                    else if (compWinner == SevenSigns.CABAL_DUSK && (playerCabal != SevenSigns.CABAL_DUSK || sealAvariceOwner != SevenSigns.CABAL_DUSK))
-                        player.sendPacket(new SystemMessage(SystemMessage.CAN_BE_USED_BY_DUSK));
-                    
-                    if (compWinner != playerCabal)
-                        filename += "necro_no.htm";
-                    else if (sealAvariceOwner != playerCabal)
-                        filename += "necro_no.htm";
-                    else
+        			if (playerCabal != compWinner || sealAvariceOwner != compWinner)
+        			{
+	                	switch (compWinner)
+	                	{
+	                		case SevenSigns.CABAL_DAWN:
+                                player.sendPacket(new SystemMessage(SystemMessage.CAN_BE_USED_BY_DAWN));
+                                filename += "necro_no.htm";
+	                			break;
+	                		case SevenSigns.CABAL_DUSK:
+                                player.sendPacket(new SystemMessage(SystemMessage.CAN_BE_USED_BY_DUSK));
+                                filename += "necro_no.htm";
+	                			break;
+	                		case SevenSigns.CABAL_NULL:
+	                        	filename = (getHtmlPath(npcId, val)); // do the default!
+	                        	break;
+	                	}
+        			}
+        			else
                     	filename = (getHtmlPath(npcId, val)); // do the default!
                 }
                 else 
@@ -2029,17 +2085,25 @@ public class L2NpcInstance extends L2Character
             case 31119: //
                 if (isSealValidationPeriod) 
                 {
-                    if (compWinner == SevenSigns.CABAL_DAWN && (playerCabal != SevenSigns.CABAL_DAWN || sealGnosisOwner != SevenSigns.CABAL_DAWN)) 
-                        player.sendPacket(new SystemMessage(SystemMessage.CAN_BE_USED_BY_DAWN));
-                    else if (compWinner == SevenSigns.CABAL_DUSK && (playerCabal != SevenSigns.CABAL_DUSK || sealGnosisOwner != SevenSigns.CABAL_DUSK))
-                        player.sendPacket(new SystemMessage(SystemMessage.CAN_BE_USED_BY_DUSK));
-                    
-                    if (compWinner != playerCabal)
-                        filename += "cata_no.htm";
-                    else if (sealGnosisOwner != playerCabal)
-                        filename += "cata_no.htm";
-                    else
-                        filename = (getHtmlPath(npcId, val)); // do the default!
+        			if (playerCabal != compWinner || sealGnosisOwner != compWinner)
+        			{
+	                	switch (compWinner)
+	                	{
+	                		case SevenSigns.CABAL_DAWN:
+                                player.sendPacket(new SystemMessage(SystemMessage.CAN_BE_USED_BY_DAWN));
+                                filename += "cata_no.htm";
+	                			break;
+	                		case SevenSigns.CABAL_DUSK:
+                                player.sendPacket(new SystemMessage(SystemMessage.CAN_BE_USED_BY_DUSK));
+                                filename += "cata_no.htm";
+	                			break;
+	                		case SevenSigns.CABAL_NULL:
+	                        	filename = (getHtmlPath(npcId, val)); // do the default!
+	                        	break;
+	                	}
+        			}
+        			else
+                    	filename = (getHtmlPath(npcId, val)); // do the default!
                 }
                 else 
                 {
@@ -2278,7 +2342,10 @@ public class L2NpcInstance extends L2Character
      */
     public void onDecay()
     {
-        // Manage Life Control Tower
+    	 if (isDecayed()) return;
+    	 setDecayed(true);
+    	 
+    	// Manage Life Control Tower
         if (this instanceof L2ControlTowerInstance)
             ((L2ControlTowerInstance)this).onDeath();
         
@@ -2337,10 +2404,10 @@ public class L2NpcInstance extends L2Character
     
     public void endDecayTask()
     {
-    	if (!isDecayed()) {
-    		_isDecayed = true;
-	    	onDecay();
+    	if (!isDecayed()) 
+    	{
 	        DecayTaskManager.getInstance().cancelDecayTask(this);
+    		onDecay();
     	}
     }
 }

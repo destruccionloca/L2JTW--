@@ -38,6 +38,7 @@ public class SystemMessage extends ServerBasePacket
 	private int _messageId;
 	private Vector<Integer> _types = new Vector<Integer>();
 	private Vector<Object> _values = new Vector<Object>();
+	private int _SkillLvL = 1;
 	
 	//PeaceZones
 	public static final int TARGET_IN_PEACEZONE = 85;
@@ -345,7 +346,8 @@ public class SystemMessage extends ServerBasePacket
     public static final int LOC_COLISEUM_S1_S2_S3 = 925;
     public static final int LOC_HEINE_S1_S2_S3 = 926;
     public static final int LOC_RUNE_S1_S2_S3 = 1537;
-    public static final int LOC_GODDARD_S1_S2_S3 = 1538;    
+    public static final int LOC_GODDARD_S1_S2_S3 = 1538;
+    public static final int LOC_SCHUTTGART_S1_S2_S3 = 1714;
 	
 	//Crystallize
 	public static final int CRYSTALLIZE_LEVEL_TOO_LOW = 562;
@@ -764,10 +766,13 @@ public class SystemMessage extends ServerBasePacket
         return this;
 	}
 
-	public SystemMessage addSkillName(int id)
+	public SystemMessage addSkillName(int id){return addSkillName(id, 1);}
+	
+	public SystemMessage addSkillName(int id, int lvl)
 	{
 		_types.add(new Integer(TYPE_SKILL_NAME));
 		_values.add(new Integer(id));
+		_SkillLvL = lvl;
         
         return this;
 	}
@@ -808,8 +813,8 @@ public class SystemMessage extends ServerBasePacket
 				case TYPE_SKILL_NAME:
 				{
 					int t1 = ((Integer)_values.get(i)).intValue();
-					writeD(t1);	
-					writeD(1);  //??
+					writeD(t1); // Skill Id
+					writeD(_SkillLvL); // Skill lvl
 					break;
 				}
 			}

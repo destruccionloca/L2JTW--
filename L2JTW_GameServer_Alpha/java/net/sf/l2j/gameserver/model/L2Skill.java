@@ -27,7 +27,8 @@ import java.util.logging.Logger;
 import javolution.text.TextBuilder;
 import javolution.util.FastList;
 import net.sf.l2j.Config;
-import net.sf.l2j.gameserver.GeoData; 
+import net.sf.l2j.gameserver.GeoData;
+import net.sf.l2j.gameserver.datatables.SkillTable;
 import net.sf.l2j.gameserver.datatables.SkillTreeTable;
 import net.sf.l2j.gameserver.ai.CtrlEvent;
 import net.sf.l2j.gameserver.datatables.SkillTable;
@@ -2004,10 +2005,13 @@ public abstract class L2Skill
             }
             case TARGET_UNDEAD:
             {
-                if (target instanceof L2Attackable)
+
+                if (target instanceof L2NpcInstance || target instanceof L2SummonInstance)
+
                 {
 
-                    if (!((L2NpcInstance) target).isUndead() || target.isDead())
+                    if (!target.isUndead() || target.isDead())
+
 
                     {
                         activeChar.sendPacket(new SystemMessage(SystemMessage.TARGET_IS_INCORRECT));

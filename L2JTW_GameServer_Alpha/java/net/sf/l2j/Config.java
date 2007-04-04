@@ -171,6 +171,9 @@ public final class Config
     
     /** Alternative gaming - allow free teleporting around the world. */
     public static boolean ALT_GAME_FREE_TELEPORT;
+
+    /** Disallow recommend character twice or more a day ? */
+    public static boolean ALT_RECOMMEND;
     
     /** Alternative gaming - allow sub-class addition without quest completion. */
     public static boolean ALT_GAME_SUBCLASS_WITHOUT_QUESTS;
@@ -874,6 +877,7 @@ public final class Config
     
     /** Player Protection control */
     public static int   PLAYER_SPAWN_PROTECTION;
+    public static int   PLAYER_FAKEDEATH_UP_PROTECTION;
 
     /** Define Party XP cutoff point method - Possible values: level and percentage */
     public static String  PARTY_XP_CUTOFF_METHOD;
@@ -1364,6 +1368,9 @@ public final class Config
 
                 /* Player protection after teleport or login */
                 PLAYER_SPAWN_PROTECTION = Integer.parseInt(otherSettings.getProperty("PlayerSpawnProtection", "0"));
+                
+                /* Player protection after recovering from fake death (works against mobs only) */
+                PLAYER_FAKEDEATH_UP_PROTECTION = Integer.parseInt(otherSettings.getProperty("PlayerFakeDeathUpProtection", "0"));
 	            
 	            /* Defines some Party XP related values */
 	            PARTY_XP_CUTOFF_METHOD  = otherSettings.getProperty("PartyXpCutoffMethod", "percentage");
@@ -1519,6 +1526,7 @@ public final class Config
                 ALT_GAME_KARMA_PLAYER_CAN_TRADE                     = Boolean.valueOf(altSettings.getProperty("AltKarmaPlayerCanTrade", "true"));
                 ALT_GAME_KARMA_PLAYER_CAN_USE_WAREHOUSE             = Boolean.valueOf(altSettings.getProperty("AltKarmaPlayerCanUseWareHouse", "true"));
                 ALT_GAME_FREE_TELEPORT                              = Boolean.parseBoolean(altSettings.getProperty("AltFreeTeleporting", "False"));
+                ALT_RECOMMEND                                       = Boolean.parseBoolean(altSettings.getProperty("AltRecommend", "False"));
                 ALT_GAME_SUBCLASS_WITHOUT_QUESTS                    = Boolean.parseBoolean(altSettings.getProperty("AltSubClassWithoutQuests", "False"));
                 ALT_GAME_VIEWNPC                    				= Boolean.parseBoolean(altSettings.getProperty("AltGameViewNpc", "False"));
 
@@ -2008,6 +2016,7 @@ public final class Config
         else if (pName.equalsIgnoreCase("UnstuckInterval")) UNSTUCK_INTERVAL = Integer.parseInt(pValue);
 
         else if (pName.equalsIgnoreCase("PlayerSpawnProtection")) PLAYER_SPAWN_PROTECTION = Integer.parseInt(pValue);
+        else if (pName.equalsIgnoreCase("PlayerFakeDeathUpProtection")) PLAYER_FAKEDEATH_UP_PROTECTION = Integer.parseInt(pValue);
 
         else if (pName.equalsIgnoreCase("PartyXpCutoffMethod")) PARTY_XP_CUTOFF_METHOD = pValue;
         else if (pName.equalsIgnoreCase("PartyXpCutoffPercent")) PARTY_XP_CUTOFF_PERCENT = Double.parseDouble(pValue);

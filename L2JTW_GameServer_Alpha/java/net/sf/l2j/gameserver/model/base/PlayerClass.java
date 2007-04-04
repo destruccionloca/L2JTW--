@@ -240,7 +240,7 @@ public enum PlayerClass
         this.type   = type;
     }
     
-    public final Set<PlayerClass> getAvaliableSubclasses()
+    public final Set<PlayerClass> getAvailableSubclasses()
     {
         Set<PlayerClass> subclasses = null;
         
@@ -261,11 +261,11 @@ public enum PlayerClass
                     break;
             }
             
-            Set<PlayerClass> unavaliableClasses = subclassSetMap.get(this);
+            Set<PlayerClass> unavailableClasses = subclassSetMap.get(this);
             
-            if (unavaliableClasses != null)
+            if (unavailableClasses != null)
             {
-                subclasses.removeAll(unavaliableClasses);
+                subclasses.removeAll(unavailableClasses);
             }
         }
         

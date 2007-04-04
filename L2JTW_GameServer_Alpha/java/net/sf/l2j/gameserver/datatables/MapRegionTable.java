@@ -206,6 +206,7 @@ public class MapRegionTable
         
         switch (nearestTownId)
         {
+
             case 0: nearestTown = "說話之島村莊"; break;
             case 1: nearestTown = "精靈村莊"; break;
             case 2: nearestTown = "黑暗精靈村莊"; break;
@@ -224,6 +225,7 @@ public class MapRegionTable
             case 15: nearestTown = "高達特城鎮"; break;
             case 16: nearestTown = "Shuttgart"; break;  ////TODO@ (Check mapregion table)[Luno]
             default: nearestTown = "亞丁城鎮"; break;
+
 
            
         }

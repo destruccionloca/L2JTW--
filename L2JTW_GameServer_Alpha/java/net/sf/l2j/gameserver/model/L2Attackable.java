@@ -19,7 +19,6 @@
 package net.sf.l2j.gameserver.model;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.logging.Level;
 
@@ -51,7 +50,7 @@ import net.sf.l2j.gameserver.model.actor.instance.L2SummonInstance;
 import net.sf.l2j.gameserver.model.actor.knownlist.AttackableKnownList;
 import net.sf.l2j.gameserver.model.base.ClassId;
 import net.sf.l2j.gameserver.model.base.SoulCrystal;
-import net.sf.l2j.gameserver.model.quest.QuestState;
+import net.sf.l2j.gameserver.model.quest.Quest;
 import net.sf.l2j.gameserver.serverpackets.InventoryUpdate;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.skills.Stats;
@@ -434,57 +433,14 @@ public class L2Attackable extends L2NpcInstance
         }
         // Notify the Quest Engine of the L2Attackable death if necessary
         try {
+            if (killer instanceof L2PcInstance || killer instanceof L2Summon) 
+            {
+                L2PcInstance player = killer instanceof L2PcInstance?(L2PcInstance)killer:((L2Summon)killer).getOwner();
 
-        	if (killer instanceof L2PcInstance || killer instanceof L2SummonInstance)
-        	{
-        		L2PcInstance player = killer instanceof L2PcInstance ? (L2PcInstance)killer : ((L2SummonInstance)killer).getOwner();
-        		List<QuestState> questList = new FastList<QuestState>(); 
-        		
-        		if (player.getParty() != null)
-        		{
-        			Map<String, List<QuestState>> tempMap = new FastMap<String, List<QuestState>>();
-        			
-	        		for (L2PcInstance pl : player.getParty().getPartyMembers())
-	        		{
-	        			if (pl.getQuestsForKills(this) == null) continue;
-	        			
-	        			for (QuestState qs : pl.getQuestsForKills(this))
-	        			{
-	        				if (qs.getState().isParty())
-	        				{
-	        					if (!qs.isCompleted() && !pl.isDead() && Util.checkIfInRange(1150, this, pl, true))
-	        					{
-	        						if (tempMap.get(qs.getQuest().getName()) != null)
-	        							tempMap.get(qs.getQuest().getName()).add(qs);
-	        						else
-	        						{
-	        							List<QuestState> tempList = new FastList<QuestState>();
-	        							tempList.add(qs);
-	        							tempMap.put(qs.getQuest().getName(), tempList);
-	        						}
-	        					}
-	        				}
-	        				else if (pl == player)
-	        					questList.add(qs);
-	        			}
-	        		}
-	        		
-	        		for (List<QuestState> list : tempMap.values())
-	        		{
-	        			Random rnd = new Random();
-	        			questList.add((QuestState)list.toArray()[rnd.nextInt(list.size())]);
-	        		}
-        		}
-        		else
-        		{
-        			if (player.getQuestsForKills(this) != null)
-        				for (QuestState qs : player.getQuestsForKills(this))
-        					questList.add(qs);
-        		}
-        		
-       			for (QuestState qs : questList)
-       				qs.getQuest().notifyKill(this, qs);
-        	}
+            	if (getTemplate().getEventQuests(Quest.QuestEventType.MOBKILLED) != null)
+            		for (Quest quest: getTemplate().getEventQuests(Quest.QuestEventType.MOBKILLED))
+            			quest.notifyKill(this, player);
+            }
         } 
         catch (Exception e) { _log.log(Level.SEVERE, "", e); }
 
@@ -854,16 +810,13 @@ public class L2Attackable extends L2NpcInstance
         if (damage > 0) getAI().notifyEvent(CtrlEvent.EVT_ATTACKED, attacker);
         
         try {
-            if (attacker instanceof L2PcInstance || attacker instanceof L2SummonInstance) 
+            if (attacker instanceof L2PcInstance || attacker instanceof L2Summon) 
             {
-                L2PcInstance player = attacker instanceof L2PcInstance?(L2PcInstance)attacker:((L2SummonInstance)attacker).getOwner();
+                L2PcInstance player = attacker instanceof L2PcInstance?(L2PcInstance)attacker:((L2Summon)attacker).getOwner();
                 
-                QuestState[] quests = player.getQuestsForAttacks(this);
-                if (quests != null) 
-                {
-                    for (QuestState qs : quests) 
-                        qs.getQuest().notifyAttack(this, qs);
-                }
+                if (getTemplate().getEventQuests(Quest.QuestEventType.MOBGOTATTACKED) !=null)
+                	for (Quest quest: getTemplate().getEventQuests(Quest.QuestEventType.MOBGOTATTACKED))
+                		quest.notifyAttack(this, player);
             }
         } 
         catch (Exception e) { _log.log(Level.SEVERE, "", e); }
@@ -1253,7 +1206,7 @@ public class L2Attackable extends L2NpcInstance
          }
          
          // Check the drop of a cursed weapon
-         if (levelModifier>0 && player.getLevel()>20)
+         if (levelModifier == 0 && player.getLevel() > 20) // Not deep blue mob
          	CursedWeaponsManager.getInstance().checkDrop(this, player);
 
          // now throw all categorized drops and handle spoil.
@@ -1324,15 +1277,16 @@ public class L2Attackable extends L2NpcInstance
          {
         	 boolean _hp = false;
         	 boolean _mp = false;
-        	 boolean _mtk = false;
+        	 boolean _spec = false;
         	 
         	 //ptk - patk type enhance
         	 int random = Rnd.get(1000); // note *10
-             if (random < Config.RATE_DROP_SPECIAL_HERBS)
+             if ((random < Config.RATE_DROP_SPECIAL_HERBS) && !_spec) // && !_spec useless yet
              {                  
                  RewardItem item = new RewardItem(8612, 1); // Herb of Warrior
                  if (Config.AUTO_LOOT && Config.AUTO_LOOT_HERBS) player.addItem("Loot", item.getItemId(), item.getCount(), this, true);
                  else DropItem(player, item);
+                 _spec = true;
              }
              else for (int i = 0; i < 3; i++)
              {
@@ -1349,45 +1303,41 @@ public class L2Attackable extends L2NpcInstance
             		 break;
             	 }
              }
+             
              //mtk - matk type enhance
              random = Rnd.get(1000); // note *10
-             if (random < Config.RATE_DROP_SPECIAL_HERBS)
+             if ((random < Config.RATE_DROP_SPECIAL_HERBS) && !_spec)
              {
                  RewardItem item = new RewardItem(8613, 1); // Herb of Mystic
                  if (Config.AUTO_LOOT && Config.AUTO_LOOT_HERBS) player.addItem("Loot", item.getItemId(), item.getCount(), this, true);
                  else DropItem(player, item);
-                 _mtk = true;
+                 _spec = true;
              }
-             if (!_mtk)
+             else for (int i = 0; i < 2; i++)
              {
             	 random = Rnd.get(100);
-            	 if (random < Config.RATE_DROP_COMMON_HERBS)
+            	 if (random < Config.RATE_DROP_COMMON_HERBS) 
             	 {
-            		 RewardItem item = new RewardItem(8607, 1); // Herb of Magic
+            		 RewardItem item = null;
+            		 if (i == 0) item = new RewardItem(8607, 1); // Herb of Magic
+            		 if (i == 1) item = new RewardItem(8609, 1); // Herb of Casting Speed
+            		 
             		 if (Config.AUTO_LOOT && Config.AUTO_LOOT_HERBS) player.addItem("Loot", item.getItemId(), item.getCount(), this, true);
             		 else DropItem(player, item);
-            		 _mtk = true;
+            		 break;
             	 }
              }
-             if (!_mtk)
-             {
-            	 random = Rnd.get(100);
-            	 if (random < Config.RATE_DROP_COMMON_HERBS)
-            	 {
-            		 RewardItem item = new RewardItem(8609, 1); // Herb of Casting Spd.
-            		 if (Config.AUTO_LOOT && Config.AUTO_LOOT_HERBS) player.addItem("Loot", item.getItemId(), item.getCount(), this, true);
-            		 else DropItem(player, item);
-            	 }
-             }
+             
              //hp+mp type
              random = Rnd.get(1000); // note *10
-             if (random < Config.RATE_DROP_SPECIAL_HERBS)
+             if ((random < Config.RATE_DROP_SPECIAL_HERBS) && !_spec)
              {
                  RewardItem item = new RewardItem(8614, 1); // Herb of Recovery       
                  if (Config.AUTO_LOOT && Config.AUTO_LOOT_HERBS) player.addItem("Loot", item.getItemId(), item.getCount(), this, true);
                  else DropItem(player, item);
                  _mp = true;
                  _hp = true;
+                 _spec = true;
              }
              //hp - restore hp type
              if (!_hp)
@@ -1398,7 +1348,7 @@ public class L2Attackable extends L2NpcInstance
             		 RewardItem item = new RewardItem(8600, 1); // Herb of Life 
             		 if (Config.AUTO_LOOT && Config.AUTO_LOOT_HERBS) player.addItem("Loot", item.getItemId(), item.getCount(), this, true);
             		 else DropItem(player, item);
-            		 _mp = true;
+            		 _hp = true;
             	 }
              }
              if (!_hp)
@@ -1409,7 +1359,7 @@ public class L2Attackable extends L2NpcInstance
             		 RewardItem item = new RewardItem(8601, 1); // Greater Herb of Life
             		 if (Config.AUTO_LOOT && Config.AUTO_LOOT_HERBS) player.addItem("Loot", item.getItemId(), item.getCount(), this, true);
             		 else DropItem(player, item);
-            		 _mp = true;
+            		 _hp = true;
             	 }
              }
              if (!_hp)
@@ -1950,7 +1900,7 @@ public class L2Attackable extends L2NpcInstance
                         
             // Ember and Anakazel(78) are not 100% success rate and each individual 
             // member of the party has a failure rate on leveling.           
-            if(isBossMob && (getNpcId() == 10319 || getNpcId() == 10338))
+            if(isBossMob && (getNpcId() == 25319 || getNpcId() == 25338))
                 doLevelup = false;
             
             // If succeeds or it is a boss mob, level up the crystal.

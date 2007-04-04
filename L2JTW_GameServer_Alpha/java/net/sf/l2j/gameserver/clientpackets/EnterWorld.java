@@ -54,8 +54,8 @@ import net.sf.l2j.gameserver.serverpackets.GameGuardQuery;
 import net.sf.l2j.gameserver.serverpackets.HennaInfo;
 import net.sf.l2j.gameserver.serverpackets.ItemList;
 import net.sf.l2j.gameserver.serverpackets.NpcHtmlMessage;
-import net.sf.l2j.gameserver.serverpackets.PledgeShowMemberListUpdate;
 import net.sf.l2j.gameserver.serverpackets.PledgeShowMemberListAll;
+import net.sf.l2j.gameserver.serverpackets.PledgeShowMemberListUpdate;
 import net.sf.l2j.gameserver.serverpackets.PledgeStatusChanged;
 import net.sf.l2j.gameserver.serverpackets.QuestList;
 import net.sf.l2j.gameserver.serverpackets.ShortCutInit;
@@ -295,21 +295,21 @@ public class EnterWorld extends ClientBasePacket
 		try {
 		    con = L2DatabaseFactory.getInstance().getConnection();
 		    PreparedStatement statement;
-		    statement = con.prepareStatement("SELECT friend_id FROM character_friends WHERE char_id=?");
+		    statement = con.prepareStatement("SELECT friend_name FROM character_friends WHERE char_id=?");
 		    statement.setInt(1, cha.getObjectId());
 		    ResultSet rset = statement.executeQuery();
 
 		    L2PcInstance friend;
-            int objectId;
+            String friendName;
             
             SystemMessage sm = new SystemMessage(SystemMessage.FRIEND_S1_HAS_LOGGED_IN);
             sm.addString(cha.getName());
 
             while (rset.next())
             {
-                objectId = rset.getInt("friend_id");
+                friendName = rset.getString("friend_name");
 
-                friend = (L2PcInstance)L2World.getInstance().findObject(objectId);
+                friend = L2World.getInstance().getPlayer(friendName);
 
                 if (friend != null) //friend logged in.
                 {

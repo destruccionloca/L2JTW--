@@ -60,6 +60,7 @@ import net.sf.l2j.gameserver.datatables.HennaTable;
 import net.sf.l2j.gameserver.datatables.ItemTable;
 import net.sf.l2j.gameserver.datatables.MapRegionTable;
 import net.sf.l2j.gameserver.datatables.NobleSkillTable;
+import net.sf.l2j.gameserver.datatables.NpcTable;
 import net.sf.l2j.gameserver.datatables.SkillTable;
 import net.sf.l2j.gameserver.datatables.SkillTreeTable;
 import net.sf.l2j.gameserver.handler.IItemHandler;
@@ -214,6 +215,10 @@ public final class L2PcInstance extends L2PlayableInstance
 	private static final String DELETE_CHAR_HENNA = "DELETE FROM character_hennas WHERE char_obj_id=? AND slot=? AND class_index=?";
 	private static final String DELETE_CHAR_HENNAS = "DELETE FROM character_hennas WHERE char_obj_id=? AND class_index=?";
 	private static final String DELETE_CHAR_SHORTCUTS = "DELETE FROM character_shortcuts WHERE char_obj_id=? AND class_index=?";
+
+	private static final String RESTORE_CHAR_RECOMS = "SELECT char_id,target_id FROM character_recommends WHERE char_id=?";
+	private static final String ADD_CHAR_RECOM = "INSERT INTO character_recommends (char_id,target_id) VALUES (?,?)";
+	private static final String DELETE_CHAR_RECOMS = "DELETE FROM character_recommends WHERE char_id=?";
 	
 	public static final int REQUEST_TIMEOUT = 15;
 	
@@ -256,6 +261,8 @@ public final class L2PcInstance extends L2PlayableInstance
         {
 			super.doAttack(target);
 			
+			// cancel the recent fake-death protection instantly if the player attacks or casts spells 
+			getPlayer().setRecentFakeDeath(false);
 			for (L2CubicInstance cubic : getCubics().values())
 				if (cubic.getId() != L2CubicInstance.LIFE_CUBIC)
 					cubic.doAction(target);
@@ -265,6 +272,8 @@ public final class L2PcInstance extends L2PlayableInstance
         {
 			super.doCast(skill);
 			
+			// cancel the recent fake-death protection instantly if the player attacks or casts spells 
+			getPlayer().setRecentFakeDeath(false);
 			if(skill == null) return;
 			if(!skill.isOffensive()) return;
 			L2Object mainTarget = skill.getFirstOfTargetList(L2PcInstance.this);
@@ -503,6 +512,9 @@ public final class L2PcInstance extends L2PlayableInstance
 	// Used for protection after teleport
 	private long _protectEndTime = 0;
 	
+	// protects a char from agro mobs when getting up from fake death
+	private long _recentFakeDeathEndTime = 0;	
+
 	/** The fists L2Weapon of the L2PcInstance (used when no weapon is equiped) */
 	private L2Weapon _fistsWeaponItem;
 	
@@ -597,7 +609,47 @@ public final class L2PcInstance extends L2PlayableInstance
 
 
 	private int _invisible = 0;
+
 	
+	private double _cpUpdateIncCheck = .0;
+	private double _cpUpdateDecCheck = .0;
+	private double _cpUpdateInterval = .0;
+	private double _mpUpdateIncCheck = .0;
+	private double _mpUpdateDecCheck = .0;
+	private double _mpUpdateInterval = .0;
+    
+
+	/** Herbs Task Time **/
+	private int _herbstask = 0;
+	/** Task for Herbs */
+	public class HerbTask implements Runnable
+	{
+		String _process;
+		int _itemId;
+		int _count;
+		L2Object _reference;
+		boolean _sendMessage;
+		HerbTask(String process, int itemId, int count, L2Object reference, boolean sendMessage)
+		{
+			_process = process;
+			_itemId = itemId;
+			_count = count;
+			_reference = reference;
+			_sendMessage = sendMessage;
+		}
+		public void run()
+		{
+			try
+			{
+				addItem(_process, _itemId, _count, _reference, _sendMessage);
+			}
+			catch (Throwable t)
+			{
+				_log.log(Level.WARNING, "", t);
+			}
+		}
+	}
+    
 	/** Skill casting information (used to queue when several skills are cast in a short time) **/
     //private L2Skill SkillDat = null;
     //private boolean _fu;
@@ -721,6 +773,16 @@ public final class L2PcInstance extends L2PlayableInstance
 		return restore(objectId);
 	}
 	
+	private void initPcStatusUpdateValues()
+	{
+		_cpUpdateInterval = getMaxCp() / 352.0;
+		_cpUpdateIncCheck = getMaxCp();
+		_cpUpdateDecCheck = getMaxCp() - _cpUpdateInterval;
+		_mpUpdateInterval = getMaxMp() / 352.0;
+		_mpUpdateIncCheck = getMaxMp();
+		_mpUpdateDecCheck = getMaxMp() - _mpUpdateInterval;
+	}
+	
 	/**
 	 * Constructor of L2PcInstance (use L2Character constructor).<BR><BR>
 	 *
@@ -741,6 +803,8 @@ public final class L2PcInstance extends L2PlayableInstance
 		this.getKnownList();	// init knownlist
         this.getStat();			// init stats
         this.getStatus();		// init status
+        super.initCharStatusUpdateValues();
+        initPcStatusUpdateValues();
 		
 		_accountName  = accountName;
 		_baseLoad     = template.baseLoad;
@@ -766,6 +830,8 @@ public final class L2PcInstance extends L2PlayableInstance
 		this.getKnownList();	// init knownlist
         this.getStat();			// init stats
         this.getStatus();		// init status
+        super.initCharStatusUpdateValues();
+        initPcStatusUpdateValues();
 		
 		_baseLoad = 0;
 	}
@@ -1086,16 +1152,16 @@ public final class L2PcInstance extends L2PlayableInstance
 		QuestState[] states = null;
 		
 		// Go through the QuestState of the L2PcInstance quests
-		for (QuestState qs : _quests.values())
+		for (Quest quest : npc.getTemplate().getEventQuests(Quest.QuestEventType.MOBGOTATTACKED))
 		{
 			// Check if the Identifier of the L2Attackable attck is needed for the current quest
-			if (qs.waitsForAttack(npc))
+			if (getQuestState(quest.getName())!=null)
 			{
 				// Copy the current L2PcInstance QuestState in the QuestState table
 				if (states == null)
-					states = new QuestState[]{qs};
+					states = new QuestState[]{getQuestState(quest.getName())};
 				else
-					states = addToQuestStateArray(states, qs);
+					states = addToQuestStateArray(states, getQuestState(quest.getName()));
 			}
 		}
 		
@@ -1115,16 +1181,16 @@ public final class L2PcInstance extends L2PlayableInstance
 		QuestState[] states = null;
 		
 		// Go through the QuestState of the L2PcInstance quests
-		for (QuestState qs : _quests.values())
+		for (Quest quest : npc.getTemplate().getEventQuests(Quest.QuestEventType.MOBKILLED))
 		{
 			// Check if the Identifier of the L2Attackable killed is needed for the current quest
-			if (qs.waitsForKill(npc))
+			if (getQuestState(quest.getName())!=null)
 			{
 				// Copy the current L2PcInstance QuestState in the QuestState table
 				if (states == null)
-					states = new QuestState[]{qs};
+					states = new QuestState[]{getQuestState(quest.getName())};
 				else
-					states = addToQuestStateArray(states, qs);
+					states = addToQuestStateArray(states, getQuestState(quest.getName()));
 			}
 		}
 		
@@ -1144,16 +1210,22 @@ public final class L2PcInstance extends L2PlayableInstance
 		QuestState[] states = null;
 		
 		// Go through the QuestState of the L2PcInstance quests
-		for (QuestState qs : _quests.values())
+		Quest[] quests = NpcTable.getInstance().getTemplate(npcId).getEventQuests(Quest.QuestEventType.QUEST_TALK);
+		if (quests != null)
 		{
-			// Check if the Identifier of the L2Attackable talk is needed for the current quest
-			if (qs.waitsForTalk(npcId))
+			for (Quest quest: quests)
 			{
-				// Copy the current L2PcInstance QuestState in the QuestState table
-				if (states == null)
-					states = new QuestState[]{qs};
-				else
-					states = addToQuestStateArray(states, qs);
+				if (quest != null)
+				{
+					// Copy the current L2PcInstance QuestState in the QuestState table
+					if (getQuestState(quest.getName())!=null)
+					{
+						if (states == null)
+							states = new QuestState[]{getQuestState(quest.getName())};
+						else
+							states = addToQuestStateArray(states, getQuestState(quest.getName()));
+					}
+				}
 			}
 		}
 		
@@ -1529,14 +1601,35 @@ public final class L2PcInstance extends L2PlayableInstance
 	
 	public void giveRecom(L2PcInstance target)
 	{
+		if (Config.ALT_RECOMMEND)
+		{
+			java.sql.Connection con = null;
+			try
+			{
+				con = L2DatabaseFactory.getInstance().getConnection();
+				PreparedStatement statement = con.prepareStatement(ADD_CHAR_RECOM);
+				statement.setInt(1, getObjectId());
+				statement.setInt(2, target.getObjectId());
+				statement.execute();
+				statement.close();
+			}
+			catch (Exception e)
+			{
+				_log.warning("could not update char recommendations:"+e);
+			}
+			finally
+			{
+				try { con.close(); } catch (Exception e) {}
+			}
+		}
 		target.incRecomHave();
 		decRecomLeft();
-		_recomChars.add(target.getName().hashCode());
+		_recomChars.add(target.getObjectId());
 	}
 	
 	public boolean canRecom(L2PcInstance target)
 	{
-		return !_recomChars.contains(target.getName().hashCode());
+		return !_recomChars.contains(target.getObjectId());
 	}
 	
 	/**
@@ -2490,7 +2583,9 @@ public final class L2PcInstance extends L2PlayableInstance
 		if (count > 0)
 		{
 			// Sends message to client if requested
-			if (sendMessage)
+			if (sendMessage && (!isCastingNow() 
+					&& ItemTable.getInstance().createDummyItem(itemId).getItemType() == L2EtcItemType.HERB 
+					|| ItemTable.getInstance().createDummyItem(itemId).getItemType() != L2EtcItemType.HERB)) 			
 			{
 				if (count > 1)
 				{
@@ -2528,12 +2623,19 @@ public final class L2PcInstance extends L2PlayableInstance
 			//Auto use herbs - autoloot
 			if (ItemTable.getInstance().createDummyItem(itemId).getItemType() == L2EtcItemType.HERB) //If item is herb dont add it to iv :]
 			{
-				L2ItemInstance herb = new L2ItemInstance(this._charId, itemId);
-                IItemHandler handler = ItemHandler.getInstance().getItemHandler(herb.getItemId());                
-                if (handler == null)
-                    _log.warning("No item handler registered for Herb - item ID " + herb.getItemId() + ".");
-                else
-                    handler.useItem(this, herb);
+				if(!isCastingNow()){
+					L2ItemInstance herb = new L2ItemInstance(this._charId, itemId);
+	                IItemHandler handler = ItemHandler.getInstance().getItemHandler(herb.getItemId());                
+	                if (handler == null)
+	                    _log.warning("No item handler registered for Herb - item ID " + herb.getItemId() + ".");
+	                else{
+	                    handler.useItem(this, herb);
+	                    if(_herbstask>=100)_herbstask -=100;
+	                }
+				}else{
+					_herbstask += 100;
+					ThreadPoolManager.getInstance().scheduleAi(new HerbTask(process, itemId, count, reference, sendMessage), _herbstask);
+				}
             }
 			else
             {
@@ -3027,6 +3129,19 @@ public final class L2PcInstance extends L2PlayableInstance
 	}
 	
 	/**
+	 * Set protection from agro mobs when getting up from fake death, according settings.
+	 */
+	public void setRecentFakeDeath(boolean protect)
+	{
+		_recentFakeDeathEndTime = protect ? GameTimeController.getGameTicks() + Config.PLAYER_FAKEDEATH_UP_PROTECTION * GameTimeController.TICKS_PER_SECOND : 0;
+	}
+	
+	public boolean isRecentFakeDeath()
+	{
+		return _recentFakeDeathEndTime > GameTimeController.getGameTicks();
+	}
+	
+	/**
 	 * Return the active connection with the client.<BR><BR>
 	 */
 	public Connection getNetConnection()
@@ -3122,6 +3237,72 @@ public final class L2PcInstance extends L2PlayableInstance
 	}
 	
 	/**
+	 * Returns true if cp update should be done, false if not
+	 * @return boolean
+	 */
+	private boolean needCpUpdate(int barPixels)
+	{
+		double currentCp = getCurrentCp();
+
+	    if (currentCp <= 1.0 || getMaxCp() < barPixels)
+	        return true;
+
+	    if (currentCp <= _cpUpdateDecCheck || currentCp >= _cpUpdateIncCheck)
+	    {
+	    	if (currentCp == getMaxCp())
+	    	{
+	    		_cpUpdateIncCheck = getMaxCp();
+	    		_cpUpdateDecCheck = _cpUpdateIncCheck - _cpUpdateInterval;
+	    	}
+	    	else
+	    	{
+	    		double doubleMulti = currentCp / _cpUpdateInterval;
+		    	int intMulti = (int)doubleMulti;
+
+	    		_cpUpdateDecCheck = _cpUpdateInterval * (doubleMulti < intMulti ? intMulti-- : intMulti);
+	    		_cpUpdateIncCheck = _cpUpdateDecCheck + _cpUpdateInterval;
+	    	}
+
+	    	return true;
+	    }
+
+	    return false;
+	}
+	
+	/**
+	 * Returns true if mp update should be done, false if not
+	 * @return boolean
+	 */
+	private boolean needMpUpdate(int barPixels)
+	{
+		double currentMp = getCurrentMp();
+
+	    if (currentMp <= 1.0 || getMaxMp() < barPixels)
+	        return true;
+
+	    if (currentMp <= _mpUpdateDecCheck || currentMp >= _mpUpdateIncCheck)
+	    {
+	    	if (currentMp == getMaxMp())
+	    	{
+	    		_mpUpdateIncCheck = getMaxMp();
+	    		_mpUpdateDecCheck = _mpUpdateIncCheck - _mpUpdateInterval;
+	    	}
+	    	else
+	    	{
+	    		double doubleMulti = currentMp / _mpUpdateInterval;
+		    	int intMulti = (int)doubleMulti;
+
+	    		_mpUpdateDecCheck = _mpUpdateInterval * (doubleMulti < intMulti ? intMulti-- : intMulti);
+	    		_mpUpdateIncCheck = _mpUpdateDecCheck + _mpUpdateInterval;
+	    	}
+
+	    	return true;
+	    }
+
+	    return false;
+	}
+	
+	/**
 	 * Send packet StatusUpdate with current HP,MP and CP to the L2PcInstance and only current HP, MP and Level to all other L2PcInstance of the Party.<BR><BR>
 	 *
 	 * <B><U> Actions</U> :</B><BR><BR>
@@ -3145,9 +3326,11 @@ public final class L2PcInstance extends L2PlayableInstance
 		su.addAttribute(StatusUpdate.MAX_CP, 	   getMaxCp());
 		sendPacket(su);
 		
-		// Check if a party is in progress
-		if (isInParty())
+		// Check if a party is in progress and party window update is usefull
+		if (isInParty() && (needCpUpdate(352) || super.needHpUpdate(352) || needMpUpdate(352)))
 		{
+			if (Config.DEBUG)
+				_log.fine("Send status for party window of " + getObjectId() + "(" + getName() + ") to his party. CP: " + getCurrentCp() + " HP: " + getCurrentHp() + " MP: " + getCurrentMp());
 			// Send the Server->Client packet PartySmallWindowUpdate with current HP, MP and Level to all other L2PcInstance of the Party
 			PartySmallWindowUpdate update = new PartySmallWindowUpdate(this);
 			getParty().broadcastToPartyMembers(this, update);
@@ -5144,6 +5327,9 @@ public final class L2PcInstance extends L2PlayableInstance
 		// Retrieve from the database all henna of this L2PcInstance and add them to _henna.
 		restoreHenna();
 		
+		// Retrieve from the database all recom data of this L2PcInstance and add to _recomChars.
+		if (Config.ALT_RECOMMEND) restoreRecom();
+		
 		// Retrieve from the database the recipe book of this L2PcInstance.
 		if (!isSubClassActive())
 			restoreRecipeBook();
@@ -5807,6 +5993,37 @@ public final class L2PcInstance extends L2PlayableInstance
 		// Calculate Henna modifiers of this L2PcInstance
 		recalcHennaStats();
 	}
+
+	/**
+	 * Retrieve from the database all Recommendation data of this L2PcInstance, add to _recomChars and calculate stats of the L2PcInstance.<BR><BR>
+	 */
+	private void restoreRecom()
+	{
+		java.sql.Connection con = null;
+		
+		try
+		{
+			con = L2DatabaseFactory.getInstance().getConnection();
+			PreparedStatement statement = con.prepareStatement(RESTORE_CHAR_RECOMS);
+			statement.setInt(1, getObjectId());
+			ResultSet rset = statement.executeQuery();
+			while (rset.next())
+			{
+				_recomChars.add(rset.getInt("target_id"));
+			}
+			
+			rset.close();
+			statement.close();
+		}
+		catch (Exception e)
+		{
+			_log.warning("could not restore recommendations: "+e);
+		}
+		finally
+		{
+			try { con.close(); } catch (Exception e) {}
+		}
+	}
 	
 	/**
 	 * Return the number of Henna empty slot of the L2PcInstance.<BR><BR>
@@ -6247,7 +6464,7 @@ public final class L2PcInstance extends L2PlayableInstance
             return;
         }
         // GeoData Los Check here
-        if (!GeoData.getInstance().canSeeTarget(this, target))
+        if (skill.getCastRange() > 0 && !GeoData.getInstance().canSeeTarget(this, target))
         {
             sendPacket(new SystemMessage(SystemMessage.CANT_SEE_TARGET));
             sendPacket(new ActionFailed());
@@ -7891,15 +8108,36 @@ public final class L2PcInstance extends L2PlayableInstance
 	
 	public void restartRecom()
 	{
-		_recomChars.clear();
-		
+		if (Config.ALT_RECOMMEND)
+		{
+			java.sql.Connection con = null;
+			try
+			{
+				con = L2DatabaseFactory.getInstance().getConnection();
+				PreparedStatement statement = con.prepareStatement(DELETE_CHAR_RECOMS);
+				statement.setInt(1, getObjectId());
+				statement.execute();
+				statement.close();
+
+				_recomChars.clear();
+			}
+			catch (Exception e)
+			{
+				_log.warning("could not clear char recommendations: "+e);
+			}
+			finally
+			{
+				try { con.close(); } catch (Exception e) {}
+			}
+		}
+
 		if (getStat().getLevel() < 20) 
-        {
+		{
 			_recomLeft = 3;
 			_recomHave--;
 		}
 		else if (getStat().getLevel() < 40) 
-        {
+		{
 			_recomLeft = 6;
 			_recomHave -= 2;
 		}
@@ -7908,16 +8146,11 @@ public final class L2PcInstance extends L2PlayableInstance
 			_recomLeft = 9;
 			_recomHave -= 3;
 		}
-		
-		if (_recomHave < 0) 
-			_recomHave = 0;
-		
+		if (_recomHave < 0) _recomHave = 0;
+
+		// If we have to update last update time, but it's now before 13, we should set it to yesterday
 		Calendar update = Calendar.getInstance();
-		 // If we have to update last update time, but it's now before 13, we should set it to yesterday
-		if(update.get(Calendar.HOUR_OF_DAY) < 13)
-		{
-			update.add(Calendar.DAY_OF_MONTH,-1);
-		}
+		if(update.get(Calendar.HOUR_OF_DAY) < 13) update.add(Calendar.DAY_OF_MONTH,-1);
 		update.set(Calendar.HOUR_OF_DAY,13);
 		_lastRecomUpdate = update.getTimeInMillis();
 	}
@@ -8475,11 +8708,11 @@ public final class L2PcInstance extends L2PlayableInstance
             if (_lure != null)
             {
         		int lureid = _lure.getItemId();
-        		isNoob = (lureid >= 7807 && lureid <= 7809);
+        		isNoob = _fish.getGroup() == 0;
         		isUpperGrade = _fish.getGroup() == 2;
                 if (lureid == 6519 || lureid == 6522 || lureid == 6525 || lureid == 8505 || lureid == 8508 || lureid == 8511) //low grade
                 	checkDelay = Math.round((float)(_fish.getGutsCheckTime() * (1.33)));
-                else if (lureid == 6520 || lureid == 6523 || lureid == 6526 || lureid == 8506 || lureid == 8509 || lureid == 8512 || (lureid >= 7610 && lureid <= 7613) || (lureid >= 7807 && lureid <= 7809) || (lureid >= 8484 && lureid <= 8486)) //medium grade, beginner, prize-winning & quest special bait
+                else if (lureid == 6520 || lureid == 6523 || lureid == 6526 || (lureid >= 8505 && lureid <= 8513) || (lureid >= 7610 && lureid <= 7613) || (lureid >= 7807 && lureid <= 7809) || (lureid >= 8484 && lureid <= 8486)) //medium grade, beginner, prize-winning & quest special bait
                 	checkDelay = Math.round((float)(_fish.getGutsCheckTime() * (1.00)));
                 else if (lureid == 6521 || lureid == 6524 || lureid == 6527 || lureid == 8507 || lureid == 8510 || lureid == 8513) //high grade
                 	checkDelay = Math.round((float)(_fish.getGutsCheckTime() * (0.66)));
@@ -8491,21 +8724,15 @@ public final class L2PcInstance extends L2PlayableInstance
 	private int GetRandomGroup() 
 	{
 		switch (_lure.getItemId()) {
-			case 7807:
-			case 7808:
-			case 7809:
-			case 8486:
+			case 7807: //green for beginners
+			case 7808: //purple for beginners
+			case 7809: //yellow for beginners
+			case 8486: //prize-winning for beginners
 				return 0;
-			case 8485:
-			case 8505:
-			case 8506:
-			case 8507:
-			case 8508:
-			case 8509:
-			case 8510:
-			case 8511:
-			case 8512:
-			case 8513:
+			case 8485: //prize-winning luminous
+			case 8506: //green luminous
+			case 8509: //purple luminous
+			case 8512: //yellow luminous
 				return 2;
 			default:
 				return 1;
@@ -8516,43 +8743,43 @@ public final class L2PcInstance extends L2PlayableInstance
 		int check = Rnd.get(100);
 		int type = 1;
 		switch (group) {
-			case 0:
+			case 0:	//fish for novices
 				switch (_lure.getItemId()) {
-					case 7807:
-						if (check <= 55)
-							type = 4;
-						else if (check <= 85)
+					case 7807: //green lure, preferred by fast-moving (nimble) fish (type 5)
+						if (check <= 54)
 							type = 5;
+						else if (check <= 77)
+							type = 4;
 						else
 							type = 6;
 						break;
-					case 7808:
-						if (check <= 55)
-							type = 6;
-						else if (check <= 85)
+					case 7808: //purple lure, preferred by fat fish (type 4)
+						if (check <= 54)
 							type = 4;
+						else if (check <= 77)
+							type = 6;
 						else
 							type = 5;
 						break;
-					case 7809:
-						if (check <= 55)
-							type = 5;
-						else if (check <= 85)
+					case 7809: //yellow lure, preferred by ugly fish (type 6)
+						if (check <= 54)
 							type = 6;
+						else if (check <= 77)
+							type = 5;
 						else
 							type = 4;
 						break;
-					case 8486:
+					case 8486:	//prize-winning fishing lure for beginners
 						if (check <= 33)
 							type = 4;
 						else if (check <= 66)
 							type = 5;
-						else if (check <= 99)
+						else
 							type = 6;
 						break;
 				}
 				break;
-			case 1:
+			case 1:	//normal fish
 				switch (_lure.getItemId()) {
 					case 7610:
 					case 7611:
@@ -8560,201 +8787,85 @@ public final class L2PcInstance extends L2PlayableInstance
 					case 7613:
 						type = 3;
 						break;
-					case 6519:
+					case 6519:  //all theese lures (green) are prefered by fast-moving (nimble) fish (type 1)
 					case 8505:
-						if (check <= 55)
-							type = 0;
-						else if (check <= 85)
-							type = 1;
-						else if (check <= 99)
-							type = 2;
-						else
-							type = 3;
-						break;
 					case 6520:
-					case 8506:
-						if (check <= 55)
-							type = 0;
-						else if (check <= 85)
-							type = 1;
-						else if (check <= 99)
-							type = 2;
-						else
-							type = 3;
-						break;
 					case 6521:
 					case 8507:
-						if (check <= 55)
-							type = 0;
-						else if (check <= 85)
+						if (check <= 54)
 							type = 1;
-						else if (check <= 99)
+						else if (check <= 74)
+							type = 0;
+						else if (check <= 94)
 							type = 2;
 						else
 							type = 3;
 						break;
-					case 6522:
+					case 6522:	 //all theese lures (purple) are prefered by fat fish (type 0)
 					case 8508:
-						if (check <= 55)
-							type = 2;
-						else if (check <= 85)
-							type = 0;
-						else if (check <= 99)
-							type = 1;
-						else
-							type = 3;
-						break;
 					case 6523:
-					case 8509:
-						if (check <= 55)
-							type = 2;
-						else if (check <= 85)
-							type = 0;
-						else if (check <= 99)
-							type = 1;
-						else
-							type = 3;
-						break;
 					case 6524:
 					case 8510:
-						if (check <= 55)
-							type = 2;
-						else if (check <= 85)
+						if (check <= 54)
 							type = 0;
-						else if (check <= 99)
+						else if (check <= 74)
 							type = 1;
+						else if (check <= 94)
+							type = 2;
 						else
 							type = 3;
 						break;
-					case 6525:
+					case 6525:	//all theese lures (yellow) are prefered by ugly fish (type 2)
 					case 8511:
-						if (check <= 55)
-							type = 1;
-						else if (check <= 85)
-							type = 2;
-						else if (check <= 99)
-							type = 0;
-						else
-							type = 3;
-						break;
 					case 6526:
-					case 8512:
-						if (check <= 55)
-							type = 1;
-						else if (check <= 85)
-							type = 2;
-						else if (check <= 99)
-							type = 0;
-						else
-							type = 3;
-						break;
 					case 6527:
 					case 8513:
 						if (check <= 55)
-							type = 1;
-						else if (check <= 85)
 							type = 2;
-						else if (check <= 99)
+						else if (check <= 74)
+							type = 1;
+						else if (check <= 94)
 							type = 0;
 						else
 							type = 3;
 						break;
-					case 8484:
+					case 8484:	//prize-winning fishing lure
 						if (check <= 33)
 							type = 0;
 						else if (check <= 66)
 							type = 1;
-						else if (check <= 99)
-							type = 2;
 						else
-							type = 3;
+							type = 2;
 						break;
 				}
 				break;
-			case 2:
+			case 2:	//upper grade fish, luminous lure
 				switch (_lure.getItemId()) {
-					case 6519:
-					case 8505:
-						if (check <= 55)
-							type = 7;
-						else if (check <= 85)
+					case 8506: //green lure, preferred by fast-moving (nimble) fish (type 8)
+						if (check <= 54)
 							type = 8;
+						else if (check <= 77)
+							type = 7;
 						else
 							type = 9;
 						break;
-					case 6520:
-					case 8506:
-						if (check <= 55)
+					case 8509: //purple lure, preferred by fat fish (type 7)
+						if (check <= 54)
 							type = 7;
-						else if (check <= 85)
-							type = 8;
-						else
+						else if (check <= 77)
 							type = 9;
-						break;
-					case 6521:
-					case 8507:
-						if (check <= 55)
-							type = 7;
-						else if (check <= 85)
-							type = 8;
-						else
-							type = 9;
-						break;
-					case 6522:
-					case 8508:
-						if (check <= 55)
-							type = 9;
-						else if (check <= 85)
-							type = 7;
 						else
 							type = 8;
 						break;
-					case 6523:
-					case 8509:
-						if (check <= 55)
+					case 8512: //yellow lure, preferred by ugly fish (type 9)
+						if (check <= 54)
 							type = 9;
-						else if (check <= 85)
-							type = 7;
-						else
+						else if (check <= 77)
 							type = 8;
-						break;
-					case 6524:
-					case 8510:
-						if (check <= 55)
-							type = 9;
-						else if (check <= 85)
-							type = 7;
-						else
-							type = 8;
-						break;
-					case 6525:
-					case 8511:
-						if (check <= 55)
-							type = 8;
-						else if (check <= 85)
-							type = 9;
 						else
 							type = 7;
 						break;
-					case 6526:
-					case 8512:
-						if (check <= 55)
-							type = 8;
-						else if (check <= 85)
-							type = 9;
-						else
-							type = 7;
-						break;
-					case 6527:
-					case 8513:
-						if (check <= 55)
-							type = 8;
-						else if (check <= 85)
-							type = 9;
-						else
-							type = 7;
-						break;
-					case 8485:
+					case 8485: //prize-winning fishing lure
 						if (check <= 33)
 							type = 7;
 						else if (check <= 66)
@@ -8777,7 +8888,7 @@ public final class L2PcInstance extends L2PlayableInstance
 		if (skilllvl <= 0) return 1;
 		int randomlvl;
 		int check = Rnd.get(100);
-		
+
 		if (check <= 50)
 		{
 			randomlvl = skilllvl;

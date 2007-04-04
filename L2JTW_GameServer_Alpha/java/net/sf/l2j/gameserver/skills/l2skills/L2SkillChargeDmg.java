@@ -123,7 +123,7 @@ public class L2SkillChargeDmg extends L2Skill
            
 			boolean shld = Formulas.getInstance().calcShldUse(caster, target);
             boolean dual = caster.isUsingDualWeapon();
-			//boolean crit = Formulas.getInstance().calcCrit(caster.getCriticalHit(target, this));
+			boolean crit = Formulas.getInstance().calcCrit(caster.getCriticalHit(target, this));
             boolean soul = (weapon != null && weapon.getChargedSoulshot() == L2ItemInstance.CHARGED_SOULSHOT);
             /*if (caster instanceof L2PcInstance && weaponInst != null) 
             {
@@ -140,6 +140,9 @@ public class L2SkillChargeDmg extends L2Skill
                 double finalDamage = damage;
                 finalDamage = finalDamage+(modifier*finalDamage);
 				target.reduceCurrentHp(finalDamage, caster);
+				
+				if (crit) caster.sendPacket(new SystemMessage(SystemMessage.CRITICAL_HIT));
+				
 				SystemMessage sm = new SystemMessage(SystemMessage.YOU_DID_S1_DMG);
 				sm.addNumber((int)finalDamage);
 				caster.sendPacket(sm);
