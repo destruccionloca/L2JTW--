@@ -257,15 +257,9 @@ public class CursedWeaponsManager
 						_log.info("PROBLEM : Player "+playerId+" owns the cursed weapon "+itemId+" but he shouldn't.");
 						
 						// Delete the item
-						statement = con.prepareStatement("DELETE FROM items WHERE playerId=? AND itemId=?");
+						statement = con.prepareStatement("DELETE FROM items WHERE owner_id=? AND item_id=?");
 						statement.setInt(1, playerId);
 						statement.setInt(2, itemId);
-						
-						statement = con.prepareStatement("DELETE FROM cursed_weapons WHERE owner_id=? AND item_id=?");
-						statement.setInt(1, playerId);
-						statement.setInt(2, itemId);
-						
-						
 						if (statement.executeUpdate() != 1)
 						{
 							_log.warning("Error while deleting cursed weapon "+itemId+" from userId "+playerId);
@@ -322,8 +316,13 @@ public class CursedWeaponsManager
 	public void activate(L2PcInstance player, L2ItemInstance item)
 	{
 		CursedWeapon cw = _cursedWeapons.get(item.getItemId());
-		
-		cw.activate(player, item);
+		if (player.isCursedWeaponEquiped()) // cannot own 2 cursed swords
+		{
+			CursedWeapon cw2 = _cursedWeapons.get(player.getCursedWeaponEquipedId());
+			cw2.increaseKills();
+			cw.endOfLife();
+		}
+		else cw.activate(player, item);
 	}
 	
 	public void drop(int itemId, L2Character killer)
@@ -348,7 +347,7 @@ public class CursedWeaponsManager
 	}
 	
 	
-	public void announce(SystemMessage sm)
+	public static void announce(SystemMessage sm)
 	{
 		for (L2PcInstance player : L2World.getInstance().getAllPlayers())
 		{
@@ -367,7 +366,7 @@ public class CursedWeaponsManager
 
 		for (CursedWeapon cw : _cursedWeapons.values())
 		{
-			if (player.getObjectId() == cw.getPlayerId())
+			if (cw.isActivated() && player.getObjectId() == cw.getPlayerId())
 			{
 				cw.setPlayer(player);
 				cw.setItem(player.getInventory().getItemByItemId(cw.getItemId()));
@@ -383,7 +382,7 @@ public class CursedWeaponsManager
 		}
 	}
 
-    public void removeFromDb(int itemId)
+    public static void removeFromDb(int itemId)
     {
     	Connection con = null;
         try

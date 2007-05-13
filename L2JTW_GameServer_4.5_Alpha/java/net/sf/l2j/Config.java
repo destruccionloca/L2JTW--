@@ -652,6 +652,7 @@ public final class Config
 
     public static final String  CLANHALL_CONFIG_FILE        = "./config/clanhall.properties";    
 
+    public static final String  L2JMOD_CONFIG_FILE			= "./config/l2jmods.properties";
 	public static int MAX_ITEM_IN_PACKET;
 
     public static boolean CHECK_KNOWN;
@@ -788,6 +789,22 @@ public final class Config
     /** Allow player with karma to use warehouse ?*/
     public static boolean ALT_GAME_KARMA_PLAYER_CAN_USE_WAREHOUSE;
 
+    /**define L2JMODS */
+    /** Champion Mod*/
+ 	public static boolean L2JMOD_CHAMPION_ENABLE;
+    public static int L2JMOD_CHAMPION_FREQUENCY;
+    public static int L2JMOD_CHAMP_MIN_LVL;
+    public static int L2JMOD_CHAMP_MAX_LVL;
+    public static int L2JMOD_CHAMPION_HP;
+    public static int L2JMOD_CHAMPION_REWARDS;
+    public static int L2JMOD_CHAMPION_ADENAS_REWARDS;
+    public static float L2JMOD_CHAMPION_HP_REGEN;
+    public static float L2JMOD_CHAMPION_ATK;
+    public static float L2JMOD_CHAMPION_SPD_ATK;
+    public static int L2JMOD_CHAMPION_REWARD;
+    public static int L2JMOD_CHAMPION_REWARD_ID;
+    public static int L2JMOD_CHAMPION_REWARD_QTY;
+    
     // Packet information
     /** Count the amount of packets per minute ? */  
 	public static boolean  COUNT_PACKETS           = false;
@@ -1723,7 +1740,34 @@ public final class Config
                 e.printStackTrace();
                 throw new Error("Failed to Load "+CLANHALL_CONFIG_FILE+" File.");
             }
+            try
+            {
+                Properties L2JModSettings  = new Properties();
+                InputStream is          = new FileInputStream(new File(L2JMOD_CONFIG_FILE));
+                L2JModSettings.load(is);
+                is.close();
 
+                L2JMOD_CHAMPION_ENABLE      		= Boolean.parseBoolean(L2JModSettings.getProperty("ChampionEnable", "false"));
+                L2JMOD_CHAMPION_FREQUENCY      		= Integer.parseInt(L2JModSettings.getProperty("ChampionFrequency", "0"));
+                L2JMOD_CHAMP_MIN_LVL				= Integer.parseInt(L2JModSettings.getProperty("ChampionMinLevel", "20"));
+                L2JMOD_CHAMP_MAX_LVL				= Integer.parseInt(L2JModSettings.getProperty("ChampionMaxLevel", "60"));
+                L2JMOD_CHAMPION_HP             		= Integer.parseInt(L2JModSettings.getProperty("ChampionHp", "7"));
+            	L2JMOD_CHAMPION_HP_REGEN       		= Float.parseFloat(L2JModSettings.getProperty("ChampionHpRegen", "1."));
+            	L2JMOD_CHAMPION_REWARDS        		= Integer.parseInt(L2JModSettings.getProperty("ChampionRewards", "8"));	
+            	L2JMOD_CHAMPION_ADENAS_REWARDS 		= Integer.parseInt(L2JModSettings.getProperty("ChampionAdenasRewards", "1"));
+            	L2JMOD_CHAMPION_ATK 				= Float.parseFloat(L2JModSettings.getProperty("ChampionAtk", "1."));
+            	L2JMOD_CHAMPION_SPD_ATK 			= Float.parseFloat(L2JModSettings.getProperty("ChampionSpdAtk", "1."));
+                L2JMOD_CHAMPION_REWARD 				= Integer.parseInt(L2JModSettings.getProperty("ChampionRewardItem", "0"));
+                L2JMOD_CHAMPION_REWARD_ID 			= Integer.parseInt(L2JModSettings.getProperty("ChampionRewardItemID", "6393"));
+                L2JMOD_CHAMPION_REWARD_QTY			= Integer.parseInt(L2JModSettings.getProperty("ChampionRewardItemQty", "1"));
+            	
+            	
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                throw new Error("Failed to Load "+L2JMOD_CONFIG_FILE+" File.");
+            }
 	        // pvp config
 	        try
 	        {
@@ -2155,6 +2199,22 @@ public final class Config
         else if (pName.equalsIgnoreCase("DwarfRecipeLimit")) DWARF_RECIPE_LIMIT = Integer.parseInt(pValue);
         else if (pName.equalsIgnoreCase("CommonRecipeLimit")) COMMON_RECIPE_LIMIT = Integer.parseInt(pValue);
 
+	//ChampionMobs L2JMOD
+        else if (pName.equalsIgnoreCase("ChampionEnable")) L2JMOD_CHAMPION_ENABLE =  Boolean.valueOf(pValue);
+        else if (pName.equalsIgnoreCase("ChampionFrequency")) L2JMOD_CHAMPION_FREQUENCY = Integer.parseInt(pValue);
+        else if (pName.equalsIgnoreCase("ChampionMinLevel")) L2JMOD_CHAMP_MIN_LVL = Integer.parseInt(pValue);
+        else if (pName.equalsIgnoreCase("ChampionMaxLevel")) L2JMOD_CHAMP_MAX_LVL = Integer.parseInt(pValue);
+        else if (pName.equalsIgnoreCase("ChampionHp")) L2JMOD_CHAMPION_HP = Integer.parseInt(pValue);
+        else if (pName.equalsIgnoreCase("ChampionHpRegen")) L2JMOD_CHAMPION_HP_REGEN = Float.parseFloat(pValue);
+        else if (pName.equalsIgnoreCase("ChampionRewards")) L2JMOD_CHAMPION_REWARDS = Integer.parseInt(pValue);        
+        else if (pName.equalsIgnoreCase("ChampionAdenasRewards")) L2JMOD_CHAMPION_ADENAS_REWARDS = Integer.parseInt(pValue);
+        else if (pName.equalsIgnoreCase("ChampionAtk")) L2JMOD_CHAMPION_ATK = Float.parseFloat(pValue);
+        else if (pName.equalsIgnoreCase("ChampionSpdAtk")) L2JMOD_CHAMPION_SPD_ATK = Float.parseFloat(pValue);
+        else if (pName.equalsIgnoreCase("ChampionRewardItem")) L2JMOD_CHAMPION_REWARD = Integer.parseInt(pValue);
+        else if (pName.equalsIgnoreCase("ChampionRewardItemID")) L2JMOD_CHAMPION_REWARD_ID = Integer.parseInt(pValue);
+        else if (pName.equalsIgnoreCase("ChampionRewardItemQty")) L2JMOD_CHAMPION_REWARD_QTY = Integer.parseInt(pValue);
+        
+        
         // PvP settings
         else if (pName.equalsIgnoreCase("MinKarma")) KARMA_MIN_KARMA = Integer.parseInt(pValue);
         else if (pName.equalsIgnoreCase("MaxKarma")) KARMA_MAX_KARMA = Integer.parseInt(pValue);

@@ -45,6 +45,7 @@ import net.sf.l2j.gameserver.datatables.FishTable;
 import net.sf.l2j.gameserver.datatables.HelperBuffTable;
 import net.sf.l2j.gameserver.datatables.HennaTable;
 import net.sf.l2j.gameserver.datatables.HennaTreeTable;
+import net.sf.l2j.gameserver.datatables.HeroSkillTable;
 import net.sf.l2j.gameserver.datatables.ItemTable;
 import net.sf.l2j.gameserver.datatables.LevelUpData;
 import net.sf.l2j.gameserver.datatables.MapRegionTable;
@@ -302,6 +303,7 @@ public class GameServer
 		SkillSpellbookTable.getInstance();
 		CharTemplateTable.getInstance();
 		NobleSkillTable.getInstance();
+		HeroSkillTable.getInstance();
         
         //Call to load caches
         HtmCache.getInstance();

@@ -66,6 +66,7 @@ import net.sf.l2j.gameserver.model.actor.knownlist.CharKnownList;
 import net.sf.l2j.gameserver.model.actor.knownlist.ObjectKnownList.KnownListAsynchronousUpdateTask;
 import net.sf.l2j.gameserver.model.actor.stat.CharStat;
 import net.sf.l2j.gameserver.model.actor.status.CharStatus;
+import net.sf.l2j.gameserver.model.entity.Duel;
 import net.sf.l2j.gameserver.model.entity.Zone;
 import net.sf.l2j.gameserver.model.entity.ZoneType;
 import net.sf.l2j.gameserver.model.quest.QuestState;
@@ -164,8 +165,8 @@ public abstract class L2Character extends L2Object
 	private double _hpUpdateIncCheck = .0;
 	private double _hpUpdateDecCheck = .0;
 	private double _hpUpdateInterval = .0;
-	
-	// =========================================================
+
+	private boolean _champion = false;
 
     private int _LastAttackChange = 0;
     private int _RaidPower = 0;
@@ -352,7 +353,13 @@ public abstract class L2Character extends L2Object
 		if (_IsPendingRevive) doRevive();
 
 		// Modify the position of the pet if necessary
-		if(getPet() != null) getPet().teleToLocation(getPosition().getX() + Rnd.get(-100,100), getPosition().getY() + Rnd.get(-100,100), getPosition().getZ(), false);
+		if(getPet() != null)
+		{
+			getPet().setFollowStatus(false);
+			getPet().teleToLocation(getPosition().getX() + Rnd.get(-100,100), getPosition().getY() + Rnd.get(-100,100), getPosition().getZ(), false);
+			getPet().setFollowStatus(true);
+		}
+
 	}
 
 	// =========================================================
@@ -559,7 +566,8 @@ public abstract class L2Character extends L2Object
 		if (isAlikeDead() || target == null || (this instanceof L2NpcInstance && target.isAlikeDead())
                 || (this instanceof L2PcInstance && target.isDead() && !target.isFakeDeath())
                 || !getKnownList().knowsObject(target)
-                || (this instanceof L2PcInstance && isDead()))
+                || (this instanceof L2PcInstance && isDead())
+                || (target instanceof L2PcInstance && ((L2PcInstance)target).getDuelState() == Duel.DUELSTATE_DEAD))
 		{
 			// If L2PcInstance is dead or the target is dead, the action is stoped
 			getAI().setIntention(CtrlIntention.AI_INTENTION_ACTIVE);
@@ -1218,6 +1226,15 @@ public abstract class L2Character extends L2Object
             return;
         }
 
+        // Can't use Hero and resurrect skills during Olympiad
+        if (this instanceof L2PcInstance && ((L2PcInstance)this).isInOlympiadMode() &&
+        		(skill.isHeroSkill() || skill.getSkillType() == SkillType.RESURRECT))
+        {
+        	SystemMessage sm = new SystemMessage(SystemMessage.THIS_SKILL_IS_NOT_AVAILABLE_FOR_THE_OLYMPIAD_EVENT);
+        	sendPacket(sm);
+        	return;
+        }
+        
         //Recharge AutoSoulShot
         if (skill.useSoulShot())
         {
@@ -4987,7 +5004,8 @@ public abstract class L2Character extends L2Object
 		}
 
 		// Check if player is using fake death.
-        if (isAlikeDead())
+		// Potions can be used while faking death.
+        if (isAlikeDead() && !skill.isPotion())
 		{
             setAttackingChar(null);
             setAttackingCharSkill(null);
@@ -5275,7 +5293,7 @@ public abstract class L2Character extends L2Object
 					{
 						if (skill.isOffensive())
 						{
-							if ((player instanceof L2PcInstance || player instanceof L2Summon) && activeChar.checkIfPvP(player))
+							if (player instanceof L2PcInstance || player instanceof L2Summon)
                             {
                                 player.getAI().notifyEvent(CtrlEvent.EVT_ATTACKED, activeChar);
                                 activeChar.updatePvPStatus(player);
@@ -5292,10 +5310,10 @@ public abstract class L2Character extends L2Object
 								// Casting non offensive skill on player with pvp flag set or with karma
 								if (!player.equals(this) &&
 										(((L2PcInstance)player).getPvpFlag() > 0 ||
-												((L2PcInstance)player).getKarma() > 0)) activeChar.updatePvPStatus(player);
+												((L2PcInstance)player).getKarma() > 0)) activeChar.updatePvPStatus();
 							}
 							else if (player instanceof L2Attackable && !(skill.getSkillType() == L2Skill.SkillType.SUMMON))
-								activeChar.updatePvPStatus(player);
+								activeChar.updatePvPStatus();
 						}
 					}
 				}
@@ -5551,7 +5569,13 @@ public abstract class L2Character extends L2Object
 	// Method - Public
 	public void addStatusListener(L2Character object) { getStatus().addStatusListener(object); }
 	public void reduceCurrentHp(double i, L2Character attacker) { reduceCurrentHp(i, attacker, true); }
-	public void reduceCurrentHp(double i, L2Character attacker, boolean awake) { getStatus().reduceHp(i, attacker, awake); }
+	public void reduceCurrentHp(double i, L2Character attacker, boolean awake) 
+	{ 
+		if (Config.L2JMOD_CHAMPION_ENABLE && isChampion() && Config.L2JMOD_CHAMPION_HP != 0)
+			getStatus().reduceHp(i/Config.L2JMOD_CHAMPION_HP, attacker, awake);
+		else 
+			getStatus().reduceHp(i, attacker, awake);
+	}
     public void reduceCurrentHp(double i, L2Character attacker, boolean awake, boolean isDOT) { getStatus().reduceHp(i, attacker, awake, isDOT); }
 	public void reduceCurrentMp(double i) { getStatus().reduceMp(i); }
 	public void removeStatusListener(L2Character object) { getStatus().removeStatusListener(object); }
@@ -5583,6 +5607,16 @@ public abstract class L2Character extends L2Object
 	{
 		return _LastBuffer;
 	}
+
+	public void setChampion(boolean champ)
+	{
+		_champion = champ;
+    	}
+    
+	public boolean isChampion()
+	{
+		return _champion;
+    	}
 
 	public int getLastHealAmount()
 	{

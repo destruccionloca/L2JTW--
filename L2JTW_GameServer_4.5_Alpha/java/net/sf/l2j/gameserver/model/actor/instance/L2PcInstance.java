@@ -57,6 +57,7 @@ import net.sf.l2j.gameserver.datatables.CharTemplateTable;
 import net.sf.l2j.gameserver.datatables.ClanTable;
 import net.sf.l2j.gameserver.datatables.FishTable;
 import net.sf.l2j.gameserver.datatables.HennaTable;
+import net.sf.l2j.gameserver.datatables.HeroSkillTable;
 import net.sf.l2j.gameserver.datatables.ItemTable;
 import net.sf.l2j.gameserver.datatables.MapRegionTable;
 import net.sf.l2j.gameserver.datatables.NobleSkillTable;
@@ -74,6 +75,7 @@ import net.sf.l2j.gameserver.instancemanager.ArenaManager;
 import net.sf.l2j.gameserver.instancemanager.CastleManager;
 import net.sf.l2j.gameserver.instancemanager.ClanHallManager;
 import net.sf.l2j.gameserver.instancemanager.CursedWeaponsManager;
+import net.sf.l2j.gameserver.instancemanager.DuelManager;
 import net.sf.l2j.gameserver.instancemanager.ItemsOnGroundManager;
 import net.sf.l2j.gameserver.instancemanager.QuestManager;
 import net.sf.l2j.gameserver.instancemanager.SiegeManager;
@@ -126,6 +128,7 @@ import net.sf.l2j.gameserver.model.base.SubClass;
 import net.sf.l2j.gameserver.model.entity.Castle;
 import net.sf.l2j.gameserver.model.entity.CTF;
 import net.sf.l2j.gameserver.model.entity.ClanHall;
+import net.sf.l2j.gameserver.model.entity.Duel;
 import net.sf.l2j.gameserver.model.entity.L2Event;
 import net.sf.l2j.gameserver.model.entity.Siege;
 import net.sf.l2j.gameserver.model.entity.Zone;
@@ -143,6 +146,7 @@ import net.sf.l2j.gameserver.serverpackets.ExFishingEnd;
 import net.sf.l2j.gameserver.serverpackets.ExFishingStart;
 import net.sf.l2j.gameserver.serverpackets.ExOlympiadMode;
 import net.sf.l2j.gameserver.serverpackets.ExOlympiadUserInfo;
+import net.sf.l2j.gameserver.serverpackets.ExDuelUpdateUserInfo;
 import net.sf.l2j.gameserver.serverpackets.HennaInfo;
 import net.sf.l2j.gameserver.serverpackets.InventoryUpdate;
 import net.sf.l2j.gameserver.serverpackets.ItemList;
@@ -207,8 +211,8 @@ public final class L2PcInstance extends L2PlayableInstance
 	private static final String RESTORE_SKILL_SAVE = "SELECT skill_id,skill_level,effect_count,effect_cur_time, reuse_delay FROM character_skills_save WHERE char_obj_id=? AND class_index=? AND restore_type=?";
 	private static final String DELETE_SKILL_SAVE = "DELETE FROM character_skills_save WHERE char_obj_id=? AND class_index=?";
 
-    private static final String UPDATE_CHARACTER = "UPDATE characters SET level=?,maxHp=?,curHp=?,maxCp=?,curCp=?,maxMp=?,curMp=?,str=?,con=?,dex=?,_int=?,men=?,wit=?,face=?,hairStyle=?,hairColor=?,heading=?,x=?,y=?,z=?,exp=?,sp=?,karma=?,pvpkills=?,pkkills=?,rec_have=?,rec_left=?,clanid=?,maxload=?,race=?,classid=?,deletetime=?,title=?,accesslevel=?,online=?,isin7sdungeon=?,clan_privs=?,wantspeace=?,base_class=?,onlinetime=?,in_jail=?,jail_timer=?,newbie=?,nobless=?,power_grade=?,subpledge=?,last_recom_date=?,lvl_joined_academy=?,apprentice=?,sponsor=?,varka_ketra_ally=?,clan_join_expiry_time=?,clan_create_expiry_time=? WHERE obj_id=?";
-    private static final String RESTORE_CHARACTER = "SELECT account_name, obj_Id, char_name, level, maxHp, curHp, maxCp, curCp, maxMp, curMp, acc, crit, evasion, mAtk, mDef, mSpd, pAtk, pDef, pSpd, runSpd, walkSpd, str, con, dex, _int, men, wit, face, hairStyle, hairColor, sex, heading, x, y, z, movement_multiplier, attack_speed_multiplier, colRad, colHeight, exp, sp, karma, pvpkills, pkkills, clanid, maxload, race, classid, deletetime, cancraft, title, rec_have, rec_left, accesslevel, online, char_slot, lastAccess, clan_privs, wantspeace, base_class, onlinetime, isin7sdungeon, in_jail, jail_timer, newbie, nobless, power_grade, subpledge, last_recom_date, lvl_joined_academy, apprentice, sponsor, varka_ketra_ally,clan_join_expiry_time,clan_create_expiry_time FROM characters WHERE obj_id=?";
+    private static final String UPDATE_CHARACTER = "UPDATE characters SET level=?,maxHp=?,curHp=?,maxCp=?,curCp=?,maxMp=?,curMp=?,str=?,con=?,dex=?,_int=?,men=?,wit=?,face=?,hairStyle=?,hairColor=?,heading=?,x=?,y=?,z=?,exp=?,expBeforeDeath=?,sp=?,karma=?,pvpkills=?,pkkills=?,rec_have=?,rec_left=?,clanid=?,maxload=?,race=?,classid=?,deletetime=?,title=?,accesslevel=?,online=?,isin7sdungeon=?,clan_privs=?,wantspeace=?,base_class=?,onlinetime=?,in_jail=?,jail_timer=?,newbie=?,nobless=?,power_grade=?,subpledge=?,last_recom_date=?,lvl_joined_academy=?,apprentice=?,sponsor=?,varka_ketra_ally=?,clan_join_expiry_time=?,clan_create_expiry_time=? WHERE obj_id=?";
+    private static final String RESTORE_CHARACTER = "SELECT account_name, obj_Id, char_name, level, maxHp, curHp, maxCp, curCp, maxMp, curMp, acc, crit, evasion, mAtk, mDef, mSpd, pAtk, pDef, pSpd, runSpd, walkSpd, str, con, dex, _int, men, wit, face, hairStyle, hairColor, sex, heading, x, y, z, movement_multiplier, attack_speed_multiplier, colRad, colHeight, exp, expBeforeDeath, sp, karma, pvpkills, pkkills, clanid, maxload, race, classid, deletetime, cancraft, title, rec_have, rec_left, accesslevel, online, char_slot, lastAccess, clan_privs, wantspeace, base_class, onlinetime, isin7sdungeon, in_jail, jail_timer, newbie, nobless, power_grade, subpledge, last_recom_date, lvl_joined_academy, apprentice, sponsor, varka_ketra_ally,clan_join_expiry_time,clan_create_expiry_time FROM characters WHERE obj_id=?";
     private static final String RESTORE_CHAR_SUBCLASSES = "SELECT class_id,exp,sp,level,class_index FROM character_subclasses WHERE char_obj_id=? ORDER BY class_index ASC";
     private static final String ADD_CHAR_SUBCLASS = "INSERT INTO character_subclasses (char_obj_id,class_id,exp,sp,level,class_index) VALUES (?,?,?,?,?,?)";
     private static final String UPDATE_CHAR_SUBCLASS = "UPDATE character_subclasses SET exp=?,sp=?,level=?,class_id=? WHERE char_obj_id=? AND class_index =?";
@@ -332,7 +336,7 @@ public final class L2PcInstance extends L2PlayableInstance
 	private int _charId = 0x00030b7a;
 	
 	/** The Experience of the L2PcInstance before the last Death Penalty */
-	private long _expBeforeDeath = 0;
+	private long _expBeforeDeath;
 	
 	/** The Karma of the L2PcInstance (if higher than 0, the name of the L2PcInstance appears in red) */
 	private int _karma;
@@ -352,7 +356,6 @@ public final class L2PcInstance extends L2PlayableInstance
 	/** The PvP Flag state of the L2PcInstance (0=White, 1=Purple) */
 	private byte _pvpFlag;
 	
-	private final int _baseLoad;
 	private int _curWeightPenalty = 0;
 	
 	/** After moving, zones are checked */
@@ -370,6 +373,15 @@ public final class L2PcInstance extends L2PlayableInstance
     private boolean _inOlympiadMode = false;
     private int _olympiadGameId = -1;
     private int _olympiadSide = -1;
+    
+    /** Duel */
+    private boolean _isInDuel = false;
+    private int _duelState = Duel.DUELSTATE_NODUEL;
+    private int _duelId = 0;
+    private int _noDuelReason = 0;
+    
+    /** Dice */
+    private long _nextRollDiceTime=0;
     
 	/** Boat */
 	private boolean _inBoat;
@@ -849,7 +861,6 @@ public final class L2PcInstance extends L2PlayableInstance
         initPcStatusUpdateValues();
 		
 		_accountName  = accountName;
-		_baseLoad     = template.baseLoad;
 		_appearance   = app;
 		
 		// Create an AI
@@ -874,8 +885,6 @@ public final class L2PcInstance extends L2PlayableInstance
         this.getStatus();		// init status
         super.initCharStatusUpdateValues();
         initPcStatusUpdateValues();
-		
-		_baseLoad = 0;
 	}
 	
 	public final PcKnownList getKnownList()
@@ -1679,6 +1688,20 @@ public final class L2PcInstance extends L2PlayableInstance
 	}
 	
 	/**
+	 * Set the exp of the L2PcInstance before a death
+	 * @param exp
+	 */
+	public void setExpBeforeDeath(long exp)
+	{
+		_expBeforeDeath = exp;
+	}
+	
+	public long getExpBeforeDeath()
+	{
+		return _expBeforeDeath;
+	}
+	
+	/**
 	 * Return the Karma of the L2PcInstance.<BR><BR>
 	 */
 	public int getKarma()
@@ -1717,7 +1740,14 @@ public final class L2PcInstance extends L2PlayableInstance
 	 */
 	public int getMaxLoad()
 	{
-		return (int)calcStat(Stats.MAX_LOAD, _baseLoad, this, null);
+		// Weight Limit = (CON Modifier*69000)*Skills 
+		// Source http://l2p.bravehost.com/weightlimit.html (May 2007)
+		// Fitted exponential curve to the data
+		int con = getCON();
+		if (con < 1) return 31000;
+		if (con > 59) return 176000;
+		double baseLoad = Math.pow(1.029993928, con)*30495.627366;
+		return (int)calcStat(Stats.MAX_LOAD, baseLoad, this, null);
 	}
 	
 	public int getexpertisePenalty()
@@ -1738,10 +1768,11 @@ public final class L2PcInstance extends L2PlayableInstance
 	 */
 	public void refreshOverloaded()
 	{
-		if (getMaxLoad() > 0)
+		int maxLoad = getMaxLoad();
+		if (maxLoad > 0)
 		{
-			setIsOverloaded(getCurrentLoad() > getMaxLoad());
-			int weightproc = getCurrentLoad() * 1000 / getMaxLoad();
+			setIsOverloaded(getCurrentLoad() > maxLoad);
+			int weightproc = getCurrentLoad() * 1000 / maxLoad;
 			int newWeightPenalty;
 			if (weightproc < 500 || _dietMode)
 			{
@@ -2140,6 +2171,34 @@ public final class L2PcInstance extends L2PlayableInstance
 		// This function gets called on login, so not such a bad place to check weight
 		refreshOverloaded();		// Update the overloaded status of the L2PcInstance
 		refreshExpertisePenalty();  // Update the expertise status of the L2PcInstance
+	}
+	
+	/**
+	 * Regive all skills which aren't saved to database, like Noble, Hero, Clan Skills<BR><BR>
+	 * 
+	 */
+	private void regiveTemporarySkills()
+	{
+		// Do not call this on enterworld or char load
+		
+		// Add noble skills if noble
+		if (isNoble())
+			setNoble(true);
+				
+		// Add Hero skills if hero
+		if (isHero())
+			setHero(true);
+		
+		// Add clan skills
+		if (getClan() != null) 
+		{
+			L2Skill[] skills = getClan().getAllSkills();
+			for (L2Skill sk : skills)
+			{
+				if(sk.getMinPledgeClass() <= getPledgeClass())
+					addSkill(sk, false);
+			}
+		}
 	}
 	
 	/**
@@ -3412,6 +3471,11 @@ public final class L2PcInstance extends L2PlayableInstance
                 }
             }
         }
+        if (isInDuel())
+        {
+        	ExDuelUpdateUserInfo update = new ExDuelUpdateUserInfo(this);
+        	DuelManager.getInstance().broadcastToOppositTeam(this, update);
+        }
 	}
 	
 	/**
@@ -3906,7 +3970,7 @@ public final class L2PcInstance extends L2PlayableInstance
 			}
             
 			// Clear resurrect xp calculation
-			_expBeforeDeath = 0;
+			setExpBeforeDeath(0);
 			
 			if (isCursedWeaponEquiped())
 			{
@@ -3923,8 +3987,10 @@ public final class L2PcInstance extends L2PlayableInstance
 						boolean isKillerPc = (killer instanceof L2PcInstance);
 		                if (isKillerPc && ((L2PcInstance)killer).getClan() != null && getClan() != null && _clan.isAtWarWith(((L2PcInstance) killer).getClanId()) && ((L2PcInstance)killer).getClan().isAtWarWith(_clan.getClanId()))
 		                {
-		                    ((L2PcInstance) killer).getClan().setReputationScore(((L2PcInstance) killer).getClan().getReputationScore()+2, true);
-		                    _clan.setReputationScore(_clan.getReputationScore()-2, true);
+		                    if (getClan().getReputationScore() > 0) // when your reputation score is 0 or below, the other clan cannot acquire any reputation points
+		                		((L2PcInstance) killer).getClan().setReputationScore(((L2PcInstance) killer).getClan().getReputationScore()+2, true);
+		                    if (((L2PcInstance)killer).getClan().getReputationScore() > 0) // when the opposing side’s reputation score is 0 or below, your clan’s reputation score does not decrease
+		                    	_clan.setReputationScore(_clan.getReputationScore()-2, true);
 		                }
 						if (Config.ALT_GAME_DELEVEL)
 						{
@@ -4093,6 +4159,9 @@ public final class L2PcInstance extends L2PlayableInstance
 			return;
 		}
 		
+		// If in duel and you kill (only can kill l2summon), do nothing
+		if (this.isInDuel() && targetPlayer.isInDuel()) return;
+		
         // If in Arena, do nothing
 		if (ArenaManager.getInstance().getArenaIndex(this.getX(),this.getY())!=-1 ||
 				ArenaManager.getInstance().getArenaIndex(target.getX(),target.getY())!=-1)
@@ -4235,15 +4304,22 @@ public final class L2PcInstance extends L2PlayableInstance
 	{
 		if (_inEventCTF && CTF._started) return;
 		
-		if (getPvpFlag() == 0) startPvPFlag();
-		if (getPvpFlag() != 0) setPvpFlagLasts (System.currentTimeMillis()); //update last pvp ATTACK controller
-	}
+		if (ZoneManager.getInstance().checkIfInZonePvP(this)) return;
+		setPvpFlagLasts(System.currentTimeMillis() + Config.PVP_NORMAL_TIME);
+		
+		if (getPvpFlag() == 0)
+			startPvPFlag();
+		}
 	
+
 
 	public void updatePvPStatus(L2Character target)
 	{
 		if (target instanceof L2PcInstance)
-			if (!ZoneManager.getInstance().checkIfInZonePvP(this) || !ZoneManager.getInstance().checkIfInZonePvP(target)) {
+		{
+			if ((isInDuel() && ((L2PcInstance)target).getDuelId() == getDuelId())) return;
+			if ((!ZoneManager.getInstance().checkIfInZonePvP(this) || !ZoneManager.getInstance().checkIfInZonePvP(target)) && ((L2PcInstance)target).getKarma() == 0)
+			{
 				if (checkIfPvP(target))
 					setPvpFlagLasts(System.currentTimeMillis() + Config.PVP_PVP_TIME);
 				else
@@ -4251,6 +4327,7 @@ public final class L2PcInstance extends L2PlayableInstance
 				if (getPvpFlag() == 0)
 					startPvPFlag();
 			}
+		}
 	}
 	
 	/**
@@ -4259,11 +4336,11 @@ public final class L2PcInstance extends L2PlayableInstance
 	 */
 	public void restoreExp(double restorePercent)
 	{ 
-		if (_expBeforeDeath > 0)
+		if (getExpBeforeDeath() > 0)
 		{   
 			// Restore the specified % of lost experience.
-			getStat().addExp((int)Math.round((_expBeforeDeath - getExp()) * restorePercent / 100));
-			_expBeforeDeath = 0;
+			getStat().addExp((int)Math.round((getExpBeforeDeath() - getExp()) * restorePercent / 100));
+			setExpBeforeDeath(0);
 		}
 	}
 	
@@ -4284,7 +4361,11 @@ public final class L2PcInstance extends L2PlayableInstance
 		final int lvl = getLevel();
 		
 		//The death steal you some Exp
-		double percentLost = -0.07 * lvl + 6.5;
+		double percentLost = 7.0;
+		if (getLevel() >= 76)
+			percentLost = 2.0;
+		else if (getLevel() >= 40)
+			percentLost = 4.0;
         
 		if (getKarma() > 0) 
             percentLost *= Config.RATE_KARMA_EXP_LOST;
@@ -4301,7 +4382,7 @@ public final class L2PcInstance extends L2PlayableInstance
 				lostExp = Math.round((getStat().getExpForLevel(Experience.MAX_LEVEL) - getStat().getExpForLevel(Experience.MAX_LEVEL - 1)) * percentLost /100);
 		
 		// Get the Experience before applying penalty
-		_expBeforeDeath = getExp();
+		setExpBeforeDeath(getExp());
 		
         if (Config.DEBUG)
             _log.fine(getName() + " died and lost " + lostExp + " experience.");
@@ -4756,7 +4837,7 @@ public final class L2PcInstance extends L2PlayableInstance
 	/**
 	 * Disarm the player's weapon and shield.<BR><BR>
 	 */
-	public synchronized boolean disarmWeapons()
+	public boolean disarmWeapons()
 	{
         // Don't allow disarming a cursed weapon
         if (isCursedWeaponEquiped()) return false;
@@ -5257,6 +5338,7 @@ public final class L2PcInstance extends L2PlayableInstance
 				player._lastAccess = rset.getLong("lastAccess");
 				
 				player.getStat().setExp(rset.getLong("exp"));
+				player.setExpBeforeDeath(rset.getLong("expBeforeDeath"));
 				player.getStat().setLevel(rset.getByte("level"));
 				player.getStat().setSp(rset.getInt("sp"));
 				
@@ -5396,6 +5478,7 @@ public final class L2PcInstance extends L2PlayableInstance
 			
 			// Retrieve from the database all secondary data of this L2PcInstance 
 			// and reward expertise/lucky skills if necessary.
+			// Note that Clan, Noblesse and Hero skills are given separately and not here.
 			player.restoreCharData();
 			player.rewardSkills();
 			
@@ -5631,51 +5714,52 @@ public final class L2PcInstance extends L2PlayableInstance
 			statement.setInt(19, _observerMode ? _obsY : getY());
 			statement.setInt(20, _observerMode ? _obsZ : getZ());
 			statement.setLong(21, exp);
-			statement.setInt(22, sp);
-			statement.setInt(23, getKarma());
-			statement.setInt(24, getPvpKills());
-			statement.setInt(25, getPkKills());
-			statement.setInt(26, getRecomHave());
-			statement.setInt(27, getRecomLeft());
-			statement.setInt(28, getClanId());
-			statement.setInt(29, getMaxLoad());
-			statement.setInt(30, getRace().ordinal());
+			statement.setLong(22, getExpBeforeDeath());
+			statement.setInt(23, sp);
+			statement.setInt(24, getKarma());
+			statement.setInt(25, getPvpKills());
+			statement.setInt(26, getPkKills());
+			statement.setInt(27, getRecomHave());
+			statement.setInt(28, getRecomLeft());
+			statement.setInt(29, getClanId());
+			statement.setInt(30, getMaxLoad());
+			statement.setInt(31, getRace().ordinal());
 			
 //			if (!isSubClassActive())
 			
 //			else 
 //			statement.setInt(30, getBaseTemplate().race.ordinal());
 			
-			statement.setInt(31, getClassId().getId());
-			statement.setLong(32, getDeleteTimer());
-			statement.setString(33, getTitle());
-			statement.setInt(34, getAccessLevel());
-			statement.setInt(35, isOnline());
-            statement.setInt(36, isIn7sDungeon() ? 1 : 0);
-			statement.setInt(37, getClanPrivileges());
-			statement.setInt(38, getWantsPeace());
-			statement.setInt(39, getBaseClass());
+			statement.setInt(32, getClassId().getId());
+			statement.setLong(33, getDeleteTimer());
+			statement.setString(34, getTitle());
+			statement.setInt(35, getAccessLevel());
+			statement.setInt(36, isOnline());
+            statement.setInt(37, isIn7sDungeon() ? 1 : 0);
+			statement.setInt(38, getClanPrivileges());
+			statement.setInt(39, getWantsPeace());
+			statement.setInt(40, getBaseClass());
 
 			long totalOnlineTime = _onlineTime;
             
 			if (_onlineBeginTime > 0)
 				totalOnlineTime += (System.currentTimeMillis()-_onlineBeginTime)/1000;
 
-            statement.setLong(40, totalOnlineTime);
-            statement.setInt(41, isInJail() ? 1 : 0);
-            statement.setLong(42, getJailTimer());
-            statement.setInt(43, isNewbie() ? 1 : 0);
-            statement.setInt(44, isNoble() ? 1 : 0);
-            statement.setLong(45, getPowerGrade());
-            statement.setInt(46, getPledgeType());
-            statement.setLong(47,getLastRecomUpdate());
-            statement.setInt(48,getLvlJoinedAcademy());
-            statement.setLong(49,getApprentice());
-            statement.setLong(50,getSponsor());
-            statement.setInt(51, getAllianceWithVarkaKetra());
-			statement.setLong(52, getClanJoinExpiryTime());
-			statement.setLong(53, getClanCreateExpiryTime());
-            statement.setInt(54, getObjectId());
+            statement.setLong(41, totalOnlineTime);
+            statement.setInt(42, isInJail() ? 1 : 0);
+            statement.setLong(43, getJailTimer());
+            statement.setInt(44, isNewbie() ? 1 : 0);
+            statement.setInt(45, isNoble() ? 1 : 0);
+            statement.setLong(46, getPowerGrade());
+            statement.setInt(47, getPledgeType());
+            statement.setLong(48,getLastRecomUpdate());
+            statement.setInt(49,getLvlJoinedAcademy());
+            statement.setLong(50,getApprentice());
+            statement.setLong(51,getSponsor());
+            statement.setInt(52, getAllianceWithVarkaKetra());
+			statement.setLong(53, getClanJoinExpiryTime());
+			statement.setLong(54, getClanCreateExpiryTime());
+            statement.setInt(55, getObjectId());
             
 			statement.execute();
 			statement.close();
@@ -5987,9 +6071,6 @@ public final class L2PcInstance extends L2PlayableInstance
 		{
 			try { con.close(); } catch (Exception e) {}
 		}
-        // Update Noble Skills after subclass change
-		if (this.isNoble())
-			this.setNoble(true); 
 	}
 	
     /**
@@ -6444,6 +6525,10 @@ public final class L2PcInstance extends L2PlayableInstance
 		// Check if the attacker is a L2PcInstance
 		if (attacker instanceof L2PcInstance)
 		{
+			// is AutoAttackable if both players are in the same duel and the duel is still going on
+			if ( getDuelState() == Duel.DUELSTATE_DUELLING
+					&& getDuelId() == ((L2PcInstance)attacker).getDuelId() )
+				return true;
 			// Check if the L2PcInstance is in an arena or a siege area
 			if (ZoneManager.getInstance().checkIfInZonePvP(this) && ZoneManager.getInstance().checkIfInZonePvP(attacker))
 				return true;
@@ -6958,11 +7043,12 @@ public final class L2PcInstance extends L2PlayableInstance
 		
 		// check for PC->PC Pvp status
 		if (
-				target != null &&                                           // target not null and
-				target != this &&                                           // target is not self and
-				target instanceof L2PcInstance &&                           // target is L2PcInstance and
-				!ZoneManager.getInstance().checkIfInZonePvP(this) &&        // Pc is not in PvP zone
-				!ZoneManager.getInstance().checkIfInZonePvP(target)         // target is not in PvP zone
+				target != null &&                                           			// target not null and
+				target != this &&                                           			// target is not self and
+				target instanceof L2PcInstance &&                           			// target is L2PcInstance and
+				!(isInDuel() && ((L2PcInstance)target).getDuelId() == getDuelId()) &&	// self is not in a duel and attacking opponent
+				!ZoneManager.getInstance().checkIfInZonePvP(this) &&        			// Pc is not in PvP zone
+				!ZoneManager.getInstance().checkIfInZonePvP(target)         			// target is not in PvP zone
 		)
 		{
 			if(skill.isPvpSkill()) // pvp skill
@@ -7647,13 +7733,18 @@ public final class L2PcInstance extends L2PlayableInstance
 		return _blockList;
 	}
 	
-	public void setConnected(boolean connected)
-	{
-		
-	}
-	
 	public void setHero(boolean hero)
 	{
+		if (hero && _baseClass == _activeClass)
+		{
+			for (L2Skill s : HeroSkillTable.getInstance().GetHeroSkills())
+				addSkill(s, false); //Dont Save Hero skills to database
+		}
+		else
+		{
+			for (L2Skill s : HeroSkillTable.getInstance().GetHeroSkills())
+				super.removeSkill(s); //Just Remove skills from nonHero characters
+		}
 		_hero = hero;
 	}
 	
@@ -7672,6 +7763,96 @@ public final class L2PcInstance extends L2PlayableInstance
     	return _inOlympiadMode;
     }
     
+	public boolean isInDuel()
+	{
+		return _isInDuel;
+	}
+	
+	public int getDuelId()
+	{
+		return _duelId;
+	}
+	
+	public void setDuelState(int mode)
+	{
+		_duelState = mode;
+	}
+	
+	public int getDuelState()
+	{
+		return _duelState;
+	}
+	
+	/**
+	 * Sets up the duel state using a non 0 duelId. 
+	 * @param duelId 0=not in a duel
+	 */
+	public void setIsInDuel(int duelId)
+	{
+		if (duelId > 0)
+		{
+			_isInDuel = true;
+			_duelState = Duel.DUELSTATE_DUELLING;
+			_duelId = duelId;
+		}
+		else
+		{
+			if (_duelState == Duel.DUELSTATE_DEAD) { enableAllSkills(); getStatus().startHpMpRegeneration(); }
+			_isInDuel = false;
+			_duelState = Duel.DUELSTATE_NODUEL;
+			_duelId = 0;
+		}
+	}
+	
+	/**
+	 * This returns a SystemMessage stating why
+	 * the player is not available for duelling.
+	 * @return S1_CANNOT_DUEL... message
+	 */
+	public SystemMessage getNoDuelReason()
+	{
+		// This is somewhat hacky - but that case should never happen anyway...
+		if (_noDuelReason == 0) _noDuelReason = SystemMessage.THERE_IS_NO_OPPONENT_TO_RECEIVE_YOUR_CHALLENGE_FOR_A_DUEL;
+
+		SystemMessage sm = new SystemMessage(_noDuelReason);
+		sm.addString(getName());
+		_noDuelReason = 0;
+		return sm;
+	}
+	
+	/**
+	 * Checks if this player might join / start a duel.
+	 * To get the reason use getNoDuelReason() after calling this function. 
+	 * @return true if the player might join/start a duel.
+	 */
+	public boolean canDuel()
+	{
+		if (isInCombat() || isInJail()) { _noDuelReason = SystemMessage.S1_CANNOT_DUEL_BECAUSE_S1_IS_CURRENTLY_ENGAGED_IN_BATTLE; return false; }
+		if (isDead() || isAlikeDead() || (getCurrentHp() < getMaxHp()/2 || getCurrentMp() < getMaxMp()/2)) { _noDuelReason = SystemMessage.S1_CANNOT_DUEL_BECAUSE_S1S_HP_OR_MP_IS_BELOW_50_PERCENT; return false; }
+		if (isInDuel()) { _noDuelReason = SystemMessage.S1_CANNOT_DUEL_BECAUSE_S1_IS_ALREADY_ENGAGED_IN_A_DUEL; return false;}
+		if (isInOlympiadMode()) { _noDuelReason = SystemMessage.S1_CANNOT_DUEL_BECAUSE_S1_IS_PARTICIPATING_IN_THE_OLYMPIAD; return false; }
+		if (isCursedWeaponEquiped()) { _noDuelReason = SystemMessage.S1_CANNOT_DUEL_BECAUSE_S1_IS_IN_A_CHAOTIC_STATE; return false; }
+		if (getPrivateStoreType() != STORE_PRIVATE_NONE) { _noDuelReason = SystemMessage.S1_CANNOT_DUEL_BECAUSE_S1_IS_CURRENTLY_ENGAGED_IN_A_PRIVATE_STORE_OR_MANUFACTURE; return false; }
+		if (isMounted() || isInBoat()) { _noDuelReason = SystemMessage.S1_CANNOT_DUEL_BECAUSE_S1_IS_CURRENTLY_RIDING_A_BOAT_WYVERN_OR_STRIDER; return false; }
+		if (isFishing()) { _noDuelReason = SystemMessage.S1_CANNOT_DUEL_BECAUSE_S1_IS_CURRENTLY_FISHING; return false; }
+		if (getInPvpZone() || ZoneManager.getInstance().checkIfInZonePeace(this) || SiegeManager.getInstance().checkIfInZone(this))
+		{
+			_noDuelReason = SystemMessage.S1_CANNOT_MAKE_A_CHALLANGE_TO_A_DUEL_BECAUSE_S1_IS_CURRENTLY_IN_A_DUEL_PROHIBITED_AREA;
+			return false;
+		}
+		return true;
+	}
+	
+	public long getRollDiceTime()
+	{
+		return _nextRollDiceTime;
+	}
+	
+	public void setRollDiceTime(long nextTime)
+	{
+		_nextRollDiceTime = nextTime;
+	}
+	
     public boolean isNoble()
     {
     	return _noble;
@@ -8070,6 +8251,7 @@ public final class L2PcInstance extends L2PlayableInstance
 		}
         
         restoreSkills();
+        regiveTemporarySkills();
         rewardSkills();
         restoreEffects();
 
@@ -8084,7 +8266,7 @@ public final class L2PcInstance extends L2PlayableInstance
         updateStats();
 
         // Clear resurrect xp calculation
-        _expBeforeDeath = 0;
+        setExpBeforeDeath(0);
         
         //_macroses.restore();
         //_macroses.sendUpdate();
@@ -8431,6 +8613,13 @@ public final class L2PcInstance extends L2PlayableInstance
         
 		if (Config.ALLOW_WATER) 
             checkWaterState();
+        if (ZoneManager.getInstance().checkIfInZone(ZoneType.getZoneTypeName(ZoneType.ZoneTypeEnum.ClanHall), this)){ 
+         	ClanHall clanHall = ClanHallManager.getInstance().getClanHall(getX(), getY()); 
+         	if(clanHall != null){ 
+         		ClanHallDecoration bl = new ClanHallDecoration(clanHall); 
+         		sendPacket(bl); 
+         	} 
+         } 
 	}
 	
 	public final boolean updatePosition(int gameTicks)

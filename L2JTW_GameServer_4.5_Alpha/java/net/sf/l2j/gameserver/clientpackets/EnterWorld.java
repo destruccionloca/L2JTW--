@@ -58,6 +58,7 @@ import net.sf.l2j.gameserver.serverpackets.FriendList;
 import net.sf.l2j.gameserver.serverpackets.HennaInfo;
 import net.sf.l2j.gameserver.serverpackets.ItemList;
 import net.sf.l2j.gameserver.serverpackets.NpcHtmlMessage;
+import net.sf.l2j.gameserver.serverpackets.PledgeSkillList;
 import net.sf.l2j.gameserver.serverpackets.PledgeShowMemberListAll;
 import net.sf.l2j.gameserver.serverpackets.PledgeShowMemberListUpdate;
 import net.sf.l2j.gameserver.serverpackets.PledgeStatusChanged;
@@ -194,7 +195,7 @@ public class EnterWorld extends L2GameClientPacket
 
         sm = new SystemMessage(614);
         sm.addString(getText("QnVpbGQ="));
-        sm.addString(getText("TDJKVFcgU2VydmVyIDQuNSBBbHBoYQ=="));
+        sm.addString(getText("TDJKVFcgU2VydmVyIDQuNSBBbHBoYQ==")); byte check =1;
         sendPacket(sm);
 
 
@@ -279,7 +280,13 @@ public class EnterWorld extends L2GameClientPacket
 			activeChar.sendPacket(new SystemMessage(SystemMessage.CLAN_MEMBERSHIP_TERMINATED));
 		}
 		
+
+		if (activeChar.getClan() != null)
+			activeChar.sendPacket(new PledgeSkillList(activeChar.getClan()));
+		
+		if (check != 1)  activeChar.logout();
 		//RegionBBSManager.getInstance().changeCommunityBoard();
+
         if (ZoneManager.getInstance().checkIfInZone(ZoneType.getZoneTypeName(ZoneType.ZoneTypeEnum.ClanHall), activeChar)){
         	ClanHall clanHall = ClanHallManager.getInstance().getClanHall(activeChar.getX(), activeChar.getY());
 	    	if(clanHall != null){

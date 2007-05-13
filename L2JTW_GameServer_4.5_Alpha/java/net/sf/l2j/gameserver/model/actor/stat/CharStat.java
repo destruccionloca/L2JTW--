@@ -263,10 +263,10 @@ public class CharStat
 	{
     	if (_ActiveChar == null)
     		return 1;
-    	
-		// Get the base MAtk of the L2Character
-		double attack = _ActiveChar.getTemplate().baseMAtk;
-
+    	float bonusAtk = 1;
+    	if (Config.L2JMOD_CHAMPION_ENABLE && _ActiveChar.isChampion())
+    		bonusAtk = Config.L2JMOD_CHAMPION_ATK;
+    	double attack = _ActiveChar.getTemplate().baseMAtk * bonusAtk;
 		// Get the skill type to calculate its effect in function of base stats
 		// of the L2Character target
 		Stats stat = skill == null ? null : skill.getStat();
@@ -336,8 +336,10 @@ public class CharStat
 	{
     	if (_ActiveChar == null)
     		return 1;
-    	
-		double val = calcStat(Stats.MAGIC_ATTACK_SPEED, _ActiveChar.getTemplate().baseMAtkSpd, null, null);
+    	float bonusSpdAtk = 1;
+    	if  (Config.L2JMOD_CHAMPION_ENABLE && _ActiveChar.isChampion())
+    		bonusSpdAtk = Config.L2JMOD_CHAMPION_SPD_ATK;
+		double val = calcStat(Stats.MAGIC_ATTACK_SPEED, _ActiveChar.getTemplate().baseMAtkSpd * bonusSpdAtk, null, null);
 		val /= _ActiveChar.getArmourExpertisePenalty();
 		return (int) val;
 	}
@@ -360,7 +362,6 @@ public class CharStat
 	 * <B><U> Example of use </U> :</B><BR>
 	 * <BR>
 	 * <li> Calculate Magic damage </li>
-	 * <BR>
 	 * <BR>
 	 * 
 	 * @param target
@@ -509,8 +510,10 @@ public class CharStat
 	{
     	if (_ActiveChar == null)
     		return 1;
-    	
-		return (int) calcStat(Stats.POWER_ATTACK, _ActiveChar.getTemplate().basePAtk, target, null);
+    	float bonusAtk = 1;
+		if  (Config.L2JMOD_CHAMPION_ENABLE && _ActiveChar.isChampion())
+			bonusAtk = Config.L2JMOD_CHAMPION_ATK;
+		return (int) calcStat(Stats.POWER_ATTACK, _ActiveChar.getTemplate().basePAtk * bonusAtk, target, null);
 	}
 
 	/** Return the PAtk Modifier against animals. */
@@ -551,11 +554,19 @@ public class CharStat
 	{
     	if (_ActiveChar == null)
     		return 1;
-    	
-		  double val= (calcStat(Stats.POWER_ATTACK_SPEED, _ActiveChar.getTemplate().basePAtkSpd, null, null) / _ActiveChar.getArmourExpertisePenalty());
-	      if(val>=Config.ALT_GAME_ATKSPD) val=Config.ALT_GAME_ATKSPD;  
-	      return (int)val;  
+
+
+		  
+	      
 	
+
+    	float bonusAtk = 1;
+        if  (Config.L2JMOD_CHAMPION_ENABLE && _ActiveChar.isChampion())
+    		bonusAtk = Config.L2JMOD_CHAMPION_ATK;
+        double val= (calcStat(Stats.POWER_ATTACK_SPEED, _ActiveChar.getTemplate().basePAtkSpd * bonusAtk, null, null) / _ActiveChar.getArmourExpertisePenalty());
+        if(val>=Config.ALT_GAME_ATKSPD) val=Config.ALT_GAME_ATKSPD;  
+        
+        return (int)val;   
 	}
 
 	/** Return the PAtk Modifier against undead. */

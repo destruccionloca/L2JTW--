@@ -443,6 +443,17 @@ public class L2Attackable extends L2NpcInstance
             }
         } 
         catch (Exception e) { _log.log(Level.SEVERE, "", e); }
+        setChampion(false);
+        if (Config.L2JMOD_CHAMPION_ENABLE)
+        {
+        	//Set champion on next spawn
+        	if (this instanceof L2MonsterInstance && Config.L2JMOD_CHAMPION_FREQUENCY > 0 && getLevel()>=Config.L2JMOD_CHAMP_MIN_LVL && getLevel()<=Config.L2JMOD_CHAMP_MAX_LVL) 
+        	{        
+        		int random = Rnd.get(100);
+        		if (random < Config.L2JMOD_CHAMPION_FREQUENCY) 
+        			setChampion(true);
+        	}
+        }
 
         // Kill the L2NpcInstance (the corpse disappeared after 7 seconds)
         super.doDie(killer);
@@ -574,6 +585,12 @@ public class L2Attackable extends L2NpcInstance
                         exp = tmp[0];
                         exp *= 1 - penalty;
                         sp = tmp[1];
+			
+                        if (Config.L2JMOD_CHAMPION_ENABLE && isChampion())
+                        {
+	                        exp *= Config.L2JMOD_CHAMPION_REWARDS;
+	                        sp *= Config.L2JMOD_CHAMPION_REWARDS;
+	                    }
                         
                         // Check for an over-hit enabled strike
                         if (attacker instanceof L2PcInstance)
@@ -637,6 +654,12 @@ public class L2Attackable extends L2NpcInstance
                     exp = tmp[0];
                     sp = tmp[1];
                     
+                    if (Config.L2JMOD_CHAMPION_ENABLE && isChampion())
+                    {
+                    	exp *= Config.L2JMOD_CHAMPION_REWARDS;
+                     	sp *= Config.L2JMOD_CHAMPION_REWARDS;
+                    }
+
                     exp *= partyMul;
                     sp *= partyMul;
                     
@@ -949,6 +972,9 @@ public class L2Attackable extends L2NpcInstance
          if (drop.getItemId() == 57) dropChance *= Config.RATE_DROP_ADENA;
          else if (isSweep) dropChance *= Config.RATE_DROP_SPOIL;
          else dropChance *= Config.RATE_DROP_ITEMS;
+         
+         if (Config.L2JMOD_CHAMPION_ENABLE && isChampion())
+	         dropChance *= Config.L2JMOD_CHAMPION_REWARDS;
 
          // Round drop chance
          dropChance = Math.round(dropChance);
@@ -985,12 +1011,15 @@ public class L2Attackable extends L2NpcInstance
              // Prepare for next iteration if dropChance > L2DropData.MAX_CHANCE
              dropChance -= L2DropData.MAX_CHANCE;
          }
-
+		 if (Config.L2JMOD_CHAMPION_ENABLE)
+			if ((drop.getItemId() == 57 || (drop.getItemId() >= 6360 && drop.getItemId() <= 6362)) && isChampion()) 
+				itemCount *= Config.L2JMOD_CHAMPION_ADENAS_REWARDS;
+	
          if (itemCount > 0) return new RewardItem(drop.getItemId(), itemCount);
          else if (itemCount == 0 && Config.DEBUG) _log.fine("Roll produced 0 items to drop...");
 
          return null;
-     }
+	 }
 
      /**
       * Calculates quantity of items for specific drop CATEGORY according to current situation <br>
@@ -1030,6 +1059,8 @@ public class L2Attackable extends L2NpcInstance
 
           // Applies Drop rates
           categoryDropChance *= Config.RATE_DROP_ITEMS;
+          if (Config.L2JMOD_CHAMPION_ENABLE && isChampion())
+			categoryDropChance *= Config.L2JMOD_CHAMPION_REWARDS; 
 
           // Round drop chance
           categoryDropChance = Math.round(categoryDropChance);
@@ -1059,6 +1090,8 @@ public class L2Attackable extends L2NpcInstance
         	  int dropChance = drop.getChance();
               if (drop.getItemId() == 57) dropChance *= Config.RATE_DROP_ADENA;
               else dropChance *= Config.RATE_DROP_ITEMS;
+              if (Config.L2JMOD_CHAMPION_ENABLE && isChampion())
+				dropChance *= Config.L2JMOD_CHAMPION_REWARDS;
 
               dropChance = Math.round(dropChance);
 
@@ -1096,6 +1129,9 @@ public class L2Attackable extends L2NpcInstance
                   // Prepare for next iteration if dropChance > L2DropData.MAX_CHANCE
                   dropChance -= L2DropData.MAX_CHANCE;
               }
+              if (Config.L2JMOD_CHAMPION_ENABLE)
+            	  if ((drop.getItemId() == 57 || (drop.getItemId() >= 6360 && drop.getItemId() <= 6362)) && isChampion()) 
+            		  itemCount *= Config.L2JMOD_CHAMPION_ADENAS_REWARDS;
               
               if (itemCount > 0) 
                   return new RewardItem(drop.getItemId(), itemCount);
@@ -1269,6 +1305,18 @@ public class L2Attackable extends L2NpcInstance
 		             }
     			 }    
     		 }
+    	 }
+   	 
+    	 // Apply Special Item drop with rnd qty for champions
+    	 if (isChampion() && (player.getLevel() <= getLevel()) && Config.L2JMOD_CHAMPION_REWARD > 0 && (Rnd.get(100) < Config.L2JMOD_CHAMPION_REWARD))
+		 {
+    		 int champqty = Rnd.get(Config.L2JMOD_CHAMPION_REWARD_QTY);
+    		 if (champqty == 0)  //do not allow for a zero drop
+    			 champqty = 1;
+    		 
+    		 RewardItem item = new RewardItem(Config.L2JMOD_CHAMPION_REWARD_ID,champqty);
+    		 if (Config.AUTO_LOOT) player.addItem("ChampionLoot", item.getItemId(), item.getCount(), this, true); // Give this or these Item(s) to the L2PcInstance that has killed the L2Attackable
+             else DropItem(player, item);	 
     	 }
          
          //Instant Item Drop :>

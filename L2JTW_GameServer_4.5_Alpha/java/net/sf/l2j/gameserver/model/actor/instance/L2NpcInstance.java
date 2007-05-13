@@ -1409,8 +1409,8 @@ public class L2NpcInstance extends L2Character
         String content;
         
         if (player.getWeightPenalty()>=3){	
-            content = "<html><body>我並沒有任何可以給你的任務,因為你身上負重.</body></html>";
-            insertObjectIdAndShowChatWindow(player, content);
+
+            player.sendPacket(new SystemMessage(1118));
             return;
         }
         
