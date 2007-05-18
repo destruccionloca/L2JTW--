@@ -33,6 +33,7 @@ import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.entity.L2Event;
 import net.sf.l2j.gameserver.model.entity.CTF;
+import net.sf.l2j.gameserver.model.entity.TvTEvent;
 import net.sf.l2j.gameserver.serverpackets.NpcHtmlMessage;
 
 /**
@@ -101,6 +102,9 @@ public final class RequestBypassToServer extends L2GameClientPacket
                 try
                 {
     				L2Object object = L2World.getInstance().findObject(Integer.parseInt(id));
+
+    				TvTEvent.onBypass(_command.substring(endOfId+1), activeChar);
+
     				if (_command.substring(endOfId+1).startsWith("event_participate")) L2Event.inscribePlayer(activeChar);
     				
     				if (_command.substring(endOfId+1).startsWith("ctf_player_join "))

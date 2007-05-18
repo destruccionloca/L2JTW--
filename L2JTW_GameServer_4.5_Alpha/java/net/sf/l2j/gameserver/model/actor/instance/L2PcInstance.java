@@ -131,6 +131,7 @@ import net.sf.l2j.gameserver.model.entity.ClanHall;
 import net.sf.l2j.gameserver.model.entity.Duel;
 import net.sf.l2j.gameserver.model.entity.L2Event;
 import net.sf.l2j.gameserver.model.entity.Siege;
+import net.sf.l2j.gameserver.model.entity.TvTEvent;
 import net.sf.l2j.gameserver.model.entity.Zone;
 import net.sf.l2j.gameserver.model.entity.ZoneType;
 import net.sf.l2j.gameserver.model.quest.Quest;
@@ -1094,6 +1095,14 @@ public final class L2PcInstance extends L2PlayableInstance
 			_commonRecipeBook.remove(recipeId); 
 		else  
 			_log.warning("Attempted to remove unknown RecipeList: "+recipeId);
+
+		L2ShortCut[] allShortCuts = getAllShortCuts();
+
+		for (L2ShortCut sc : allShortCuts)
+		{
+			if (sc != null && sc.getId() == recipeId && sc.getType() == L2ShortCut.TYPE_RECIPE)
+				deleteShortCut(sc.getSlot(), sc.getPage());
+		}
 	}
 	
 	/**
@@ -3311,6 +3320,13 @@ public final class L2PcInstance extends L2PlayableInstance
 	 */
 	public void onAction(L2PcInstance player)
 	{
+		// See description in TvTEvent.java
+		if (!TvTEvent.onAction(player.getName(), getName()))
+		{
+			player.sendPacket(new ActionFailed());
+			return;
+		}
+
 		// Check if the L2PcInstance is confused
 		if (player.isConfused())
 		{
@@ -3934,6 +3950,8 @@ public final class L2PcInstance extends L2PlayableInstance
 			if (killer instanceof L2PcInstance)
 				pk = (L2PcInstance) killer;
 			
+			TvTEvent.onKill(killer, this);
+			
 			if (atEvent && pk != null)
 			{
 				pk.kills.add(getName());
@@ -3989,7 +4007,7 @@ public final class L2PcInstance extends L2PlayableInstance
 		                {
 		                    if (getClan().getReputationScore() > 0) // when your reputation score is 0 or below, the other clan cannot acquire any reputation points
 		                		((L2PcInstance) killer).getClan().setReputationScore(((L2PcInstance) killer).getClan().getReputationScore()+2, true);
-		                    if (((L2PcInstance)killer).getClan().getReputationScore() > 0) // when the opposing side’s reputation score is 0 or below, your clan’s reputation score does not decrease
+		                    if (((L2PcInstance)killer).getClan().getReputationScore() > 0) // when the opposing sides reputation score is 0 or below, your clans reputation score does not decrease
 		                    	_clan.setReputationScore(_clan.getReputationScore()-2, true);
 		                }
 						if (Config.ALT_GAME_DELEVEL)
@@ -5970,6 +5988,15 @@ public final class L2PcInstance extends L2PlayableInstance
 			try { con.close(); } catch (Exception e) {}
 		}
 		
+
+		L2ShortCut[] allShortCuts = getAllShortCuts();
+
+		for (L2ShortCut sc : allShortCuts)
+		{
+			if (sc != null && skill != null && sc.getId() == skill.getId() && sc.getType() == L2ShortCut.TYPE_SKILL)
+				deleteShortCut(sc.getSlot(), sc.getPage());
+		}
+				
 		return oldSkill;
 	}
 	

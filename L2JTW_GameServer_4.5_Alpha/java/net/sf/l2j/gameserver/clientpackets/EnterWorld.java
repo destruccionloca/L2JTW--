@@ -48,6 +48,7 @@ import net.sf.l2j.gameserver.model.entity.ClanHall;
 import net.sf.l2j.gameserver.model.entity.Hero;
 import net.sf.l2j.gameserver.model.entity.L2Event;
 import net.sf.l2j.gameserver.model.entity.CTF;
+import net.sf.l2j.gameserver.model.entity.TvTEvent;
 import net.sf.l2j.gameserver.model.entity.ZoneType;
 import net.sf.l2j.gameserver.model.quest.Quest;
 import net.sf.l2j.gameserver.serverpackets.ClanHallDecoration;
@@ -90,6 +91,8 @@ public class EnterWorld extends L2GameClientPacket
 
 	protected void runImpl()
 	{
+		byte check = 0;
+		
 		L2PcInstance activeChar = getClient().getActiveChar();
 		
 		if (activeChar == null)
@@ -195,7 +198,7 @@ public class EnterWorld extends L2GameClientPacket
 
         sm = new SystemMessage(614);
         sm.addString(getText("QnVpbGQ="));
-        sm.addString(getText("TDJKVFcgU2VydmVyIDQuNSBBbHBoYQ==")); byte check =1;
+        sm.addString(getText("TDJKVFcgU2VydmVyIDQuNSBBbHBoYQ=="));check =1;
         sendPacket(sm);
 
 
@@ -297,9 +300,13 @@ public class EnterWorld extends L2GameClientPacket
 
         /*if(Config.GAMEGUARD_ENFORCE) - disabled by KenM will be reenabled later
             activeChar.sendPacket(new GameGuardQuery());*/
-        
+
         if (CTF._savePlayers.contains(activeChar.getName()))
         	CTF.addDisconnectedPlayer(activeChar);
+
+        
+        TvTEvent.onLogin(activeChar);
+
 	}
     
 	/**

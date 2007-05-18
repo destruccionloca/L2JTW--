@@ -167,11 +167,11 @@ public abstract class L2Character extends L2Object
 	private double _hpUpdateInterval = .0;
 
 	private boolean _champion = false;
-
     private int _LastAttackChange = 0;
     private int _RaidPower = 0;
     private int _RaidAI = 0;
     private int _RPMin = 0;
+    private boolean _isFirstAtk = false;
 	public static boolean _isNPC;
 	
 	// =========================================================
@@ -582,7 +582,7 @@ public abstract class L2Character extends L2Object
 		if (this instanceof L2PcInstance) {
 	        if (((L2PcInstance)this).inObserverMode())
 	        {
-	            ((L2PcInstance)this).sendMessage("Cant attack in observer mode");
+	            ((L2PcInstance)this).sendMessage("µLªk¶i¦æ§ðÀ»");
 	            sendPacket(new ActionFailed());
 	            return;
 	        }
@@ -590,13 +590,13 @@ public abstract class L2Character extends L2Object
 	        if (target instanceof L2PcInstance)
 	        {
 		        if (((L2PcInstance)target).isCursedWeaponEquiped() && ((L2PcInstance)this).getLevel()<=20){
-		        	((L2PcInstance)this).sendMessage("Cant attack a cursed Player under twenty");
+		        	((L2PcInstance)this).sendMessage("µLªk¶i¦æ§ðÀ»");
 		        	sendPacket(new ActionFailed());
 		        	return;
 		        }
 
 		        if (((L2PcInstance)this).isCursedWeaponEquiped() && ((L2PcInstance)target).getLevel()<=20){
-		        	((L2PcInstance)this).sendMessage("Cant attack a newbie player with Zarike");
+		        	((L2PcInstance)this).sendMessage("µLªk¶i¦æ§ðÀ»");
 		        	sendPacket(new ActionFailed());
 		        	return;
 		        }
@@ -729,6 +729,8 @@ public abstract class L2Character extends L2Object
 		reuse *= getStat().getReuseModifier(target);
 		
 		// Select the type of attack to start
+		
+		_isFirstAtk = true;
 
 		if (weaponItem == null)
 			hitted = doAttackHitSimple(attack, target, sAtk);
@@ -794,6 +796,7 @@ public abstract class L2Character extends L2Object
 			broadcastPacket(attack);
 
 		// Notify AI with EVT_READY_TO_ACT
+		//ThreadPoolManager.getInstance().scheduleAi(new NotifyAITask(CtrlEvent.EVT_READY_TO_ACT), sAtk+reuse);
 		ThreadPoolManager.getInstance().scheduleAi(new NotifyAITask(CtrlEvent.EVT_READY_TO_ACT), sAtk+reuse);
 	}
 
@@ -1165,8 +1168,15 @@ public abstract class L2Character extends L2Object
 			if (attackpercent != 100)
 				damage1 = (int)(damage1*attackpercent/100);
 		}
+		
 
 		// Create a new hit task with Medium priority
+		if (_isFirstAtk)
+		{
+		ThreadPoolManager.getInstance().scheduleAi(new HitTask(target, damage1, crit1, miss1, attack._soulshot, shld1), (int)(sAtk/2));
+		_isFirstAtk=false;
+		}
+		else
 		ThreadPoolManager.getInstance().scheduleAi(new HitTask(target, damage1, crit1, miss1, attack._soulshot, shld1), sAtk);
 		
 		// Add this hit to the Server-Client packet Attack
@@ -4679,23 +4689,15 @@ public abstract class L2Character extends L2Object
         
         if (this instanceof L2Summon)
         {
-            
-           
-            
+
             _isNPC = true;
-           
-            
             
         } 
         else if(this instanceof L2Attackable)
         {
             
             _isNPC = true;
-            if ((((L2NpcInstance)this).getTemplate().ischar>0))
-            {
-                _isNPC = false;
-            }
-            
+
         } 
         else if(this instanceof L2PcInstance)
         {
@@ -4720,8 +4722,8 @@ public abstract class L2Character extends L2Object
             
         }
 
- 
         atkSpd = getStat().getPAtkSpd();
+        
 		return Formulas.getInstance().calcPAtkSpd(this, target, atkSpd);
 	}
 

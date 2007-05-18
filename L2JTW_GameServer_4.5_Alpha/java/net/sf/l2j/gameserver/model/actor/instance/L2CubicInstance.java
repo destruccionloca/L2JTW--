@@ -46,6 +46,7 @@ public class L2CubicInstance
     public static final int BINDING_CUBIC = 6;
     public static final int AQUA_CUBIC = 7;
     public static final int SPARK_CUBIC = 8;
+    public static final int ATTRACT_CUBIC = 9;
 
     protected L2PcInstance _owner;
     protected L2Character _target;
@@ -94,6 +95,10 @@ public class L2CubicInstance
             case SPARK_CUBIC:
                 _skills.add(4166);
                 break;
+            case ATTRACT_CUBIC:
+                _skills.add(5115);
+                _skills.add(5116);
+                break;
         }
         if (_disappearTask == null)
             _disappearTask = ThreadPoolManager.getInstance().scheduleGeneral(new Disappear(), 1200000); // disappear in 20 mins
@@ -127,6 +132,10 @@ public class L2CubicInstance
                 break;
             case LIFE_CUBIC:
                 _actionTask = ThreadPoolManager.getInstance().scheduleEffectAtFixedRate(new Heal(80), 0, 10000);
+                break;
+            case ATTRACT_CUBIC:
+                _actionTask = ThreadPoolManager.getInstance().scheduleEffectAtFixedRate(new Action(30),
+                                                                                        0, 8000);
                 break;
         }
     }
