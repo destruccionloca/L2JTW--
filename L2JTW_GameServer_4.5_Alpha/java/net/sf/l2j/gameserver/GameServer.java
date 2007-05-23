@@ -35,6 +35,7 @@ import net.sf.l2j.Server;
 import net.sf.l2j.gameserver.cache.CrestCache;
 import net.sf.l2j.gameserver.cache.HtmCache;
 import net.sf.l2j.gameserver.datatables.ArmorSetsTable;
+import net.sf.l2j.gameserver.datatables.AugmentationData;
 import net.sf.l2j.gameserver.datatables.CharNameTable;
 import net.sf.l2j.gameserver.datatables.CharTemplateTable;
 import net.sf.l2j.gameserver.datatables.ClanTable;
@@ -118,6 +119,7 @@ import net.sf.l2j.gameserver.handler.admincommandhandlers.AdminTest;
 import net.sf.l2j.gameserver.handler.admincommandhandlers.AdminCTFEngine;
 import net.sf.l2j.gameserver.handler.admincommandhandlers.AdminUnblockIp;
 import net.sf.l2j.gameserver.handler.admincommandhandlers.AdminZone;
+import net.sf.l2j.gameserver.handler.itemhandlers.BeastSpice;
 import net.sf.l2j.gameserver.handler.itemhandlers.BeastSoulShot;
 import net.sf.l2j.gameserver.handler.itemhandlers.BeastSpiritShot;
 import net.sf.l2j.gameserver.handler.itemhandlers.BlessedSpiritShot;
@@ -147,8 +149,9 @@ import net.sf.l2j.gameserver.handler.itemhandlers.SoulShots;
 import net.sf.l2j.gameserver.handler.itemhandlers.SpiritShot;
 import net.sf.l2j.gameserver.handler.itemhandlers.SummonItems;
 import net.sf.l2j.gameserver.handler.itemhandlers.WorldMap;
-//import net.sf.l2j.gameserver.handler.skillhandlers.Charge;
 //import net.sf.l2j.gameserver.handler.skillhandlers.BalanceLife;
+import net.sf.l2j.gameserver.handler.skillhandlers.BeastFeed;
+//import net.sf.l2j.gameserver.handler.skillhandlers.Charge;
 import net.sf.l2j.gameserver.handler.skillhandlers.CombatPointHeal;
 import net.sf.l2j.gameserver.handler.skillhandlers.Continuous;
 import net.sf.l2j.gameserver.handler.skillhandlers.Craft;
@@ -194,6 +197,7 @@ import net.sf.l2j.gameserver.model.entity.Hero;
 import net.sf.l2j.gameserver.model.entity.TvTManager;
 import net.sf.l2j.gameserver.network.L2GameClient;
 import net.sf.l2j.gameserver.network.L2GamePacketHandler;
+import net.sf.l2j.gameserver.pathfinding.geonodes.GeoPathFinding;
 import net.sf.l2j.gameserver.script.faenor.FaenorScriptEngine;
 import net.sf.l2j.gameserver.taskmanager.TaskManager;
 import net.sf.l2j.gameserver.util.DynamicExtension;
@@ -340,6 +344,9 @@ public class GameServer
         }
         
         GeoData.getInstance();
+        if (Config.GEODATA == 2) 
+        	GeoPathFinding.getInstance();
+        
 		TeleportLocationTable.getInstance();
 		LevelUpData.getInstance();
 		L2World.getInstance();
@@ -349,7 +356,9 @@ public class GameServer
 		Announcements.getInstance();
 		MapRegionTable.getInstance();
 		EventDroplist.getInstance();
-       	if (Config.SAVE_DROPPED_ITEM)
+		AugmentationData.getInstance();
+		
+		if (Config.SAVE_DROPPED_ITEM)
 			ItemsOnGroundManager.getInstance();  
         
 		if (Config.AUTODESTROY_ITEM_AFTER > 0 || Config.HERB_AUTO_DESTROY_TIME > 0)
@@ -407,6 +416,7 @@ public class GameServer
 		_itemHandler.registerItemHandler(new FishShots());
 		_itemHandler.registerItemHandler(new ExtractableItems());
 		_itemHandler.registerItemHandler(new SummonItems());
+		_itemHandler.registerItemHandler(new BeastSpice());
         _log.config("ItemHandler: Loaded " + _itemHandler.size() + " handlers.");
 
 		_skillHandler = SkillHandler.getInstance();
@@ -434,6 +444,7 @@ public class GameServer
         _skillHandler.registerSkillHandler(new Craft()); 
 		_skillHandler.registerSkillHandler(new Fishing()); 
 		_skillHandler.registerSkillHandler(new FishingSkill()); 
+        _skillHandler.registerSkillHandler(new BeastFeed());
         _log.config("SkillHandler: Loaded " + _skillHandler.size() + " handlers.");
 
 		_adminCommandHandler = AdminCommandHandler.getInstance();

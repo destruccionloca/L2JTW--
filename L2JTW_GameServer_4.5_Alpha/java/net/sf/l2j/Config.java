@@ -1089,8 +1089,8 @@ public final class Config
     public static int CH_FRONT1_FEE;
     public static int CH_FRONT2_FEE;
 
-    /** GeoData On/Off */
-    public static boolean GEODATA;
+    /** GeoData 0/1/2 */
+    public static int GEODATA;
 
 
     public static String CTF_EVEN_TEAMS;
@@ -1282,7 +1282,7 @@ public final class Config
                 GRID_NEIGHBOR_TURNON_TIME       = Integer.parseInt(optionsSettings.getProperty("GridNeighborTurnOnTime", "30"));
                 GRID_NEIGHBOR_TURNOFF_TIME      = Integer.parseInt(optionsSettings.getProperty("GridNeighborTurnOffTime", "300"));    
                 
-                GEODATA                         = Boolean.parseBoolean(optionsSettings.getProperty("GeoData", "False"));
+                GEODATA                         = Integer.parseInt(optionsSettings.getProperty("GeoData", "0"));
                 FORCE_GEODATA                   = Boolean.parseBoolean(optionsSettings.getProperty("ForceGeoData", "True"));
                 
                 // ---------------------------------------------------

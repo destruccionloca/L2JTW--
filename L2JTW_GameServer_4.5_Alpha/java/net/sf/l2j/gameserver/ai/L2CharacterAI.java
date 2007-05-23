@@ -28,6 +28,7 @@ import static net.sf.l2j.gameserver.ai.CtrlIntention.AI_INTENTION_MOVE_TO;
 import static net.sf.l2j.gameserver.ai.CtrlIntention.AI_INTENTION_PICK_UP;
 import static net.sf.l2j.gameserver.ai.CtrlIntention.AI_INTENTION_REST;
 import net.sf.l2j.Config;
+import net.sf.l2j.gameserver.GeoData;
 import net.sf.l2j.gameserver.Universe;
 import net.sf.l2j.gameserver.model.L2CharPosition;
 import net.sf.l2j.gameserver.model.L2Character;
@@ -643,7 +644,9 @@ public class L2CharacterAI extends AbstractAI
      */
     protected void onEvtArrived()
     {
-        // If the Intention was AI_INTENTION_MOVE_TO, set the Intention to AI_INTENTION_ACTIVE
+    	clientStoppedMoving();
+    	
+    	// If the Intention was AI_INTENTION_MOVE_TO, set the Intention to AI_INTENTION_ACTIVE
         if (getIntention() == AI_INTENTION_MOVE_TO) setIntention(AI_INTENTION_ACTIVE);
 
         // Launch an explore task if necessary
@@ -893,7 +896,18 @@ public class L2CharacterAI extends AbstractAI
              if (Config.DEBUG)
              _log.warning("L2CharacterAI: maybeMoveToPawn -> moving to catch target. Casting stopped");
              */
-   	
+        	
+        	// Caller should be L2Playable and thinkAttack/thinkCast/thinkInteract/thinkPickUp
+        	if (Config.GEODATA > 0 && !GeoData.getInstance().canSeeTarget(_actor, target))
+        	{
+        		if (getFollowTarget() != null) {
+        			// cannot see and follow active
+        			stopFollow();
+        		}
+        		setIntention(AI_INTENTION_IDLE);
+        		return true;
+        	}
+        	
             if (getFollowTarget() != null) { 
                 // prevent attack-follow into peace zones
             	if(getAttackTarget() != null && _actor instanceof L2PlayableInstance && target instanceof L2PlayableInstance)

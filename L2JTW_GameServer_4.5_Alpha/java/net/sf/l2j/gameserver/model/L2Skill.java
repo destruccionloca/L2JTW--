@@ -231,6 +231,7 @@ public abstract class L2Skill
         SUMMON_TREASURE_KEY,
         SUMMON_FRIEND,
         HEAL_STATIC,
+        BEAST_FEED,
 		// unimplemented
 		NOTDONE;
 		
@@ -239,6 +240,7 @@ public abstract class L2Skill
 		
     
 		public L2Skill makeSkill(StatsSet set)
+
 
 
 

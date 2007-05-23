@@ -60,7 +60,8 @@ public class RequestUnEquipItem extends L2GameClientPacket
 		if (activeChar == null)
 		    return;
 		
-		if (activeChar.getInventory().getPaperdollItemByL2ItemId(_slot).isWear())
+		L2ItemInstance item = activeChar.getInventory().getPaperdollItemByL2ItemId(_slot);
+		if (item != null && item.isWear())
 		{
 			// Wear-items are not to be unequipped
 			return;
@@ -81,6 +82,12 @@ public class RequestUnEquipItem extends L2GameClientPacket
         }
         if (activeChar.isAttackingNow() || activeChar.isCastingNow()) 
         	return;
+        
+        // Remove augmentation boni
+        if (item != null && item.isAugmented())
+        {
+        	item.getAugmentation().removeBoni(activeChar);
+        }
         
 		L2ItemInstance[] unequiped =
 			activeChar.getInventory().unEquipItemInBodySlotAndRecord(_slot); 
