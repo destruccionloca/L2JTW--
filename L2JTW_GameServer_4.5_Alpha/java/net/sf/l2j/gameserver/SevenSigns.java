@@ -34,6 +34,7 @@ import net.sf.l2j.gameserver.model.AutoSpawnHandler;
 import net.sf.l2j.gameserver.model.L2World;
 import net.sf.l2j.gameserver.model.AutoSpawnHandler.AutoSpawnInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SignsSky;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.templates.StatsSet;
@@ -48,7 +49,7 @@ import net.sf.l2j.gameserver.templates.StatsSet;
  */
 public class SevenSigns 
 {
-    protected static Logger _log = Logger.getLogger(SevenSigns.class.getName());
+    protected static final Logger _log = Logger.getLogger(SevenSigns.class.getName());
 	private static SevenSigns _instance;
 
 	// Basic Seven Signs Constants \\
@@ -1081,16 +1082,16 @@ public class SevenSigns
     	switch (getCurrentPeriod()) 
         {
             case PERIOD_COMP_RECRUITING:
-                sm = new SystemMessage(SystemMessage.PREPARATIONS_PERIOD_BEGUN);
+                sm = new SystemMessage(SystemMessageId.PREPARATIONS_PERIOD_BEGUN);
                 break;
             case PERIOD_COMPETITION:
-                sm = new SystemMessage(SystemMessage.COMPETITION_PERIOD_BEGUN);
+                sm = new SystemMessage(SystemMessageId.COMPETITION_PERIOD_BEGUN);
                 break;
             case PERIOD_COMP_RESULTS:
-                sm = new SystemMessage(SystemMessage.RESULTS_PERIOD_BEGUN);
+                sm = new SystemMessage(SystemMessageId.RESULTS_PERIOD_BEGUN);
                 break;
             case PERIOD_SEAL_VALIDATION:
-                sm = new SystemMessage(SystemMessage.VALIDATION_PERIOD_BEGUN);
+                sm = new SystemMessage(SystemMessageId.VALIDATION_PERIOD_BEGUN);
                 break;
         }	
     	
@@ -1102,7 +1103,7 @@ public class SevenSigns
      * 
 	 * @param sysMsgId
 	 */
-	public void sendMessageToAll(int sysMsgId)
+	public void sendMessageToAll(SystemMessageId sysMsgId)
 	{
         SystemMessage sm = new SystemMessage(sysMsgId);
         
@@ -1259,21 +1260,21 @@ public class SevenSigns
 			{
 				case SEAL_AVARICE:
 					if (newSealOwner == CABAL_DAWN)
-						sendMessageToAll(SystemMessage.DAWN_OBTAINED_AVARICE);
+						sendMessageToAll(SystemMessageId.DAWN_OBTAINED_AVARICE);
 					if (newSealOwner == CABAL_DUSK)
-						sendMessageToAll(SystemMessage.DUSK_OBTAINED_AVARICE);
+						sendMessageToAll(SystemMessageId.DUSK_OBTAINED_AVARICE);
 					break;
 				case SEAL_GNOSIS:
 					if (newSealOwner == CABAL_DAWN)
-						sendMessageToAll(SystemMessage.DAWN_OBTAINED_GNOSIS);
+						sendMessageToAll(SystemMessageId.DAWN_OBTAINED_GNOSIS);
 					if (newSealOwner == CABAL_DUSK)
-						sendMessageToAll(SystemMessage.DUSK_OBTAINED_GNOSIS);
+						sendMessageToAll(SystemMessageId.DUSK_OBTAINED_GNOSIS);
 					break;
 				case SEAL_STRIFE:
 					if (newSealOwner == CABAL_DAWN)
-						sendMessageToAll(SystemMessage.DAWN_OBTAINED_STRIFE);
+						sendMessageToAll(SystemMessageId.DAWN_OBTAINED_STRIFE);
 					if (newSealOwner == CABAL_DUSK)
-						sendMessageToAll(SystemMessage.DUSK_OBTAINED_STRIFE);
+						sendMessageToAll(SystemMessageId.DUSK_OBTAINED_STRIFE);
 					break;
 			}    	
 		}
@@ -1343,12 +1344,12 @@ public class SevenSigns
                     SevenSignsFestival.getInstance().startFestivalManager();                
                     
                     // Send message that Competition has begun.
-                    sendMessageToAll(SystemMessage.QUEST_EVENT_PERIOD_BEGUN);
+                    sendMessageToAll(SystemMessageId.QUEST_EVENT_PERIOD_BEGUN);
 	                break;
 	            case PERIOD_COMPETITION: // Results Calculation
                     
 	                // Send message that Competition has ended.
-	                sendMessageToAll(SystemMessage.QUEST_EVENT_PERIOD_ENDED);
+	                sendMessageToAll(SystemMessageId.QUEST_EVENT_PERIOD_ENDED);
 	                
 	                int compWinner = getCabalHighestScore();				
 	                
@@ -1360,10 +1361,10 @@ public class SevenSigns
                     switch (compWinner)
                     {
                     	case CABAL_DAWN:
-                    		sendMessageToAll(SystemMessage.DAWN_WON);
+                    		sendMessageToAll(SystemMessageId.DAWN_WON);
                     		break;
                     	case CABAL_DUSK:
-                    		sendMessageToAll(SystemMessage.DUSK_WON);
+                    		sendMessageToAll(SystemMessageId.DUSK_WON);
                     		break;
                     }
 
@@ -1375,17 +1376,19 @@ public class SevenSigns
                     initializeSeals();
                     
                     // Send message that Seal Validation has begun.
-                    sendMessageToAll(SystemMessage.SEAL_VALIDATION_PERIOD_BEGUN);
+                    sendMessageToAll(SystemMessageId.SEAL_VALIDATION_PERIOD_BEGUN);
                     
                     _log.info("SevenSigns: The " + getCabalName(_previousWinner) + " have won the competition with " + getCurrentScore(_previousWinner) + " points!");
 	                break;			
 	            case PERIOD_SEAL_VALIDATION: // Reset for New Cycle
                     
+	            	SevenSignsFestival.getInstance().rewardHighestRanked(); // reward highest ranking members from cycle
+	            	
 	                // Ensure a cycle restart when this period ends.
                     _activePeriod = PERIOD_COMP_RECRUITING;
 
 	                // Send message that Seal Validation has ended.
-	                sendMessageToAll(SystemMessage.SEAL_VALIDATION_PERIOD_ENDED);
+	                sendMessageToAll(SystemMessageId.SEAL_VALIDATION_PERIOD_ENDED);
 	                
 	                // Reset all data
 	                resetPlayerData();

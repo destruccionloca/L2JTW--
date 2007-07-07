@@ -24,9 +24,10 @@ import java.util.logging.Logger;
 import javolution.text.TextBuilder;
 import net.sf.l2j.gameserver.Olympiad;
 import net.sf.l2j.gameserver.model.L2ItemInstance;
+import net.sf.l2j.gameserver.model.L2Multisell;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.ExHeroList;
 import net.sf.l2j.gameserver.serverpackets.InventoryUpdate;
-import net.sf.l2j.gameserver.serverpackets.MultiSellList;
 import net.sf.l2j.gameserver.serverpackets.NpcHtmlMessage;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
@@ -41,7 +42,7 @@ public class L2OlympiadManagerInstance extends L2FolkInstance
 {
     private static Logger _logOlymp = Logger.getLogger(L2OlympiadManagerInstance.class.getName());
     
-    private static final int _gatePass = 6651;
+    private static final int GATE_PASS = 6651;
     
     public L2OlympiadManagerInstance (int objectId, L2NpcTemplate template)
     {
@@ -132,13 +133,13 @@ public class L2OlympiadManagerInstance extends L2FolkInstance
                     int passes = Olympiad.getInstance().getNoblessePasses(player.getObjectId());
                     if (passes > 0)
                     {
-                        L2ItemInstance item = player.getInventory().addItem("Olympiad", _gatePass, passes, player, this);
+                        L2ItemInstance item = player.getInventory().addItem("Olympiad", GATE_PASS, passes, player, this);
                         
                         InventoryUpdate iu = new InventoryUpdate();
                         iu.addModifiedItem(item);
                         player.sendPacket(iu);
                         
-                        SystemMessage sm = new SystemMessage(SystemMessage.EARNED_ITEM);
+                        SystemMessage sm = new SystemMessage(SystemMessageId.EARNED_ITEM);
                         sm.addNumber(passes);
                         sm.addItemName(item.getItemId());
                         player.sendPacket(sm);
@@ -150,7 +151,7 @@ public class L2OlympiadManagerInstance extends L2FolkInstance
                     }
                     break;
                 case 7:
-                    player.sendPacket(new MultiSellList(102, this));
+                	L2Multisell.getInstance().SeparateAndSend(102, player, false, getCastle().getTaxRate());
                     break;
                     default:
                         _logOlymp.warning("Olympiad System: Couldnt send packet for request " + val);

@@ -7,9 +7,10 @@ import java.util.logging.Logger;
 
 import net.sf.l2j.Config;
 import net.sf.l2j.L2DatabaseFactory;
-import net.sf.l2j.gameserver.instancemanager.ZoneManager;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.model.actor.instance.L2PetInstance;
 import net.sf.l2j.gameserver.model.base.Experience;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.PledgeShowMemberListUpdate;
 import net.sf.l2j.gameserver.serverpackets.SocialAction;
 import net.sf.l2j.gameserver.serverpackets.StatusUpdate;
@@ -23,8 +24,8 @@ public class PcStat extends PlayableStat
     // =========================================================
     // Data Field
 
-    private int _OldMaxHp;      // stats watch
-    private int _OldMaxMp;      // stats watch
+    private int _oldMaxHp;      // stats watch
+    private int _oldMaxMp;      // stats watch
     
     // =========================================================
     // Constructor
@@ -40,7 +41,7 @@ public class PcStat extends PlayableStat
     	L2PcInstance activeChar = getActiveChar();
     	
         // Set new karma
-        if (!activeChar.isCursedWeaponEquiped() && activeChar.getKarma() > 0 && (activeChar.isGM() || !ZoneManager.getInstance().checkIfInZonePvP(activeChar)))
+        if (!activeChar.isCursedWeaponEquiped() && activeChar.getKarma() > 0 && (activeChar.isGM() || !activeChar.getInPvpZone()))
         {
             int karmaLost = activeChar.calculateKarmaLost(value);
             if (karmaLost > 0) activeChar.setKarma(activeChar.getKarma() - karmaLost);
@@ -77,14 +78,34 @@ public class PcStat extends PlayableStat
      */
     public boolean addExpAndSp(long addToExp, int addToSp)
     {
+    	float ratioTakenByPet = 0;
     	//Player is Gm and acces level is below or equal to GM_DONT_TAKE_EXPSP and is in party, don't give Xp/Sp
-    	if (getActiveChar().isGM() && getActiveChar().getAccessLevel() <= Config.GM_DONT_TAKE_EXPSP && getActiveChar().isInParty())
+    	L2PcInstance activeChar = getActiveChar();
+    	if (activeChar.isGM() && activeChar.getAccessLevel() <= Config.GM_DONT_TAKE_EXPSP && activeChar.isInParty())
     	     return false;
     	
-    	if (!super.addExpAndSp(addToExp, addToSp)) return false;
+    	// if this player has a pet that takes from the owner's Exp, give the pet Exp now
+    	
+    	if (activeChar.getPet() instanceof L2PetInstance )
+    	{
+    		L2PetInstance pet = (L2PetInstance) activeChar.getPet();
+    		ratioTakenByPet = pet.getPetData().getOwnerExpTaken();
+
+    		// only give exp/sp to the pet by taking from the owner if the pet has a non-zero, positive ratio
+    		// allow possible customizations that would have the pet earning more than 100% of the owner's exp/sp
+    		if (ratioTakenByPet > 0 && !pet.isDead())
+    			pet.addExpAndSp((long)(addToExp*ratioTakenByPet), (int)(addToSp*ratioTakenByPet));
+    		// now adjust the max ratio to avoid the owner earning negative exp/sp
+    		if (ratioTakenByPet > 1)
+    			ratioTakenByPet = 1;
+    		addToExp = (long)(addToExp*(1-ratioTakenByPet));
+    		addToSp = (int)(addToSp*(1-ratioTakenByPet));
+    	}
+    	    	
+    	if ( !super.addExpAndSp(addToExp, addToSp) ) return false;
 
         // Send a Server->Client System Message to the L2PcInstance
-        SystemMessage sm = new SystemMessage(SystemMessage.YOU_EARNED_S1_EXP_AND_S2_SP);
+        SystemMessage sm = new SystemMessage(SystemMessageId.YOU_EARNED_S1_EXP_AND_S2_SP);
         sm.addNumber((int)addToExp);
         sm.addNumber(addToSp);
         getActiveChar().sendPacket(sm);
@@ -98,7 +119,7 @@ public class PcStat extends PlayableStat
 
         // Send a Server->Client System Message to the L2PcInstance
         //TODO: add right System msg
-        SystemMessage sm = new SystemMessage(SystemMessage.YOU_EARNED_S1_EXP_AND_S2_SP);
+        SystemMessage sm = new SystemMessage(SystemMessageId.YOU_EARNED_S1_EXP_AND_S2_SP);
         sm.addNumber((int)addToExp);
         sm.addNumber(addToSp);
         getActiveChar().sendPacket(sm);
@@ -170,7 +191,7 @@ public class PcStat extends PlayableStat
         	
         	getActiveChar().setCurrentCp(getMaxCp());
             getActiveChar().broadcastPacket(new SocialAction(getActiveChar().getObjectId(), 15));
-            getActiveChar().sendPacket(new SystemMessage(SystemMessage.YOU_INCREASED_YOUR_LEVEL));
+            getActiveChar().sendPacket(new SystemMessage(SystemMessageId.YOU_INCREASED_YOUR_LEVEL));
         }
 
         getActiveChar().rewardSkills(); // Give Expertise skill of this level
@@ -252,9 +273,9 @@ public class PcStat extends PlayableStat
     {
         // Get the Max HP (base+modifier) of the L2PcInstance
         int val = super.getMaxHp();
-        if (val != _OldMaxHp)
+        if (val != _oldMaxHp)
         {
-            _OldMaxHp = val;
+            _oldMaxHp = val;
 
             // Launch a regen task if the new Max HP is higher than the old one
             if (getActiveChar().getStatus().getCurrentHp() != val) getActiveChar().getStatus().setCurrentHp(getActiveChar().getStatus().getCurrentHp()); // trigger start of regeneration
@@ -268,9 +289,9 @@ public class PcStat extends PlayableStat
         // Get the Max MP (base+modifier) of the L2PcInstance
         int val = super.getMaxMp();
         
-        if (val != _OldMaxMp)
+        if (val != _oldMaxMp)
         {
-            _OldMaxMp = val;
+            _oldMaxMp = val;
 
             // Launch a regen task if the new Max MP is higher than the old one
             if (getActiveChar().getStatus().getCurrentMp() != val) 

@@ -27,20 +27,21 @@ import net.sf.l2j.gameserver.model.L2Spawn;
 import net.sf.l2j.gameserver.model.L2World;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PlayableInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
 
 public class ChristmasTree implements IItemHandler
 {
-    private static int[] _itemIds = {
-                                     5560, // x-mas tree
-                                     5561  // Special x-mas tree
-                                     };
+    private static final int[] ITEM_IDS = {
+    										5560, /* x-mas tree */
+    										5561  /* Special x-mas tree*/
+    									  };
 
-    private static int[] _npcIds = {
-    	                            13006, //Christmas tree w. flashing lights and snow
-    	                            13007
-                                    };
+    private static final int[] NPC_IDS = {
+    										13006, /* Christmas tree w. flashing lights and snow */
+    										13007
+    									 };
 
     public void useItem(L2PlayableInstance playable, L2ItemInstance item)
     {
@@ -48,11 +49,11 @@ public class ChristmasTree implements IItemHandler
         L2NpcTemplate template1 = null;
 
         int itemId = item.getItemId();
-        for (int i = 0; i < _itemIds.length; i++)
+        for (int i = 0; i < ITEM_IDS.length; i++)
         {
-            if (_itemIds[i] == itemId)
+            if (ITEM_IDS[i] == itemId)
             {
-                template1 = NpcTable.getInstance().getTemplate(_npcIds[i]);
+                template1 = NpcTable.getInstance().getTemplate(NPC_IDS[i]);
                 break;
             }
         }
@@ -75,13 +76,13 @@ public class ChristmasTree implements IItemHandler
 
             activeChar.destroyItem("Consume", item.getObjectId(), 1, null, false);
 
-            SystemMessage sm = new SystemMessage(614);
+            SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
             sm.addString("Created " + template1.name + " at x: " + spawn.getLocx() + " y: " + spawn.getLocy() + " z: " + spawn.getLocz());
             activeChar.sendPacket(sm);
         }
         catch (Exception e)
         {
-            SystemMessage sm = new SystemMessage(614);
+            SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 			sm.addString( "SYS" ); 
 			sm.addString( "¥Ø¼Ð¿ù»~" ); 
             activeChar.sendPacket(sm);
@@ -90,6 +91,6 @@ public class ChristmasTree implements IItemHandler
 
     public int[] getItemIds()
     {
-        return _itemIds;
+        return ITEM_IDS;
     }
 }

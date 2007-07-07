@@ -25,6 +25,7 @@ import net.sf.l2j.gameserver.handler.IAdminCommandHandler;
 import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.MagicSkillUser;
 import net.sf.l2j.gameserver.serverpackets.SetupGauge;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
@@ -36,9 +37,7 @@ import net.sf.l2j.gameserver.serverpackets.SystemMessage;
  */
 public class AdminPolymorph implements IAdminCommandHandler
 {
-    //private static Logger _log = Logger.getLogger(AdminDelete.class.getName());
-
-    private static String[] _adminCommands = { "admin_polymorph" };
+    private static final String[] ADMIN_COMMANDS = { "admin_polymorph" };
 
     private static final int REQUIRED_LEVEL = Config.GM_NPC_EDIT;
 
@@ -67,7 +66,7 @@ public class AdminPolymorph implements IAdminCommandHandler
 
     public String[] getAdminCommandList()
     {
-        return _adminCommands;
+        return ADMIN_COMMANDS;
     }
 
     private boolean checkLevel(int level)
@@ -98,7 +97,7 @@ public class AdminPolymorph implements IAdminCommandHandler
         }
         else
         {
-            SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);
+            SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
             sm.addString("SYS");
             sm.addString("¿ù»~¥Ø¼Ð");
             activeChar.sendPacket(sm);

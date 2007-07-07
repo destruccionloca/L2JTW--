@@ -27,12 +27,13 @@ import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.model.L2Summon;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
 
 public class L2SummonInstance extends L2Summon
 {
-    protected static Logger log = Logger.getLogger(L2SummonInstance.class.getName());
+    protected static final Logger log = Logger.getLogger(L2SummonInstance.class.getName());
 
     private float _expPenalty = 0; // exp decrease multiplier (i.e. 0.3 (= 30%) for shadow)
     private int _itemConsumeId;
@@ -131,7 +132,7 @@ public class L2SummonInstance extends L2Summon
     public void reduceCurrentHp(int damage, L2Character attacker)
     {
         super.reduceCurrentHp(damage, attacker);
-        SystemMessage sm = new SystemMessage(SystemMessage.SUMMON_RECEIVED_DAMAGE_OF_S2_BY_S1);
+        SystemMessage sm = new SystemMessage(SystemMessageId.SUMMON_RECEIVED_DAMAGE_S2_BY_S1);
         if (attacker instanceof L2NpcInstance)
         {
             sm.addNpcName(((L2NpcInstance) attacker).getTemplate().npcId);
@@ -246,4 +247,21 @@ public class L2SummonInstance extends L2Summon
 
         return getOwner().destroyItemByItemId(process, itemId, count, reference, sendMessage);
     }
+    
+    public final void sendDamageMessage(L2Character target, int damage, boolean mcrit, boolean pcrit, boolean miss)
+    {
+    	if (miss) return;
+        	
+    	// Prevents the double spam of system messages, if the target is the owning player.
+    	if (target.getObjectId() != getOwner().getObjectId())
+    	{
+    		if (pcrit || mcrit)
+    			getOwner().sendPacket(new SystemMessage(SystemMessageId.CRITICAL_HIT_BY_SUMMONED_MOB));
+
+    		SystemMessage sm = new SystemMessage(SystemMessageId.SUMMON_GAVE_DAMAGE_S1);
+    		sm.addNumber(damage);
+    		getOwner().sendPacket(sm);
+        }
+    }
+    
 }

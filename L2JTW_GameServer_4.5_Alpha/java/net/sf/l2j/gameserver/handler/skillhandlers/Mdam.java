@@ -30,6 +30,7 @@ import net.sf.l2j.gameserver.model.L2Skill.SkillType;
 import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2RaidBossInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.skills.Formulas;
 import net.sf.l2j.gameserver.skills.Stats;
@@ -48,7 +49,7 @@ public class Mdam implements ISkillHandler
     /* (non-Javadoc)
      * @see net.sf.l2j.gameserver.handler.IItemHandler#useItem(net.sf.l2j.gameserver.model.L2PcInstance, net.sf.l2j.gameserver.model.L2ItemInstance)
      */
-    private static SkillType[] _skillIds = {SkillType.MDAM, SkillType.DEATHLINK};
+	private static final SkillType[] SKILL_IDS = {SkillType.MDAM, SkillType.DEATHLINK};
 
     /* (non-Javadoc)
      * @see net.sf.l2j.gameserver.handler.IItemHandler#useItem(net.sf.l2j.gameserver.model.L2PcInstance, net.sf.l2j.gameserver.model.L2ItemInstance)
@@ -61,6 +62,7 @@ public class Mdam implements ISkillHandler
         boolean bss = false;
 
         L2ItemInstance weaponInst = activeChar.getActiveWeaponInstance();
+
 
 
 
@@ -196,14 +198,7 @@ public class Mdam implements ISkillHandler
                     target.breakCast();
                 }
 
-                if (activeChar instanceof L2PcInstance)
-                {
-                    if (mcrit) activeChar.sendPacket(new SystemMessage(1280));
-    
-                    SystemMessage sm = new SystemMessage(SystemMessage.YOU_DID_S1_DMG);
-                    sm.addNumber(damage);
-                    activeChar.sendPacket(sm);
-                }
+                activeChar.sendDamageMessage(target, damage, mcrit, false, false);
     
                 if (skill.hasEffects())
                 {
@@ -215,7 +210,7 @@ public class Mdam implements ISkillHandler
                         skill.getEffects(activeChar, target);
                     else
                     {
-                        SystemMessage sm = new SystemMessage(SystemMessage.S1_WAS_UNAFFECTED_BY_S2);
+                        SystemMessage sm = new SystemMessage(SystemMessageId.S1_WAS_UNAFFECTED_BY_S2);
                         sm.addString(target.getName());
                         sm.addSkillName(skill.getId());
 
@@ -250,7 +245,7 @@ public class Mdam implements ISkillHandler
 
     public SkillType[] getSkillIds()
     {
-        return _skillIds;
+        return SKILL_IDS;
     }
 
 }

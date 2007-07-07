@@ -33,6 +33,7 @@ import net.sf.l2j.gameserver.model.L2World;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PetInstance;
 import net.sf.l2j.gameserver.model.base.ClassId;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.CharInfo;
 import net.sf.l2j.gameserver.serverpackets.NpcHtmlMessage;
 import net.sf.l2j.gameserver.serverpackets.StatusUpdate;
@@ -55,7 +56,7 @@ public class AdminEditChar implements IAdminCommandHandler
 {
 	private static Logger _log = Logger.getLogger(AdminEditChar.class.getName());
 	
-	private static String[] _adminCommands = 
+	private static final String[] ADMIN_COMMANDS = 
     {
 			"admin_edit_character",
 			"admin_current_player",
@@ -133,7 +134,7 @@ public class AdminEditChar implements IAdminCommandHandler
 			}
 			catch (StringIndexOutOfBoundsException e)
 			{	//Case of empty character name
-				SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);
+				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 				sm.addString("SYS");
 				sm.addString("無法搜尋到人物");
 				activeChar.sendPacket(sm);
@@ -165,7 +166,7 @@ public class AdminEditChar implements IAdminCommandHandler
 			catch (StringIndexOutOfBoundsException e)
 			{
 				if ( Config.DEVELOPER ) System.out.println("Set karma error: "+e);
-				SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);
+				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 				sm.addString("SYS");
 				sm.addString("請輸入正確的性向值");
 				activeChar.sendPacket(sm);
@@ -183,7 +184,7 @@ public class AdminEditChar implements IAdminCommandHandler
 			}
 			catch (StringIndexOutOfBoundsException e)
 			{	//Case of empty character name
-				SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);
+				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 				sm.addString("SYS");
 				sm.addString("修改出錯");
 				activeChar.sendPacket(sm);
@@ -204,7 +205,7 @@ public class AdminEditChar implements IAdminCommandHandler
 				return false;
             
 			player.setRecomHave(player.getRecomHave() + 1);
-			SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);
+			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 			sm.addString("SYS");
 			sm.addString("GM增加推薦值");
 			player.sendPacket(sm);
@@ -226,7 +227,7 @@ public class AdminEditChar implements IAdminCommandHandler
 					return false;
 				}
 	            player.setRecomHave(player.getRecomHave() + recVal);
-				SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);
+				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
                 sm.addString("SYS");
 				sm.addString("GM增加推薦職");
 				player.sendPacket(sm);
@@ -252,7 +253,7 @@ public class AdminEditChar implements IAdminCommandHandler
                     return false;
                 }
                 player.setTitle(val);
-                SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);
+                SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
                 sm.addString("SYS");
                 sm.addString("標題被GM更改");
                 player.sendPacket(sm);
@@ -260,7 +261,7 @@ public class AdminEditChar implements IAdminCommandHandler
             }
             catch (StringIndexOutOfBoundsException e)
             {   //Case of empty character title
-                SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);
+                SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
                 sm.addString("SYS");
                 sm.addString("請輸入正確的標題");
                 activeChar.sendPacket(sm);
@@ -281,7 +282,7 @@ public class AdminEditChar implements IAdminCommandHandler
                     return false;
                 }
                 player.setName(val);
-                SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);
+                SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
                 sm.addString("SYS");
                 sm.addString("GM修改名子");
                 player.sendPacket(sm);
@@ -289,7 +290,7 @@ public class AdminEditChar implements IAdminCommandHandler
             }
             catch (StringIndexOutOfBoundsException e)
             {   //Case of empty character name
-                SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);
+                SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
                 sm.addString("SYS");
                 sm.addString("請輸入正確名稱");
                 activeChar.sendPacket(sm);
@@ -307,7 +308,7 @@ public class AdminEditChar implements IAdminCommandHandler
                     return false;
                 }
                 player.getAppearance().setSex(player.getAppearance().getSex()? false : true);
-                SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);
+                SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
                 sm.addString("SYS");
                 sm.addString("性別被GM修改");
                 player.sendPacket(sm);
@@ -346,7 +347,7 @@ public class AdminEditChar implements IAdminCommandHandler
         		targetPet.setCurrentFed(targetPet.getMaxFed());
         	}
         	else {
-        		activeChar.sendPacket(new SystemMessage(SystemMessage.INCORRECT_TARGET));
+        		activeChar.sendPacket(new SystemMessage(SystemMessageId.INCORRECT_TARGET));
         	}
         }
 		
@@ -354,7 +355,7 @@ public class AdminEditChar implements IAdminCommandHandler
 	}
 	
 	public String[] getAdminCommandList() {
-		return _adminCommands;
+		return ADMIN_COMMANDS;
 	}
 	
 	private boolean checkLevel(int level) {
@@ -520,13 +521,13 @@ public class AdminEditChar implements IAdminCommandHandler
 		    player.sendPacket(info2);
 			
 			//Common character information
-			SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);
+			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 			sm.addString("SYS");
 			sm.addString("管理員將你性向從 " + oldKarma + " 改為 " + newKarma + ".");
 			player.sendPacket(sm);
 			
 			//Admin information	
-			SystemMessage smA = new SystemMessage(SystemMessage.S1_S2);
+			SystemMessage smA = new SystemMessage(SystemMessageId.S1_S2);
 			smA.addString("SYS");
 			smA.addString("成功修改 "+player.getName()+" 性向從 (" + oldKarma + ") 到 (" + newKarma + ").");		
 			activeChar.sendPacket(smA);			
@@ -536,7 +537,7 @@ public class AdminEditChar implements IAdminCommandHandler
 		}
 		else {
 			// tell admin of mistake 
-			SystemMessage smA = new SystemMessage(SystemMessage.S1_S2);
+			SystemMessage smA = new SystemMessage(SystemMessageId.S1_S2);
 			smA.addString("SYS");
 			smA.addString("請輸入正確數值");		
 			activeChar.sendPacket(smA);

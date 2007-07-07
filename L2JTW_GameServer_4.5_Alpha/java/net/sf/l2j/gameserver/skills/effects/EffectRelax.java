@@ -21,6 +21,7 @@ import net.sf.l2j.gameserver.skills.Env;
 import net.sf.l2j.gameserver.ai.CtrlIntention;
 import net.sf.l2j.gameserver.model.L2Effect;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
 
@@ -64,7 +65,7 @@ class EffectRelax extends L2Effect
 		if (getEffected().getCurrentHp()+1 > getEffected().getMaxHp()) {
 			if(getSkill().isToggle())
 			{
-				SystemMessage sm = new SystemMessage(614);
+				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 				sm.addString("SYS");
 				sm.addString("完整回覆，技能解除.");
 				getEffected().sendPacket(sm);
@@ -81,7 +82,7 @@ class EffectRelax extends L2Effect
 		{
 			if(getSkill().isToggle())
 			{
-				SystemMessage sm = new SystemMessage(140);
+				SystemMessage sm = new SystemMessage(SystemMessageId.SKILL_REMOVED_DUE_LACK_MP);
 				getEffected().sendPacket(sm);
 				//if (getEffected() instanceof L2PcInstance)
 					//((L2PcInstance)getEffected()).standUp();

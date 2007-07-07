@@ -28,6 +28,7 @@ import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2World;
 import net.sf.l2j.gameserver.model.actor.instance.L2ControllableMobInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.taskmanager.DecayTaskManager;
 
@@ -41,7 +42,7 @@ import net.sf.l2j.gameserver.taskmanager.DecayTaskManager;
 public class AdminRes implements IAdminCommandHandler 
 {
 	private static Logger _log = Logger.getLogger(AdminRes.class.getName());
-	private static String[] _adminCommands = {"admin_res", "admin_res_monster"};
+	private static final String[] ADMIN_COMMANDS = {"admin_res", "admin_res_monster"};
 	private static final int REQUIRED_LEVEL = Config.GM_RES;
 	
 	public boolean useAdminCommand(String command, L2PcInstance activeChar) 
@@ -67,7 +68,7 @@ public class AdminRes implements IAdminCommandHandler
 	
 	public String[] getAdminCommandList() 
 	{
-		return _adminCommands;
+		return ADMIN_COMMANDS;
 	}
 	
 	private boolean checkLevel(int level) 
@@ -117,7 +118,7 @@ public class AdminRes implements IAdminCommandHandler
 		
         if (obj instanceof L2ControllableMobInstance)
         {
-            activeChar.sendPacket(new SystemMessage(SystemMessage.INCORRECT_TARGET));
+            activeChar.sendPacket(new SystemMessage(SystemMessageId.INCORRECT_TARGET));
             return;
         }
         
@@ -158,7 +159,7 @@ public class AdminRes implements IAdminCommandHandler
 		
 		if (obj == null || obj instanceof L2PcInstance || obj instanceof L2ControllableMobInstance)
         {
-		    activeChar.sendPacket(new SystemMessage(SystemMessage.INCORRECT_TARGET));
+		    activeChar.sendPacket(new SystemMessage(SystemMessageId.INCORRECT_TARGET));
 		    return;
         }
 

@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.handler.IAdminCommandHandler;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
 /**
@@ -39,7 +40,7 @@ public class AdminUnblockIp implements IAdminCommandHandler
     private static final Logger _log = Logger.getLogger(AdminTeleport.class.getName());
 
     private static final int REQUIRED_LEVEL = Config.GM_UNBLOCK;
-    private static String[] _adminCommands = {
+    private static final String[] ADMIN_COMMANDS = {
         "admin_unblockip"
     };
 
@@ -58,7 +59,7 @@ public class AdminUnblockIp implements IAdminCommandHandler
                 String ipAddress = command.substring(16);
                 if (unblockIp(ipAddress, activeChar))
                 {
-                    SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);
+                    SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
                     sm.addString("SYS");
                     sm.addString("移除IP " + ipAddress + " 從封鎖名單內");
                     activeChar.sendPacket(sm);
@@ -67,7 +68,7 @@ public class AdminUnblockIp implements IAdminCommandHandler
             catch (StringIndexOutOfBoundsException e)
             {
                 // Send syntax to the user
-                SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);
+                SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
                 sm.addString("SYS");
                 sm.addString("格式 //unblockip <ip>");
                 activeChar.sendPacket(sm);
@@ -79,7 +80,7 @@ public class AdminUnblockIp implements IAdminCommandHandler
 
     public String[] getAdminCommandList()
     {
-        return _adminCommands;
+        return ADMIN_COMMANDS;
     }
 
     private boolean checkLevel(int level)

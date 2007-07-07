@@ -21,6 +21,7 @@ package net.sf.l2j.gameserver.handler.admincommandhandlers;
 import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.handler.IAdminCommandHandler;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.Ride;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
@@ -31,7 +32,7 @@ import net.sf.l2j.gameserver.serverpackets.SystemMessage;
  */
 public class AdminRideWyvern implements IAdminCommandHandler
 {
-    private static String[] _adminCommands = {
+    private static final String[] ADMIN_COMMANDS = {
         "admin_ride_wyvern",
         "admin_ride_strider",
         "admin_unride_wyvern",
@@ -39,7 +40,7 @@ public class AdminRideWyvern implements IAdminCommandHandler
         "admin_unride",
     };
     private static final int REQUIRED_LEVEL = Config.GM_RIDER;
-    private int PetRideId;
+    private int _petRideId;
     
     public boolean useAdminCommand(String command, L2PcInstance activeChar) {
         
@@ -49,28 +50,28 @@ public class AdminRideWyvern implements IAdminCommandHandler
         if(command.startsWith("admin_ride"))
         {
             if(activeChar.isMounted() || activeChar.getPet() != null){
-                SystemMessage sm = new SystemMessage(614);
+                SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
                 sm.addString("SYS");
                 sm.addString("已經有使魔召喚");
                 activeChar.sendPacket(sm);
                 return false;
             }
             if (command.startsWith("admin_ride_wyvern")) {
-            PetRideId = 12621;
+            	_petRideId = 12621;
             }
             else if (command.startsWith("admin_ride_strider")) {
-                PetRideId = 12526;
+            	_petRideId = 12526;
             }         
             else
             {
-                SystemMessage sm = new SystemMessage(614);
+                SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
                 sm.addString("SYS");
                 sm.addString("指令 '"+command+"' 錯誤");
                 activeChar.sendPacket(sm);
                 return false;
             }
             if(!activeChar.disarmWeapons()) return false;
-            Ride mount = new Ride(activeChar.getObjectId(), Ride.ACTION_MOUNT, PetRideId);
+            Ride mount = new Ride(activeChar.getObjectId(), Ride.ACTION_MOUNT, _petRideId);
             activeChar.sendPacket(mount);
             activeChar.broadcastPacket(mount);
             activeChar.setMountType(mount.getMountType());
@@ -85,7 +86,7 @@ public class AdminRideWyvern implements IAdminCommandHandler
     }
     
     public String[] getAdminCommandList() {
-        return _adminCommands;
+        return ADMIN_COMMANDS;
     }
     
     private boolean checkLevel(int level) {

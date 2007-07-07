@@ -45,7 +45,7 @@ import net.sf.l2j.util.Rnd;
  */
 public class L2Spawn
 {
-    protected static Logger _log = Logger.getLogger(L2Spawn.class.getName());
+    protected static final Logger _log = Logger.getLogger(L2Spawn.class.getName());
     
     /** The link on the L2NpcTemplate object containing generic and static properties of this spawn (ex : RewardExp, RewardSP, AggroRange...) */
 	private L2NpcTemplate _template;
@@ -68,13 +68,13 @@ public class L2Spawn
     protected int _scheduledCount;
 	
 	/** The X position of the spwan point */
-	private int _locx;
+	private int _locX;
 	
 	/** The Y position of the spwan point */
-	private int _locy;
+	private int _locY;
 	
 	/** The Z position of the spwan point */
-	private int _locz;
+	private int _locZ;
 	
 	/** The heading of L2NpcInstance when they are spawned */
 	private int _heading;
@@ -102,12 +102,12 @@ public class L2Spawn
 	{
 		//L2NpcInstance _instance;
 		//int _objId;
-        L2NpcInstance oldNpc;
+        private L2NpcInstance _oldNpc;
 		
 		public SpawnTask(/*int objid*/L2NpcInstance pOldNpc)
 		{
 			//_objId= objid;
-            this.oldNpc = pOldNpc;
+            this._oldNpc = pOldNpc;
 		}
 		
 		public void run()
@@ -115,7 +115,7 @@ public class L2Spawn
 			try
 			{
 				//doSpawn();
-                respawnNpc(oldNpc);
+                respawnNpc(_oldNpc);
 			}
 			catch (Exception e)
 			{
@@ -148,7 +148,7 @@ public class L2Spawn
 	 * @param mobTemplate The L2NpcTemplate to link to this L2Spawn
 	 * 
 	 */
-	public L2Spawn(L2NpcTemplate mobTemplate) throws SecurityException, ClassNotFoundException
+	public L2Spawn(L2NpcTemplate mobTemplate) throws SecurityException, ClassNotFoundException, NoSuchMethodException
 	{
 		// Set the _template of the L2Spawn
 		 _template = mobTemplate;
@@ -168,7 +168,8 @@ public class L2Spawn
             implementationName = "L2SymbolMaker";
 		
 		// Create the generic constructor of L2NpcInstance managed by this L2Spawn
-		_constructor = Class.forName("net.sf.l2j.gameserver.model.actor.instance." + implementationName + "Instance").getConstructors()[0];
+		Class[] parameters = {int.class, Class.forName("net.sf.l2j.gameserver.templates.L2NpcTemplate")};
+		_constructor = Class.forName("net.sf.l2j.gameserver.model.actor.instance." + implementationName + "Instance").getConstructor(parameters);
 	}
 
 	/**
@@ -200,7 +201,7 @@ public class L2Spawn
 	 */
 	public int getLocx()
 	{
-		return _locx;
+		return _locX;
 	}
 	
 	/**
@@ -208,7 +209,7 @@ public class L2Spawn
 	 */
 	public int getLocy()
 	{
-		return _locy;
+		return _locY;
 	}
 	
 	/**
@@ -216,7 +217,7 @@ public class L2Spawn
 	 */
 	public int getLocz()
 	{
-		return _locz;
+		return _locZ;
 	}
 	
 	/**
@@ -299,7 +300,7 @@ public class L2Spawn
 	 */
 	public void setLocx(int locx)
 	{
-		_locx = locx;
+		_locX = locx;
 	}
 	
 	/**
@@ -307,7 +308,7 @@ public class L2Spawn
 	 */
 	public void setLocy(int locy)
 	{
-		_locy = locy;
+		_locY = locy;
 	}
 	
 	/**
@@ -315,7 +316,7 @@ public class L2Spawn
 	 */
 	public void setLocz(int locz)
 	{
-		_locz = locz;
+		_locZ = locz;
 	}
 	
 	/**
@@ -432,7 +433,8 @@ public class L2Spawn
 			Object[] parameters = {IdFactory.getInstance().getNextId(), _template};
 			
 			// Call the constructor of the L2NpcInstance 
-			// (can be a L2ArtefactInstance, L2FriendlyMobInstance, L2GuardInstance, L2MonsterInstance, L2SiegeGuardInstance, L2BoxInstance or L2FolkInstance or L2TvTEventNpcInstance)
+			// (can be a L2ArtefactInstance, L2FriendlyMobInstance, L2GuardInstance, L2MonsterInstance, L2SiegeGuardInstance, L2BoxInstance,
+			// L2FeedableBeastInstance, L2TamedBeastInstance, L2FolkInstance or L2TvTEventNpcInstance)
 			Object  tmp = _constructor.newInstance(parameters);
 			
 			// Check if the Instance is a L2NpcInstance

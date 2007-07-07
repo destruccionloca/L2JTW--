@@ -26,6 +26,7 @@ import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2World;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
 /**
@@ -36,7 +37,7 @@ import net.sf.l2j.gameserver.serverpackets.SystemMessage;
  */
 public class AdminHeal implements IAdminCommandHandler {
     private static Logger _log = Logger.getLogger(AdminRes.class.getName());
-    private static String[] _adminCommands = {"admin_heal"};
+    private static final String[] ADMIN_COMMANDS = { "admin_heal" };
     private static final int REQUIRED_LEVEL = Config.GM_HEAL;
     
     public boolean useAdminCommand(String command, L2PcInstance activeChar) {
@@ -53,7 +54,7 @@ public class AdminHeal implements IAdminCommandHandler {
             catch (StringIndexOutOfBoundsException e)
             {
                 if ( Config.DEVELOPER ) System.out.println("Heal error: "+e);
-                SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);
+                SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
                 sm.addString("目標錯誤或者半徑錯誤.");
                 activeChar.sendPacket(sm);
             }
@@ -62,7 +63,7 @@ public class AdminHeal implements IAdminCommandHandler {
     }
     
     public String[] getAdminCommandList() {
-        return _adminCommands;
+        return ADMIN_COMMANDS;
     }
     
     private boolean checkLevel(int level) {
@@ -112,7 +113,7 @@ public class AdminHeal implements IAdminCommandHandler {
                 _log.fine("GM: "+activeChar.getName()+"("+activeChar.getObjectId()+") healed character "+target.getName());
         } 
         else {
-            SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);
+            SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
             sm.addString("SYS");
             sm.addString("錯誤目標");
             activeChar.sendPacket(sm);

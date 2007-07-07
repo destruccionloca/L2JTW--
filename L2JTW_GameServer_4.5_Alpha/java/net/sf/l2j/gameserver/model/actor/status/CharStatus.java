@@ -25,20 +25,20 @@ import net.sf.l2j.util.Rnd;
 
 public class CharStatus
 {
-    protected static Logger _log = Logger.getLogger(CharStatus.class.getName());
+    protected static final Logger _log = Logger.getLogger(CharStatus.class.getName());
 
     // =========================================================
     // Data Field
-    private L2Character _ActiveChar;
-    private double _CurrentCp               = 0; //Current CP of the L2Character
-    private double _CurrentHp               = 0; //Current HP of the L2Character
-    private double _CurrentMp               = 0; //Current MP of the L2Character
-    private List<Double> _HpStatusWatch     = new FastList<Double>();
+    private L2Character _activeChar;
+    private double _currentCp               = 0; //Current CP of the L2Character
+    private double _currentHp               = 0; //Current HP of the L2Character
+    private double _currentMp               = 0; //Current MP of the L2Character
+    private List<Double> _hpStatusWatch     = new FastList<Double>();
 
     /** Array containing all clients that need to be notified about hp/mp updates of the L2Character */
     private Set<L2Character> _StatusListener;
     
-    private Future _RegTask;
+    private Future _regTask;
     private byte _flagsRegenActive           = 0;
     private static final byte REGEN_FLAG_CP  = 4;
     private static final byte REGEN_FLAG_HP  = 1;
@@ -48,7 +48,7 @@ public class CharStatus
     // Constructor
     public CharStatus(L2Character activeChar)
     {
-        _ActiveChar = activeChar;
+        _activeChar = activeChar;
     }
 
     // =========================================================
@@ -56,7 +56,7 @@ public class CharStatus
     /** Add the decimal value of a percent (current hp/max hp) when a status update should kick in */
     public final void addHpStatusWatch(double percenAsDecimal)
     {
-        _HpStatusWatch.add(percenAsDecimal);
+        _hpStatusWatch.add(percenAsDecimal);
     }
 
     /**
@@ -120,11 +120,22 @@ public class CharStatus
 				// cancel duel if player got hit by another player, that is not part of the duel or a monster
 				if ( !(attacker instanceof L2SummonInstance) && !(attacker instanceof L2PcInstance
 						&& ((L2PcInstance)attacker).getDuelId() == ((L2PcInstance)getActiveChar()).getDuelId()) )
+				{
 					((L2PcInstance)getActiveChar()).setDuelState(Duel.DUELSTATE_INTERRUPTED);
+				}
 			}
     	    if (getActiveChar().isDead() && !getActiveChar().isFakeDeath()) return; // Disabled == null check so skills like Body to Mind work again untill another solution is found
-    	} else {
+    	}
+    	else
+    	{
     	    if (getActiveChar().isDead()) return; // Disabled == null check so skills like Body to Mind work again untill another solution is found
+    	    
+    	    if (attacker instanceof L2PcInstance && ((L2PcInstance)attacker).isInDuel() &&
+    	    		!(getActiveChar() instanceof L2SummonInstance &&
+    	    		((L2SummonInstance)getActiveChar()).getOwner().getDuelId() == ((L2PcInstance)attacker).getDuelId()) ) // Duelling player attacks mob
+    	    {
+    	    	((L2PcInstance)attacker).setDuelState(Duel.DUELSTATE_INTERRUPTED);
+    	    }
     	}
         if (awake && getActiveChar().isSleeping()) getActiveChar().stopSleeping(null);
         if (getActiveChar().isStunned() && Rnd.get(10) == 0) getActiveChar().stopStunning(null);
@@ -308,7 +319,7 @@ public class CharStatus
      */
     public synchronized final void startHpMpRegeneration()
     {
-        if (_RegTask == null && !getActiveChar().isDead())
+        if (_regTask == null && !getActiveChar().isDead())
         {
             if (Config.DEBUG) _log.fine("HP/MP/CP regen started");
 
@@ -316,7 +327,7 @@ public class CharStatus
             int period = Formulas.getInstance().getRegeneratePeriod(getActiveChar());
 
             // Create the HP/MP/CP Regeneration task
-            _RegTask = ThreadPoolManager.getInstance().scheduleEffectAtFixedRate(new RegenTask(), period, period);
+            _regTask = ThreadPoolManager.getInstance().scheduleEffectAtFixedRate(new RegenTask(), period, period);
         }
     }
 
@@ -330,13 +341,13 @@ public class CharStatus
      */
     public synchronized final void stopHpMpRegeneration()
     {
-        if (_RegTask != null)
+        if (_regTask != null)
         {
             if (Config.DEBUG) _log.fine("HP/MP/CP regen stop");
 
             // Stop the HP/MP/CP Regeneration task
-            _RegTask.cancel(false);
-            _RegTask = null;
+            _regTask.cancel(false);
+            _regTask = null;
 
             // Set the RegenActive flag to false
             _flagsRegenActive = 0;
@@ -350,10 +361,10 @@ public class CharStatus
     // Property - Public
     public L2Character getActiveChar()
     {        
-        return _ActiveChar;
+        return _activeChar;
     }
     
-    public final double getCurrentCp() { return _CurrentCp; }
+    public final double getCurrentCp() { return _currentCp; }
     
     public final void setCurrentCp(double newCp) {
     	setCurrentCp(newCp, true);
@@ -371,7 +382,7 @@ public class CharStatus
             if (newCp >= maxCp)
             {
                 // Set the RegenActive flag to false
-                _CurrentCp = maxCp;
+                _currentCp = maxCp;
                 _flagsRegenActive &= ~REGEN_FLAG_CP;
 
                 // Stop the HP/MP/CP Regeneration task
@@ -380,7 +391,7 @@ public class CharStatus
             else
             {
                 // Set the RegenActive flag to true
-                _CurrentCp = newCp;
+                _currentCp = newCp;
                 _flagsRegenActive |= REGEN_FLAG_CP;
 
                 // Start the HP/MP/CP Regeneration task with Medium priority
@@ -393,7 +404,7 @@ public class CharStatus
         	getActiveChar().broadcastStatusUpdate();
     }
 
-    public final double getCurrentHp() { return _CurrentHp; }
+    public final double getCurrentHp() { return _currentHp; }
     
     public final void setCurrentHp(double newHp) {
     	setCurrentHp(newHp, true);
@@ -409,7 +420,7 @@ public class CharStatus
             if (newHp >= maxHp)
             {
                 // Set the RegenActive flag to false
-                _CurrentHp = maxHp;
+                _currentHp = maxHp;
                 _flagsRegenActive &= ~REGEN_FLAG_HP;
                 getActiveChar().setIsKilledAlready(false);
 
@@ -419,7 +430,7 @@ public class CharStatus
             else
             {
                 // Set the RegenActive flag to true
-                _CurrentHp = newHp;
+                _currentHp = newHp;
                 _flagsRegenActive |= REGEN_FLAG_HP;
                 if (!getActiveChar().isDead()) getActiveChar().setIsKilledAlready(false);
 
@@ -427,10 +438,10 @@ public class CharStatus
                 startHpMpRegeneration();
             }
 
-            if (_HpStatusWatch.size() > 0)
+            if (_hpStatusWatch.size() > 0)
             {
                 maxHp = getCurrentHp() / maxHp; // Reused maxHp var as percentOfMaxHp so that we don't have to waste memory
-                for (Double d: _HpStatusWatch)
+                for (Double d: _hpStatusWatch)
                 {
                     if (maxHp < d) continue;
                     getActiveChar().updateStats();
@@ -449,7 +460,7 @@ public class CharStatus
         setCurrentMp(newMp,true); //send the StatusUpdate only once
     }
     
-    public final double getCurrentMp() { return _CurrentMp; }
+    public final double getCurrentMp() { return _currentMp; }
     
     public final void setCurrentMp(double newMp) {
     	setCurrentMp(newMp, true);
@@ -464,7 +475,7 @@ public class CharStatus
             if (newMp >= maxMp)
             {
                 // Set the RegenActive flag to false
-                _CurrentMp = maxMp;
+                _currentMp = maxMp;
                 _flagsRegenActive &= ~REGEN_FLAG_MP;
 
                 // Stop the HP/MP/CP Regeneration task
@@ -473,7 +484,7 @@ public class CharStatus
             else
             {
                 // Set the RegenActive flag to true
-                _CurrentMp = newMp;
+                _currentMp = newMp;
                 _flagsRegenActive |= REGEN_FLAG_MP;
 
                 // Start the HP/MP/CP Regeneration task with Medium priority

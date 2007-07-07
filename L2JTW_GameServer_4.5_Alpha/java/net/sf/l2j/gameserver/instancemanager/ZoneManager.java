@@ -31,26 +31,26 @@ import net.sf.l2j.gameserver.model.entity.ZoneType;
 
 public class ZoneManager
 {
-    protected static Logger _log = Logger.getLogger(ZoneManager.class.getName());
+    protected static final Logger _log = Logger.getLogger(ZoneManager.class.getName());
 
     // =========================================================
-    private static ZoneManager _Instance;
+    private static ZoneManager _instance;
     public static final ZoneManager getInstance()
     {
-        if (_Instance == null)
+        if (_instance == null)
         {
     		System.out.println("Initializing ZoneManager");
-        	_Instance = new ZoneManager();
-        	_Instance.load();
+        	_instance = new ZoneManager();
+        	_instance.load();
         }
-        return _Instance;
+        return _instance;
     }
     // =========================================================
 
 
     // =========================================================
     // Data Field
-    private List<ZoneType> _ZoneTypes;
+    private List<ZoneType> _zoneTypes;
     
     // =========================================================
     // Constructor
@@ -136,7 +136,7 @@ public class ZoneManager
     public boolean checkIfInZonePvP(int x, int y)
     {
         return  (
-                    SiegeManager.getInstance().checkIfInZone(x, y) ||               // object is inside a siege zone or
+                    // siege zone check is done separately...
                     checkIfInZone(ZoneType.getZoneTypeName(ZoneType.ZoneTypeEnum.OlympiadStadia), x, y) || // object is inside an olympaid stadia
                     checkIfInZone(ZoneType.getZoneTypeName(ZoneType.ZoneTypeEnum.Arena), x, y) || // object is inside pvp zone or
                     (                                                               // (
@@ -234,7 +234,7 @@ public class ZoneManager
     
     public final List<ZoneType> getZoneTypes()
     {
-        if (_ZoneTypes == null) _ZoneTypes = new FastList<ZoneType>();
-        return _ZoneTypes;
+        if (_zoneTypes == null) _zoneTypes = new FastList<ZoneType>();
+        return _zoneTypes;
     }
 }

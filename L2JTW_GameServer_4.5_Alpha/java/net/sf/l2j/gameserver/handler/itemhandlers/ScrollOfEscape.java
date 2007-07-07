@@ -31,8 +31,7 @@ import net.sf.l2j.gameserver.model.L2ItemInstance;
 import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PlayableInstance;
-import net.sf.l2j.gameserver.model.entity.ClanHall;
-import net.sf.l2j.gameserver.serverpackets.ClanHallDecoration;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.MagicSkillUser;
 import net.sf.l2j.gameserver.serverpackets.SetupGauge;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
@@ -46,7 +45,7 @@ import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 public class ScrollOfEscape implements IItemHandler
 {
     // all the items ids that this handler knowns
-    private static int[] _itemIds = { 736, 1830, 1829, 1538, 3958, 5858, 5859,
+    private static final int[] ITEM_IDS = { 736, 1830, 1829, 1538, 3958, 5858, 5859,
     								  7117,7118,7119,7120,7121,7122,7123,7124,
     								  7125,7126,7127,7128,7129,7130,7131,7132,
     								  7133,7134,7135,7554,7555,7556,7557,7558,
@@ -65,13 +64,13 @@ public class ScrollOfEscape implements IItemHandler
         
         if (activeChar.isSitting())
         {
-            activeChar.sendPacket(new SystemMessage(SystemMessage.CANT_MOVE_SITTING));
+            activeChar.sendPacket(new SystemMessage(SystemMessageId.CANT_MOVE_SITTING));
             return;
         }
         
         if (activeChar.isInOlympiadMode())
         {
-            activeChar.sendPacket(new SystemMessage(SystemMessage.THIS_ITEM_IS_NOT_AVAILABLE_FOR_THE_OLYMPIAD_EVENT));
+            activeChar.sendPacket(new SystemMessage(SystemMessageId.THIS_ITEM_IS_NOT_AVAILABLE_FOR_THE_OLYMPIAD_EVENT));
             return;
         }
         
@@ -119,7 +118,7 @@ public class ScrollOfEscape implements IItemHandler
         activeChar.sendPacket(sg);
         //End SoE Animation section
         
-        SystemMessage sm = new SystemMessage(SystemMessage.S1_DISAPPEARED);
+        SystemMessage sm = new SystemMessage(SystemMessageId.S1_DISAPPEARED);
         sm.addItemName(itemId);
         activeChar.sendPacket(sm);
 
@@ -156,7 +155,7 @@ public class ScrollOfEscape implements IItemHandler
                 }
                 else if(_itemId == 5858) // do nothing
                 {
-                	_activeChar.sendPacket(new SystemMessage(681));
+                	_activeChar.sendPacket(new SystemMessage(SystemMessageId.CLAN_HAS_NO_CLAN_HALL));
                     return;
                 }
                 else if(_itemId == 5859) // do nothing
@@ -267,6 +266,6 @@ public class ScrollOfEscape implements IItemHandler
     
     public int[] getItemIds()
     {
-        return _itemIds;
+        return ITEM_IDS;
     }
 }

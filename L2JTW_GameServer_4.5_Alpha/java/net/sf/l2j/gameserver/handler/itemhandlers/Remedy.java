@@ -25,6 +25,7 @@ import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PetInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PlayableInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.MagicSkillUser;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
@@ -36,7 +37,7 @@ import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
 public class Remedy implements IItemHandler
 {
-	private static int[] _itemIds = { 1831, 1832, 1833, 1834, 3889 };
+	private static int[] ITEM_IDS = { 1831, 1832, 1833, 1834, 3889 };
 	
 	public void useItem(L2PlayableInstance playable, L2ItemInstance item)
 	{
@@ -50,7 +51,7 @@ public class Remedy implements IItemHandler
 		
 		if (activeChar.isInOlympiadMode())
         {
-            activeChar.sendPacket(new SystemMessage(SystemMessage.THIS_ITEM_IS_NOT_AVAILABLE_FOR_THE_OLYMPIAD_EVENT));
+            activeChar.sendPacket(new SystemMessage(SystemMessageId.THIS_ITEM_IS_NOT_AVAILABLE_FOR_THE_OLYMPIAD_EVENT));
             return;
         }
 		
@@ -136,6 +137,6 @@ public class Remedy implements IItemHandler
 	}
 	public int[] getItemIds()
 	{
-		return _itemIds;
+		return ITEM_IDS;
 	}
 }

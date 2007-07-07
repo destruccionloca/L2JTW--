@@ -1510,7 +1510,7 @@ public class CommunityBoard
             cal.set(Calendar.MINUTE, t % 60);
             htmlCode.append(tdOpen + "遊戲時間: " + format.format(cal.getTime()) + tdClose);
             htmlCode.append(colSpacer);
-            htmlCode.append(tdOpen + "啟動時間: " + GameServer.DateTimeServerStarted.getTime() + tdClose);
+           // htmlCode.append(tdOpen + "啟動時間: " + GameServer.DateTimeServerStarted.getTime() + tdClose);
             htmlCode.append(trClose);
 
             htmlCode.append(trOpen);

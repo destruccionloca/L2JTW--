@@ -19,6 +19,7 @@
 package net.sf.l2j.gameserver.skills.effects;
 import net.sf.l2j.gameserver.skills.Env;
 import net.sf.l2j.gameserver.model.L2Effect;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
 /**
@@ -60,7 +61,7 @@ final class EffectFakeDeath extends L2Effect {
 		{
 			if(getSkill().isToggle())
 			{
-				SystemMessage sm = new SystemMessage(140);
+				SystemMessage sm = new SystemMessage(SystemMessageId.SKILL_REMOVED_DUE_LACK_MP);
 				getEffected().sendPacket(sm);
 				return false;
 			}
@@ -70,4 +71,5 @@ final class EffectFakeDeath extends L2Effect {
 		return true;
     }
 }
+
 

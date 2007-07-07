@@ -21,6 +21,7 @@ package net.sf.l2j.gameserver.clientpackets;
 import net.sf.l2j.gameserver.instancemanager.CastleManager;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.entity.Castle;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
 /**
@@ -29,18 +30,18 @@ import net.sf.l2j.gameserver.serverpackets.SystemMessage;
  */
 public final class RequestJoinSiege extends L2GameClientPacket
 {
-    private static final String _C__a4_RequestJoinSiege = "[C] a4 RequestJoinSiege";
+    private static final String _C__A4_RequestJoinSiege = "[C] a4 RequestJoinSiege";
     //private static Logger _log = Logger.getLogger(RequestJoinSiege.class.getName());
 
-    private int _CastleId;
-    private int _IsAttacker;
-    private int _IsJoining;
+    private int _castleId;
+    private int _isAttacker;
+    private int _isJoining;
     
     protected void readImpl()
     {
-        _CastleId = readD();
-        _IsAttacker = readD();
-        _IsJoining = readD();
+        _castleId = readD();
+        _isAttacker = readD();
+        _isJoining = readD();
     }
 
     protected void runImpl()
@@ -49,17 +50,17 @@ public final class RequestJoinSiege extends L2GameClientPacket
         if(activeChar == null) return;
         if (!activeChar.isClanLeader()) return;
         
-        Castle castle = CastleManager.getInstance().getCastle(_CastleId);
+        Castle castle = CastleManager.getInstance().getCastle(_castleId);
         if (castle == null) return;
 
-        if (_IsJoining == 1)
+        if (_isJoining == 1)
         {
         	if (System.currentTimeMillis() < activeChar.getClan().getDissolvingExpiryTime())
         	{
-        		activeChar.sendPacket(new SystemMessage(SystemMessage.CANT_PARTICIPATE_IN_SIEGE_WHILE_DISSOLUTION_IN_PROGRESS));
+        		activeChar.sendPacket(new SystemMessage(SystemMessageId.CANT_PARTICIPATE_IN_SIEGE_WHILE_DISSOLUTION_IN_PROGRESS));
         		return;
         	}
-            if (_IsAttacker == 1)
+            if (_isAttacker == 1)
                 castle.getSiege().registerAttacker(activeChar);
             else
                 castle.getSiege().registerDefender(activeChar);
@@ -73,6 +74,6 @@ public final class RequestJoinSiege extends L2GameClientPacket
     
     public String getType()
     {
-        return _C__a4_RequestJoinSiege;
+        return _C__A4_RequestJoinSiege;
     }
 }

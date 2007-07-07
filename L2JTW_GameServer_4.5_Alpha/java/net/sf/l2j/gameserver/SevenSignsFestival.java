@@ -32,10 +32,12 @@ import javolution.util.FastMap;
 import net.sf.l2j.Config;
 import net.sf.l2j.L2DatabaseFactory;
 import net.sf.l2j.gameserver.ai.CtrlIntention;
+import net.sf.l2j.gameserver.datatables.ClanTable;
 import net.sf.l2j.gameserver.datatables.MapRegionTable;
 import net.sf.l2j.gameserver.datatables.NpcTable;
 import net.sf.l2j.gameserver.datatables.SpawnTable;
 import net.sf.l2j.gameserver.model.L2CharPosition;
+import net.sf.l2j.gameserver.model.L2Clan;
 import net.sf.l2j.gameserver.model.L2ItemInstance;
 import net.sf.l2j.gameserver.model.L2Party;
 import net.sf.l2j.gameserver.model.L2Spawn;
@@ -47,9 +49,11 @@ import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.base.Experience;
 import net.sf.l2j.gameserver.serverpackets.CreatureSay;
 import net.sf.l2j.gameserver.serverpackets.MagicSkillUser;
+import net.sf.l2j.gameserver.serverpackets.PledgeShowInfoUpdate;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
 import net.sf.l2j.gameserver.templates.StatsSet;
 import net.sf.l2j.gameserver.util.Util;
+
 
 /**
  *  Seven Signs Festival of Darkness Engine
@@ -62,10 +66,12 @@ import net.sf.l2j.gameserver.util.Util;
  */
 public class SevenSignsFestival implements SpawnListener 
 {
-    protected static Logger _log = Logger.getLogger(SevenSignsFestival.class.getName());
+    protected static final Logger _log = Logger.getLogger(SevenSignsFestival.class.getName());
     private static SevenSignsFestival _instance;
     
     public static final String FESTIVAL_DATA_FILE = "config/signs.properties";
+    
+    private static final String GET_CLAN_NAME = "SELECT clan_name FROM clan_data WHERE clan_id = (SELECT clanid FROM characters WHERE char_name = ?)";
     
     /**
      * These length settings are important! :)
@@ -115,7 +121,7 @@ public class SevenSignsFestival implements SpawnListener
     * All data is given by: X, Y, Z (coords), Heading, NPC ID (if necessary)
     * This may be moved externally in time, but the data should not change.
     */
-    public static final int[][] festivalDawnPlayerSpawns = 
+    public static final int[][] FESTIVAL_DAWN_PLAYER_SPAWNS = 
     {
          {-79187, 113186, -4895, 0}, // 31 and below
          {-75918, 110137, -4895, 0}, // 42 and below
@@ -124,7 +130,7 @@ public class SevenSignsFestival implements SpawnListener
          {-78927, 109528, -4895, 0}  // No level limit
     };
     
-    public static final int[][] festivalDuskPlayerSpawns = 
+    public static final int[][] FESTIVAL_DUSK_PLAYER_SPAWNS = 
     {
          {-77200, 88966, -5151, 0}, // 31 and below
          {-76941, 85307, -5151, 0}, // 42 and below
@@ -133,7 +139,7 @@ public class SevenSignsFestival implements SpawnListener
          {-79954, 84697, -5151, 0}  // No level limit
     };
     
-    protected static final int[][] festivalDawnWitchSpawns = 
+    protected static final int[][] FESTIVAL_DAWN_WITCH_SPAWNS = 
     {
          {-79183, 113052, -4891, 0, 31132}, // 31 and below
          {-75916, 110270, -4891, 0, 31133}, // 42 and below
@@ -142,7 +148,7 @@ public class SevenSignsFestival implements SpawnListener
          {-78930, 109664, -4891, 0, 31136}  // No level limit
     };
     
-    protected static final int[][] festivalDuskWitchSpawns = 
+    protected static final int[][] FESTIVAL_DUSK_WITCH_SPAWNS = 
     {
          {-77199, 88830, -5147, 0, 31142}, // 31 and below
          {-76942, 85438, -5147, 0, 31143}, // 42 and below
@@ -151,7 +157,7 @@ public class SevenSignsFestival implements SpawnListener
          {-79952, 84833, -5147, 0, 31146}  // No level limit
     };
     
-    protected static final int[][][] festivalDawnPrimarySpawns = 
+    protected static final int[][][] FESTIVAL_DAWN_PRIMARY_SPAWNS = 
     {
      {
          /* Level 31 and Below - Offering of the Branded */
@@ -275,7 +281,7 @@ public class SevenSignsFestival implements SpawnListener
      }
     };
     
-    protected static final int[][][] festivalDuskPrimarySpawns = 
+    protected static final int[][][] FESTIVAL_DUSK_PRIMARY_SPAWNS = 
     {
      {
          /* Level 31 and Below - Offering of the Branded */
@@ -399,7 +405,7 @@ public class SevenSignsFestival implements SpawnListener
      }
     };
     
-    protected static final int[][][] festivalDawnSecondarySpawns =
+    protected static final int[][][] FESTIVAL_DAWN_SECONDARY_SPAWNS =
     {
      {   
          /* 31 and Below */
@@ -483,7 +489,7 @@ public class SevenSignsFestival implements SpawnListener
      }
     };    
     
-    protected static final int[][][] festivalDuskSecondarySpawns =
+    protected static final int[][][] FESTIVAL_DUSK_SECONDARY_SPAWNS =
     {
      {
          /* 31 and Below */
@@ -567,7 +573,7 @@ public class SevenSignsFestival implements SpawnListener
      }
     };
     
-    protected static final int[][][] festivalDawnChestSpawns = 
+    protected static final int[][][] FESTIVAL_DAWN_CHEST_SPAWNS = 
     {
      {
          /* Level 31 and Below */ 
@@ -661,7 +667,7 @@ public class SevenSignsFestival implements SpawnListener
      }
     };
     
-    protected static final int[][][] festivalDuskChestSpawns = 
+    protected static final int[][][] FESTIVAL_DUSK_CHEST_SPAWNS = 
     {
      {
          /* Level 31 and Below */ 
@@ -767,7 +773,7 @@ public class SevenSignsFestival implements SpawnListener
     protected boolean _festivalInitialized;
     protected boolean _festivalInProgress;
     protected List<Integer> _accumulatedBonuses;   // The total bonus available (in Ancient Adena)
-    protected Random rnd = new Random();
+    protected Random _rnd = new Random();
     
     private L2NpcInstance _dawnChatGuide; 
     private L2NpcInstance _duskChatGuide;
@@ -1128,6 +1134,103 @@ public class SevenSignsFestival implements SpawnListener
         	catch (Exception e) {}
         }
     }
+    
+    /**
+     * If a clan member is a member of the highest-ranked party in the Festival of Darkness, 100 points are added per member
+     */
+    protected void rewardHighestRanked()
+    {
+    	String[] partyMembers;
+    	StatsSet overallData = getOverallHighestScoreData(FESTIVAL_LEVEL_MAX_31);
+        if (overallData != null)
+    	{
+    		partyMembers = overallData.getString("members").split(",");
+    		for (String partyMemberName : partyMembers)
+    			addReputationPointsForPartyMemberClan(partyMemberName);
+    	}
+
+    	overallData = getOverallHighestScoreData(FESTIVAL_LEVEL_MAX_42);
+    	if (overallData != null)
+    	{
+    		partyMembers = overallData.getString("members").split(",");
+    		for (String partyMemberName : partyMembers)
+    			addReputationPointsForPartyMemberClan(partyMemberName);
+    	}
+
+    	overallData = getOverallHighestScoreData(FESTIVAL_LEVEL_MAX_53);
+    	if (overallData != null)
+    	{
+    		partyMembers = overallData.getString("members").split(",");
+    		for (String partyMemberName : partyMembers)
+    			addReputationPointsForPartyMemberClan(partyMemberName);
+    	}
+
+    	overallData = getOverallHighestScoreData(FESTIVAL_LEVEL_MAX_64);
+    	if (overallData != null)
+    	{
+    		partyMembers = overallData.getString("members").split(",");
+    		for (String partyMemberName : partyMembers)
+    			addReputationPointsForPartyMemberClan(partyMemberName);
+    	}
+
+    	overallData = getOverallHighestScoreData(FESTIVAL_LEVEL_MAX_NONE);
+    	if (overallData != null)
+    	{
+    		partyMembers = overallData.getString("members").split(",");
+    		for (String partyMemberName : partyMembers)
+    			addReputationPointsForPartyMemberClan(partyMemberName);
+    	}
+    }
+    
+    private void addReputationPointsForPartyMemberClan(String partyMemberName)
+    {
+    	L2PcInstance player = L2World.getInstance().getPlayer(partyMemberName);
+		if (player != null)
+		{
+			if (player.getClan() != null) 
+			{
+				player.getClan().setReputationScore(player.getClan().getReputationScore()+100, true);
+				player.getClan().broadcastToOnlineMembers(new PledgeShowInfoUpdate(player.getClan()));
+			}
+		}
+		else
+		{
+			java.sql.Connection con = null;
+        	
+        	try
+        	{
+        		con = L2DatabaseFactory.getInstance().getConnection();
+        		PreparedStatement statement = con.prepareStatement(GET_CLAN_NAME);
+        		statement.setString(1, partyMemberName);
+        		ResultSet rset = statement.executeQuery();
+        		if (rset.next())
+        		{
+        			String clanName = rset.getString("clan_name");
+        			if (clanName != null)
+        			{
+        				L2Clan clan = ClanTable.getInstance().getClanByName(clanName);
+        				if (clan != null)
+        				{
+        					clan.setReputationScore(clan.getReputationScore()+100, true);
+        					clan.broadcastToOnlineMembers(new PledgeShowInfoUpdate(clan));
+        				}
+        			}
+        		}
+        		
+        		rset.close();
+        		statement.close();
+        	}
+        	catch (Exception e)
+        	{
+        		_log.warning("could not get clan name of " + partyMemberName + ": "+e);
+        	}
+        	finally
+        	{
+        		try { con.close(); } catch (Exception e) {}
+        	}
+		}
+    }
+    
     
     /**
      * Used to reset all festival data at the beginning of a new quest event period.
@@ -1930,14 +2033,14 @@ public class SevenSignsFestival implements SpawnListener
             if (cabal == SevenSigns.CABAL_DAWN)
             {
                 _participants = _dawnFestivalParticipants.get(levelRange);
-                _witchSpawn = new FestivalSpawn(festivalDawnWitchSpawns[levelRange]);
-                _startLocation = new FestivalSpawn(festivalDawnPlayerSpawns[levelRange]);
+                _witchSpawn = new FestivalSpawn(FESTIVAL_DAWN_WITCH_SPAWNS[levelRange]);
+                _startLocation = new FestivalSpawn(FESTIVAL_DAWN_PLAYER_SPAWNS[levelRange]);
             }
             else
             {
                 _participants = _duskFestivalParticipants.get(levelRange);
-                _witchSpawn = new FestivalSpawn(festivalDuskWitchSpawns[levelRange]);
-                _startLocation = new FestivalSpawn(festivalDuskPlayerSpawns[levelRange]);
+                _witchSpawn = new FestivalSpawn(FESTIVAL_DUSK_WITCH_SPAWNS[levelRange]);
+                _startLocation = new FestivalSpawn(FESTIVAL_DUSK_PLAYER_SPAWNS[levelRange]);
             }
             
             // FOR TESTING!
@@ -1965,17 +2068,17 @@ public class SevenSignsFestival implements SpawnListener
                     int x = _startLocation._x;
                     int y = _startLocation._y;
                     
-                    isPositive = (rnd.nextInt(2) == 1);
+                    isPositive = (_rnd.nextInt(2) == 1);
                     
                     if (isPositive) 
                     {
-                        x += rnd.nextInt(FESTIVAL_MAX_OFFSET_X);
-                        y += rnd.nextInt(FESTIVAL_MAX_OFFSET_Y);
+                        x += _rnd.nextInt(FESTIVAL_MAX_OFFSET_X);
+                        y += _rnd.nextInt(FESTIVAL_MAX_OFFSET_Y);
                     }
                     else 
                     {
-                        x -= rnd.nextInt(FESTIVAL_MAX_OFFSET_X);
-                        y -= rnd.nextInt(FESTIVAL_MAX_OFFSET_Y);
+                        x -= _rnd.nextInt(FESTIVAL_MAX_OFFSET_X);
+                        y -= _rnd.nextInt(FESTIVAL_MAX_OFFSET_Y);
                     }
                     
                     participant.getAI().setIntention(CtrlIntention.AI_INTENTION_IDLE);
@@ -2065,20 +2168,20 @@ public class SevenSignsFestival implements SpawnListener
                  * maximum allowed offset are generated to prevent the mobs from all moving 
                  * to the exact same place.
                  */
-                isPositive = (rnd.nextInt(2) == 1);
+                isPositive = (_rnd.nextInt(2) == 1);
                 
                 if (isPositive) 
                 {
-                    x += rnd.nextInt(FESTIVAL_MAX_OFFSET_X);
-                    y += rnd.nextInt(FESTIVAL_MAX_OFFSET_Y);
+                    x += _rnd.nextInt(FESTIVAL_MAX_OFFSET_X);
+                    y += _rnd.nextInt(FESTIVAL_MAX_OFFSET_Y);
                 }
                 else 
                 {
-                    x -= rnd.nextInt(FESTIVAL_MAX_OFFSET_X);
-                    y -= rnd.nextInt(FESTIVAL_MAX_OFFSET_Y);
+                    x -= _rnd.nextInt(FESTIVAL_MAX_OFFSET_X);
+                    y -= _rnd.nextInt(FESTIVAL_MAX_OFFSET_Y);
                 }
                 
-                L2CharPosition moveTo = new L2CharPosition(x, y, _startLocation._z, rnd.nextInt(65536));
+                L2CharPosition moveTo = new L2CharPosition(x, y, _startLocation._z, _rnd.nextInt(65536));
                 
                 festivalMob.setRunning();
                 festivalMob.getAI().setIntention(CtrlIntention.AI_INTENTION_MOVE_TO, moveTo);
@@ -2117,13 +2220,13 @@ public class SevenSignsFestival implements SpawnListener
             {
                 case 0:
                 case 1:
-                    _npcSpawns = (_cabal == SevenSigns.CABAL_DAWN) ? festivalDawnPrimarySpawns[_levelRange] : festivalDuskPrimarySpawns[_levelRange];
+                    _npcSpawns = (_cabal == SevenSigns.CABAL_DAWN) ? FESTIVAL_DAWN_PRIMARY_SPAWNS[_levelRange] : FESTIVAL_DUSK_PRIMARY_SPAWNS[_levelRange];
                     break;
                 case 2:
-                    _npcSpawns = (_cabal == SevenSigns.CABAL_DAWN) ? festivalDawnSecondarySpawns[_levelRange] : festivalDuskSecondarySpawns[_levelRange];
+                    _npcSpawns = (_cabal == SevenSigns.CABAL_DAWN) ? FESTIVAL_DAWN_SECONDARY_SPAWNS[_levelRange] : FESTIVAL_DUSK_SECONDARY_SPAWNS[_levelRange];
                     break;
                 case 3:
-                    _npcSpawns = (_cabal == SevenSigns.CABAL_DAWN) ? festivalDawnChestSpawns[_levelRange] : festivalDuskChestSpawns[_levelRange];
+                    _npcSpawns = (_cabal == SevenSigns.CABAL_DAWN) ? FESTIVAL_DAWN_CHEST_SPAWNS[_levelRange] : FESTIVAL_DUSK_CHEST_SPAWNS[_levelRange];
                     break;
             }
             
@@ -2144,7 +2247,7 @@ public class SevenSignsFestival implements SpawnListener
                     npcSpawn.setLocx(currSpawn._x);
                     npcSpawn.setLocy(currSpawn._y);
                     npcSpawn.setLocz(currSpawn._z);
-                    npcSpawn.setHeading(rnd.nextInt(65536));
+                    npcSpawn.setHeading(_rnd.nextInt(65536));
                     npcSpawn.setAmount(1);
                     npcSpawn.setRespawnDelay(respawnDelay);
                     
@@ -2271,7 +2374,7 @@ public class SevenSignsFestival implements SpawnListener
             _z = z;
             
             // Generate a random heading if no positive one given.
-            _heading = (heading < 0) ? rnd.nextInt(65536) : heading;
+            _heading = (heading < 0) ? _rnd.nextInt(65536) : heading;
             
             _npcId = -1;
         }
@@ -2282,7 +2385,7 @@ public class SevenSignsFestival implements SpawnListener
             _y = spawnData[1];
             _z = spawnData[2];
 
-            _heading = (spawnData[3] < 0) ? rnd.nextInt(65536) : spawnData[3];
+            _heading = (spawnData[3] < 0) ? _rnd.nextInt(65536) : spawnData[3];
             
             if (spawnData.length > 4)
                 _npcId = spawnData[4];

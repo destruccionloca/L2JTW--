@@ -23,6 +23,7 @@ import net.sf.l2j.gameserver.handler.IAdminCommandHandler;
 import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2World;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
 /**
@@ -33,7 +34,7 @@ import net.sf.l2j.gameserver.serverpackets.SystemMessage;
  */
 public class AdminTarget implements IAdminCommandHandler {
 
-	private static String[] _adminCommands = {"admin_target"};
+	private static final String[] ADMIN_COMMANDS = { "admin_target" };
 	private static final int REQUIRED_LEVEL = Config.GM_MIN;
 
 	public boolean useAdminCommand(String command, L2PcInstance activeChar) {
@@ -45,7 +46,7 @@ public class AdminTarget implements IAdminCommandHandler {
 	}
 	
 	public String[] getAdminCommandList() {
-		return _adminCommands;
+		return ADMIN_COMMANDS;
 	}
 	
 	private boolean checkLevel(int level) {
@@ -59,13 +60,13 @@ public class AdminTarget implements IAdminCommandHandler {
 			if ((obj != null) && (obj instanceof L2PcInstance)) {
 				obj.onAction(activeChar);
 			} else {
-				SystemMessage sm = new SystemMessage(614);
+				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 				sm.addString("SYS");
 				sm.addString("人物 "+targetName+" 無法尋找");
 				activeChar.sendPacket(sm);
 			}
 		} catch (IndexOutOfBoundsException e) {
-			SystemMessage sm = new SystemMessage(614);
+			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 			sm.addString("SYS");
 			sm.addString("請確認名稱");
 			activeChar.sendPacket(sm);

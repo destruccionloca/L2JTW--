@@ -27,6 +27,7 @@ import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PetInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PlayableInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.ActionFailed;
 import net.sf.l2j.gameserver.serverpackets.MagicSkillUser;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
@@ -35,9 +36,9 @@ import net.sf.l2j.gameserver.skills.l2skills.L2SkillCharge;
 
 public class EnergyStone implements IItemHandler 
 {
-    private static int[] _itemIds = { 5589 };
-    private EffectCharge effect;
-    private L2SkillCharge skill;
+    private static final int[] ITEM_IDS = { 5589 };
+    private EffectCharge _effect;
+    private L2SkillCharge _skill;
 
     public void useItem(L2PlayableInstance playable, L2ItemInstance item)
     {
@@ -68,54 +69,54 @@ public class EnergyStone implements IItemHandler
 
             if (activeChar.isSitting())
             {
-                     activeChar.sendPacket(new SystemMessage(SystemMessage.CANT_MOVE_SITTING));
+                     activeChar.sendPacket(new SystemMessage(SystemMessageId.CANT_MOVE_SITTING));
                      return;
             }
      
-            skill = getChargeSkill(activeChar);
-            if (skill == null)
+            _skill = getChargeSkill(activeChar);
+            if (_skill == null)
             {
-                     SystemMessage sm = new SystemMessage(SystemMessage.S1_CANNOT_BE_USED);
+                     SystemMessage sm = new SystemMessage(SystemMessageId.S1_CANNOT_BE_USED);
                      sm.addItemName(5589);
                      activeChar.sendPacket(sm);
                      return;
             }
      
-            effect = getChargeEffect(activeChar);
+            _effect = getChargeEffect(activeChar);
         
-            if (effect == null)
+            if (_effect == null)
             {
-                L2Skill dummy = SkillTable.getInstance().getInfo(skill.getId(),skill.getLevel());
+                L2Skill dummy = SkillTable.getInstance().getInfo(_skill.getId(),_skill.getLevel());
                 if (dummy != null) 
                 {
                 	dummy.getEffects(null, activeChar);
-                	activeChar.destroyItem("Consume", item.getObjectId(), 1, null, false);
+                	activeChar.destroyItemWithoutTrace("Consume", item.getObjectId(), 1, null, false);
                 	return;
                 }
                 return;
             }
     
-            if (effect.getLevel() < 2)
+            if (_effect.getLevel() < 2)
             {
-                MagicSkillUser MSU = new MagicSkillUser(playable, activeChar, skill.getId(), 1, 1, 0);
+                MagicSkillUser MSU = new MagicSkillUser(playable, activeChar, _skill.getId(), 1, 1, 0);
                 activeChar.sendPacket(MSU);
                 activeChar.broadcastPacket(MSU);
-                effect.addNumCharges(1);
+                _effect.addNumCharges(1);
                 activeChar.updateEffectIcons();
                 activeChar.destroyItem("Consume", item.getObjectId(), 1, null, false);
             }
-            else if (effect.getLevel() == 2)
+            else if (_effect.getLevel() == 2)
             {
-                activeChar.sendPacket(new SystemMessage(SystemMessage.FORCE_MAXLEVEL_REACHED));
+                activeChar.sendPacket(new SystemMessage(SystemMessageId.FORCE_MAXLEVEL_REACHED));
             }
-            SystemMessage sm = new SystemMessage(SystemMessage.FORCE_INCREASED_TO_S1);
-            sm.addNumber(effect.getLevel());
+            SystemMessage sm = new SystemMessage(SystemMessageId.FORCE_INCREASED_TO_S1);
+            sm.addNumber(_effect.getLevel());
             activeChar.sendPacket(sm);
             return;
         }
         else
         {
-             SystemMessage sm = new SystemMessage(SystemMessage.S1_CANNOT_BE_USED);
+             SystemMessage sm = new SystemMessage(SystemMessageId.S1_CANNOT_BE_USED);
              sm.addItemName(5589);
              activeChar.sendPacket(sm);
              return;
@@ -147,6 +148,6 @@ public class EnergyStone implements IItemHandler
 
     public int[] getItemIds()
     {
-        return _itemIds;
+        return ITEM_IDS;
     }
 }

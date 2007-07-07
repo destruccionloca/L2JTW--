@@ -24,6 +24,7 @@ import net.sf.l2j.gameserver.idfactory.IdFactory;
 import net.sf.l2j.gameserver.instancemanager.RaidBossSpawnManager;
 import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.L2Spawn;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
 import net.sf.l2j.util.Rnd;
@@ -69,7 +70,7 @@ public final class L2RaidBossInstance extends L2MonsterInstance
     {
         if(killer instanceof L2PlayableInstance)
         {
-        	SystemMessage msg = new SystemMessage(1209);
+        	SystemMessage msg = new SystemMessage(SystemMessageId.RAID_WAS_SUCCESSFUL);
         	broadcastPacket(msg);
         }
         
@@ -132,15 +133,18 @@ public final class L2RaidBossInstance extends L2MonsterInstance
     @Override
     protected void manageMinions()
     {
-        minionList.spawnMinions();
-        minionMaintainTask = ThreadPoolManager.getInstance().scheduleGeneralAtFixedRate(new Runnable() {
+        _minionList.spawnMinions();
+        _minionMaintainTask = ThreadPoolManager.getInstance().scheduleGeneralAtFixedRate(new Runnable() {
             public void run()
             {
                 // teleport raid boss home if it's too far from home location
                 L2Spawn bossSpawn = getSpawn();
                 if(!isInsideRadius(bossSpawn.getLocx(),bossSpawn.getLocy(),bossSpawn.getLocz(), 5000, true, false))
+                {
                     teleToLocation(bossSpawn.getLocx(),bossSpawn.getLocy(),bossSpawn.getLocz(), true);
-                minionList.maintainMinions();
+                    healFull(); // prevents minor exploiting with it
+                }
+                _minionList.maintainMinions();
             }
         }, 60000, getMaintenanceInterval()+Rnd.get(5000));
     }
@@ -162,6 +166,12 @@ public final class L2RaidBossInstance extends L2MonsterInstance
     public void reduceCurrentHp(double damage, L2Character attacker, boolean awake)
     {
         super.reduceCurrentHp(damage, attacker, awake);
+    }
+    
+    public void healFull()
+    {
+        super.setCurrentHp(super.getMaxHp());
+        super.setCurrentMp(super.getMaxMp());
     }
     
 }

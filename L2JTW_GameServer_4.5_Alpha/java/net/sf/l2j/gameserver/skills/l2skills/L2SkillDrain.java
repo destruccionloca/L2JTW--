@@ -25,21 +25,20 @@ import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.model.L2Summon;
 import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.serverpackets.StatusUpdate;
-import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.skills.Formulas;
 import net.sf.l2j.gameserver.templates.StatsSet;
 
 public class L2SkillDrain extends L2Skill {
 
-	private float absorbPart;
-	private int   absorbAbs;
+	private float _absorbPart;
+	private int   _absorbAbs;
 	
 	public L2SkillDrain(StatsSet set) 
     {
 		super(set);
 		
-		absorbPart = set.getFloat ("absorbPart", 0.f);
-		absorbAbs  = set.getInteger("absorbAbs", 0);
+		_absorbPart = set.getFloat ("absorbPart", 0.f);
+		_absorbAbs  = set.getInteger("absorbAbs", 0);
 	}
 
 	public void useSkill(L2Character activeChar, L2Object[] targets)
@@ -95,7 +94,7 @@ public class L2SkillDrain extends L2Skill {
 			int damage = (int)Formulas.getInstance().calcMagicDam(
 					activeChar, target, this, ss, bss, mcrit);
             
-			double hpAdd = absorbAbs + absorbPart * damage;
+			double hpAdd = _absorbAbs + _absorbPart * damage;
 			double hp = ((activeChar.getCurrentHp() + hpAdd) > activeChar.getMaxHp() ? activeChar.getMaxHp() : (activeChar.getCurrentHp() + hpAdd));
 
             activeChar.setCurrentHp(hp); 
@@ -116,11 +115,7 @@ public class L2SkillDrain extends L2Skill {
                     target.breakCast();
                 }
 
-                if (mcrit) activeChar.sendPacket(new SystemMessage(1280));
-                
-    			SystemMessage sm = new SystemMessage(SystemMessage.YOU_DID_S1_DMG);
-    			sm.addNumber(damage); 
-    			activeChar.sendPacket(sm);
+            	activeChar.sendDamageMessage(target, damage, mcrit, false, false);
             }
             
             // Check to see if we should do the decay right after the cast

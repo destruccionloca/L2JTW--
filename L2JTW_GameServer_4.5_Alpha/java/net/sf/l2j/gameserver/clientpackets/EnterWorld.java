@@ -37,22 +37,18 @@ import net.sf.l2j.gameserver.cache.HtmCache;
 //import net.sf.l2j.gameserver.communitybbs.Manager.RegionBBSManager;
 import net.sf.l2j.gameserver.datatables.MapRegionTable;
 import net.sf.l2j.gameserver.handler.AdminCommandHandler;
-import net.sf.l2j.gameserver.instancemanager.ClanHallManager;
 import net.sf.l2j.gameserver.instancemanager.PetitionManager;
-import net.sf.l2j.gameserver.instancemanager.ZoneManager;
 import net.sf.l2j.gameserver.model.L2Clan;
 import net.sf.l2j.gameserver.model.L2Effect;
+import net.sf.l2j.gameserver.model.L2ItemInstance;
 import net.sf.l2j.gameserver.model.L2World;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
-import net.sf.l2j.gameserver.model.entity.ClanHall;
 import net.sf.l2j.gameserver.model.entity.Hero;
 import net.sf.l2j.gameserver.model.entity.L2Event;
 import net.sf.l2j.gameserver.model.entity.CTF;
 import net.sf.l2j.gameserver.model.entity.TvTEvent;
-import net.sf.l2j.gameserver.model.entity.ZoneType;
 import net.sf.l2j.gameserver.model.quest.Quest;
-import net.sf.l2j.gameserver.model.L2ItemInstance;
-import net.sf.l2j.gameserver.serverpackets.ClanHallDecoration;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.Die;
 import net.sf.l2j.gameserver.serverpackets.EtcStatusUpdate;
 import net.sf.l2j.gameserver.serverpackets.ExStorageMaxCount;
@@ -60,15 +56,16 @@ import net.sf.l2j.gameserver.serverpackets.FriendList;
 import net.sf.l2j.gameserver.serverpackets.HennaInfo;
 import net.sf.l2j.gameserver.serverpackets.ItemList;
 import net.sf.l2j.gameserver.serverpackets.NpcHtmlMessage;
-import net.sf.l2j.gameserver.serverpackets.PledgeSkillList;
 import net.sf.l2j.gameserver.serverpackets.PledgeShowMemberListAll;
 import net.sf.l2j.gameserver.serverpackets.PledgeShowMemberListUpdate;
+import net.sf.l2j.gameserver.serverpackets.PledgeSkillList;
 import net.sf.l2j.gameserver.serverpackets.PledgeStatusChanged;
 import net.sf.l2j.gameserver.serverpackets.QuestList;
 import net.sf.l2j.gameserver.serverpackets.ShortCutInit;
 import net.sf.l2j.gameserver.serverpackets.SignsSky;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.serverpackets.UserInfo;
+import net.sf.l2j.gameserver.util.FloodProtector;
 /**
  * Enter World Packet Handler<p>
  * <p>
@@ -99,8 +96,12 @@ public class EnterWorld extends L2GameClientPacket
 		if (activeChar == null)
 		{
 			_log.warning("EnterWorld failed! activeChar is null...");
+			this.getClient().closeNow();
 		    return;
 		}
+		
+		// Register in flood protector
+		FloodProtector.getInstance().registerNewPlayer(activeChar.getObjectId());
 		
 		if (L2World.getInstance().findObject(activeChar.getObjectId()) != null)
 		{
@@ -184,31 +185,26 @@ public class EnterWorld extends L2GameClientPacket
         activeChar.sendPacket(esmc);        
         
         activeChar.getMacroses().sendUpdate();
-        
-        sendPacket(new ItemList(activeChar, false));
 
         sendPacket(new UserInfo(activeChar));
-
-		sendPacket(new ShortCutInit(activeChar));
 
         sendPacket(new HennaInfo(activeChar));
         
         sendPacket(new FriendList(activeChar));
         
-        SystemMessage sm = new SystemMessage(34);
+        sendPacket(new ItemList(activeChar, false));
+        
+        sendPacket(new ShortCutInit(activeChar));
+
+        SystemMessage sm = new SystemMessage(SystemMessageId.WELCOME_TO_LINEAGE);
         sendPacket(sm);
 	    
-
-
 
         sm = new SystemMessage(614);
         sm.addString(getText("QnVpbGQ="));
         sm.addString(getText("TDJKVFcgU2VydmVyIDQuNSBBbHBoYQ=="));check =1;
-        sendPacket(sm);
-
-
-
-                
+        
+            
         Welcome_Path = "data/html/welcome/welcome.htm";
         File mainText = new File(Config.DATAPACK_ROOT, Welcome_Path);        // Return the pathfile of the HTML file
         if (mainText.exists())
@@ -216,13 +212,9 @@ public class EnterWorld extends L2GameClientPacket
             NpcHtmlMessage html = new NpcHtmlMessage(1);
             html.setFile(Welcome_Path);
             sendPacket(html);
-
         }
 
         sm = null;
-
-        
-
         SevenSigns.getInstance().sendCurrentPeriodMsg(activeChar);
         Announcements.getInstance().showAnnouncements(activeChar);
 
@@ -285,7 +277,7 @@ public class EnterWorld extends L2GameClientPacket
 
 		if (activeChar.getClanJoinExpiryTime() > System.currentTimeMillis())
 		{
-			activeChar.sendPacket(new SystemMessage(SystemMessage.CLAN_MEMBERSHIP_TERMINATED));
+			activeChar.sendPacket(new SystemMessage(SystemMessageId.CLAN_MEMBERSHIP_TERMINATED));
 		}
 		
 
@@ -293,15 +285,9 @@ public class EnterWorld extends L2GameClientPacket
 			activeChar.sendPacket(new PledgeSkillList(activeChar.getClan()));
 		
 		if (check != 1)  activeChar.logout();
+		
 		//RegionBBSManager.getInstance().changeCommunityBoard();
-
-        if (ZoneManager.getInstance().checkIfInZone(ZoneType.getZoneTypeName(ZoneType.ZoneTypeEnum.ClanHall), activeChar)){
-        	ClanHall clanHall = ClanHallManager.getInstance().getClanHall(activeChar.getX(), activeChar.getY());
-	    	if(clanHall != null){
-        		ClanHallDecoration bl = new ClanHallDecoration(clanHall);
-	    		activeChar.sendPacket(bl);
-	    	}
-    	}
+		sendPacket(sm);
 
         /*if(Config.GAMEGUARD_ENFORCE) - disabled by KenM will be reenabled later
             activeChar.sendPacket(new GameGuardQuery());*/
@@ -331,7 +317,7 @@ public class EnterWorld extends L2GameClientPacket
 		    L2PcInstance friend;
             String friendName;
             
-            SystemMessage sm = new SystemMessage(SystemMessage.FRIEND_S1_HAS_LOGGED_IN);
+            SystemMessage sm = new SystemMessage(SystemMessageId.FRIEND_S1_HAS_LOGGED_IN);
             sm.addString(cha.getName());
 
             while (rset.next())
@@ -347,6 +333,9 @@ public class EnterWorld extends L2GameClientPacket
                 }
 		    }
             sm = null;
+            
+            rset.close();
+            statement.close();
         } 
 		catch (Exception e) {
             _log.warning("could not restore friend data:"+e);
@@ -365,7 +354,7 @@ public class EnterWorld extends L2GameClientPacket
 		if (clan != null)
 		{
 			clan.getClanMember(activeChar.getName()).setPlayerInstance(activeChar);
-			SystemMessage msg = new SystemMessage(SystemMessage.CLAN_MEMBER_S1_LOGGED_IN);
+			SystemMessage msg = new SystemMessage(SystemMessageId.CLAN_MEMBER_S1_LOGGED_IN);
 			msg.addString(activeChar.getName());
 			clan.broadcastToOtherOnlineMembers(msg, activeChar);
 			msg = null;
@@ -384,7 +373,7 @@ public class EnterWorld extends L2GameClientPacket
 			
 			if (sponsor != null)
 			{
-				SystemMessage msg = new SystemMessage(SystemMessage.YOUR_APPRENTICE_S1_HAS_LOGGED_IN);
+				SystemMessage msg = new SystemMessage(SystemMessageId.YOUR_APPRENTICE_S1_HAS_LOGGED_IN);
 				msg.addString(activeChar.getName());
 				sponsor.sendPacket(msg);
 			}
@@ -395,7 +384,7 @@ public class EnterWorld extends L2GameClientPacket
 			
 			if (apprentice != null)
 			{
-				SystemMessage msg = new SystemMessage(SystemMessage.YOUR_SPONSOR_S1_HAS_LOGGED_IN);
+				SystemMessage msg = new SystemMessage(SystemMessageId.YOUR_SPONSOR_S1_HAS_LOGGED_IN);
 				msg.addString(activeChar.getName());
 				apprentice.sendPacket(msg);
 			}
@@ -425,147 +414,19 @@ public class EnterWorld extends L2GameClientPacket
 	{
 		return _C__03_ENTERWORLD;
 	}
-	
-	/**
-    * @param activeChar
-    * @return
-    */
+
 	private void setPledgeClass(L2PcInstance activeChar)
 	{
-       int pledgeClass = 0;
-       L2Clan clan = activeChar.getClan();
-       if (clan != null)
-       {
-           switch (activeChar.getClan().getLevel())
-           {
-               case 4:
-                   if (activeChar.isClanLeader())
-                       pledgeClass = 3;
-                   break;
-               case 5:
-                   if (activeChar.isClanLeader())
-                       pledgeClass = 4;
-                   else
-                       pledgeClass = 2;
-                   break;
-               case 6:
-                   switch (activeChar.getPledgeType())
-                   {
-                       case -1:
-                         pledgeClass = 1;
-                         break;
-                       case 100:
-                       case 200:
-                           pledgeClass = 2;
-                           break;
-                       case 0:
-                           if (activeChar.isClanLeader())
-                               pledgeClass = 5;
-                           else
-                               switch (clan.getLeaderSubPledge(activeChar.getName()))
-                               {
-                                   case 100:
-                                   case 200:
-                                       pledgeClass = 4;
-                                       break;
-                                   case -1:
-                                   default:
-                                       pledgeClass = 3;
-                                       break;
-                               }
-                           break;
-                   }
-                   break;
-               case 7:
-                   switch (activeChar.getPledgeType())
-                   {
-                       case -1:
-                         pledgeClass = 1;
-                         break;
-                       case 100:
-                       case 200:
-                               pledgeClass = 3;
-                           break;
-                       case 1001:
-                       case 1002:
-                       case 2001:
-                       case 2002:
-                               pledgeClass = 2;
-                           break;
-                       case 0:
-                           if (activeChar.isClanLeader())
-                               pledgeClass = 7;
-                           else
-                               switch (clan.getLeaderSubPledge(activeChar.getName()))
-                               {
-                                   case 100:
-                                   case 200:
-                                       pledgeClass = 6;
-                                       break;
-                                   case 1001:
-                                   case 1002:
-                                   case 2001:
-                                   case 2002:
-                                       pledgeClass = 5;
-                                       break;
-                                   case -1:
-                                   default:
-                                       pledgeClass = 4;
-                                       break;
-                               }
-                           break;
-                   }
-                   break;
-               case 8:
-                   switch (activeChar.getPledgeType())
-                   {
-                       case -1:
-                         pledgeClass = 1;
-                         break;
-                       case 100:
-                       case 200:
-                               pledgeClass = 4;
-                           break;
-                       case 1001:
-                       case 1002:
-                       case 2001:
-                       case 2002:
-                               pledgeClass = 3;
-                           break;
-                       case 0:
-                           if (activeChar.isClanLeader())
-                               pledgeClass = 8;
-                           else
-                               switch (clan.getLeaderSubPledge(activeChar.getName()))
-                               {
-                                   case 100:
-                                   case 200:
-                                       pledgeClass = 7;
-                                       break;
-                                   case 1001:
-                                   case 1002:
-                                   case 2001:
-                                   case 2002:
-                                       pledgeClass = 6;
-                                       break;
-                                   case -1:
-                                   default:
-                                       pledgeClass = 5;
-                                       break;
-                               }
-                           break;
-                   }
-                   break;
-               default:
-                   pledgeClass = 1;
-               break;
-           }
-       }
-       if (pledgeClass < 5 && activeChar.isNoble())
-           pledgeClass = 5;
-       else if (activeChar.isHero())
-           pledgeClass = 8;
-       activeChar.setPledgeClass(pledgeClass);
+		int pledgeClass = 0;
+		if ( activeChar.getClan() != null)
+			pledgeClass = activeChar.getClan().getClanMember(activeChar.getObjectId()).calculatePledgeClass(activeChar);
+		
+		if (activeChar.isNoble() && pledgeClass < 5)
+	           pledgeClass = 5;
+		
+	    if (activeChar.isHero())
+	           pledgeClass = 8;
+	           
+	    activeChar.setPledgeClass(pledgeClass);
 	}
- 
 }

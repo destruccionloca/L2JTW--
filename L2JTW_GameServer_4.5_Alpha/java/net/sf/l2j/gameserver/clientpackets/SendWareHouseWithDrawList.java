@@ -25,10 +25,10 @@ import net.sf.l2j.gameserver.model.ClanWarehouse;
 import net.sf.l2j.gameserver.model.ItemContainer;
 import net.sf.l2j.gameserver.model.L2Clan;
 import net.sf.l2j.gameserver.model.L2ItemInstance;
-import net.sf.l2j.gameserver.model.PcFreight;
 import net.sf.l2j.gameserver.model.actor.instance.L2FolkInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.InventoryUpdate;
 import net.sf.l2j.gameserver.serverpackets.ItemList;
 import net.sf.l2j.gameserver.serverpackets.StatusUpdate;
@@ -82,7 +82,7 @@ public final class SendWareHouseWithDrawList extends L2GameClientPacket
 		L2FolkInstance manager = player.getLastFolkNPC();
 		if ((manager == null || !player.isInsideRadius(manager, L2NpcInstance.INTERACTION_DISTANCE, false, false)) && !player.isGM()) return;
 
-        if ((warehouse instanceof PcFreight || warehouse instanceof ClanWarehouse) && Config.GM_DISABLE_TRANSACTION && player.getAccessLevel() >= Config.GM_TRANSACTION_MIN && player.getAccessLevel() <= Config.GM_TRANSACTION_MAX)
+        if (warehouse instanceof ClanWarehouse && Config.GM_DISABLE_TRANSACTION && player.getAccessLevel() >= Config.GM_TRANSACTION_MIN && player.getAccessLevel() <= Config.GM_TRANSACTION_MAX)
         {
             player.sendMessage("Transactions are disable for your Access Level");
             return;
@@ -96,14 +96,16 @@ public final class SendWareHouseWithDrawList extends L2GameClientPacket
         	if (warehouse instanceof ClanWarehouse && 
         			((player.getClanPrivileges() & L2Clan.CP_CL_VIEW_WAREHOUSE) 
         			!= L2Clan.CP_CL_VIEW_WAREHOUSE))
+        	{
         		return;
+        	}
         }
         else
         {
         	if (warehouse instanceof ClanWarehouse && !player.isClanLeader()) 
         	{
         		// this msg is for depositing but maybe good to send some msg?
-        		player.sendPacket(new SystemMessage(SystemMessage.ONLY_CLAN_LEADER_CAN_RETRIEVE_ITEMS_FROM_CLAN_WAREHOUSE));
+        		player.sendPacket(new SystemMessage(SystemMessageId.ONLY_CLAN_LEADER_CAN_RETRIEVE_ITEMS_FROM_CLAN_WAREHOUSE));
         		return;
         	}
         }
@@ -127,14 +129,14 @@ public final class SendWareHouseWithDrawList extends L2GameClientPacket
         // Item Max Limit Check 
         if (!player.getInventory().validateCapacity(slots))
         {
-            sendPacket(new SystemMessage(SystemMessage.SLOTS_FULL));
+            sendPacket(new SystemMessage(SystemMessageId.SLOTS_FULL));
             return;
         }
         
         // Weight limit Check 
         if (!player.getInventory().validateWeight(weight))
         {
-            sendPacket(new SystemMessage(SystemMessage.WEIGHT_LIMIT_EXCEEDED));
+            sendPacket(new SystemMessage(SystemMessageId.WEIGHT_LIMIT_EXCEEDED));
             return;
         }
         

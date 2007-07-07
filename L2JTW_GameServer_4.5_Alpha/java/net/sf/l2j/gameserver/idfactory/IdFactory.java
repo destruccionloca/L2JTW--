@@ -35,7 +35,7 @@ public abstract class IdFactory
 {
 	private static Logger _log = Logger.getLogger(IdFactory.class.getName());
 
-	protected static String[] id_updates = 
+	protected static final String[] ID_UPDATES = 
 	{
 		"UPDATE items                 SET owner_id = ?    WHERE owner_id = ?",
 		"UPDATE items                 SET object_id = ?   WHERE object_id = ?",
@@ -64,7 +64,7 @@ public abstract class IdFactory
         "UPDATE clanhall             SET ownerId = ?       WHERE ownerId = ?"
 	};
 
-    protected static String[] id_checks = 
+    protected static final String[] ID_CHECKS = 
 	{
 		"SELECT owner_id    FROM items                 WHERE object_id >= ?   AND object_id < ?",
 		"SELECT object_id   FROM items                 WHERE object_id >= ?   AND object_id < ?",
@@ -88,7 +88,7 @@ public abstract class IdFactory
 		"SELECT object_id   FROM itemsonground        WHERE object_id >= ?   AND object_id < ?"
 	};
 	
-    protected boolean initialized;
+    protected boolean _initialized;
 	
     public static final int FIRST_OID            = 0x10000000;
     public static final int LAST_OID             = 0x7FFFFFFF;
@@ -130,6 +130,8 @@ public abstract class IdFactory
             Statement s2 = con2.createStatement();
             s2.executeUpdate("update characters set online=0");
             _log.info("Updated characters online status.");
+            
+            s2.close();
         }
         catch (SQLException e)
         {
@@ -172,10 +174,14 @@ public abstract class IdFactory
             cleanCount += stmt.executeUpdate("DELETE FROM olympiad_nobles WHERE olympiad_nobles.char_id NOT IN (SELECT obj_Id FROM characters);");
             cleanCount += stmt.executeUpdate("DELETE FROM pets WHERE pets.item_obj_id NOT IN (SELECT object_id FROM items);");
             cleanCount += stmt.executeUpdate("DELETE FROM seven_signs WHERE seven_signs.char_obj_id NOT IN (SELECT obj_Id FROM characters);");
-            //Clann related
+            //Auction
+            cleanCount += stmt.executeUpdate("DELETE FROM auction WHERE auction.id IN (SELECT id FROM clanhall WHERE ownerId <> 0);");
+            cleanCount += stmt.executeUpdate("DELETE FROM auction_bid WHERE auctionId IN (SELECT id FROM clanhall WHERE ownerId <> 0)");
+            //Clan related
+            stmt.executeUpdate("UPDATE clan_data SET auction_bid_at = 0 WHERE auction_bid_at NOT IN (SELECT auctionId FROM auction_bid);");
             cleanCount += stmt.executeUpdate("DELETE FROM clan_data WHERE clan_data.leader_id NOT IN (SELECT obj_Id FROM characters);");
             cleanCount += stmt.executeUpdate("DELETE FROM auction_bid WHERE auction_bid.bidderId NOT IN (SELECT clan_id FROM clan_data);");
-            cleanCount += stmt.executeUpdate("DELETE FROM clanhall_functions WHERE clanhall_functions.hall_id NOT IN (SELECT hasHideout FROM clan_data);");
+            cleanCount += stmt.executeUpdate("DELETE FROM clanhall_functions WHERE clanhall_functions.hall_id NOT IN (SELECT id FROM clanhall WHERE ownerId <> 0);");
             cleanCount += stmt.executeUpdate("DELETE FROM clan_privs WHERE clan_privs.clan_id NOT IN (SELECT clan_id FROM clan_data);");
             cleanCount += stmt.executeUpdate("DELETE FROM clan_skills WHERE clan_skills.clan_id NOT IN (SELECT clan_id FROM clan_data);");
             cleanCount += stmt.executeUpdate("DELETE FROM clan_subpledges WHERE clan_subpledges.clan_id NOT IN (SELECT clan_id FROM clan_data);");
@@ -267,7 +273,7 @@ public abstract class IdFactory
     }
 
 	public boolean isInitialized() {
-		return initialized;
+		return _initialized;
 	}
 	
 	public static IdFactory getInstance()

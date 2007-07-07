@@ -189,9 +189,9 @@ public enum PlayerClass
     財富獵人     (Dwarf, Fighter, Fourth),
     巨匠           (Dwarf, Fighter, Fourth);
     
-    private PlayerRace race;
-    private ClassLevel level;
-    private ClassType type;
+    private PlayerRace _race;
+    private ClassLevel _level;
+    private ClassType _type;
     
     private static final Set<PlayerClass> mainSubclassSet;
     private static final Set<PlayerClass> neverSubclassed   = EnumSet.of(霸主, 戰爭工匠);
@@ -233,25 +233,27 @@ public enum PlayerClass
         subclassSetMap.put(狂咒術士, subclasseSet5);
     }
     
-    PlayerClass(PlayerRace race, ClassType type, ClassLevel level)
+    PlayerClass(PlayerRace pRace, ClassType pType, ClassLevel pLevel)
     {
-        this.race   = race;
-        this.level  = level;
-        this.type   = type;
+
+        this._race = pRace;
+        this._level = pLevel;
+        this._type = pType;
+
     }
     
     public final Set<PlayerClass> getAvailableSubclasses()
     {
         Set<PlayerClass> subclasses = null;
         
-        if (this.level == Third)
+        if (this._level == Third)
         {
             subclasses  = EnumSet.copyOf(mainSubclassSet);
             
             subclasses.removeAll(neverSubclassed);
             subclasses.remove(this);
             
-            switch (this.race)
+            switch (this._race)
             {
                 case LightElf:
                     subclasses.removeAll(getSet(DarkElf, Third));
@@ -290,22 +292,28 @@ public enum PlayerClass
         return allOf;
     }
     
-    public final boolean isOfRace(PlayerRace race)
+    public final boolean isOfRace(PlayerRace pRace)
     {
-        return this.race == race;
+
+        return this._race == pRace;
+
     }
     
-    public final boolean isOfType(ClassType type)
+    public final boolean isOfType(ClassType pType)
     {
-        return this.type == type;
+
+        return this._type == pType;
+
     }
     
-    public final boolean isOfLevel(ClassLevel level)
+    public final boolean isOfLevel(ClassLevel pLevel)
     {
-        return this.level == level;
+
+        return this._level == pLevel;
+
     }
     public final ClassLevel getLevel()
     {
-        return level;
+        return _level;
     }
 }

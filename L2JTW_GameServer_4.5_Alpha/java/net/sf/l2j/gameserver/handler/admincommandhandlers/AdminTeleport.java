@@ -35,6 +35,7 @@ import net.sf.l2j.gameserver.model.L2Spawn;
 import net.sf.l2j.gameserver.model.L2World;
 import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.ActionFailed;
 import net.sf.l2j.gameserver.serverpackets.NpcHtmlMessage;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
@@ -54,7 +55,7 @@ public class AdminTeleport implements IAdminCommandHandler
 {
     private static final Logger _log = Logger.getLogger(AdminTeleport.class.getName());
     
-    private static String[] _adminCommands = {
+    private static final String[] ADMIN_COMMANDS = {
         "admin_show_moves",
         "admin_show_moves_other",
         "admin_show_teleport",
@@ -204,7 +205,7 @@ public class AdminTeleport implements IAdminCommandHandler
         }
         else if (command.startsWith("admin_failed"))
         {
-            SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);
+            SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
             sm.addString("SYS");
             sm.addString("動作失敗");
             activeChar.sendPacket(sm);
@@ -358,7 +359,7 @@ public class AdminTeleport implements IAdminCommandHandler
     
     public String[] getAdminCommandList() 
     {
-        return _adminCommands;
+        return ADMIN_COMMANDS;
     }
     
     private boolean checkLevel(int level) 
@@ -382,7 +383,7 @@ public class AdminTeleport implements IAdminCommandHandler
             activeChar.getAI().setIntention(CtrlIntention.AI_INTENTION_IDLE);
             activeChar.teleToLocation(x, y, z, false);
             
-            SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);
+            SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
             sm.addString("SYS");
             sm.addString("傳送至 " + Cords);
             activeChar.sendPacket(sm);
@@ -601,7 +602,7 @@ public class AdminTeleport implements IAdminCommandHandler
                 SpawnTable.getInstance().addNewSpawn(spawn, true);
                 spawn.init();
                 
-                SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);
+                SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
                 sm.addString("SYS");
                 sm.addString("創造 " + template1.name + " 在 " + target.getObjectId() + ".");
                 activeChar.sendPacket(sm);

@@ -39,6 +39,7 @@ import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.L2ItemInstance;
 import net.sf.l2j.gameserver.model.L2World;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
 import org.w3c.dom.Document;
@@ -54,15 +55,15 @@ public class CursedWeaponsManager
 	private static final Logger _log = Logger.getLogger(CursedWeaponsManager.class.getName());
 
 	// =========================================================
-	private static CursedWeaponsManager _Instance;
+	private static CursedWeaponsManager _instance;
 
 	public static final CursedWeaponsManager getInstance()
 	{
-		if (_Instance == null)
+		if (_instance == null)
 		{
-			_Instance = new CursedWeaponsManager();
+			_instance = new CursedWeaponsManager();
 		}
-		return _Instance;
+		return _instance;
 	}
 
 	// =========================================================
@@ -88,7 +89,7 @@ public class CursedWeaponsManager
 	// Method - Private
 	public final void reload()
 	{
-		_Instance = new CursedWeaponsManager();
+		_instance = new CursedWeaponsManager();
 	}
 	private final void load()
 	{
@@ -238,6 +239,12 @@ public class CursedWeaponsManager
 			PreparedStatement statement = null;
 			ResultSet rset = null;
 
+			// TODO: See comments below...
+			// This entire for loop should NOT be necessary, since it is already handled by
+			// CursedWeapon.endOfLife().  However, if we indeed *need* to duplicate it for safety,
+			// then we'd better make sure that it FULLY cleans up inactive cursed weapons!
+			// Undesired effects result otherwise, such as player with no zariche but with karma
+			// or a lost-child entry in the cursedweapons table, without a corresponding one in items...
 			for (CursedWeapon cw : _cursedWeapons.values())
 			{
 				if (cw.isActivated()) continue;
@@ -264,6 +271,7 @@ public class CursedWeaponsManager
 						{
 							_log.warning("Error while deleting cursed weapon "+itemId+" from userId "+playerId);
 						}
+						statement.close();
 						
 						// Delete the skill
 						/*
@@ -275,9 +283,24 @@ public class CursedWeaponsManager
 							_log.warning("Error while deleting cursed weapon "+itemId+" skill from userId "+playerId);
 						}
 						*/
+						// Restore the player's old karma and pk count
+		    			statement = con.prepareStatement("UPDATE characters SET karma=?, pkkills=? WHERE obj_id=?");
+		    			statement.setInt(1, cw.getPlayerKarma());
+		    			statement.setInt(2, cw.getPlayerPkKills());
+		    			statement.setInt(3, playerId);
+		    			if (statement.executeUpdate() != 1)
+		    			{
+		    				_log.warning("Error while updating karma & pkkills for userId "+cw.getPlayerId());
+		    			}
+		    			// clean up the cursedweapons table.
+		    			removeFromDb(itemId);
 					}
+					rset.close();
+					statement.close();
 				} catch (SQLException sqlE)
 				{}
+				// close the statement to avoid multiply prepared statement errors in following iterations.
+    			try { con.close(); } catch (Exception e) {}
 			}
 		}
 		catch (Exception e)
@@ -319,8 +342,20 @@ public class CursedWeaponsManager
 		if (player.isCursedWeaponEquiped()) // cannot own 2 cursed swords
 		{
 			CursedWeapon cw2 = _cursedWeapons.get(player.getCursedWeaponEquipedId());
+			/* TODO: give the bonus level in a more appropriate manner.
+			 *  The following code adds "_stageKills" levels.  This will also show in the char status.
+			 * I do not have enough info to know if the bonus should be shown in the pk count, or if it
+			 * should be a full "_stageKills" bonus or just the remaining from the current count till the 
+			 * of the current stage...
+			 * This code is a TEMP fix, so that the cursed weapon's bonus level can be observed with as 
+			 * little change in the code as possible, until proper info arises.
+			 */
+			cw2.setNbKills(cw2.getStageKills()-1);
 			cw2.increaseKills();
-			cw.endOfLife();
+			
+			// erase the newly obtained cursed weapon
+			cw.setPlayer(player);  // NECESSARY in order to find which inventory the weapon is in!
+			cw.endOfLife();        // expire the weapon and clean up.
 		}
 		else cw.activate(player, item);
 	}
@@ -373,10 +408,10 @@ public class CursedWeaponsManager
 				cw.giveSkill();
 				player.setCursedWeaponEquipedId(cw.getItemId());
 				
-				SystemMessage sm = new SystemMessage(SystemMessage.S2_MINUTE_OF_USAGE_TIME_ARE_LEFT_FOR_S1);
+				SystemMessage sm = new SystemMessage(SystemMessageId.S2_MINUTE_OF_USAGE_TIME_ARE_LEFT_FOR_S1);
 				sm.addString(cw.getName());
 				//sm.addItemName(cw.getItemId());
-				sm.addNumber((new Long((cw.getEndTime() - System.currentTimeMillis()) / 60000)).intValue());
+				sm.addNumber((int)((cw.getEndTime() - System.currentTimeMillis()) / 60000));
 				player.sendPacket(sm);
 			}
 		}

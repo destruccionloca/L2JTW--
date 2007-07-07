@@ -20,7 +20,11 @@ package net.sf.l2j.gameserver.clientpackets;
 
 import net.sf.l2j.gameserver.datatables.PetNameTable;
 import net.sf.l2j.gameserver.model.L2Character;
+import net.sf.l2j.gameserver.model.L2ItemInstance;
 import net.sf.l2j.gameserver.model.L2Summon;
+import net.sf.l2j.gameserver.model.actor.instance.L2PetInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
+import net.sf.l2j.gameserver.serverpackets.InventoryUpdate;
 import net.sf.l2j.gameserver.serverpackets.NpcInfo;
 import net.sf.l2j.gameserver.serverpackets.PetInfo;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
@@ -54,17 +58,17 @@ public final class RequestChangePetName extends L2GameClientPacket
 
 		if (pet.getName() != null)
 		{
-			activeChar.sendPacket(new SystemMessage(SystemMessage.NAMING_YOU_CANNOT_SET_NAME_OF_THE_PET));
+			activeChar.sendPacket(new SystemMessage(SystemMessageId.NAMING_YOU_CANNOT_SET_NAME_OF_THE_PET));
 			return;
 		}
 		else if (PetNameTable.getInstance().doesPetNameExist(_name, pet.getTemplate().npcId))
 		{
-			activeChar.sendPacket(new SystemMessage(SystemMessage.NAMING_ALREADY_IN_USE_BY_ANOTHER_PET));
+			activeChar.sendPacket(new SystemMessage(SystemMessageId.NAMING_ALREADY_IN_USE_BY_ANOTHER_PET));
 			return;
 		}
         else if ((_name.length() < 2) || (_name.length() > 16))
 		{
-            SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);
+            SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
             sm.addString("SYS");
             sm.addString("寵物名稱最多只能使用8個中文字16個英文.");
 			// SystemMessage sm = new SystemMessage(SystemMessage.NAMING_PETNAME_UP_TO_8CHARS);
@@ -75,13 +79,27 @@ public final class RequestChangePetName extends L2GameClientPacket
 		}
         else if (!PetNameTable.getInstance().isValidPetName(_name))
 		{
-        	activeChar.sendPacket(new SystemMessage(SystemMessage.NAMING_PETNAME_CONTAINS_INVALID_CHARS));
+        	activeChar.sendPacket(new SystemMessage(SystemMessageId.NAMING_PETNAME_CONTAINS_INVALID_CHARS));
 			return;
 		}
 		
 		pet.setName(_name);
 		pet.broadcastPacket(new NpcInfo(pet, activeChar));
 		activeChar.sendPacket(new PetInfo(pet));
+		
+		// set the flag on the control item to say that the pet has a name
+		if (pet instanceof L2PetInstance)
+		{
+			L2ItemInstance controlItem = pet.getOwner().getInventory().getItemByObjectId(pet.getControlItemId());
+			if (controlItem != null)
+			{
+				controlItem.setCustomType2(1);
+				controlItem.updateDatabase();
+				InventoryUpdate iu = new InventoryUpdate();
+				iu.addModifiedItem(controlItem);
+				activeChar.sendPacket(iu);
+			}
+		}
 	}
 	
 	public String getType()

@@ -41,7 +41,7 @@ public class CharTemplateTable
 			
 	private static CharTemplateTable _instance;
 	
-    public static final String[] charClasses = {
+    private static final String[] CHAR_CLASSES = {
                                                 "人類戰士", "鬥士", "劍鬥士", "傭兵", "騎士", "聖騎士", "闇騎士", "盜賊", "寶藏獵人", "鷹眼", "法師", "巫師", "術士", "死靈法師", "法魔", "牧師", "主教", "先知",
                                                 "精靈戰士", "精靈騎士", "聖殿騎士", "劍術詩人", "巡守", "大地行者", "銀月遊俠", "精靈法師", "精靈巫師", "咒術詩人", "元素使", "神使", "長老",
                                                 "黑暗精靈戰士", "沼澤騎士", "席琳騎士", "劍刃舞者", "暗殺者", "深淵行者", "闇影遊俠", "黑暗精靈法師", "黑暗精靈巫師", "狂咒術士", "暗影召喚師", "席琳神使", "席琳長老",
@@ -168,14 +168,14 @@ public class CharTemplateTable
     
     public static final String getClassNameById(int classId)
     {
-        return charClasses[classId];
+        return CHAR_CLASSES[classId];
     }
     
     public static final int getClassIdByName(String className)
     {
         int currId = 1;
         
-        for (String name : charClasses)
+        for (String name : CHAR_CLASSES)
         {
             if (name.equalsIgnoreCase(className))
                 break;

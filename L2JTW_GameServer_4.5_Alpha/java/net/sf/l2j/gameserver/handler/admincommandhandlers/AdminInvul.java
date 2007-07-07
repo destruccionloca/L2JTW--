@@ -25,6 +25,7 @@ import net.sf.l2j.gameserver.handler.IAdminCommandHandler;
 import net.sf.l2j.gameserver.model.GMAudit;
 import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
 /**
@@ -35,7 +36,7 @@ import net.sf.l2j.gameserver.serverpackets.SystemMessage;
  */
 public class AdminInvul implements IAdminCommandHandler {
 	private static Logger _log = Logger.getLogger(AdminInvul.class.getName());
-	private static String[] _adminCommands = {"admin_invul", "admin_setinvul"};
+	private static final String[] ADMIN_COMMANDS = {"admin_invul", "admin_setinvul"};
 	private static final int REQUIRED_LEVEL = Config.GM_GODMODE;
 
 	public boolean useAdminCommand(String command, L2PcInstance activeChar) {
@@ -55,7 +56,7 @@ public class AdminInvul implements IAdminCommandHandler {
 	}
 	
 	public String[] getAdminCommandList() {
-		return _adminCommands;
+		return ADMIN_COMMANDS;
 	}
 	
 	private boolean checkLevel(int level) {
@@ -67,7 +68,7 @@ public class AdminInvul implements IAdminCommandHandler {
 		{
         	activeChar.setIsInvul(false);
         	String text = activeChar.getName() + " 無敵取消";
-        	SystemMessage sm = new SystemMessage(614);
+        	SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
         	sm.addString("SYS");
         	sm.addString(text);
         	activeChar.sendPacket(sm);
@@ -77,7 +78,7 @@ public class AdminInvul implements IAdminCommandHandler {
 		{
 			activeChar.setIsInvul(true);
 			String text = activeChar.getName() + " 無敵啟動";
-			SystemMessage sm = new SystemMessage(614);
+			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 			sm.addString("SYS");
 			sm.addString(text);
 			activeChar.sendPacket(sm);

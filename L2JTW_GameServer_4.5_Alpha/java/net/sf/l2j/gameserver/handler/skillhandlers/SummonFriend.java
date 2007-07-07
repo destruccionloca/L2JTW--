@@ -20,7 +20,6 @@ package net.sf.l2j.gameserver.handler.skillhandlers;
 
 import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.handler.ISkillHandler;
-import net.sf.l2j.gameserver.instancemanager.ZoneManager;
 import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2Skill;
@@ -28,6 +27,7 @@ import net.sf.l2j.gameserver.model.L2World;
 import net.sf.l2j.gameserver.model.L2Skill.SkillType;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2RaidBossInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.util.Util;
 /**
@@ -37,19 +37,26 @@ import net.sf.l2j.gameserver.util.Util;
 public class SummonFriend implements ISkillHandler
 {
 	//private static Logger _log = Logger.getLogger(SummonFriend.class.getName());
-	protected SkillType[] _skillIds = {SkillType.SUMMON_FRIEND};
+	private static final SkillType[] SKILL_IDS = {SkillType.SUMMON_FRIEND};
 
  	public void useSkill(@SuppressWarnings("unused") L2Character activeChar, @SuppressWarnings("unused") L2Skill skill, L2Object[] targets)
 	{
- 		if (activeChar instanceof L2PcInstance)
-        {
-            if (((L2PcInstance)activeChar).isInOlympiadMode())
-            {
-                ((L2PcInstance)activeChar).sendPacket(new SystemMessage(SystemMessage.THIS_ITEM_IS_NOT_AVAILABLE_FOR_THE_OLYMPIAD_EVENT));
-                return;
-            }
+ 		if (!(activeChar instanceof L2PcInstance)) return; // currently not implemented for others
+ 		L2PcInstance activePlayer = (L2PcInstance)activeChar;
+ 		
+ 		if (activePlayer.isInOlympiadMode())
+ 		{
+ 			activePlayer.sendPacket(new SystemMessage(SystemMessageId.THIS_ITEM_IS_NOT_AVAILABLE_FOR_THE_OLYMPIAD_EVENT));
+ 			return;
         }
         
+ 		// Checks summoner not in arenas, siege zones, jail
+       	if (activePlayer.getInPvpZone())
+       	{
+       		activePlayer.sendPacket(new SystemMessage(SystemMessageId.YOU_CANNOT_SUMMON_IN_COMBAT));
+        	return;
+        }
+       	
         // check for summoner not in raid areas
         L2Object[] objects = L2World.getInstance().getVisibleObjects(activeChar, 5000);
         
@@ -59,20 +66,12 @@ public class SummonFriend implements ISkillHandler
         	{
         		if (object instanceof L2RaidBossInstance) 
         		{
-        			((L2PcInstance)activeChar).sendPacket(new SystemMessage(SystemMessage.YOU_MAY_NOT_SUMMON_FROM_YOUR_CURRENT_LOCATION));
+        			activePlayer.sendPacket(new SystemMessage(SystemMessageId.YOU_MAY_NOT_SUMMON_FROM_YOUR_CURRENT_LOCATION));
                     return;
         		}
         	}
         }
         
-        // Checks summoner not in arenas, siege zones, jail
-        if (ZoneManager.getInstance().checkIfInZonePvP(activeChar)) 
-        {
-        	if (activeChar instanceof L2PcInstance)
-        		((L2PcInstance)activeChar).sendPacket(new SystemMessage(SystemMessage.YOU_CANNOT_SUMMON_IN_COMBAT));
-        	return;
-        }
-
 		try 
         {
 			for (int index = 0; index < targets.length; index++)
@@ -92,7 +91,7 @@ public class SummonFriend implements ISkillHandler
                 	
                     //This message naturally doesn't bring up a box...
                     //$s1 wishes to summon you from $s2. Do you accept?
-    				//SystemMessage sm2 = new SystemMessage(1842);
+    				//SystemMessage sm2 = new SystemMessage(SystemMessageId.S1_WISHES_TO_SUMMON_YOU_FROM_S2_DO_YOU_ACCEPT);
                 	//sm2.addString(activeChar.getName());
                 	//String nearestTown = MapRegionTable.getInstance().getClosestTownName(activeChar);
                 	//sm2.addString(nearestTown);
@@ -104,7 +103,7 @@ public class SummonFriend implements ISkillHandler
                     
                     if (targetChar.isAlikeDead())
                     {
-                    	SystemMessage sm = new SystemMessage(SystemMessage.S1_IS_DEAD_AT_THE_MOMENT_AND_CANNOT_BE_SUMMONED);
+                    	SystemMessage sm = new SystemMessage(SystemMessageId.S1_IS_DEAD_AT_THE_MOMENT_AND_CANNOT_BE_SUMMONED);
                     	sm.addString(targetChar.getName());
                     	activeChar.sendPacket(sm);
                     	continue;
@@ -112,7 +111,7 @@ public class SummonFriend implements ISkillHandler
                     
                     if (targetChar.isInStoreMode())
                     {
-                    	SystemMessage sm = new SystemMessage(SystemMessage.S1_CURRENTLY_TRADING_OR_OPERATING_PRIVATE_STORE_AND_CANNOT_BE_SUMMONED);
+                    	SystemMessage sm = new SystemMessage(SystemMessageId.S1_CURRENTLY_TRADING_OR_OPERATING_PRIVATE_STORE_AND_CANNOT_BE_SUMMONED);
                     	sm.addString(targetChar.getName());
                     	activeChar.sendPacket(sm);
                     	continue;
@@ -121,7 +120,7 @@ public class SummonFriend implements ISkillHandler
                     // Target cannot be in combat (or dead, but that's checked by TARGET_PARTY)
                     if (targetChar.isRooted() || targetChar.isInCombat()) 
                     {
-                    	SystemMessage sm = new SystemMessage(SystemMessage.S1_IS_ENGAGED_IN_COMBAT_AND_CANNOT_BE_SUMMONED);
+                    	SystemMessage sm = new SystemMessage(SystemMessageId.S1_IS_ENGAGED_IN_COMBAT_AND_CANNOT_BE_SUMMONED);
                     	sm.addString(targetChar.getName());
                     	activeChar.sendPacket(sm);
                     	continue;
@@ -129,20 +128,20 @@ public class SummonFriend implements ISkillHandler
                     
                     // Check for the the target's festival status
                     if (targetChar.isInOlympiadMode()) {
-                        activeChar.sendPacket(new SystemMessage(SystemMessage.YOU_CANNOT_SUMMON_PLAYERS_WHO_ARE_IN_OLYMPIAD));
+                        activeChar.sendPacket(new SystemMessage(SystemMessageId.YOU_CANNOT_SUMMON_PLAYERS_WHO_ARE_IN_OLYMPIAD));
                         continue;
                     }
                     
                     // Check for the the target's festival status
                     if (targetChar.isFestivalParticipant()) {
-                    	activeChar.sendPacket(new SystemMessage(SystemMessage.YOUR_TARGET_IS_IN_AN_AREA_WHICH_BLOCKS_SUMMONING));
+                    	activeChar.sendPacket(new SystemMessage(SystemMessageId.YOUR_TARGET_IS_IN_AN_AREA_WHICH_BLOCKS_SUMMONING));
                         continue;
                     }
                     
                     // Check for the target's jail status, arenas and siege zones
-                    if (ZoneManager.getInstance().checkIfInZonePvP(targetChar))
+                    if (targetChar.getInPvpZone())
                     {
-                    	activeChar.sendPacket(new SystemMessage(SystemMessage.YOUR_TARGET_IS_IN_AN_AREA_WHICH_BLOCKS_SUMMONING));
+                    	activeChar.sendPacket(new SystemMessage(SystemMessageId.YOUR_TARGET_IS_IN_AN_AREA_WHICH_BLOCKS_SUMMONING));
                         continue;
                     }
                     
@@ -150,7 +149,7 @@ public class SummonFriend implements ISkillHandler
                     if (targetChar.getInventory().getItemByItemId(8615) == null)
                     {
                     	((L2PcInstance)activeChar).sendMessage("Your target cannot be summoned while he hasn't got a Summoning Crystal");
-                    	targetChar.sendMessage("You cannot summoned while you haven't got a Summoning Crystal");
+                    	targetChar.sendMessage("You cannot be summoned while you haven't got a Summoning Crystal");
                     	continue;
                     }
                     
@@ -174,6 +173,6 @@ public class SummonFriend implements ISkillHandler
 
 	public SkillType[] getSkillIds()
 	{
-		return _skillIds;
+		return SKILL_IDS;
 	}
 }

@@ -23,6 +23,7 @@ import net.sf.l2j.gameserver.model.L2ItemInstance;
 import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PlayableInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.MagicSkillUser;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.templates.L2Item;
@@ -37,8 +38,8 @@ import net.sf.l2j.gameserver.util.Broadcast;
 public class FishShots implements IItemHandler 
 { 
 	// All the item IDs that this handler knows.
-	private static int[] _itemIds = { 6535, 6536, 6537, 6538, 6539, 6540 }; 
-	private static int[] _skillIds = { 2181, 2182, 2183, 2184, 2185, 2186 };
+	private static final int[] ITEM_IDS = { 6535, 6536, 6537, 6538, 6539, 6540 }; 
+	private static final int[] SKILL_IDS = { 2181, 2182, 2183, 2184, 2185, 2186 };
 
 	/* (non-Javadoc) 
  	* @see net.sf.l2j.gameserver.handler.IItemHandler#useItem(net.sf.l2j.gameserver.model.L2PcInstance, net.sf.l2j.gameserver.model.L2ItemInstance) 
@@ -75,7 +76,7 @@ public class FishShots implements IItemHandler
 		(grade == L2Item.CRYSTAL_S && FishshotId != 6540)) 
 		{ 
 			//1479 - This fishing shot is not fit for the fishing pole crystal.             
-			activeChar.sendPacket(new SystemMessage(SystemMessage.WRONG_FISHINGSHOT_GRADE));
+			activeChar.sendPacket(new SystemMessage(SystemMessageId.WRONG_FISHINGSHOT_GRADE));
 			return; 
 		} 
 
@@ -85,19 +86,19 @@ public class FishShots implements IItemHandler
 		} 
 
 		weaponInst.setChargedFishshot(true);
-		activeChar.destroyItem("Consume", item.getObjectId(), 1, null, false);
+		activeChar.destroyItemWithoutTrace("Consume", item.getObjectId(), 1, null, false);
         L2Object oldTarget = activeChar.getTarget();
         activeChar.setTarget(activeChar);
 
 		//activeChar.sendPacket(new SystemMessage(SystemMessage.ENABLED_SPIRITSHOT));
         
-		MagicSkillUser MSU = new MagicSkillUser(activeChar,_skillIds[grade],1,0,0); 
+		MagicSkillUser MSU = new MagicSkillUser(activeChar,SKILL_IDS[grade],1,0,0); 
         Broadcast.toSelfAndKnownPlayers(activeChar, MSU);
         activeChar.setTarget(oldTarget);        
 	} 
 
 	public int[] getItemIds() 
 	{ 
-		return _itemIds; 
+		return ITEM_IDS; 
 	} 
 }

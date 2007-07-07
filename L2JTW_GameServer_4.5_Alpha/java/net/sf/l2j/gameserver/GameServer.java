@@ -131,10 +131,11 @@ import net.sf.l2j.gameserver.handler.itemhandlers.EnergyStone;
 import net.sf.l2j.gameserver.handler.itemhandlers.ExtractableItems;
 import net.sf.l2j.gameserver.handler.itemhandlers.Firework;
 import net.sf.l2j.gameserver.handler.itemhandlers.FishShots;
-import net.sf.l2j.gameserver.handler.itemhandlers.Guide;
+import net.sf.l2j.gameserver.handler.itemhandlers.Book;
 import net.sf.l2j.gameserver.handler.itemhandlers.Harvester;
 import net.sf.l2j.gameserver.handler.itemhandlers.MercTicket;
 import net.sf.l2j.gameserver.handler.itemhandlers.MysteryPotion;
+import net.sf.l2j.gameserver.handler.itemhandlers.PaganKeys;
 import net.sf.l2j.gameserver.handler.itemhandlers.Potions;
 import net.sf.l2j.gameserver.handler.itemhandlers.Recipes;
 import net.sf.l2j.gameserver.handler.itemhandlers.Remedy;
@@ -184,11 +185,22 @@ import net.sf.l2j.gameserver.handler.usercommandhandlers.PartyInfo;
 import net.sf.l2j.gameserver.handler.usercommandhandlers.Time;
 import net.sf.l2j.gameserver.handler.voicedcommandhandlers.stats;
 import net.sf.l2j.gameserver.idfactory.IdFactory;
+import net.sf.l2j.gameserver.instancemanager.ArenaManager;
+import net.sf.l2j.gameserver.instancemanager.AuctionManager;
+import net.sf.l2j.gameserver.instancemanager.BoatManager;
+import net.sf.l2j.gameserver.instancemanager.CastleManager;
+import net.sf.l2j.gameserver.instancemanager.ClanHallManager;
 import net.sf.l2j.gameserver.instancemanager.CursedWeaponsManager;
 import net.sf.l2j.gameserver.instancemanager.DayNightSpawnManager;
 import net.sf.l2j.gameserver.instancemanager.ItemsOnGroundManager;
-import net.sf.l2j.gameserver.instancemanager.Manager;
+import net.sf.l2j.gameserver.instancemanager.MercTicketManager;
+import net.sf.l2j.gameserver.instancemanager.OlympiadStadiaManager;
+import net.sf.l2j.gameserver.instancemanager.PetitionManager;
+import net.sf.l2j.gameserver.instancemanager.QuestManager;
 import net.sf.l2j.gameserver.instancemanager.RaidBossSpawnManager;
+import net.sf.l2j.gameserver.instancemanager.SiegeManager;
+import net.sf.l2j.gameserver.instancemanager.TownManager;
+import net.sf.l2j.gameserver.instancemanager.ZoneManager;
 import net.sf.l2j.gameserver.model.AutoChatHandler;
 import net.sf.l2j.gameserver.model.AutoSpawnHandler;
 import net.sf.l2j.gameserver.model.L2PetDataTable;
@@ -201,6 +213,7 @@ import net.sf.l2j.gameserver.pathfinding.geonodes.GeoPathFinding;
 import net.sf.l2j.gameserver.script.faenor.FaenorScriptEngine;
 import net.sf.l2j.gameserver.taskmanager.TaskManager;
 import net.sf.l2j.gameserver.util.DynamicExtension;
+import net.sf.l2j.gameserver.util.FloodProtector;
 import net.sf.l2j.status.Status;
 
 
@@ -219,7 +232,7 @@ public class GameServer
 	private final HennaTable _hennaTable;
 	private final IdFactory _idFactory;
 	public static GameServer gameServer;
-
+	private static ClanHallManager _cHManager;
 	private final ItemHandler _itemHandler;
 	private final SkillHandler _skillHandler;
 	private final AdminCommandHandler _adminCommandHandler;
@@ -233,11 +246,11 @@ public class GameServer
 	private LoginServerThread _loginThread;
     private final HelperBuffTable _helperBuffTable;
     
-	public static Status statusServer;
+	private static Status _statusServer;
 	@SuppressWarnings("unused")
 	private final ThreadPoolManager _threadpools;
 
-    public static final Calendar DateTimeServerStarted = Calendar.getInstance();
+    public static final Calendar dateTimeServerStarted = Calendar.getInstance();
     
     public long getUsedMemoryMB()
 	{
@@ -249,6 +262,9 @@ public class GameServer
     	return _selectorThread;
     }
 
+	public ClanHallManager getCHManager(){
+		return _cHManager;
+	}
 	public GameServer() throws Exception
 	{
         gameServer = this;
@@ -313,7 +329,7 @@ public class GameServer
         //Call to load caches
         HtmCache.getInstance();
         CrestCache.getInstance();
-
+        ClanTable.getInstance();
 		_npcTable = NpcTable.getInstance();
         
 		if (!_npcTable.isInitialized())
@@ -356,8 +372,22 @@ public class GameServer
 		Announcements.getInstance();
 		MapRegionTable.getInstance();
 		EventDroplist.getInstance();
-		AugmentationData.getInstance();
 		
+		/** Load Manager */
+		ArenaManager.getInstance();
+		AuctionManager.getInstance();
+		_cHManager = ClanHallManager.getInstance();
+		BoatManager.getInstance();
+		CastleManager.getInstance();
+		MercTicketManager.getInstance();
+		//PartyCommandManager.getInstance();
+		PetitionManager.getInstance();
+		QuestManager.getInstance();
+		SiegeManager.getInstance();
+		TownManager.getInstance();
+		ZoneManager.getInstance();
+		OlympiadStadiaManager.getInstance();
+		AugmentationData.getInstance();
 		if (Config.SAVE_DROPPED_ITEM)
 			ItemsOnGroundManager.getInstance();  
         
@@ -394,6 +424,7 @@ public class GameServer
 		_itemHandler.registerItemHandler(new BlessedSpiritShot());
         _itemHandler.registerItemHandler(new BeastSoulShot());
         _itemHandler.registerItemHandler(new BeastSpiritShot());
+        _itemHandler.registerItemHandler(new PaganKeys());
 		_itemHandler.registerItemHandler(new WorldMap());
 		_itemHandler.registerItemHandler(new Potions());
 		_itemHandler.registerItemHandler(new Recipes());
@@ -402,7 +433,7 @@ public class GameServer
         _itemHandler.registerItemHandler(new MysteryPotion());
 		_itemHandler.registerItemHandler(new EnchantScrolls());
         _itemHandler.registerItemHandler(new EnergyStone());
-		_itemHandler.registerItemHandler(new Guide());
+		_itemHandler.registerItemHandler(new Book());
 		_itemHandler.registerItemHandler(new Remedy());
 		_itemHandler.registerItemHandler(new Scrolls());
 		_itemHandler.registerItemHandler(new CrystalCarol());
@@ -531,8 +562,6 @@ public class GameServer
 
         Universe.getInstance();
 
-        Manager.loadAll();
-        
 		_shutdownHandler = Shutdown.getInstance();
 		Runtime.getRuntime().addShutdownHook(_shutdownHandler);
 
@@ -556,7 +585,6 @@ public class GameServer
             _log.warning("Door.csv does not contain the right door info. Update door.csv");
             e.printStackTrace();
         }
-        ClanTable.getInstance();
         _log.config("IdFactory: Free ObjectID's remaining: " + IdFactory.getInstance().size());
 
         // initialize the dynamic extension loader
@@ -566,8 +594,8 @@ public class GameServer
             _log.log(Level.WARNING, "DynamicExtension could not be loaded and initialized", ex);
         }
         
+        FloodProtector.getInstance();
         TvTManager.getInstance();
-
 		System.gc();
 		// maxMemory is the upper limit the jvm can use, totalMemory the size of the current allocation pool, freeMemory the unused memory in the allocation pool
 		long freeMem = (Runtime.getRuntime().maxMemory()-Runtime.getRuntime().totalMemory()+Runtime.getRuntime().freeMemory()) / 1048576; // 1024 * 1024 = 1048576;
@@ -587,7 +615,7 @@ public class GameServer
 	
 	public static void main(String[] args) throws Exception
     {
-		Server.SERVER_MODE = Server.MODE_GAMESERVER;
+		Server.serverMode = Server.MODE_GAMESERVER;
 //      Local Constants
 		final String LOG_FOLDER = "log"; // Name of folder for log file
 		final String LOG_NAME   = "./log.cfg"; // Name of log file
@@ -608,8 +636,8 @@ public class GameServer
 		gameServer = new GameServer();
 		
 		if ( Config.IS_TELNET_ENABLED ) {
-		    statusServer = new Status(Server.SERVER_MODE);
-		    statusServer.start();
+		    _statusServer = new Status(Server.serverMode);
+		    _statusServer.start();
 		}
 		else {
 		    System.out.println("Telnet server is currently disabled.");

@@ -41,6 +41,7 @@ import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2TradeList;
 import net.sf.l2j.gameserver.model.actor.instance.L2BoxInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.NpcHtmlMessage;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.templates.L2Item;
@@ -56,7 +57,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
     private static Logger _log = Logger.getLogger(AdminEditChar.class.getName());
     private final static int PAGE_LIMIT = 7;
     
-    private static String[] _adminCommands = {
+    private static final String[] ADMIN_COMMANDS = {
             "admin_edit_npc",
             "admin_save_npc",
             "admin_show_droplist",
@@ -130,7 +131,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
             }
             else
             {
-                SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);
+                SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
                 sm.addString("指令錯誤");
                 sm.addString("//show_droplist <npc_id>");
                 activeChar.sendPacket(sm);
@@ -203,7 +204,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
                 }
                 else
                 {
-                    SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);
+                    SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
                     sm.addString("指令錯誤");
                     sm.addString("//edit_drop <npc_id> <item_id> <category> [<min> <max> <chance>]");
                     activeChar.sendPacket(sm);
@@ -211,7 +212,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
             }
             catch (StringIndexOutOfBoundsException e)
             {
-                SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);
+                SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
                 sm.addString("指令錯誤");
                 sm.addString("//edit_drop <npc_id> <item_id> <category> [<min> <max> <chance>]");
                 activeChar.sendPacket(sm);
@@ -260,7 +261,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
                 }
                 else
                 {
-                    SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);
+                    SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
                     sm.addString("指令錯誤");
                     sm.addString("//add_drop <npc_id> [<item_id> <category> <min> <max> <chance>]");
                     activeChar.sendPacket(sm);
@@ -268,7 +269,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
             }
             catch (StringIndexOutOfBoundsException e)
             {
-                SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);
+                SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
                 sm.addString("指令錯誤");
                 sm.addString("//add_drop <npc_id> [<item_id> <category> <min> <max> <chance>]");
                 activeChar.sendPacket(sm);
@@ -295,7 +296,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
             }
             else
             {
-                SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);
+                SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
                 sm.addString("指令錯誤");
                 sm.addString("//del_drop <npc_id> <item_id> <category>");
                 activeChar.sendPacket(sm);
@@ -323,7 +324,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
                 else
                 {
                 	try {
-                		SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);
+                		SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
                 		String msg = "權限:";
                 		for (Object p : box.getAccess())
                 			msg += " "+(String)p;
@@ -449,6 +450,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
             
             L2ItemInstance newItem = ItemTable.getInstance().createDummyItem(itemID);
             newItem.setPriceToSell(price);
+            newItem.setCount(-1);
             tradeList.addItem(newItem);
             storeTradeList(itemID, price, tradeListID, order);
             
@@ -617,7 +619,11 @@ public class AdminEditNpc implements IAdminCommandHandler {
 	        PreparedStatement stmt = con.prepareStatement("SELECT * FROM merchant_buylists WHERE `shop_id`='"+tradeListID+"' AND `item_id` ='"+itemID+"' AND `price` = '"+price+"'");
     	    ResultSet rs = stmt.executeQuery();
     	    rs.first();
-    	    return rs.getInt("order");
+    	    
+    	    order = rs.getInt("order");
+    	    
+    	    stmt.close();
+    	    rs.close();
         }catch (SQLException esql) {esql.printStackTrace();}
         finally{ try {con.close();} catch (SQLException e) {e.printStackTrace();}}
         return order;
@@ -664,7 +670,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
 	}
 	
 	public String[] getAdminCommandList() {
-		return _adminCommands;
+		return ADMIN_COMMANDS;
 	}	
 	
 	private void Show_Npc_Property(L2PcInstance adminPlayer, L2NpcTemplate npc)
@@ -675,30 +681,48 @@ public class AdminEditNpc implements IAdminCommandHandler {
 	    if (content != null)
         {
             adminReply.setHtml(content);
-	        adminReply.replace("%NpcName%", npc.name);
-	        adminReply.replace("%CollisionRadius%", String.valueOf(npc.collisionRadius));
-	        adminReply.replace("%CollisionHeight%", String.valueOf(npc.collisionHeight));
-	        adminReply.replace("%Level%", String.valueOf(npc.level));
-	        adminReply.replace("%Sex%", String.valueOf(npc.sex));	        
-	        adminReply.replace("%Type%", String.valueOf(npc.type));
-	        adminReply.replace("%AttackRange%", String.valueOf(npc.baseAtkRange));
-	        adminReply.replace("%MaxHp%", String.valueOf(npc.baseHpMax));
-	        adminReply.replace("%MaxBaseMp%", String.valueOf(npc.baseMpMax));
-	        adminReply.replace("%Exp%", String.valueOf(npc.rewardExp));
-	        adminReply.replace("%Sp%", String.valueOf(npc.rewardSp));
-	        adminReply.replace("%Patk%", String.valueOf(npc.basePAtk));
-	        adminReply.replace("%Pdef%", String.valueOf(npc.basePDef));
-	        adminReply.replace("%Matk%", String.valueOf(npc.baseMAtk));	        
-	        adminReply.replace("%Mdef%", String.valueOf(npc.baseMDef));
-	        adminReply.replace("%Atkspd%", String.valueOf(npc.basePAtkSpd));
-	        adminReply.replace("%Agro%", String.valueOf(npc.aggroRange));
-	        adminReply.replace("%Matkspd%", String.valueOf(npc.baseMAtkSpd));
-	        adminReply.replace("%Rhand%", String.valueOf(npc.rhand));
-	        adminReply.replace("%Lhand%", String.valueOf(npc.lhand));
-	        adminReply.replace("%Armor%", String.valueOf(npc.armor));
-	        adminReply.replace("%WalkSpeed%", String.valueOf(npc.baseRunSpd*0.7));
-	        adminReply.replace("%RunSpeed%", String.valueOf(npc.baseRunSpd));
-	        adminReply.replace("%NpcId%", String.valueOf(npc.npcId));
+
+            adminReply.replace("%npcId%", String.valueOf(npc.npcId));
+            adminReply.replace("%templateId%", String.valueOf(npc.idTemplate));
+	        adminReply.replace("%name%", npc.name);
+	        adminReply.replace("%serverSideName%", npc.serverSideName == true ? "1" : "0");
+	        adminReply.replace("%title%", npc.title);
+	        adminReply.replace("%serverSideTitle%", npc.serverSideTitle == true ? "1" : "0");
+	        adminReply.replace("%collisionRadius%", String.valueOf(npc.collisionRadius));
+	        adminReply.replace("%collisionHeight%", String.valueOf(npc.collisionHeight));
+	        adminReply.replace("%level%", String.valueOf(npc.level));
+	        adminReply.replace("%sex%", String.valueOf(npc.sex));	        
+	        adminReply.replace("%type%", String.valueOf(npc.type));
+	        adminReply.replace("%attackRange%", String.valueOf(npc.baseAtkRange));
+	        adminReply.replace("%hp%", String.valueOf(npc.baseHpMax));
+	        adminReply.replace("%mp%", String.valueOf(npc.baseMpMax));
+	        adminReply.replace("%hpRegen%", String.valueOf(npc.baseHpReg));
+	        adminReply.replace("%mpRegen%", String.valueOf(npc.baseMpReg));
+	        adminReply.replace("%str%", String.valueOf(npc.baseSTR));
+	        adminReply.replace("%con%", String.valueOf(npc.baseCON));
+	        adminReply.replace("%dex%", String.valueOf(npc.baseDEX));
+	        adminReply.replace("%int%", String.valueOf(npc.baseINT));
+	        adminReply.replace("%wit%", String.valueOf(npc.baseWIT));
+	        adminReply.replace("%men%", String.valueOf(npc.baseMEN));
+	        adminReply.replace("%exp%", String.valueOf(npc.rewardExp));
+	        adminReply.replace("%sp%", String.valueOf(npc.rewardSp));
+	        adminReply.replace("%pAtk%", String.valueOf(npc.basePAtk));
+	        adminReply.replace("%pDef%", String.valueOf(npc.basePDef));
+	        adminReply.replace("%mAtk%", String.valueOf(npc.baseMAtk));
+	        adminReply.replace("%mDef%", String.valueOf(npc.baseMDef));
+	        adminReply.replace("%pAtkSpd%", String.valueOf(npc.basePAtkSpd));
+	        adminReply.replace("%aggro%", String.valueOf(npc.aggroRange));
+	        adminReply.replace("%mAtkSpd%", String.valueOf(npc.baseMAtkSpd));
+	        adminReply.replace("%rHand%", String.valueOf(npc.rhand));
+	        adminReply.replace("%lHhand%", String.valueOf(npc.lhand));
+	        adminReply.replace("%armor%", String.valueOf(npc.armor));
+	        adminReply.replace("%walkSpd%", String.valueOf(npc.baseRunSpd * 0.7));
+	        adminReply.replace("%runSpd%", String.valueOf(npc.baseRunSpd));
+	        adminReply.replace("%factionId%", npc.factionId == null ? "" : npc.factionId);
+	        adminReply.replace("%factionRange%", String.valueOf(npc.factionRange));
+	        adminReply.replace("%isUndead%", npc.isUndead ? "1" : "0");
+	        adminReply.replace("%absorbLevel%", String.valueOf(npc.absorbLevel));
+
 	    }
         else
 	    {
@@ -827,7 +851,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
 	    L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(npcId);
 	    if(npcData == null)
 	    {
-	        SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);
+	        SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 	        sm.addString("SYS");
 	        sm.addString("未知的NPC基本編號" + npcId);
 	        admin.sendPacket(sm);
@@ -990,7 +1014,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
 	        }
 	        else
 	        {
-	            SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);
+	            SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 	            sm.addString("SYS");
 	            sm.addString("發生錯誤");
 	            admin.sendPacket(sm);

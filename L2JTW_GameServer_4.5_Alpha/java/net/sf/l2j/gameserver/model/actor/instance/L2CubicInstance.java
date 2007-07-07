@@ -36,7 +36,7 @@ import net.sf.l2j.util.Rnd;
 
 public class L2CubicInstance
 {
-    protected static Logger _log = Logger.getLogger(L2CubicInstance.class.getName());
+    protected static final Logger _log = Logger.getLogger(L2CubicInstance.class.getName());
 
     public static final int STORM_CUBIC = 1;
     public static final int VAMPIRIC_CUBIC = 2;
@@ -112,30 +112,39 @@ public class L2CubicInstance
         switch (_id)
         {
             case STORM_CUBIC:
-                _actionTask = ThreadPoolManager.getInstance().scheduleEffectAtFixedRate(new Action(80), 0, 10000);
+
+                _actionTask = ThreadPoolManager.getInstance().scheduleEffectAtFixedRate(new Action(12), 0, 10000);
+
                 break;
             case VAMPIRIC_CUBIC:
-                _actionTask = ThreadPoolManager.getInstance().scheduleEffectAtFixedRate(new Action(60), 0, 10000);
+
+                _actionTask = ThreadPoolManager.getInstance().scheduleEffectAtFixedRate(new Action(8), 0, 11000);
+
                 break;
             case VIPER_CUBIC:
 
-                _actionTask = ThreadPoolManager.getInstance().scheduleEffectAtFixedRate(new Action(30), 0, 10000);
+                _actionTask = ThreadPoolManager.getInstance().scheduleEffectAtFixedRate(new Action(30), 0, 13000);
 
                 break;
             case POLTERGEIST_CUBIC:
-                _actionTask = ThreadPoolManager.getInstance().scheduleEffectAtFixedRate(new Action(20), 0, 10000);
+
+                _actionTask = ThreadPoolManager.getInstance().scheduleEffectAtFixedRate(new Action(30), 0, 8000);
+
                 break;
             case BINDING_CUBIC:
             case AQUA_CUBIC:
             case SPARK_CUBIC:
-                _actionTask = ThreadPoolManager.getInstance().scheduleEffectAtFixedRate(new Action(40), 0, 10000);
+
+                _actionTask = ThreadPoolManager.getInstance().scheduleEffectAtFixedRate(new Action(30), 0, 8000);
+
                 break;
             case LIFE_CUBIC:
-                _actionTask = ThreadPoolManager.getInstance().scheduleEffectAtFixedRate(new Heal(80), 0, 10000);
+
+                _actionTask = ThreadPoolManager.getInstance().scheduleEffectAtFixedRate(new Heal(50), 0, 15000);
+
                 break;
             case ATTRACT_CUBIC:
-                _actionTask = ThreadPoolManager.getInstance().scheduleEffectAtFixedRate(new Action(30),
-                                                                                        0, 8000);
+                _actionTask = ThreadPoolManager.getInstance().scheduleEffectAtFixedRate(new Action(30), 0, 8000);
                 break;
         }
     }

@@ -24,10 +24,10 @@ import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.model.ClanWarehouse;
 import net.sf.l2j.gameserver.model.ItemContainer;
 import net.sf.l2j.gameserver.model.L2ItemInstance;
-import net.sf.l2j.gameserver.model.PcFreight;
 import net.sf.l2j.gameserver.model.actor.instance.L2FolkInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.InventoryUpdate;
 import net.sf.l2j.gameserver.serverpackets.ItemList;
 import net.sf.l2j.gameserver.serverpackets.StatusUpdate;
@@ -84,7 +84,7 @@ public final class SendWareHouseDepositList extends L2GameClientPacket
 		L2FolkInstance manager = player.getLastFolkNPC();
         if ((manager == null || !player.isInsideRadius(manager, L2NpcInstance.INTERACTION_DISTANCE, false, false)) && !player.isGM()) return;
         
-        if ((warehouse instanceof PcFreight || warehouse instanceof ClanWarehouse) && Config.GM_DISABLE_TRANSACTION && player.getAccessLevel() >= Config.GM_TRANSACTION_MIN && player.getAccessLevel() <= Config.GM_TRANSACTION_MAX)
+        if ((warehouse instanceof ClanWarehouse) && Config.GM_DISABLE_TRANSACTION && player.getAccessLevel() >= Config.GM_TRANSACTION_MIN && player.getAccessLevel() <= Config.GM_TRANSACTION_MAX)
         {
 
             player.sendMessage("Åv­­¤£¨¬");
@@ -97,9 +97,6 @@ public final class SendWareHouseDepositList extends L2GameClientPacket
         
         // Freight price from config or normal price per item slot (30)
 		int fee = _count * 30;
-		if (warehouse instanceof PcFreight)
-			if (Config.ALT_GAME_FREIGHTS)
-				fee = _count * Config.ALT_GAME_FREIGHT_PRICE;
 		int currentAdena = player.getAdena(); 
         int slots = 0;
 
@@ -117,7 +114,8 @@ public final class SendWareHouseDepositList extends L2GameClientPacket
             	_items[i * 2 + 1] = 0;
             	continue;
             }
-            if ((warehouse instanceof PcFreight || warehouse instanceof ClanWarehouse) && !item.isTradeable() || item.getItemType() == L2EtcItemType.QUEST) return;
+            
+            if ((warehouse instanceof ClanWarehouse) && !item.isTradeable() || item.getItemType() == L2EtcItemType.QUEST) return;
             // Calculate needed adena and slots
             if (item.getItemId() == 57) currentAdena -= count;
             if (!item.isStackable()) slots += count;
@@ -127,14 +125,14 @@ public final class SendWareHouseDepositList extends L2GameClientPacket
         // Item Max Limit Check 
         if (!warehouse.validateCapacity(slots))
         {
-            sendPacket(new SystemMessage(SystemMessage.YOU_HAVE_EXCEEDED_QUANTITY_THAT_CAN_BE_INPUTTED));
+            sendPacket(new SystemMessage(SystemMessageId.YOU_HAVE_EXCEEDED_QUANTITY_THAT_CAN_BE_INPUTTED));
             return;
         }
 
         // Check if enough adena and charge the fee
         if (currentAdena < fee || !player.reduceAdena("Warehouse", fee, player.getLastFolkNPC(), false))
         {
-            sendPacket(new SystemMessage(SystemMessage.YOU_NOT_ENOUGH_ADENA));
+            sendPacket(new SystemMessage(SystemMessageId.YOU_NOT_ENOUGH_ADENA));
             return;
         }
 

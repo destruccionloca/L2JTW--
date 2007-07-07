@@ -39,18 +39,18 @@ import net.sf.l2j.gameserver.model.actor.knownlist.ObjectKnownList.KnownListAsyn
 public class L2PlayerAI extends L2CharacterAI
 {
 
-    private boolean thinking; // to prevent recursive thinking
+    private boolean _thinking; // to prevent recursive thinking
 
     class IntentionCommand
     {
-        protected CtrlIntention intention;
-        protected Object arg0, arg1;
+        protected CtrlIntention _crtlIntention;
+        protected Object _arg0, _arg1;
 
         protected IntentionCommand(CtrlIntention pIntention, Object pArg0, Object pArg1)
         {
-            intention = pIntention;
-            arg0 = pArg0;
-            arg1 = pArg1;
+        	_crtlIntention = pIntention;
+            _arg0 = pArg0;
+            _arg1 = pArg1;
         }
     }
 
@@ -84,7 +84,7 @@ public class L2PlayerAI extends L2CharacterAI
         }
 
         // do nothing if next intention is same as current one.
-        if (intention == _intention && arg0 == _intention_arg0 && arg1 == _intention_arg1)
+        if (intention == _intention && arg0 == _intentionArg0 && arg1 == _intentionArg1)
         {
             super.changeIntention(intention, arg0, arg1);
             return;
@@ -96,9 +96,9 @@ public class L2PlayerAI extends L2CharacterAI
          */
 
         // push current intention to stack
-        // Fix for the Lame ass skill loop...XD
-        if(_intention != AI_INTENTION_CAST) 
-        _interuptedIntentions.push(new IntentionCommand(_intention, _intention_arg0, _intention_arg1));
+
+        _interuptedIntentions.push(new IntentionCommand(_intention, _intentionArg0, _intentionArg1));
+
         super.changeIntention(intention, arg0, arg1);
     }
 
@@ -136,9 +136,10 @@ public class L2PlayerAI extends L2CharacterAI
                  */
 
 
-                if (cmd != null && cmd.intention != AI_INTENTION_CAST) // previous state shouldn't be casting 
+                if (cmd != null && cmd._crtlIntention != AI_INTENTION_CAST) // previous state shouldn't be casting 
+
                 {
-                	setIntention(cmd.intention, cmd.arg0, cmd.arg1);
+                	setIntention(cmd._crtlIntention, cmd._arg0, cmd._arg1);
                 }
                 
                 else setIntention(AI_INTENTION_IDLE);
@@ -179,8 +180,8 @@ public class L2PlayerAI extends L2CharacterAI
 
     protected void clientNotifyDead()
     {
-        _client_moving_to_pawn_offset = 0;
-        _client_moving = false;
+        _clientMovingToPawnOffset = 0;
+        _clientMoving = false;
 
         super.clientNotifyDead();
     }
@@ -266,14 +267,14 @@ public class L2PlayerAI extends L2CharacterAI
 
     protected void onEvtThink()
     {
-        if (thinking || _actor.isAllSkillsDisabled()) return;
+        if (_thinking || _actor.isAllSkillsDisabled()) return;
 
         /*
          if (Config.DEBUG)
          _log.warning("L2PlayerAI: onEvtThink -> Check intention");
          */
 
-        thinking = true;
+        _thinking = true;
         try
         {
             if (getIntention() == AI_INTENTION_ATTACK) thinkAttack();
@@ -283,7 +284,7 @@ public class L2PlayerAI extends L2CharacterAI
         }
         finally
         {
-            thinking = false;
+            _thinking = false;
         }
     }
 

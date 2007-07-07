@@ -37,6 +37,7 @@ import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2Spawn;
 import net.sf.l2j.gameserver.model.L2World;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.NpcHtmlMessage;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
@@ -51,7 +52,7 @@ import net.sf.l2j.gameserver.templates.L2NpcTemplate;
 public class AdminSpawn implements IAdminCommandHandler
 {
 
-    private static String[] _adminCommands = { "admin_show_spawns", "admin_spawn", "admin_spawn_monster", "admin_spawn_index",
+    private static final String[] ADMIN_COMMANDS = { "admin_show_spawns", "admin_spawn", "admin_spawn_monster", "admin_spawn_index",
     											"admin_unspawnall","admin_respawnall","admin_spawn_reload","admin_npc_index",
     											"admin_show_npcs","admin_teleport_reload", "admin_spawnnight", "admin_spawnday" };
     public static Logger _log = Logger.getLogger(AdminSpawn.class.getName());
@@ -143,7 +144,7 @@ public class AdminSpawn implements IAdminCommandHandler
         {
             for (L2PcInstance player : L2World.getInstance().getAllPlayers())
             {
-                player.sendPacket(new SystemMessage(SystemMessage.NPC_SERVER_NOT_OPERATING));
+                player.sendPacket(new SystemMessage(SystemMessageId.NPC_SERVER_NOT_OPERATING));
             }
 
             RaidBossSpawnManager.getInstance().cleanUp();
@@ -183,7 +184,7 @@ public class AdminSpawn implements IAdminCommandHandler
 
     public String[] getAdminCommandList()
     {
-        return _adminCommands;
+        return ADMIN_COMMANDS;
     }
 
     private boolean checkLevel(int level)
@@ -197,7 +198,7 @@ public class AdminSpawn implements IAdminCommandHandler
         if (target == null)
         {
             target = activeChar;/*
-            SystemMessage sm = new SystemMessage(614);
+            SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
             sm.addString("Incorrect target.");
             activeChar.sendPacket(sm);
             return;*/
@@ -222,7 +223,7 @@ public class AdminSpawn implements IAdminCommandHandler
         
        if (template1 == null)
         {
-            //SystemMessage sm = new SystemMessage(614);
+            //SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
             //sm.addString("Incorrect monster template.");
             //activeChar.sendPacket(sm);
             //return;
@@ -245,7 +246,7 @@ public class AdminSpawn implements IAdminCommandHandler
 
             if (RaidBossSpawnManager.getInstance().isDefined(spawn.getNpcid()))
             {
-                SystemMessage sm = new SystemMessage(614);
+                SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
                 sm.addString("SYS");
                 sm.addString("無法創造 instance " + template1.name + ".");
                 activeChar.sendPacket(sm);
@@ -259,7 +260,7 @@ public class AdminSpawn implements IAdminCommandHandler
 
                 spawn.init();
 
-                SystemMessage sm = new SystemMessage(614);
+                SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
                 sm.addString("SYS");
                 sm.addString("創造 " + template1.name + " 再 " + target.getObjectId() + ".");
                 activeChar.sendPacket(sm);
@@ -267,7 +268,7 @@ public class AdminSpawn implements IAdminCommandHandler
         }
         catch (Exception e)
         {
-            SystemMessage sm = new SystemMessage(614);
+            SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
             sm.addString("SYS");
             sm.addString("目標不在遊戲內");
             activeChar.sendPacket(sm);

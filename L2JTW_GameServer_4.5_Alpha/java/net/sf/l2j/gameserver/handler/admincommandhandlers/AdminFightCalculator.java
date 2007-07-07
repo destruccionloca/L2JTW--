@@ -318,6 +318,7 @@ public class AdminFightCalculator implements IAdminCommandHandler {
             replyMSG.append("<td>¥Ã»·¤£¦º</td>");
 		replyMSG.append("</tr>");
 
+
         replyMSG.append("</table>");
         replyMSG.append("<center><br>");
         if (params.length() == 0) {
@@ -338,4 +339,3 @@ public class AdminFightCalculator implements IAdminCommandHandler {
     }
 
 }
-

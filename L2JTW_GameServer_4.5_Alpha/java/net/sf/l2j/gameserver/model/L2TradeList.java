@@ -26,6 +26,7 @@ import javolution.util.FastList;
 import net.sf.l2j.L2DatabaseFactory;
 import net.sf.l2j.gameserver.datatables.ItemTable;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.InventoryUpdate;
 import net.sf.l2j.gameserver.serverpackets.StatusUpdate;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
@@ -42,7 +43,7 @@ public class L2TradeList
 	private List<L2ItemInstance> _items;
 	private int _listId;
 	private boolean _confirmed;
-	private String _Buystorename,_Sellstorename;
+	private String _buystorename, _sellstorename;
     
     private String _npcId;
 	
@@ -122,19 +123,19 @@ public class L2TradeList
 	}
 	public void setSellStoreName(String name)
 	{
-		_Sellstorename = name;
+		_sellstorename = name;
 	}
 	public String getSellStoreName()
 	{
-		return _Sellstorename;
+		return _sellstorename;
 	}
 	public void setBuyStoreName(String name)
 	{
-		_Buystorename = name;
+		_buystorename = name;
 	}
 	public String getBuyStoreName()
 	{
-		return _Buystorename;
+		return _buystorename;
 	}
 	
 	/**
@@ -483,23 +484,23 @@ public class L2TradeList
 		        temp = buyerInv.addItem("", newitem, null, null);
 		        if (amount == 1)//system msg stuff
 		        {
-		            msg = new SystemMessage(SystemMessage.S1_PURCHASED_S2);
+		            msg = new SystemMessage(SystemMessageId.S1_PURCHASED_S2);
 		            msg.addString(buyer.getName());
 		            msg.addItemName(sellerItem.getItemId());
 		            sysmsgs.add(msg);
-		            msg = new SystemMessage(SystemMessage.S1_PURCHASED_S2);
+		            msg = new SystemMessage(SystemMessageId.S1_PURCHASED_S2);
 		            msg.addString("±z");
 		            msg.addItemName(sellerItem.getItemId());
 		            sysmsgs.add(msg);
 		        }
 		        else
 		        {
-		            msg = new SystemMessage(SystemMessage.S1_PURCHASED_S3_S2_s);
+		            msg = new SystemMessage(SystemMessageId.S1_PURCHASED_S3_S2_S);
 		            msg.addString(buyer.getName());
 		            msg.addItemName(sellerItem.getItemId());
 		            msg.addNumber(amount);
 		            sysmsgs.add(msg);
-		            msg = new SystemMessage(SystemMessage.S1_PURCHASED_S3_S2_s);
+		            msg = new SystemMessage(SystemMessageId.S1_PURCHASED_S3_S2_S);
 		            msg.addString("±z");
 		            msg.addItemName(sellerItem.getItemId());
 		            msg.addNumber(amount);

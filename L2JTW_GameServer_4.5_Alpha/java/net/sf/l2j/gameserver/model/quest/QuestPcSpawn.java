@@ -21,36 +21,36 @@ import net.sf.l2j.util.Rnd;
 
 public class QuestPcSpawn
 {
-    protected static Logger _log = Logger.getLogger(QuestPcSpawn.class.getName());
+    protected static final Logger _log = Logger.getLogger(QuestPcSpawn.class.getName());
 
     public class DeSpawnScheduleTimerTask implements Runnable
     {
-        int _ObjectId = 0;
+        int _objectId = 0;
         public DeSpawnScheduleTimerTask(int objectId)
         {
-            _ObjectId = objectId;
+            _objectId = objectId;
         }
         
         public void run()
         {
             try
             {
-                removeSpawn(_ObjectId);
+                removeSpawn(_objectId);
             } catch (Throwable t){}
         }
     }
 
     // =========================================================
     // Data Field
-    private L2PcInstance _Player;
+    private L2PcInstance _player;
     private List<AutoSpawnInstance> _autoSpawns = new FastList<AutoSpawnInstance>();
-    private List<L2Spawn> _Spawns = new FastList<L2Spawn>();
+    private List<L2Spawn> _spawns = new FastList<L2Spawn>();
     
     // =========================================================
     // Constructor
     public QuestPcSpawn(L2PcInstance player)
     {
-        _Player = player;
+        _player = player;
     }
 
     // =========================================================
@@ -117,21 +117,6 @@ public class QuestPcSpawn
     {
         try 
         {
-            if (randomOffset)
-            {
-                int offset;
-
-                offset = Rnd.get(1); // Get the direction of the offset
-                if (offset == 0) {offset = -1;} // make offset negative
-                offset *= Rnd.get(50, 100);
-                x += offset;
-
-                offset = Rnd.get(1); // Get the direction of the offset
-                if (offset == 0) {offset = -1;} // make offset negative
-                offset *= Rnd.get(50, 100); 
-                y += offset;
-            }
-            
             L2NpcTemplate template = NpcTable.getInstance().getTemplate(npcId);
             if (template != null)
             {
@@ -150,9 +135,9 @@ public class QuestPcSpawn
                 	_log.log(Level.WARNING, getPlayer().getName() + " requested quest spawn with loc 0,0.  Loc is being adjusted");
 
                 	// attempt to use the player's xyz as a the default spawn location.
-                	x = getPlayer().getX();
-                	y = getPlayer().getY();
-                	z = getPlayer().getZ();
+                	x = getPlayer().getClientX();
+                	y = getPlayer().getClientY();
+                	z = getPlayer().getClientZ();
                 	// if the fail-safe also did not help, abort this spawning and give a severe log 
                     if ((x == 0) && (y == 0))
                     {
@@ -160,12 +145,28 @@ public class QuestPcSpawn
                     	return 0;
                     }
                 }
+                
+                if (randomOffset)
+                {
+                    int offset;
+
+                    offset = Rnd.get(2); // Get the direction of the offset
+                    if (offset == 0) {offset = -1;} // make offset negative
+                    offset *= Rnd.get(50, 100);
+                    x += offset;
+
+                    offset = Rnd.get(2); // Get the direction of the offset
+                    if (offset == 0) {offset = -1;} // make offset negative
+                    offset *= Rnd.get(50, 100); 
+                    y += offset;
+                }
+                
                 spawn.setLocx(x);
                 spawn.setLocy(y);
                 spawn.setLocz(z + 20);
                 spawn.stopRespawn();
                 spawn.doSpawn();
-                _Spawns.add(spawn);
+                _spawns.add(spawn);
                 int objectId = spawn.getLastSpawn().getObjectId();
                 if (despawnDelay > 0)
                 	addDeSpawnTask(objectId, despawnDelay);
@@ -285,7 +286,7 @@ public class QuestPcSpawn
     /** Return current player instance */
     public L2PcInstance getPlayer()
     {
-        return _Player;
+        return _player;
     }
 
     /**
@@ -352,8 +353,8 @@ public class QuestPcSpawn
      */
     public List<L2Spawn> getSpawns()
     {
-        if (_Spawns == null)
-            _Spawns = new FastList<L2Spawn>();
-        return _Spawns;
+        if (_spawns == null)
+            _spawns = new FastList<L2Spawn>();
+        return _spawns;
     }
 }

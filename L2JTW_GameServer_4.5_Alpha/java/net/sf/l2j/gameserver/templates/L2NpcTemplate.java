@@ -52,7 +52,7 @@ import net.sf.l2j.gameserver.skills.Stats;
  */
 public final class L2NpcTemplate extends L2CharTemplate
 {
-	protected static Logger _log = Logger.getLogger(Quest.class.getName());
+	protected static final Logger _log = Logger.getLogger(Quest.class.getName());
 
 	public final int     npcId;
     public final int     idTemplate;
@@ -77,7 +77,7 @@ public final class L2NpcTemplate extends L2CharTemplate
     public final int     glove;
 	public final String  factionId;
 	public final int     factionRange;
-    public final int     absorb_level;
+    public final int     absorbLevel;
     public final int     primary_attack;
     public final int     skill_chance;
     public final int     canMove;
@@ -95,7 +95,7 @@ public final class L2NpcTemplate extends L2CharTemplate
     public final int     enemyRange;
     public final int     baseShldRate;
     public final int     baseShldDef;
-	private final StatsSet npcStatsSet;
+	private final StatsSet _npcStatsSet;
 
 	/** fixed skills*/
 	public int     race;
@@ -173,7 +173,7 @@ public final class L2NpcTemplate extends L2CharTemplate
 		else
 			factionId = f.intern();
 		factionRange  = set.getInteger("factionRange");
-        absorb_level  = set.getInteger("absorb_level", 0);
+        absorbLevel  = set.getInteger("absorb_level", 0);
         
         primary_attack = set.getInteger("primary_attack");
         skill_chance = set.getInteger("skill_chance");
@@ -184,7 +184,7 @@ public final class L2NpcTemplate extends L2CharTemplate
 		//else
 		//	race = r.intern();
 		race = 0;
-		npcStatsSet = set;
+		_npcStatsSet = set;
 		_teachInfo = null;
 	}
 	
@@ -386,7 +386,7 @@ public final class L2NpcTemplate extends L2CharTemplate
 	
 	public StatsSet getStatsSet()
 	{
-		return npcStatsSet;
+		return _npcStatsSet;
 	}
 	public void setRace(int newrace)
 	{

@@ -30,6 +30,7 @@ import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.model.L2World;
 import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.CharInfo;
 import net.sf.l2j.gameserver.serverpackets.Earthquake;
 import net.sf.l2j.gameserver.serverpackets.MagicSkillUser;
@@ -54,7 +55,7 @@ import net.sf.l2j.gameserver.serverpackets.UserInfo;
 */
 public class AdminEffects implements IAdminCommandHandler
 {
-   private static String[] _adminCommands = { "admin_invis", "admin_invisible", "admin_vis",
+   private static final String[] ADMIN_COMMANDS = { "admin_invis", "admin_invisible", "admin_vis",
 
                                               "admin_visible", "admin_earthquake", "admin_bighead", "admin_shrinkhead", "admin_gmspeed", 
                                               "admin_unpara_all", "admin_para_all", "admin_unpara", "admin_para", "admin_polyself",
@@ -124,9 +125,9 @@ public class AdminEffects implements IAdminCommandHandler
                {
                    player = (L2Character)target;
                    if (type.equals("1"))
-                       player.startAbnormalEffect((short)0x0400);
+                       player.startAbnormalEffect(0x0400);
                    else
-                       player.startAbnormalEffect((short)0x0800);
+                       player.startAbnormalEffect(0x0800);
                    player.setIsParalyzed(true);
                    StopMove sm = new StopMove(player);
                    player.sendPacket(sm);
@@ -162,7 +163,7 @@ public class AdminEffects implements IAdminCommandHandler
                {
                    if (!player.isGM())
                    {
-                       player.startAbnormalEffect((short)0x0400);
+                       player.startAbnormalEffect(0x0400);
                        player.setIsParalyzed(true);
 
                        StopMove sm = new StopMove(player);
@@ -181,7 +182,7 @@ public class AdminEffects implements IAdminCommandHandler
            {
                for (L2PcInstance player : activeChar.getKnownList().getKnownPlayers().values())
                {
-                   player.stopAbnormalEffect((short)0x0400);
+                   player.stopAbnormalEffect(0x0400);
                    player.setIsParalyzed(false);
                }
            }
@@ -198,7 +199,7 @@ public class AdminEffects implements IAdminCommandHandler
                if (target instanceof L2Character) 
                {
                    player = (L2Character)target;
-                   player.startAbnormalEffect((short)0x2000);
+                   player.startAbnormalEffect(0x2000);
                 }
            }
            catch (Exception e)
@@ -232,7 +233,7 @@ public class AdminEffects implements IAdminCommandHandler
                activeChar.stopEffect(7029);
                if (val == 0 && sendMessage)
                {
-                   SystemMessage sm = new SystemMessage(SystemMessage.EFFECT_S1_DISAPPEARED);
+                   SystemMessage sm = new SystemMessage(SystemMessageId.EFFECT_S1_DISAPPEARED);
                    sm.addSkillName(7029);
                    activeChar.sendPacket(sm);
                 }
@@ -244,7 +245,7 @@ public class AdminEffects implements IAdminCommandHandler
            }
            catch (Exception e)
            {
-               SystemMessage sm = new SystemMessage(614);
+               SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
                sm.addString("Use //gmspeed value = [0...4].");
               activeChar.sendPacket(sm);
            }
@@ -319,7 +320,7 @@ public class AdminEffects implements IAdminCommandHandler
                          NpcInfo info1 = new NpcInfo((L2NpcInstance)player, null);
                          player.broadcastPacket(info1);
                      }
-                     SystemMessage smA = new SystemMessage(SystemMessage.S1_S2);
+                     SystemMessage smA = new SystemMessage(SystemMessageId.S1_S2);
      			     smA.addString("SYS");
     				 smA.addString("將名稱從 "+ oldName +" 改為 "+ name +".");	 
                      activeChar.sendPacket(smA);
@@ -360,7 +361,7 @@ public class AdminEffects implements IAdminCommandHandler
                        player.setTeam(0);
                        if (teamVal != 0)
                        {
-                           SystemMessage sm = new SystemMessage(614);
+                           SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
                            sm.addString("SYS");
                            sm.addString("加入隊伍 " + teamVal);
                            player.sendPacket(sm);
@@ -388,7 +389,8 @@ public class AdminEffects implements IAdminCommandHandler
            if (teamVal != 0)
            {
 
-               SystemMessage sm = new SystemMessage(614);
+               SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
+
 				sm.addString("SYS");
 				sm.addString("加入隊伍 " + teamVal);
                player.sendPacket(sm);
@@ -413,7 +415,7 @@ public class AdminEffects implements IAdminCommandHandler
                         L2PcInstance player = L2World.getInstance().getPlayer(target);
                         if (player != null)
                         {
-                            if (perform_social(social,player))
+                            if (performSocial(social,player))
                                 activeChar.sendMessage(player.getName()+" was affected by your request.");
                         }
                         else
@@ -423,7 +425,7 @@ public class AdminEffects implements IAdminCommandHandler
                                 int radius = Integer.parseInt(target);
                                 for (L2Object object : activeChar.getKnownList().getKnownObjects().values())
                                    if (activeChar.isInsideRadius(object, radius, false, false))
-                                       perform_social(social,object);
+                                       performSocial(social,object);
                                 activeChar.sendMessage(radius+ " units radius affected by your request.");
                             }
                             catch (NumberFormatException nbe)
@@ -439,7 +441,7 @@ public class AdminEffects implements IAdminCommandHandler
                         obj = activeChar;
                     if (obj != null) 
                     {
-                        if (perform_social(social,obj))
+                        if (performSocial(social,obj))
                              activeChar.sendMessage(obj.getName()+ " was affected by your request.");
                     }
                     else
@@ -488,7 +490,7 @@ public class AdminEffects implements IAdminCommandHandler
        return true;
    }
    
-   private boolean perform_social(int action, L2Object target)
+   private boolean performSocial(int action, L2Object target)
    {
        try
        {
@@ -508,7 +510,7 @@ public class AdminEffects implements IAdminCommandHandler
 
    public String[] getAdminCommandList()
    {
-       return _adminCommands;
+       return ADMIN_COMMANDS;
    }
 
    private boolean checkLevel(int level)

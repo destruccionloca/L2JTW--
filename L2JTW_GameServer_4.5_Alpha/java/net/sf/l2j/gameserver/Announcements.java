@@ -35,6 +35,7 @@ import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.clientpackets.Say2;
 import net.sf.l2j.gameserver.model.L2World;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.script.DateRange;
 import net.sf.l2j.gameserver.serverpackets.CreatureSay;
 import net.sf.l2j.gameserver.serverpackets.NpcHtmlMessage;
@@ -53,7 +54,9 @@ public class Announcements
 	private List<String> _announcements = new FastList<String>();
 
 	private List<String> _announcecycle = new FastList<String>();
-	private List<List<Object>> eventAnnouncements = new FastList<List<Object>>();
+
+	private List<List<Object>> _eventAnnouncements = new FastList<List<Object>>();
+
 	private int _announcecyclesize = 0;
 
 
@@ -133,13 +136,13 @@ public class Announcements
 	{
 		for (int i = 0; i < _announcements.size(); i++)//修改為限定公告行數設置 by game
 		{
-			CreatureSay cs = new CreatureSay(0, Say2.ANNOUNCEMENT, activeChar.getName(), _announcements.get(i).toString());
+			CreatureSay cs = new CreatureSay(0, Say2.ANNOUNCEMENT, activeChar.getName(), _announcements.get(i));
 			activeChar.sendPacket(cs);
 		}
 		
-		for (int i = 0; i < eventAnnouncements.size(); i++)
+		for (int i = 0; i < _eventAnnouncements.size(); i++)
 		{
-		    List<Object> entry   = eventAnnouncements.get(i);
+		    List<Object> entry   = _eventAnnouncements.get(i);
             
             DateRange validDateRange  = (DateRange)entry.get(0);
             String[] msg              = (String[])entry.get(1);
@@ -147,7 +150,7 @@ public class Announcements
 		    
 		    if (!validDateRange.isValid() || validDateRange.isWithinRange(currentDate))
 		    {
-                SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);
+                SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
                 for (int j=0; j<msg.length; j++)
                 {
                     sm.addString(msg[j]);
@@ -183,7 +186,7 @@ public class Announcements
 	    List<Object> entry = new FastList<Object>();
 	    entry.add(validDateRange);
 	    entry.add(msg);
-	    eventAnnouncements.add(entry);
+	    _eventAnnouncements.add(entry);
 	}
 	
     /** 開啟公告發布功能頁*/
@@ -209,12 +212,14 @@ public class Announcements
 		replyMSG.append("<br>");
 		for (int i = 0; i < _announcements.size(); i++)
 		{
+
 			replyMSG.append("<table width=260><tr><td>");
 			replyMSG.append(_announcements.get(i).toString());
 			replyMSG.append("</td></tr><tr><td>");
 			replyMSG.append("<button value=\"單項公告\" action=\"bypass -h admin_one_announcement " + i + "\" width=60 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
 			replyMSG.append("&nbsp;&nbsp;&nbsp;<td><button value=\"刪除\" action=\"bypass -h admin_del_announcement " + i + "\" width=60 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
 			replyMSG.append("</td></tr></table>");
+
 		}
 		replyMSG.append("</body></html>");
 		
@@ -322,7 +327,7 @@ public class Announcements
 			save = new FileWriter(file);
 			for (int i = 0; i < _announcements.size(); i++)
 			{
-				save.write(_announcements.get(i).toString());
+				save.write(_announcements.get(i));
 				save.write("\r\n");
 			}
 			save.flush();

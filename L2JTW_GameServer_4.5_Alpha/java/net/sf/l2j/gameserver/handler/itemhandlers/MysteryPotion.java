@@ -23,6 +23,7 @@ import net.sf.l2j.gameserver.handler.IItemHandler;
 import net.sf.l2j.gameserver.model.L2ItemInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PlayableInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.MagicSkillUser;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
@@ -34,10 +35,10 @@ import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
 public class MysteryPotion implements IItemHandler
 {
-    private static int[] _itemIds = { 5234 };
-    private static final short BIGHEAD_EFFECT = 0x2000;
+    private static final int[] ITEM_IDS = { 5234 };
+    private static final int BIGHEAD_EFFECT = 0x2000;
     private static final int MYSTERY_POTION_SKILL = 2103;
-    private final int _effectDuration = 1200000; // 20 mins
+    private static final int EFFECT_DURATION = 1200000; // 20 mins
 
 	public void useItem(L2PlayableInstance playable, L2ItemInstance item)
 	{
@@ -54,12 +55,12 @@ public class MysteryPotion implements IItemHandler
 		activeChar.startAbnormalEffect(BIGHEAD_EFFECT);
 		activeChar.destroyItem("Consume", item.getObjectId(), 1, null, false);
 
-		SystemMessage sm = new SystemMessage(46);
+		SystemMessage sm = new SystemMessage(SystemMessageId.USE_S1);
 		sm.addSkillName(MYSTERY_POTION_SKILL);
 		activeChar.sendPacket(sm);
 
 		MysteryPotionStop mp = new MysteryPotionStop(playable);
-		ThreadPoolManager.getInstance().scheduleEffect(mp, _effectDuration);
+		ThreadPoolManager.getInstance().scheduleEffect(mp, EFFECT_DURATION);
     }
 
 	public class MysteryPotionStop implements Runnable
@@ -85,6 +86,6 @@ public class MysteryPotion implements IItemHandler
 
     public int[] getItemIds()
     {
-        return _itemIds;
+        return ITEM_IDS;
     }
 }

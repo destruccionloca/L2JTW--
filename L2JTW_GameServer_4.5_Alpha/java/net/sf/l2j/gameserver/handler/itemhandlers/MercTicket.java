@@ -28,7 +28,7 @@ import net.sf.l2j.gameserver.model.entity.Castle;
 
 public class MercTicket implements IItemHandler
 {
-    private static String[] _Messages = {
+    private static final String[] MESSAGES = {
                                          "為了榮耀!",
                                          "已經準備好了我的君主,只差時間還未到.",
                                          "你召喚了我."
@@ -98,7 +98,7 @@ public class MercTicket implements IItemHandler
 
         }
  
-        int npcId = MercTicketManager.getInstance().addTicket(item.getItemId(), activeChar, _Messages);
+        int npcId = MercTicketManager.getInstance().addTicket(item.getItemId(), activeChar, MESSAGES);
         activeChar.destroyItem("Consume", item.getObjectId(), 1, null, false); // Remove item from char's inventory
         activeChar.sendMessage("傭兵聘請 ("+itemId+","+npcId+") 位置:" + activeChar.getX() + "," + activeChar.getY() + "," + activeChar.getZ() + " 面向:" + activeChar.getHeading());
     }

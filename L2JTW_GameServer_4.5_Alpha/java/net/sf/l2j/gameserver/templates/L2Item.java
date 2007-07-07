@@ -113,9 +113,9 @@ public abstract class L2Item
 	public static final int CRYSTAL_A = 0x04; // ??
 	public static final int CRYSTAL_S = 0x05; // ??
 	
-    public static final int[] crystalItemId = {0, 1458, 1459, 1460, 1461, 1462};
-    public static final int[] crystalEnchantBonusArmor = {0, 11, 6, 11, 19, 25};
-    public static final int[] crystalEnchantBonusWeapon = {0, 90, 45, 67, 144, 250};
+    private static final int[] crystalItemId = {0, 1458, 1459, 1460, 1461, 1462};
+    private static final int[] crystalEnchantBonusArmor = {0, 11, 6, 11, 19, 25};
+    private static final int[] crystalEnchantBonusWeapon = {0, 90, 45, 67, 144, 250};
 
 	private final int _itemId;
 	private final String _name;
@@ -126,7 +126,7 @@ public abstract class L2Item
 	private final boolean _stackable;
 	private final int _materialType;
 	private final int _crystalType; // default to none-grade 
-	private final int _durability;
+	private final int _duration;
 	private final int _bodyPart;
 	private final int _referencePrice;
 	private final int _crystalCount;
@@ -155,7 +155,7 @@ public abstract class L2Item
 	 * <LI>_crystallizable</LI>
 	 * <LI>_stackable</LI>
 	 * <LI>_materialType & _crystalType & _crystlaCount</LI>
-	 * <LI>_durability</LI>
+	 * <LI>_duration</LI>
 	 * <LI>_bodypart</LI>
 	 * <LI>_referencePrice</LI>
 	 * <LI>_sellable</LI>
@@ -174,7 +174,7 @@ public abstract class L2Item
 		_stackable      = set.getBool("stackable", false);
 		_materialType   = set.getInteger("material");
 		_crystalType    = set.getInteger("crystal_type", CRYSTAL_NONE); // default to none-grade 
-		_durability     = set.getInteger("durability");
+		_duration     = set.getInteger("duration");
 		_bodyPart       = set.getInteger("bodypart");
 		_referencePrice = set.getInteger("price");
 		_crystalCount   = set.getInteger("crystal_count", 0);
@@ -194,12 +194,12 @@ public abstract class L2Item
 	}
 	
 	/**
-	 * Returns the durability of th item
+	 * Returns the duration of the item
 	 * @return int
 	 */
-	public final int getDurability()
+	public final int getDuration()
 	{
-		return _durability;
+		return _duration;
 	}
 
 	/**
@@ -447,9 +447,9 @@ public abstract class L2Item
     	List<Func> funcs = new FastList<Func>();
 		for (FuncTemplate t : _funcTemplates) {
 	    	Env env = new Env();
-	    	env._player = player;
-	    	env._target = player;
-	    	env._item = instance;
+	    	env.player = player;
+	    	env.target = player;
+	    	env.item = instance;
 	    	Func f = t.getFunc(env, this); // skill is owner
 	    	if (f != null)
 	    		funcs.add(f);
@@ -472,9 +472,9 @@ public abstract class L2Item
     	List<L2Effect> effects = new FastList<L2Effect>();
 		for (EffectTemplate et : _effectTemplates) {
 	    	Env env = new Env();
-	    	env._player = player;
-	    	env._target = player;
-	    	env._item = instance;
+	    	env.player = player;
+	    	env.target = player;
+	    	env.item = instance;
 	    	L2Effect e = et.getEffect(env);
 	    	if (e != null)
 	    		effects.add(e);

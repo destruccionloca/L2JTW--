@@ -49,6 +49,11 @@ public class PcInventory extends Inventory
 	 */
 	public L2ItemInstance[] getUniqueItems(boolean allowAdena, boolean allowAncientAdena)
 	{
+		return getUniqueItems(allowAdena, allowAncientAdena, true);
+	}
+	
+	public L2ItemInstance[] getUniqueItems(boolean allowAdena, boolean allowAncientAdena, boolean onlyAvailable)
+	{
 		List<L2ItemInstance> list = new FastList<L2ItemInstance>();
 		for (L2ItemInstance item : _items)
 		{
@@ -66,7 +71,7 @@ public class PcInventory extends Inventory
 					break;
 				}
 			}
-			if (!isDuplicate && item.getItem().isSellable() && item.isAvailable(getOwner(), false)) list.add(item);
+			if (!isDuplicate && (!onlyAvailable || (item.getItem().isSellable() && item.isAvailable(getOwner(), false)))) list.add(item);
 		}
 
 		return list.toArray(new L2ItemInstance[list.size()]);
@@ -78,6 +83,11 @@ public class PcInventory extends Inventory
 	 * @return L2ItemInstance : items in inventory
 	 */
 	public L2ItemInstance[] getUniqueItemsByEnchantLevel(boolean allowAdena, boolean allowAncientAdena)
+	{
+		return getUniqueItemsByEnchantLevel(allowAdena, allowAncientAdena, true);
+	}
+	
+	public L2ItemInstance[] getUniqueItemsByEnchantLevel(boolean allowAdena, boolean allowAncientAdena, boolean onlyAvailable)
 	{
 		List<L2ItemInstance> list = new FastList<L2ItemInstance>();
 		for (L2ItemInstance item : _items)
@@ -94,7 +104,7 @@ public class PcInventory extends Inventory
 					isDuplicate = true;
 					break;
 				}
-			if (!isDuplicate && item.getItem().isSellable() && item.isAvailable(getOwner(), false)) list.add(item);
+			if (!isDuplicate && (!onlyAvailable || (item.getItem().isSellable() && item.isAvailable(getOwner(), false)))) list.add(item);
 		}
 
 		return list.toArray(new L2ItemInstance[list.size()]);
@@ -448,7 +458,7 @@ public class PcInventory extends Inventory
 	/**
 	 * Refresh the weight of equipment loaded
 	 */
-	protected void refreshWeight()
+	public void refreshWeight()
 	{
 		super.refreshWeight();
 		getOwner().refreshOverloaded();
@@ -484,6 +494,9 @@ public class PcInventory extends Inventory
             	paperdoll[slot][1] = invdata.getInt("item_id");
 				paperdoll[slot][2] = invdata.getInt("enchant_level");
             }
+            
+            invdata.close();
+            statement2.close();
         } 
         catch (Exception e) {
 			_log.log(Level.WARNING, "could not restore inventory:", e);

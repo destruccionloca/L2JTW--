@@ -27,6 +27,7 @@ import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2Spawn;
 import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
 /**
@@ -38,7 +39,7 @@ public class AdminDelete implements IAdminCommandHandler
 {
     //private static Logger _log = Logger.getLogger(AdminDelete.class.getName());
 
-    private static String[] _adminCommands = {"admin_delete"};
+    private static final String[] ADMIN_COMMANDS = {"admin_delete"};
 
     private static final int REQUIRED_LEVEL = Config.GM_NPC_EDIT;
 
@@ -57,7 +58,7 @@ public class AdminDelete implements IAdminCommandHandler
 
     public String[] getAdminCommandList()
     {
-        return _adminCommands;
+        return ADMIN_COMMANDS;
     }
 
     private boolean checkLevel(int level)
@@ -85,14 +86,14 @@ public class AdminDelete implements IAdminCommandHandler
                 else SpawnTable.getInstance().deleteSpawn(spawn, true);
             }
 
-            SystemMessage sm = new SystemMessage(614);
+            SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
             sm.addString("SYS");
             sm.addString("刪除 " + target.getName() + " 從 " + target.getObjectId() + ".");
             activeChar.sendPacket(sm);
         }
         else
         {
-            SystemMessage sm = new SystemMessage(614);
+            SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
             sm.addString("SYS");
             sm.addString("錯誤目標");
             activeChar.sendPacket(sm);

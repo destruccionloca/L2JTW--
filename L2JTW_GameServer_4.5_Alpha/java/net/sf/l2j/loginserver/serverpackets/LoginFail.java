@@ -31,7 +31,10 @@ public final class LoginFail extends L2LoginServerPacket
 		REASON_USER_OR_PASS_WRONG	(0x03),
 		REASON_ACCESS_FAILED		(0x04),
 		REASON_ACCOUNT_IN_USE		(0x07),
-		REASON_ACCOUNT_BANNED		(0x09);
+		REASON_SERVER_OVERLOADED	(0x0f),
+		REASON_SERVER_MAINTENANCE	(0x10),
+		REASON_TEMP_PASS_EXPIRED	(0x11),
+		REASON_DUAL_BOX				(0x23);
 		
 		private final int _code;
 		

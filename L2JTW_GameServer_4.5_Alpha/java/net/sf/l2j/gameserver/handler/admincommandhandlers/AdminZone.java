@@ -42,7 +42,7 @@ import net.sf.l2j.gameserver.model.entity.ZoneType;
 public class AdminZone implements IAdminCommandHandler
 {
     private static final int REQUIRED_LEVEL = Config.GM_TEST;
-    public static final String[] ADMIN_ZONE_COMMANDS =
+    private static final String[] ADMIN_COMMANDS =
     {
         "admin_zone_check", "admin_zone_reload"
     };
@@ -115,7 +115,7 @@ public class AdminZone implements IAdminCommandHandler
      */
     public String[] getAdminCommandList()
     {
-        return ADMIN_ZONE_COMMANDS;
+        return ADMIN_COMMANDS;
     }
 
 }

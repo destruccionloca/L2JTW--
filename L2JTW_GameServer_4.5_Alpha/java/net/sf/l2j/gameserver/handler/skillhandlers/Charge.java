@@ -39,6 +39,8 @@ public class Charge implements ISkillHandler
 	
 
 
+
+
 	public void useSkill(L2Character activeChar, L2Skill skill, L2Object[] targets)
 	{
 		
@@ -61,7 +63,7 @@ public class Charge implements ISkillHandler
 
 	public SkillType[] getSkillIds()
 	{
-		return _skillIds;
+		return SKILL_IDS;
 	}
 }
 */

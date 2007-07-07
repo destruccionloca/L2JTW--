@@ -37,6 +37,7 @@ import net.sf.l2j.gameserver.model.L2Effect;
 import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.model.L2Skill.SkillTargetType;
+import net.sf.l2j.gameserver.model.actor.instance.L2ChestInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2DoorInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2FestivalMonsterInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2FolkInstance;
@@ -77,16 +78,16 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
     private static final int MAX_ATTACK_TIMEOUT = 300; // int ticks, i.e. 30 seconds 
 
     /** The L2Attackable AI task executed every 1s (call onEvtThink method)*/
-    private Future aiTask;
+    private Future _aiTask;
 
     /** The delay after wich the attacked is stopped */
-    private int _attack_timeout;
+    private int _attackTimeout;
 
     /** The L2Attackable aggro counter */
     private int _globalAggro;
 
     /** The flag used to indicate that a thinking action is in progress */
-    private boolean thinking; // to prevent recursive thinking
+    private boolean _thinking; // to prevent recursive thinking
 
     private int enemyRange;
     
@@ -105,7 +106,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
     {
         super(accessor);
 
-        _attack_timeout = Integer.MAX_VALUE;
+        _attackTimeout = Integer.MAX_VALUE;
         _globalAggro = -10; // 10 seconds timeout of ATTACK after respawn
         enemyRange = ((L2Attackable) _actor).getEnemyRange();
     }
@@ -374,18 +375,18 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
     public void startAITask()
     {
         // If not idle - create an AI task (schedule onEvtThink repeatedly)
-        if (aiTask == null)
+        if (_aiTask == null)
         {
-            aiTask = ThreadPoolManager.getInstance().scheduleAiAtFixedRate(this, 1000, 1000);
+            _aiTask = ThreadPoolManager.getInstance().scheduleAiAtFixedRate(this, 1000, 1000);
         }
     }
 
     public void stopAITask()
     {
-        if (aiTask != null)
+        if (_aiTask != null)
         {
-            aiTask.cancel(false);
-            aiTask = null;
+            _aiTask.cancel(false);
+            _aiTask = null;
         }
     }
 
@@ -424,10 +425,10 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
                 super.changeIntention(AI_INTENTION_IDLE, null, null);
 
                 // Stop AI task and detach AI from NPC
-                if (aiTask != null)
+                if (_aiTask != null)
                 {
-                    aiTask.cancel(true);
-                    aiTask = null;
+                    _aiTask.cancel(true);
+                    _aiTask = null;
                 }
 
                 // Cancel the AI
@@ -453,7 +454,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
     protected void onIntentionAttack(L2Character target)
     {
         // Calculate the attack timeout
-        _attack_timeout = MAX_ATTACK_TIMEOUT + GameTimeController.getGameTicks();
+        _attackTimeout = MAX_ATTACK_TIMEOUT + GameTimeController.getGameTicks();
 
         // Manage the Attack Intention : Stop current Attack (if necessary), Start a new Attack and Launch Think Event
         super.onIntentionAttack(target);
@@ -742,6 +743,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
      */
     private void thinkAttack()
     {
+
     	
     	
     	
@@ -843,7 +845,8 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
     	
         if(_actor.isAttackingDisabled()) return;
         
-        if (_attack_timeout < GameTimeController.getGameTicks())
+        if (_attackTimeout < GameTimeController.getGameTicks())
+
         {
             // Check if the actor is running
             if (_actor.isRunning())
@@ -852,13 +855,13 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
                 _actor.setWalking();
 
                 // Calculate a new attack timeout
-                _attack_timeout = MAX_ATTACK_TIMEOUT + GameTimeController.getGameTicks();
+                _attackTimeout = MAX_ATTACK_TIMEOUT + GameTimeController.getGameTicks();
             }
         }
 
         // Check if target is dead or if timeout is expired to stop this attack
         if (getAttackTarget() == null || getAttackTarget().isAlikeDead()
-            || _attack_timeout < GameTimeController.getGameTicks())
+            || _attackTimeout < GameTimeController.getGameTicks())
         {
             // Stop hating this target after the attack timeout or if target is dead
             if (getAttackTarget() != null)
@@ -873,7 +876,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
             }
 
             // Cancel target and timeout
-            _attack_timeout = Integer.MAX_VALUE;
+            _attackTimeout = Integer.MAX_VALUE;
            
             // Set the AI Intention to AI_INTENTION_ACTIVE
             setIntention(AI_INTENTION_ACTIVE);
@@ -1005,10 +1008,46 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
                         else
                         posX=hated.getX()-Rnd.get(50);
                         
+<<<<<<< .mine
                         if (Rnd.get(2)>1)
                         posY=hated.getY() + Rnd.get(50);
                         else
                         posY=hated.getY()-Rnd.get(50);
+=======
+                        if (((sk.getSkillType() == L2Skill.SkillType.BUFF || sk.getSkillType() == L2Skill.SkillType.HEAL) || (dist2 >= castRange * castRange / 9.0)
+                            && (dist2 <= castRange * castRange) && (castRange > 70))
+                            && !_actor.isSkillDisabled(sk.getId())
+                            && _actor.getCurrentMp() >= _actor.getStat().getMpConsume(sk)
+                            && !sk.isPassive()
+                            && Rnd.nextInt(100) <= 5)
+                        {
+                            L2Object OldTarget = _actor.getTarget();
+                            if (sk.getSkillType() == L2Skill.SkillType.BUFF
+                                || sk.getSkillType() == L2Skill.SkillType.HEAL)
+                            {
+                                boolean useSkillSelf = true;
+                                if (sk.getSkillType() == L2Skill.SkillType.HEAL
+                                    && _actor.getCurrentHp() > (int) (_actor.getMaxHp() / 1.5))
+                                {
+                                    useSkillSelf = false;
+                                    break;
+                                }
+                                if (sk.getSkillType() == L2Skill.SkillType.BUFF)
+                                {
+                                    L2Effect[] effects = _actor.getAllEffects();
+                                    for (int i = 0; effects != null && i < effects.length; i++)
+                                    {
+                                        L2Effect effect = effects[i];
+                                        if (effect.getSkill() == sk)
+                                        {
+                                            useSkillSelf = false;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (useSkillSelf) _actor.setTarget(_actor);
+                            }
+>>>>>>> .r971
 
                         moveTo(posX, posY, posZ);
                         return;
@@ -1025,6 +1064,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
             // Primary Attack - Skill
             if (((L2Attackable) _actor).getPrimaryAttack()>0)
             {
+
             	//Skill Chance
             	if (Rnd.nextInt(100)<=((L2Attackable) _actor).getSkillChance())
             	{
@@ -1039,6 +1079,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
             			TargetReconsider(_actor);
             			return;
             		}
+
 
                     if (hated.isMoving()) range -= 100; if (range < 5) range = 5; 
         			//_accessor.moveTo(hated.getX(), hated.getY(), hated.getZ());	
@@ -1901,10 +1942,10 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
     protected void onEvtThink()
     {
         // Check if the actor can't use skills and if a thinking action isn't already in progress
-        if (thinking || _actor.isAllSkillsDisabled()) return;
+        if (_thinking || _actor.isAllSkillsDisabled()) return;
 
         // Start thinking action
-        thinking = true;
+        _thinking = true;
 
         try
         {
@@ -1915,7 +1956,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         finally
         {
             // Stop thinking action
-            thinking = false;
+            _thinking = false;
         }
     }
 
@@ -1932,8 +1973,14 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
      */
     protected void onEvtAttacked(L2Character attacker)
     {
+    	if (_actor instanceof L2ChestInstance && !((L2ChestInstance)_actor).isOpenFailed())
+    	{
+    		((L2ChestInstance)_actor).deleteMe();
+    		((L2ChestInstance)_actor).getSpawn().startRespawn();
+    	}
+    	
         // Calculate the attack timeout
-        _attack_timeout = MAX_ATTACK_TIMEOUT + GameTimeController.getGameTicks();
+        _attackTimeout = MAX_ATTACK_TIMEOUT + GameTimeController.getGameTicks();
 
         // Set the _globalAggro to 0 to permit attack even just after spawn
         if (_globalAggro < 0) _globalAggro = 0;

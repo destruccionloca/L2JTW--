@@ -25,6 +25,7 @@ import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.handler.IAdminCommandHandler;
 import net.sf.l2j.gameserver.model.GMAudit;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.ItemList;
 import net.sf.l2j.gameserver.serverpackets.NpcHtmlMessage;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
@@ -38,7 +39,7 @@ import net.sf.l2j.gameserver.serverpackets.SystemMessage;
  */
 public class AdminCreateItem implements IAdminCommandHandler {
 
-	private static String[] _adminCommands = {
+	private static final String[] ADMIN_COMMANDS = {
 			"admin_itemcreate",
 			"admin_create_item"
 			};
@@ -79,13 +80,13 @@ public class AdminCreateItem implements IAdminCommandHandler {
 			}
 			catch (StringIndexOutOfBoundsException e)
 			{
-				SystemMessage sm = new SystemMessage(614);
+				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 				sm.addString("SYS");
 				sm.addString("物品創造失敗");
 				activeChar.sendPacket(sm);
 			} catch (NumberFormatException nfe)
 			{
-				SystemMessage sm = new SystemMessage(614);
+				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 				sm.addString("Wrong number entered.");
 				activeChar.sendPacket(sm);
 			}
@@ -96,7 +97,7 @@ public class AdminCreateItem implements IAdminCommandHandler {
 	}
 	
 	public String[] getAdminCommandList() {
-		return _adminCommands;
+		return ADMIN_COMMANDS;
 	}
 	
 	private boolean checkLevel(int level) {
@@ -110,7 +111,7 @@ public class AdminCreateItem implements IAdminCommandHandler {
 		ItemList il = new ItemList(activeChar, true);
 		activeChar.sendPacket(il);
 		
-		SystemMessage sm = new SystemMessage(614);
+		SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 		sm.addString("SYS");
 		sm.addString("創造" + num + "個編號" + id + "的物品.");
 		activeChar.sendPacket(sm);

@@ -24,6 +24,7 @@ import net.sf.l2j.gameserver.model.L2ItemInstance;
 import net.sf.l2j.gameserver.model.L2RecipeList;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PlayableInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
 /**
@@ -34,15 +35,15 @@ import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
 public class Recipes implements IItemHandler
 {
-    private static int[] _itemIds = null;
+    private final int[] ITEM_IDS;
 
     public Recipes()
     {
         RecipeController rc = RecipeController.getInstance();
-        _itemIds = new int[rc.getRecipesCount()];
+        ITEM_IDS = new int[rc.getRecipesCount()];
         for (int i = 0; i < rc.getRecipesCount(); i++)
         {
-            _itemIds[i] = rc.getRecipeList(i).getRecipeId();
+        	ITEM_IDS[i] = rc.getRecipeList(i).getRecipeId();
         }
     }
 
@@ -54,7 +55,7 @@ public class Recipes implements IItemHandler
         L2RecipeList rp = RecipeController.getInstance().getRecipeByItemId(item.getItemId()); 
      	if (activeChar.hasRecipeList(rp.getId())) 
         {
-     		SystemMessage sm = new SystemMessage(SystemMessage.RECIPE_ALREADY_REGISTERED); 
+     		SystemMessage sm = new SystemMessage(SystemMessageId.RECIPE_ALREADY_REGISTERED); 
      	 	activeChar.sendPacket(sm); 
         }
         else
@@ -66,13 +67,13 @@ public class Recipes implements IItemHandler
 			    if (rp.getLevel()>activeChar.getDwarvenCraft())
 			    {
 				//can't add recipe, becouse create item level too low
-        			SystemMessage sm = new SystemMessage(404); 
+        			SystemMessage sm = new SystemMessage(SystemMessageId.CREATE_LVL_TOO_LOW_TO_REGISTER); 
         			activeChar.sendPacket(sm); 
 			    }
 			    else if (activeChar.getDwarvenRecipeBook().length >= activeChar.GetDwarfRecipeLimit())
 				{
 					//Up to $s1 recipes can be registered.
-					SystemMessage sm = new SystemMessage(894);
+					SystemMessage sm = new SystemMessage(SystemMessageId.UP_TO_S1_RECIPES_CAN_REGISTER);
 					sm.addNumber(activeChar.GetDwarfRecipeLimit());
         			activeChar.sendPacket(sm);
 				}
@@ -80,7 +81,7 @@ public class Recipes implements IItemHandler
 			    {
         			activeChar.registerDwarvenRecipeList(rp); 
         			activeChar.destroyItem("Consume", item.getObjectId(), 1, null, false); 
-        			SystemMessage sm = new SystemMessage(614); 
+        			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2); 
         			sm.addString("SYS"); 
         			sm.addString("增加 \"" + rp.getRecipeName() + "\" 製作資料到製作書內"); 
         			activeChar.sendPacket(sm); 
@@ -88,7 +89,7 @@ public class Recipes implements IItemHandler
         		} 
         		else 
         		{ 
-        			SystemMessage sm = new SystemMessage(SystemMessage.CANT_REGISTER_NO_ABILITY_TO_CRAFT); 
+        			SystemMessage sm = new SystemMessage(SystemMessageId.CANT_REGISTER_NO_ABILITY_TO_CRAFT); 
         			activeChar.sendPacket(sm); 
         		} 
         	} 
@@ -99,13 +100,13 @@ public class Recipes implements IItemHandler
 			    if (rp.getLevel()>activeChar.getCommonCraft())
 			    {
 				//can't add recipe, becouse create item level too low
-        			SystemMessage sm = new SystemMessage(404); 
+        			SystemMessage sm = new SystemMessage(SystemMessageId.CREATE_LVL_TOO_LOW_TO_REGISTER); 
         			activeChar.sendPacket(sm); 
 			    }
 			    else if (activeChar.getCommonRecipeBook().length >= activeChar.GetCommonRecipeLimit())
 				{
 					//Up to $s1 recipes can be registered.
-					SystemMessage sm = new SystemMessage(894);
+					SystemMessage sm = new SystemMessage(SystemMessageId.UP_TO_S1_RECIPES_CAN_REGISTER);
 					sm.addNumber(activeChar.GetCommonRecipeLimit());
         			activeChar.sendPacket(sm);
 				}
@@ -113,7 +114,7 @@ public class Recipes implements IItemHandler
 			    {
         			activeChar.registerCommonRecipeList(rp); 
         			activeChar.destroyItem("Consume", item.getObjectId(), 1, null, false); 
-        			SystemMessage sm = new SystemMessage(614); 
+        			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2); 
         			sm.addString("SYS"); 
         			sm.addString("增加 \"" + rp.getRecipeName() + "\" 製作資料到製作書內"); 
         			activeChar.sendPacket(sm); 
@@ -121,7 +122,7 @@ public class Recipes implements IItemHandler
         		} 
         		else 
         		{ 
-        			SystemMessage sm = new SystemMessage(SystemMessage.CANT_REGISTER_NO_ABILITY_TO_CRAFT); 
+        			SystemMessage sm = new SystemMessage(SystemMessageId.CANT_REGISTER_NO_ABILITY_TO_CRAFT); 
         			activeChar.sendPacket(sm); 
         		} 
         	}
@@ -130,6 +131,6 @@ public class Recipes implements IItemHandler
 
     public int[] getItemIds()
     {
-        return _itemIds;
+        return ITEM_IDS;
     }
 }

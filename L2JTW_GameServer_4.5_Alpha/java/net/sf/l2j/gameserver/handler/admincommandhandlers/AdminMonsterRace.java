@@ -23,6 +23,7 @@ import net.sf.l2j.gameserver.MonsterRace;
 import net.sf.l2j.gameserver.ThreadPoolManager;
 import net.sf.l2j.gameserver.handler.IAdminCommandHandler;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.DeleteObject;
 import net.sf.l2j.gameserver.serverpackets.MonRaceInfo;
 import net.sf.l2j.gameserver.serverpackets.PlaySound;
@@ -38,7 +39,7 @@ public class AdminMonsterRace implements IAdminCommandHandler
 {
     //private static Logger _log = Logger.getLogger(AdminMonsterRace.class.getName());
 
-    private static String[] _adminCommands = {"admin_mons"};
+    private static final String[] ADMIN_COMMANDS = {"admin_mons"};
 
     private static final int REQUIRED_LEVEL = Config.GM_MONSTERRACE;
     protected static int state = -1;
@@ -62,7 +63,7 @@ public class AdminMonsterRace implements IAdminCommandHandler
 
     public String[] getAdminCommandList()
     {
-        return _adminCommands;
+        return ADMIN_COMMANDS;
     }
 
     private boolean checkLevel(int level)
@@ -97,7 +98,7 @@ public class AdminMonsterRace implements IAdminCommandHandler
         else if (state == 0)
         {
             state++;
-            SystemMessage sm = new SystemMessage(824);
+            SystemMessage sm = new SystemMessage(SystemMessageId.MONSRACE_RACE_START);
             sm.addNumber(0);
             activeChar.sendPacket(sm);
             PlaySound SRace = new PlaySound(1, "S_Race", 0, 0, 0, 0, 0);

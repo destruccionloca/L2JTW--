@@ -41,7 +41,7 @@ import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
  */
 public final class Config 
 {
-	protected static Logger _log = Logger.getLogger(Config.class.getName());
+	protected static final Logger _log = Logger.getLogger(Config.class.getName());
 	/** Debug/release mode */
     public static boolean DEBUG;
     /** Enable/disable assertions */
@@ -56,6 +56,8 @@ public final class Config
     public static int PORT_GAME;
     /** Login Server port */
     public static int PORT_LOGIN;
+    /** Login Server bind ip */
+    public static String LOGIN_BIND_ADDRESS;
     /** Number of trys of login before ban */
     public static int LOGIN_TRY_BEFORE_BAN;
     /** Hostname of the Game Server */
@@ -124,6 +126,8 @@ public final class Config
     public static double ALT_GAME_CREATION_XP_RATE;
     /** Alternative game crafting SP rate multiplier - default 1*/
     public static double ALT_GAME_CREATION_SP_RATE;
+    /** Alternative setting to blacksmith use of recipes to craft - default true*/
+    public static boolean ALT_BLACKSMITH_USE_RECIPES;
     
     
     /** Alternative game skill learning */
@@ -145,9 +149,6 @@ public final class Config
 
     /** Alternative game mob ATTACK AI */
     public static boolean ALT_GAME_MOB_ATTACK_AI;
-    
-    /** Alternative success rate formulas for skills such root/sleep/stun */
-    public static String ALT_GAME_SKILL_FORMULAS;
     
     /** Alternative freight modes - Freights can be withdrawed from any village */
     public static boolean ALT_GAME_FREIGHTS;
@@ -535,6 +536,9 @@ public final class Config
     /** Revision of L2Walker */
     public static int             L2WALKER_REVISION;
 
+    /** FloodProtector initial capacity */
+    public static int			  FLOODPROTECTOR_INITIALSIZE;
+    
     /** Allow Discard item ?*/
     public static boolean         ALLOW_DISCARDITEM;
     /** Allow freight ? */
@@ -716,24 +720,6 @@ public final class Config
     public static int WAREHOUSE_SLOTS_CLAN;
     /** Maximum inventory slots limits for freight */
     public static int FREIGHT_SLOTS;
-    
-    // Spoil Rates
-    /** Allow spoil on lower level mobs than the character */
-    public static boolean CAN_SPOIL_LOWER_LEVEL_MOBS;
-    /** Allow delevel and spoil mob ? */
-    public static boolean CAN_DELEVEL_AND_SPOIL_MOBS;
-    /** Maximum level difference between player and mob level */
-    public static float   MAXIMUM_PLAYER_AND_MOB_LEVEL_DIFFERENCE;
-    /** Base rate for spoil */
-    public static float   BASE_SPOIL_RATE;
-    /** Minimum spoil rate */
-    public static float   MINIMUM_SPOIL_RATE;
-    /** Maximum level difference between player and spoil level to allow before decreasing spoil chance */
-    public static float   SPOIL_LEVEL_DIFFERENCE_LIMIT;
-    /** Spoil level multiplier */
-    public static float   SPOIL_LEVEL_DIFFERENCE_MULTIPLIER;
-    /** Last level spoil learned */
-    public static int     LAST_LEVEL_SPOIL_IS_LEARNED;
     
     // Karma System Variables
     /** Minimum karma gain/loss */
@@ -1115,7 +1101,7 @@ public final class Config
      */
 	public static void load()
 	{
-		if(Server.SERVER_MODE == Server.MODE_GAMESERVER)
+		if(Server.serverMode == Server.MODE_GAMESERVER)
 		{
 			_log.info("loading gameserver config");
 		    try {
@@ -1217,6 +1203,7 @@ public final class Config
                 ALLOW_RACE                      = Boolean.valueOf(optionsSettings.getProperty("AllowRace", "False"));
                 ALLOW_WATER                     = Boolean.valueOf(optionsSettings.getProperty("AllowWater", "False"));
                 ALLOW_RENTPET                   = Boolean.valueOf(optionsSettings.getProperty("AllowRentPet", "False"));
+                FLOODPROTECTOR_INITIALSIZE		= Integer.parseInt(optionsSettings.getProperty("FloodProtectorInitialSize", "50"));
                 ALLOW_DISCARDITEM               = Boolean.valueOf(optionsSettings.getProperty("AllowDiscardItem", "True"));
                 ALLOWFISHING                    = Boolean.valueOf(optionsSettings.getProperty("AllowFishing", "False"));
                 ALLOW_BOAT                      = Boolean.valueOf(optionsSettings.getProperty("AllowBoat", "False"));
@@ -1548,14 +1535,6 @@ public final class Config
                 KARMA_RATE_DROP_EQUIP           = Integer.parseInt(ratesSettings.getProperty("KarmaRateDropEquip", "40"));
                 KARMA_RATE_DROP_EQUIP_WEAPON    = Integer.parseInt(ratesSettings.getProperty("KarmaRateDropEquipWeapon", "10"));
 	            
-	            CAN_SPOIL_LOWER_LEVEL_MOBS              = Boolean.parseBoolean(ratesSettings.getProperty("CanSpoilLowerLevelMobs", "false"));
-	            CAN_DELEVEL_AND_SPOIL_MOBS              = Boolean.parseBoolean(ratesSettings.getProperty("CanDelevelToSpoil", "true"));                       
-	            MAXIMUM_PLAYER_AND_MOB_LEVEL_DIFFERENCE = Float.parseFloat(ratesSettings.getProperty("MaximumPlayerAndMobLevelDifference", "9."));
-	            BASE_SPOIL_RATE                         = Float.parseFloat(ratesSettings.getProperty("BasePercentChanceOfSpoilSuccess", "40."));
-	            MINIMUM_SPOIL_RATE                      = Float.parseFloat(ratesSettings.getProperty("MinimumPercentChanceOfSpoilSuccess", "3."));
-	            SPOIL_LEVEL_DIFFERENCE_LIMIT            = Float.parseFloat(ratesSettings.getProperty("SpoilLevelDifferenceLimit", "5."));
-	            SPOIL_LEVEL_DIFFERENCE_MULTIPLIER       = Float.parseFloat(ratesSettings.getProperty("SpoilLevelMultiplier", "7."));
-	            LAST_LEVEL_SPOIL_IS_LEARNED             = Integer.parseInt(ratesSettings.getProperty("LastLevelSpoilIsLearned", "72"));
 	        }
 	        catch (Exception e) {
 	            e.printStackTrace();
@@ -1575,6 +1554,7 @@ public final class Config
 	            ALT_GAME_CREATION_SPEED = Double.parseDouble(altSettings.getProperty("AltGameCreationSpeed", "1"));
 	            ALT_GAME_CREATION_XP_RATE=Double.parseDouble(altSettings.getProperty("AltGameCreationXpRate", "1"));
 	            ALT_GAME_CREATION_SP_RATE=Double.parseDouble(altSettings.getProperty("AltGameCreationSpRate", "1"));
+	            ALT_BLACKSMITH_USE_RECIPES=Boolean.parseBoolean(altSettings.getProperty("AltBlacksmithUseRecipes", "true"));
 	            ALT_GAME_SKILL_LEARN    = Boolean.parseBoolean(altSettings.getProperty("AltGameSkillLearn", "false"));
                 AUTO_LEARN_SKILLS       = Boolean.parseBoolean(altSettings.getProperty("AutoLearnSkills", "false"));
                 ALT_GAME_CANCEL_BOW     = altSettings.getProperty("AltGameCancelByHit", "Cast").equalsIgnoreCase("cast") || altSettings.getProperty("AltGameCancelByHit", "Cast").equalsIgnoreCase("all");
@@ -1583,7 +1563,6 @@ public final class Config
 	            ALT_GAME_DELEVEL        = Boolean.parseBoolean(altSettings.getProperty("Delevel", "true"));
             	ALT_GAME_MAGICFAILURES  = Boolean.parseBoolean(altSettings.getProperty("MagicFailures", "false"));
 	            ALT_GAME_MOB_ATTACK_AI  = Boolean.parseBoolean(altSettings.getProperty("AltGameMobAttackAI", "false"));
-	            ALT_GAME_SKILL_FORMULAS = altSettings.getProperty("AltGameSkillFormulas", "none");
 	            ALT_GAME_EXPONENT_XP    = Float.parseFloat(altSettings.getProperty("AltGameExponentXp", "0."));
 	            ALT_GAME_EXPONENT_SP    = Float.parseFloat(altSettings.getProperty("AltGameExponentSp", "0."));
 	            ALLOW_CLASS_MASTERS     = Boolean.valueOf(altSettings.getProperty("AllowClassMasters", "False"));
@@ -2020,18 +1999,21 @@ public final class Config
 	        	        }
 	        
 		}
-		else if(Server.SERVER_MODE == Server.MODE_LOGINSERVER)
+		else if(Server.serverMode == Server.MODE_LOGINSERVER)
 		{
 			_log.info("loading login config");
-			try {
+			try
+			{
 		        Properties serverSettings    = new Properties();
 				InputStream is               = new FileInputStream(new File(LOGIN_CONFIGURATION_FILE));  
 				serverSettings.load(is);
 				is.close();
 				
-				GAME_SERVER_LOGIN_HOST = serverSettings.getProperty("LoginserverHostname","127.0.0.1");
+				GAME_SERVER_LOGIN_HOST = serverSettings.getProperty("LoginHostname","*");
 				GAME_SERVER_LOGIN_PORT = Integer.parseInt(serverSettings.getProperty("LoginPort","9013"));
-				PORT_LOGIN              = Integer.parseInt(serverSettings.getProperty("LoginserverPort", "2106"));
+				
+				LOGIN_BIND_ADDRESS 	= serverSettings.getProperty("LoginserverHostname", "*");
+				PORT_LOGIN			= Integer.parseInt(serverSettings.getProperty("LoginserverPort", "2106"));
 				
 				DEBUG        = Boolean.parseBoolean(serverSettings.getProperty("Debug", "false"));
 				DEVELOPER    = Boolean.parseBoolean(serverSettings.getProperty("Developer", "false"));
@@ -2233,24 +2215,13 @@ public final class Config
         else if (pName.equalsIgnoreCase("StoreSkillCooltime")) STORE_SKILL_COOLTIME = Boolean.valueOf(pValue);
         else if (pName.equalsIgnoreCase("AnnounceMammonSpawn")) ANNOUNCE_MAMMON_SPAWN = Boolean.valueOf(pValue);
         
-        // Spoil settings
-        else if (pName.equalsIgnoreCase("CanSpoilLowerLevelMobs")) CAN_SPOIL_LOWER_LEVEL_MOBS = Boolean.valueOf(pValue);
-        else if (pName.equalsIgnoreCase("CanDelevelToSpoil")) CAN_DELEVEL_AND_SPOIL_MOBS = Boolean.valueOf(pValue);
-
-        else if (pName.equalsIgnoreCase("MaximumPlayerAndMobLevelDifference")) MAXIMUM_PLAYER_AND_MOB_LEVEL_DIFFERENCE = Float.parseFloat(pValue);
-        else if (pName.equalsIgnoreCase("BasePercentChanceOfSpoilSuccess")) BASE_SPOIL_RATE = Float.parseFloat(pValue);
-        else if (pName.equalsIgnoreCase("MinimumPercentChanceOfSpoilSuccess")) MINIMUM_SPOIL_RATE = Float.parseFloat(pValue);
-        else if (pName.equalsIgnoreCase("SpoilLevelDifferenceLimit")) SPOIL_LEVEL_DIFFERENCE_LIMIT = Float.parseFloat(pValue);
-        else if (pName.equalsIgnoreCase("SpoilLevelMultiplier")) SPOIL_LEVEL_DIFFERENCE_MULTIPLIER = Float.parseFloat(pValue);
-
-        else if (pName.equalsIgnoreCase("LastLevelSpoilIsLearned")) LAST_LEVEL_SPOIL_IS_LEARNED = Integer.parseInt(pValue);
-
         // Alternative settings
         else if (pName.equalsIgnoreCase("AltGameTiredness")) ALT_GAME_TIREDNESS = Boolean.valueOf(pValue);
         else if (pName.equalsIgnoreCase("AltGameCreation")) ALT_GAME_CREATION = Boolean.valueOf(pValue);
         else if (pName.equalsIgnoreCase("AltGameCreationSpeed")) ALT_GAME_CREATION_SPEED = Double.parseDouble(pValue);
         else if (pName.equalsIgnoreCase("AltGameCreationXpRate")) ALT_GAME_CREATION_XP_RATE = Double.parseDouble(pValue);
         else if (pName.equalsIgnoreCase("AltGameCreationSpRate")) ALT_GAME_CREATION_SP_RATE = Double.parseDouble(pValue);
+        else if (pName.equalsIgnoreCase("AltBlacksmithUseRecipes")) ALT_BLACKSMITH_USE_RECIPES = Boolean.valueOf(pValue);
         else if (pName.equalsIgnoreCase("AltGameSkillLearn")) ALT_GAME_SKILL_LEARN = Boolean.valueOf(pValue);
 
         else if (pName.equalsIgnoreCase("AltGameCancelByHit"))
@@ -2263,7 +2234,6 @@ public final class Config
         else if (pName.equalsIgnoreCase("Delevel")) ALT_GAME_DELEVEL = Boolean.valueOf(pValue);
         else if (pName.equalsIgnoreCase("MagicFailures")) ALT_GAME_MAGICFAILURES = Boolean.valueOf(pValue);
         else if (pName.equalsIgnoreCase("AltGameMobAttackAI")) ALT_GAME_MOB_ATTACK_AI = Boolean.valueOf(pValue);
-        else if (pName.equalsIgnoreCase("AltGameSkillFormulas")) ALT_GAME_SKILL_FORMULAS = pValue;
 
         else if (pName.equalsIgnoreCase("AltGameExponentXp")) ALT_GAME_EXPONENT_XP = Float.parseFloat(pValue);
         else if (pName.equalsIgnoreCase("AltGameExponentSp")) ALT_GAME_EXPONENT_SP = Float.parseFloat(pValue);

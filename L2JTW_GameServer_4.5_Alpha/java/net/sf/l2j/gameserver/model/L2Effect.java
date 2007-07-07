@@ -28,6 +28,7 @@ import javolution.util.FastList;
 import net.sf.l2j.gameserver.GameTimeController;
 import net.sf.l2j.gameserver.datatables.SkillTable;
 import net.sf.l2j.gameserver.ThreadPoolManager;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.ExOlympiadSpelledInfo;
 import net.sf.l2j.gameserver.serverpackets.MagicEffectIcons;
 import net.sf.l2j.gameserver.serverpackets.PartySpelled;
@@ -100,19 +101,19 @@ public abstract class L2Effect
     private int _count;
 
     // abnormal effect mask
-    private short _abnormalEffect;
+    private int _abnormalEffect;
     
     private boolean _preventExitUpdate;
     
     public final class EffectTask implements Runnable
     {
-        protected final int delay;
-        protected final int rate;
+        protected final int _delay;
+        protected final int _rate;
 
         EffectTask(int pDelay, int pRate)
         {
-            this.delay = pDelay;
-            this.rate = pRate;
+            this._delay = pDelay;
+            this._rate = pRate;
         }
 
         public void run()
@@ -146,30 +147,33 @@ public abstract class L2Effect
 
     protected L2Effect(Env env, EffectTemplate template)
     {
-       double reflectStancePercent = env._target.getStat().calcStat(Stats.REFLECT_STANCE,0,null,null);
+       double reflectStancePercent = env.target.getStat().calcStat(Stats.REFLECT_STANCE,0,null,null);
        
         _state = EffectState.CREATED;
+
         if(getEffectType()==EffectType.CHARGE || getEffectType()==EffectType.CHARGE_SELF)
         {
-            L2Skill charge = SkillTable.getInstance().getInfo(4271, env._skill.getLevel());
+            L2Skill charge = SkillTable.getInstance().getInfo(4271, env.skill.getLevel());
             _skill = charge;    
         }
         else
-        _skill = env._skill;
+        _skill = env.skill;
+
         //_item = env._item == null ? null : env._item.getItem();
+
         if (getEffectType() == EffectType.BUFF_SELF || getEffectType() == EffectType.CHARGE_SELF || getEffectType() == EffectType.CHARGE || (reflectStancePercent > 0 && (getEffectType() == EffectType.BUFF)))
-            _effected = env._player;
+            _effected = env.player;
             else
-            _effected = env._target;
-        _effector = env._player;
-        _lambda = template._lambda;
-        _funcTemplates = template._funcTemplates;
-        _count = template._counter;
+            _effected = env.target;
+        _effector = env.player;
+        _lambda = template.lambda;
+        _funcTemplates = template.funcTemplates;
+        _count = template.counter;
         _totalCount = _count;
-        _period = template._period;
-        _abnormalEffect = template._abnormalEffect;
-        _stackType = template._stackType;
-        _stackOrder = template._stackOrder;
+        _period = template.period;
+        _abnormalEffect = template.abnormalEffect;
+        _stackType = template.stackType;
+        _stackOrder = template.stackOrder;
         _periodStartTicks = GameTimeController.getGameTicks();
         _periodfirsttime = 0;
         scheduleEffect();
@@ -279,20 +283,22 @@ public abstract class L2Effect
     public final double calc()
     {
         Env env = new Env();
-        env._player = _effector;
+
+        env.player = _effector;
         double reflectStancePercent = _effected.getStat().calcStat(Stats.REFLECT_STANCE,0,null,null);
                //_item = env._item == null ? null : env._item.getItem();
         if (getEffectType() == EffectType.BUFF_SELF || getEffectType() == EffectType.CHARGE_SELF || getEffectType() == EffectType.CHARGE || (reflectStancePercent > 0 && (getEffectType() == EffectType.BUFF)))
-                env._player = _effected;
+                env.player = _effected;
          else
-            env._target = _effected;
+            env.target = _effected;
         if(getEffectType()==EffectType.CHARGE || getEffectType()==EffectType.CHARGE_SELF)
         {
             L2Skill charge = SkillTable.getInstance().getInfo(4271, _skill.getLevel());
-            env._skill = charge;    
+            env.skill = charge;    
         }
         else
-        env._skill = _skill;
+        env.skill = _skill;
+
         
         return _lambda.calc(env);
     }
@@ -344,7 +350,7 @@ public abstract class L2Effect
      * <li>Stop and remove L2Effect from L2Character and update client magic icone </li><BR><BR>
      * 
      */
-    private synchronized void stopEffectTask()
+    public synchronized void stopEffectTask()
     {
         if (_currentFuture != null)
         {
@@ -412,7 +418,7 @@ public abstract class L2Effect
 
             if (_skill.isPvpSkill())
             {
-                SystemMessage smsg = new SystemMessage(110);
+                SystemMessage smsg = new SystemMessage(SystemMessageId.YOU_FEEL_S1_EFFECT);
                 smsg.addSkillName(_skill.getId());
                 getEffected().sendPacket(smsg);
             }
@@ -431,9 +437,14 @@ public abstract class L2Effect
 
         if (_state == EffectState.ACTING)
         {
-            if (_count-- > 0)
+        	if (_count-- > 0)
             {
-                if (onActionTime()) return;
+            	if (getInUse()) { // effect has to be in use 
+            		if (onActionTime()) return; // false causes effect to finish right away
+            	}
+            	else if (_count > 0) { // do not finish it yet, in case reactivated
+            		return;
+            	}
             }
             _state = EffectState.FINISHING;
         }
@@ -446,7 +457,7 @@ public abstract class L2Effect
             //If the time left is equal to zero, send the message
             if (_count == 0)
             {
-                SystemMessage smsg3 = new SystemMessage(92);
+                SystemMessage smsg3 = new SystemMessage(SystemMessageId.S1_HAS_WORN_OFF);
                 smsg3.addSkillName(_skill.getId());
                 getEffected().sendPacket(smsg3);
             }
@@ -470,19 +481,21 @@ public abstract class L2Effect
         for (FuncTemplate t : _funcTemplates)
         {
             Env env = new Env();
-            env._player = getEffector();
+
+            env.player = getEffector();
             //_item = env._item == null ? null : env._item.getItem();
             if (getEffectType() == EffectType.BUFF_SELF || getEffectType() == EffectType.CHARGE_SELF || getEffectType() == EffectType.CHARGE || (reflectStancePercent > 0 && (getEffectType() == EffectType.BUFF)))
-                   env._player = _effected;
+                   env.player = _effected;
                 else
-                env._target = _effected;
+                env.target = _effected;
             if(getEffectType()==EffectType.CHARGE || getEffectType()==EffectType.CHARGE_SELF)
             {
-                L2Skill charge = SkillTable.getInstance().getInfo(4271, env._skill.getLevel());
-                env._skill = charge;    
+                L2Skill charge = SkillTable.getInstance().getInfo(4271, env.skill.getLevel());
+                env.skill = charge;    
             }
             else
-            env._skill = getSkill();
+            env.skill = getSkill();
+
             Func f = t.getFunc(env, this); // effect is owner
             if (f != null) funcs.add(f);
         }
@@ -497,7 +510,7 @@ public abstract class L2Effect
         if (task == null || future == null) return;
         if (_state == EffectState.FINISHING || _state == EffectState.CREATED) return;
         L2Skill sk = getSkill();
-        if (task.rate > 0)
+        if (task._rate > 0)
         {
         	if (sk.isPotion()) mi.addEffect(sk.getId(), getLevel(), sk.getBuffDuration()-(getTaskTime()*1000));
         	else mi.addEffect(sk.getId(), getLevel(), -1);

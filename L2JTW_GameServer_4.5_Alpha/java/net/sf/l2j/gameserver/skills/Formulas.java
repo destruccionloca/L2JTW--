@@ -23,7 +23,6 @@ import java.util.logging.Logger;
 import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.SevenSigns;
 import net.sf.l2j.gameserver.SevenSignsFestival;
-import net.sf.l2j.gameserver.datatables.SkillTable;
 import net.sf.l2j.gameserver.instancemanager.ClanHallManager;
 import net.sf.l2j.gameserver.instancemanager.SiegeManager;
 import net.sf.l2j.gameserver.model.Inventory;
@@ -38,10 +37,10 @@ import net.sf.l2j.gameserver.model.actor.instance.L2DoorInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PetInstance;
-import net.sf.l2j.gameserver.model.actor.instance.L2RaidBossInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2MonsterInstance;
 import net.sf.l2j.gameserver.model.entity.ClanHall;
 import net.sf.l2j.gameserver.model.entity.Siege;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.skills.conditions.ConditionPlayerState;
 import net.sf.l2j.gameserver.skills.conditions.ConditionUsingItemType;
@@ -65,7 +64,7 @@ public final class Formulas
 	protected static final Logger _log = Logger.getLogger(L2Character.class.getName());
 	private static final int HP_REGENERATE_PERIOD = 3000; // 3 secs
 
-	public static int MAX_STAT_VALUE = 100;
+	public static final int MAX_STAT_VALUE = 100;
 
     private static final double[] STRCompute = new double[]{1.036, 34.845}; //{1.016, 28.515}; for C1
     private static final double[] INTCompute = new double[]{1.020, 31.375}; //{1.020, 31.375}; for C1
@@ -111,14 +110,14 @@ public final class Formulas
 			return _instancies[pos];
 		}
 
-		private FuncAddLevel3(Stats stat)
+		private FuncAddLevel3(Stats pStat)
 		{
-			super(stat, 0x10, null);
+			super(pStat, 0x10, null);
 		}
 
 		public void calc(Env env)
 		{
-			env.value += env._player.getLevel() / 3;
+			env.value += env.player.getLevel() / 3.0;
 		}
 	}
 
@@ -133,14 +132,14 @@ public final class Formulas
 			return _instancies[pos];
 		}
 
-		private FuncMultLevelMod(Stats stat)
+		private FuncMultLevelMod(Stats pStat)
 		{
-			super(stat, 0x20, null);
+			super(pStat, 0x20, null);
 		}
 
 		public void calc(Env env)
 		{
-			env.value *= env._player.getLevelMod();
+			env.value *= env.player.getLevelMod();
 		}
 	}
 
@@ -163,9 +162,9 @@ public final class Formulas
 		/**
 		 * Constructor of the FuncMultRegenResting.<BR><BR>
 		 */
-		private FuncMultRegenResting(Stats stat)
+		private FuncMultRegenResting(Stats pStat)
 		{
-			super(stat, 0x20, null);
+			super(pStat, 0x20, null);
 			setCondition(new ConditionPlayerState(CheckPlayerState.RESTING, true));
 		}
 
@@ -174,7 +173,7 @@ public final class Formulas
 		 */
 		public void calc(Env env)
 		{
-			if (!_cond.test(env)) return;
+			if (!cond.test(env)) return;
 
 			env.value *= 1.45;
 		}
@@ -196,7 +195,7 @@ public final class Formulas
 
 		public void calc(Env env)
 		{
-			env.value *= STRbonus[env._player.getSTR()] * env._player.getLevelMod();
+			env.value *= STRbonus[env.player.getSTR()] * env.player.getLevelMod();
 		}
 	}
 
@@ -216,8 +215,8 @@ public final class Formulas
 
 		public void calc(Env env)
 		{
-			double intb = INTbonus[env._player.getINT()];
-			double lvlb = env._player.getLevelMod();
+			double intb = INTbonus[env.player.getINT()];
+			double lvlb = env.player.getLevelMod();
 			env.value *= (lvlb * lvlb) * (intb * intb);
 		}
 	}
@@ -238,16 +237,16 @@ public final class Formulas
 
 		public void calc(Env env)
 		{
-            if (env._player instanceof L2PcInstance)
+            if (env.player instanceof L2PcInstance)
             {
-    			L2PcInstance p = (L2PcInstance) env._player;
+    			L2PcInstance p = (L2PcInstance) env.player;
     			if (p.getInventory().getPaperdollItem(Inventory.PAPERDOLL_LFINGER) != null) env.value -= 5;
     			if (p.getInventory().getPaperdollItem(Inventory.PAPERDOLL_RFINGER) != null) env.value -= 5;
     			if (p.getInventory().getPaperdollItem(Inventory.PAPERDOLL_LEAR) != null) env.value -= 9;
     			if (p.getInventory().getPaperdollItem(Inventory.PAPERDOLL_REAR) != null) env.value -= 9;
     			if (p.getInventory().getPaperdollItem(Inventory.PAPERDOLL_NECK) != null) env.value -= 13;
             }
-			env.value *= MENbonus[env._player.getMEN()] * env._player.getLevelMod();
+			env.value *= MENbonus[env.player.getMEN()] * env.player.getLevelMod();
 		}
 	}
 
@@ -267,9 +266,9 @@ public final class Formulas
 
 		public void calc(Env env)
 		{
-			if (env._player instanceof L2PcInstance)
+			if (env.player instanceof L2PcInstance)
             {
-                L2PcInstance p = (L2PcInstance) env._player;
+                L2PcInstance p = (L2PcInstance) env.player;
     			if (p.getInventory().getPaperdollItem(Inventory.PAPERDOLL_HEAD) != null) env.value -= 12;
     			if (p.getInventory().getPaperdollItem(Inventory.PAPERDOLL_CHEST) != null)
     				env.value -= ((p.getClassId().isMage()) ? 15 : 31);
@@ -278,7 +277,7 @@ public final class Formulas
     			if (p.getInventory().getPaperdollItem(Inventory.PAPERDOLL_GLOVES) != null) env.value -= 8;
     			if (p.getInventory().getPaperdollItem(Inventory.PAPERDOLL_FEET) != null) env.value -= 7;
             }
-			env.value *= env._player.getLevelMod();
+			env.value *= env.player.getLevelMod();
 		}
 	}
 
@@ -299,7 +298,7 @@ public final class Formulas
 
 		public void calc(Env env)
 		{
-			if (!_cond.test(env)) return;
+			if (!cond.test(env)) return;
 			env.value += 450;
 		}
 	}
@@ -320,7 +319,7 @@ public final class Formulas
 
 		public void calc(Env env)
 		{
-			L2Character p = env._player;
+			L2Character p = env.player;
 			//[Square(DEX)]*6 + lvl + weapon hitbonus;
 			env.value += Math.sqrt(p.getDEX()) * 6;
 			env.value += p.getLevel();
@@ -344,7 +343,7 @@ public final class Formulas
 
 		public void calc(Env env)
 		{
-			L2Character p = env._player;
+			L2Character p = env.player;
 			//[Square(DEX)]*6 + lvl;
 			env.value += Math.sqrt(p.getDEX()) * 6;
 			env.value += p.getLevel();
@@ -367,7 +366,7 @@ public final class Formulas
 
 		public void calc(Env env)
 		{
-			L2Character p = env._player;
+			L2Character p = env.player;
 			if( p instanceof L2Summon) env.value = 40;
 			else if (p instanceof L2PcInstance && p.getActiveWeaponInstance() == null) env.value = 40;
 			else
@@ -396,7 +395,7 @@ public final class Formulas
 
 		public void calc(Env env)
 		{
-			L2PcInstance p = (L2PcInstance) env._player;
+			L2PcInstance p = (L2PcInstance) env.player;
 			env.value *= DEXbonus[p.getDEX()];
 		}
 	}
@@ -417,7 +416,7 @@ public final class Formulas
 
 		public void calc(Env env)
 		{
-			L2PcInstance p = (L2PcInstance) env._player;
+			L2PcInstance p = (L2PcInstance) env.player;
 			env.value *= DEXbonus[p.getDEX()];
 		}
 	}
@@ -438,7 +437,7 @@ public final class Formulas
 
 		public void calc(Env env)
 		{
-			L2PcInstance p = (L2PcInstance) env._player;
+			L2PcInstance p = (L2PcInstance) env.player;
 			env.value *= WITbonus[p.getWIT()];
 		}
 	}
@@ -460,7 +459,7 @@ public final class Formulas
 		public void calc(Env env)
 		{
 			//			L2PcTemplate t = (L2PcTemplate)env._player.getTemplate();
-			L2PcInstance pc = (L2PcInstance) env._player;
+			L2PcInstance pc = (L2PcInstance) env.player;
 			if (pc != null) env.value += pc.getHennaStatSTR();
 		}
 	}
@@ -482,7 +481,7 @@ public final class Formulas
 		public void calc(Env env)
 		{
 			//			L2PcTemplate t = (L2PcTemplate)env._player.getTemplate();
-			L2PcInstance pc = (L2PcInstance) env._player;
+			L2PcInstance pc = (L2PcInstance) env.player;
 			if (pc != null) env.value += pc.getHennaStatDEX();
 		}
 	}
@@ -504,7 +503,7 @@ public final class Formulas
 		public void calc(Env env)
 		{
 			//			L2PcTemplate t = (L2PcTemplate)env._player.getTemplate();
-			L2PcInstance pc = (L2PcInstance) env._player;
+			L2PcInstance pc = (L2PcInstance) env.player;
 			if (pc != null) env.value += pc.getHennaStatINT();
 		}
 	}
@@ -526,7 +525,7 @@ public final class Formulas
 		public void calc(Env env)
 		{
 			//			L2PcTemplate t = (L2PcTemplate)env._player.getTemplate();
-			L2PcInstance pc = (L2PcInstance) env._player;
+			L2PcInstance pc = (L2PcInstance) env.player;
 			if (pc != null) env.value += pc.getHennaStatMEN();
 		}
 	}
@@ -548,7 +547,7 @@ public final class Formulas
 		public void calc(Env env)
 		{
 			//			L2PcTemplate t = (L2PcTemplate)env._player.getTemplate();
-			L2PcInstance pc = (L2PcInstance) env._player;
+			L2PcInstance pc = (L2PcInstance) env.player;
 			if (pc != null) env.value += pc.getHennaStatCON();
 		}
 	}
@@ -570,7 +569,7 @@ public final class Formulas
 		public void calc(Env env)
 		{
 			//			L2PcTemplate t = (L2PcTemplate)env._player.getTemplate();
-			L2PcInstance pc = (L2PcInstance) env._player;
+			L2PcInstance pc = (L2PcInstance) env.player;
 			if (pc != null) env.value += pc.getHennaStatWIT();
 		}
 	}
@@ -591,8 +590,8 @@ public final class Formulas
 
 		public void calc(Env env)
 		{
-			L2PcTemplate t = (L2PcTemplate) env._player.getTemplate();
-			int lvl = env._player.getLevel() - t.classBaseLevel;
+			L2PcTemplate t = (L2PcTemplate) env.player.getTemplate();
+			int lvl = env.player.getLevel() - t.classBaseLevel;
 			double hpmod = t.lvlHpMod * lvl;
 			double hpmax = (t.lvlHpAdd + hpmod) * lvl;
 			double hpmin = (t.lvlHpAdd * lvl) + hpmod;
@@ -616,7 +615,7 @@ public final class Formulas
 
 		public void calc(Env env)
 		{
-			L2PcInstance p = (L2PcInstance) env._player;
+			L2PcInstance p = (L2PcInstance) env.player;
 			env.value *= CONbonus[p.getCON()];
 		}
 	}
@@ -637,8 +636,8 @@ public final class Formulas
 
 		public void calc(Env env)
 		{
-			L2PcTemplate t = (L2PcTemplate) env._player.getTemplate();
-			int lvl = env._player.getLevel() - t.classBaseLevel;
+			L2PcTemplate t = (L2PcTemplate) env.player.getTemplate();
+			int lvl = env.player.getLevel() - t.classBaseLevel;
 			double cpmod = t.lvlCpMod * lvl;
 			double cpmax = (t.lvlCpAdd + cpmod) * lvl;
 			double cpmin = (t.lvlCpAdd * lvl) + cpmod;
@@ -662,7 +661,7 @@ public final class Formulas
 
 		public void calc(Env env)
 		{
-			L2PcInstance p = (L2PcInstance) env._player;
+			L2PcInstance p = (L2PcInstance) env.player;
 			env.value *= CONbonus[p.getCON()];
 		}
 	}
@@ -683,8 +682,8 @@ public final class Formulas
 
 		public void calc(Env env)
 		{
-			L2PcTemplate t = (L2PcTemplate) env._player.getTemplate();
-			int lvl = env._player.getLevel() - t.classBaseLevel;
+			L2PcTemplate t = (L2PcTemplate) env.player.getTemplate();
+			int lvl = env.player.getLevel() - t.classBaseLevel;
 			double mpmod = t.lvlMpMod * lvl;
 			double mpmax = (t.lvlMpAdd + mpmod) * lvl;
 			double mpmin = (t.lvlMpAdd * lvl) + mpmod;
@@ -708,7 +707,7 @@ public final class Formulas
 
 		public void calc(Env env)
 		{
-			L2PcInstance p = (L2PcInstance) env._player;
+			L2PcInstance p = (L2PcInstance) env.player;
 			env.value *= MENbonus[p.getMEN()];
 		}
 	}
@@ -842,7 +841,7 @@ public final class Formulas
             L2PcInstance player = (L2PcInstance) cha;
 
             // Calculate correct baseHpReg value for certain level of PC
-            init += (player.getLevel() > 10) ? ((player.getLevel()-1)/10) : 0.5;
+            init += (player.getLevel() > 10) ? ((player.getLevel()-1)/10.0) : 0.5;
             
             // SevenSigns Festival modifier
 			if (SevenSignsFestival.getInstance().isFestivalInProgress() && player.isFestivalParticipant()) 
@@ -853,7 +852,7 @@ public final class Formulas
 				if (siegeModifier > 0) hpRegenMultiplier *= siegeModifier;
 			}
             
-            if (player.getIsInClanHall())
+            if (player.getIsInClanHall() == 2 && player.getClan() != null)
             {
             	int clanHallIndex = player.getClan().getHasHideout();
             	if (clanHallIndex > 0) 
@@ -896,7 +895,7 @@ public final class Formulas
 			L2PcInstance player = (L2PcInstance) cha;
 
             // Calculate correct baseMpReg value for certain level of PC
-            init += 0.3*((player.getLevel()-1)/10);
+            init += 0.3*((player.getLevel()-1)/10.0);
 			
             // SevenSigns Festival modifier
             if (SevenSignsFestival.getInstance().isFestivalInProgress() && player.isFestivalParticipant())
@@ -905,7 +904,7 @@ public final class Formulas
 			// Mother Tree effect is calculated at last
 			if (player.getInMotherTreeZone()) mpRegenBonus += 1;
             
-            if (player.getIsInClanHall())
+            if (player.getIsInClanHall() == 2)
             {
             	int clanHallIndex = player.getClan().getHasHideout();
             	if (clanHallIndex > 0)
@@ -946,7 +945,7 @@ public final class Formulas
 	        L2PcInstance player = (L2PcInstance) cha;
 	
 	        // Calculate correct baseHpReg value for certain level of PC
-	        init += (player.getLevel() > 10) ? ((player.getLevel()-1)/10) : 0.5;
+	        init += (player.getLevel() > 10) ? ((player.getLevel()-1)/10.0) : 0.5;
 	        
 	        // Calculate Movement bonus
 	        if (player.isSitting()) cpRegenMultiplier *= 1.5;      // Sitting
@@ -981,8 +980,8 @@ public final class Formulas
 		if (festivalId < 0) return 0;
 
 		// Retrieve the X and Y coords for the center of the festival arena the player is in.
-		if (oracle == SevenSigns.CABAL_DAWN) festivalCenter = SevenSignsFestival.festivalDawnPlayerSpawns[festivalId];
-		else festivalCenter = SevenSignsFestival.festivalDuskPlayerSpawns[festivalId];
+		if (oracle == SevenSigns.CABAL_DAWN) festivalCenter = SevenSignsFestival.FESTIVAL_DAWN_PLAYER_SPAWNS[festivalId];
+		else festivalCenter = SevenSignsFestival.FESTIVAL_DUSK_PLAYER_SPAWNS[festivalId];
 
 		// Check the distance between the player and the player spawn point, in the center of the arena.
 		double distToCenter = activeChar.getDistance(festivalCenter[0], festivalCenter[1]);
@@ -1034,8 +1033,20 @@ public final class Formulas
 		if (ss) damage *= 2;
 		if (skill != null && skill.getSkillType() != SkillType.SPOILATK && skill.getSkillType() != SkillType.CHARGEATK)
 		{
-			damage += skill.getPower();
-			//damage += skill.getPower() * 0.7 * attacker.getPAtk(target)/defence;
+			double skillpower = skill.getPower();
+			float ssboost = skill.getSSBoost();
+			if (ssboost <= 0)
+				damage += skillpower;
+			else if (ssboost > 0)
+			{
+				if (ss)
+				{
+					skillpower *= ssboost;
+					damage += skillpower;
+				}
+				else
+					damage += skillpower;
+			}
 		}
 		if(skill !=null && (skill.getSkillType() == SkillType.SPOILATK || skill.getSkillType() == SkillType.CHARGEATK))
 		{
@@ -1270,14 +1281,18 @@ public final class Formulas
 				if (calcMagicSuccess(attacker, target, skill)
 					&& (target.getLevel() - attacker.getLevel()) <= 9)
 				{
-					if (skill.getSkillType() == SkillType.DRAIN) attacker.sendPacket(new SystemMessage(SystemMessage.DRAIN_HALF_SUCCESFUL));
-					else attacker.sendPacket(new SystemMessage(SystemMessage.ATTACK_FAILED));
+
+					if (skill.getSkillType() == SkillType.DRAIN)
+						attacker.sendPacket(new SystemMessage(SystemMessageId.DRAIN_HALF_SUCCESFUL));
+					else
+						attacker.sendPacket(new SystemMessage(SystemMessageId.ATTACK_FAILED));
+
 
 					damage /= 2;
 				}
 				else
 				{
-					SystemMessage sm = new SystemMessage(SystemMessage.S1_WAS_UNAFFECTED_BY_S2);
+					SystemMessage sm = new SystemMessage(SystemMessageId.S1_WAS_UNAFFECTED_BY_S2);
 					sm.addString(target.getName());
 					sm.addSkillName(skill.getId());
 					attacker.sendPacket(sm);
@@ -1290,13 +1305,13 @@ public final class Formulas
 			{
 				if (skill.getSkillType() == SkillType.DRAIN)
 				{
-					SystemMessage sm = new SystemMessage(SystemMessage.RESISTED_S1_DRAIN);
+					SystemMessage sm = new SystemMessage(SystemMessageId.RESISTED_S1_DRAIN);
 					sm.addString(attacker.getName());
 					target.sendPacket(sm);
 				}
 				else
 				{
-					SystemMessage sm = new SystemMessage(SystemMessage.RESISTED_S1_MAGIC);
+					SystemMessage sm = new SystemMessage(SystemMessageId.RESISTED_S1_MAGIC);
 					sm.addString(attacker.getName());
 					target.sendPacket(sm);
 				}
@@ -1362,7 +1377,7 @@ public final class Formulas
         if (rate > 99) rate = 99;
         else if (rate < 1) rate = 1;
         
-        if (target instanceof L2RaidBossInstance)
+        if (target.isRaid())
         {
             rate = 100;
         }
@@ -1463,192 +1478,6 @@ public final class Formulas
 		return d > 0;
 	}
 
-	public boolean calcSkillSuccessOld(L2Character player, L2Character target, L2Skill skill,
-										boolean ss, boolean sps, boolean bss)
-	{
-		if (Config.ALT_GAME_SKILL_FORMULAS.equalsIgnoreCase("alt")
-			|| Config.ALT_GAME_SKILL_FORMULAS.equalsIgnoreCase("true"))
-			return calcAltSkillSuccess(player, target, skill);
-		if (target instanceof L2RaidBossInstance) return false;
-
-		SkillType type = skill.getSkillType();
-
-		boolean success = false;
-		int rate = 0;
-		int check = Rnd.get(100);
-		double modifier = 1;
-		double ssmodifier = 1;
-		int value = 1;
-		int maxLevel = SkillTable.getInstance().getMaxLevel(skill.getId(), skill.getLevel());
-		double /*pAtk,*/pDef, mAtk, mDef;
-		if (bss) ssmodifier *= 2;
-		else if (sps) ssmodifier *= 1.5;
-		else if (ss) ssmodifier *= 1.5;
-
-		switch (type)
-		{
-			case STUN:
-				// For normal Stun Attack, with skillType = STUN
-				pDef = 1;
-				pDef = target.calcStat(Stats.STUN_RES, pDef, target, null);
-				value = 4800 + (int) (50 * (player.getLevel() - target.getLevel()) + 5100 * ((float) skill.getLevel() / maxLevel));
-				if (pDef > 0) value /= pDef;
-				modifier = 10 * target.getCON() / 3;
-				if (modifier > 0) value /= modifier;
-				value *= ssmodifier;
-				value /= 100;
-				if (!(target instanceof L2RaidBossInstance))
-				{
-					//min success
-					if (value < 40) value = 40;
-					//max success
-					if (value > 99) value = 99;
-				}
-				rate = value;
-				break;
-			case MDOT:
-            case MANADAM:    
-			case CONFUSION:
-				mAtk = player.getMAtk(target, skill);
-				mDef = target.getMDef(player, skill);
-				value = 3000 + (int) (7000 * ((float) skill.getLevel() / maxLevel));
-				if (mDef > 0 && mAtk > 0) value *= 0.6 * mAtk / mDef;
-				modifier = 20 * target.getMEN() / 3;
-				//_log.fine(player.getName()+" matk:"+mAtk+",mdef="+mDef+",value="+value+",modifier="+modifier+",maxlevel="+maxLevel+",level="+skill.getLevel());
-				break;
-			case MUTE:
-				mAtk = player.getMAtk(target, skill);
-				mDef = target.getMDef(player, skill);
-				value = 3000 + (int) (7000 * ((float) skill.getLevel() / maxLevel));
-				if (mDef > 0 && mAtk > 0) value *= 0.6 * mAtk / mDef;
-				modifier = 20 * target.getMEN() / 3;
-				//_log.fine(player.getName()+" matk:"+mAtk+",mdef="+mDef+",value="+value+",modifier="+modifier+",maxlevel="+maxLevel+",level="+skill.getLevel());
-				if (target instanceof L2RaidBossInstance)
-				{
-					rate = 0;
-					value = 0;
-				}
-				break;
-			case MDAM:
-			case PARALYZE:
-				mAtk = player.getMAtk(target, skill);
-				mDef = target.getMDef(player, skill);
-				value = 5000 + (int) (5000 * ((float) skill.getLevel() / maxLevel));
-				if (mDef > 0 && mAtk > 0) value *= 0.6 * mAtk / mDef;
-				modifier = 20 * target.getMEN() / 3;
-				if (modifier > 0) value /= modifier;
-				value *= ssmodifier;
-				value /= 100;
-				if (!(target instanceof L2RaidBossInstance))
-				{
-					//min success
-					if (value < 35) value = 35;
-					//max success
-					if (value > 90) value = 90;
-					rate = value;
-				}
-				//_log.fine(player.getName()+" matk:"+mAtk+",mdef="+mDef+",value="+value+",modifier="+modifier+",maxlevel="+maxLevel+",level="+skill.getLevel());
-				break;
-			case SLEEP:
-				mAtk = player.getMAtk(target, skill);
-				mDef = target.getMDef(player, skill);
-				value = 5000 + (int) (5000 * ((float) skill.getLevel() / maxLevel));
-				mDef = target.calcStat(Stats.SLEEP_RES, mDef, target, null);
-				if (mDef > 0 && mAtk > 0) value *= 0.6 * mAtk / mDef;
-				modifier = 20 * target.getWIT() / 3;
-				if (modifier > 0) value /= modifier;
-				value *= ssmodifier;
-				value /= 100;
-				if (!(target instanceof L2RaidBossInstance))
-				{
-					//min success
-					if (value < 45) value = 45;
-					//max success
-					if (value > 90) value = 90;
-				}
-				rate = value;
-				//_log.fine(player.getName()+" matk:"+mAtk+",mdef="+mDef+",value="+value+",modifier="+modifier+",maxlevel="+maxLevel+",level="+skill.getLevel());
-				break;
-			case ROOT:
-				mAtk = player.getMAtk(target, skill);
-				mDef = target.getMDef(player, skill);
-				value = 5000 + (int) (5000 * ((float) skill.getLevel() / maxLevel));
-				mDef = target.calcStat(Stats.ROOT_RES, mDef, target, null);
-				if (mDef > 0 && mAtk > 0) value *= 0.6 * mAtk / mDef;
-				modifier = 10 * target.getDEX() / 3;
-				if (modifier > 0) value /= modifier;
-				value *= ssmodifier;
-				value /= 100;
-				if (!(target instanceof L2RaidBossInstance))
-				{
-					//min success
-					if (value < 35) value = 35;
-					//max success
-					if (value > 90) value = 90;
-				}
-				rate = value;
-				break;
-			default:
-				// For normal Stun attack with skillType = PDAM
-				//pAtk = (int)skill.getPower();
-				pDef = 1;
-				pDef = target.calcStat(Stats.STUN_RES, pDef, target, null);
-				value = 5000 + (int) (50 * (player.getLevel() - target.getLevel())+ 5000 * ((float) skill.getLevel() / maxLevel));
-				if (pDef > 0) value /= pDef;
-				modifier = 10 * target.getCON() / 3;
-				if (modifier > 0) value /= modifier;
-				value *= ssmodifier;
-				value /= 100;
-				if (!(target instanceof L2RaidBossInstance))
-				{
-					//min success
-					if (value < 35) value = 35;
-					//max success
-					if (value > 90) value = 90;
-				}
-				rate = value;
-				//			pDef = target.getPDef(player);
-				//			pDef = target.calcStat(Stats.STUN_RES,pDef,target,null);
-				//			value = 30 * 100 + (int)(70 * 100 * ((float)skill.getLevel()/maxLevel));
-				//			value = 100 * 100;
-				//			if (pDef > 0 && pAtk > 0)
-				//			value *= 0.6 * pAtk/pDef;
-				//			modifier    = 100 * target.getCON()/30;
-				break;
-		}
-
-		if (modifier == 0)
-		{
-			_log.warning("Name: " + target.getName()
-				+ " has bad base stat value. Fix datapack or notify dp ppl");
-			modifier = 1;
-		}
-
-		if (rate == 0)
-			rate = (int) (((player.getLevel() - target.getLevel()) + (int) (value / modifier)) * ssmodifier);
-		//_log.fine(player.getName()+" rate:"+rate);
-
-		if (rate > 100) rate = 100;
-		else if (rate < 0) rate = 0;
-
-		if (target instanceof L2RaidBossInstance)
-		{
-			int cLevel = player.getLevel();
-			int tLevel = target.getLevel();
-			int rRate = 1;
-			if (cLevel > tLevel)
-			{
-				rRate = cLevel - tLevel;
-				if (rRate > 9) rate /= rRate;
-				if (rate < 1) rate = 0;
-			}
-		}
-
-		if (check > rate) success = false;
-		else success = true;
-
-		return success;
-	}
 
 	public int calcSkillResistance(SkillType type, L2Character target)
 	{
@@ -1668,12 +1497,15 @@ public final class Formulas
 			case SLEEP:
 				return (int) target.calcStat(Stats.SLEEP_RES, 0, target, null);
 			case MUTE:
-				return (int) target.calcStat(Stats.MUTE_RES, 0, target, null);
 			case FEAR:
+			case BETRAY:
+			case AGGREDUCE_CHAR:
+				return (int) target.calcStat(Stats.DERANGEMENT_RES, 0, target, null);
 			case CONFUSION:
 				return (int) target.calcStat(Stats.CONFUSION_RES, 0, target, null);
-			case CANCEL:
-				return (int) target.calcStat(Stats.CONFUSION_RES, 0, target, null);
+			case DEBUFF:
+			case WEAKNESS:
+				return (int) target.calcStat(Stats.DEBUFF_RES, 0, target, null);
 			default:
 				return 0;
 		}
@@ -1685,13 +1517,19 @@ public final class Formulas
 		switch (type)
 		{
 			case STUN:
+			case BLEED:
 				return (int) (Math.sqrt(CONbonus[target.getCON()]) * 100 - 100);
-			case ROOT:
-				return (int) (Math.sqrt(DEXbonus[target.getDEX()]) * 100 - 100);
+			case POISON:
 			case SLEEP:
-				return (int) (Math.sqrt(WITbonus[target.getWIT()]) * 100 - 100);
+			case DEBUFF:
+			case WEAKNESS:
+			case ERASE:
+			case ROOT:
 			case MUTE:
+			case FEAR:
+			case BETRAY:
 			case CONFUSION:
+			case AGGREDUCE_CHAR:
 			case PARALYZE:
 				return (int) (Math.sqrt(MENbonus[target.getMEN()]) * 100 - 100);
 			default:
@@ -1702,13 +1540,6 @@ public final class Formulas
 	public boolean calcSkillSuccess(L2Character attacker, L2Character target, L2Skill skill, boolean ss,
 									boolean sps, boolean bss)
 	{
-		if (Config.ALT_GAME_SKILL_FORMULAS.equalsIgnoreCase("alt")
-			|| Config.ALT_GAME_SKILL_FORMULAS.equalsIgnoreCase("true"))
-			return calcAltSkillSuccess(attacker, target, skill);
-
-		// Uncomment this if you want to revert to old skill success calculation: 
-		// return calcSkillSuccessOld(attacker, target, skill, ss, sps, bss);
-
 		SkillType type = skill.getSkillType();
 
  
@@ -1796,51 +1627,6 @@ public final class Formulas
 		int rate = Math.round((float)(Math.pow(1.3, lvlDifference) * 100));
 
 		return (Rnd.get(10000) > rate);
-	}
-
-	public boolean calcAltSkillSuccess(L2Character activeChar, L2Character target, L2Skill skill)
-	{
-		// Get our numbers and base success rate
-		SkillType type = skill.getSkillType();
-		boolean success = true;
-		int skillPower = (int) skill.getPower();
-		int skillLevel = skill.getLevel();
-		int attackerLevel = activeChar.getLevel();
-		int targetLevel = target.getLevel();
-		int CONModifier = (100 - target.getCON());
-		int DEXModifier = (90 - target.getDEX());
-		int WITModifier = (80 - target.getWIT());
-		int powerModifier = Math.round(skillPower / 100);
-		int levelModifier = Math.round(skillLevel / 2);
-		int baseRate = (attackerLevel - targetLevel) + powerModifier + levelModifier;
-		int rate = baseRate;
-		int check = Rnd.get(100);
-
-		switch (type)
-		{
-			case STUN:
-				rate += CONModifier; // uses CON Modifier for STUN types
-				break;
-			case ROOT:
-				rate += DEXModifier; // uses DEX Modifier for ROOT types
-				break;
-			case PARALYZE:
-			case SLEEP:
-				rate += WITModifier; // uses WIT Modifier for SLEEP and PARALYZE types
-				break;
-			default:
-				rate += CONModifier; // uses CON Modifier for any other types (like PDAM ones)
-				break;
-		}
-
-		if (rate > 100) rate = 100; // We shouldn't have more than 100% success rate
-		if (rate < 1) rate = 1; // We shouldn't have less than 1% success rate
-        if (target.isRaid())
-        {
-            rate = 0;
-        }
-		if (check > rate) success = false;
-		return success;
 	}
 
 	public boolean calculateUnlockChance(L2Skill skill)

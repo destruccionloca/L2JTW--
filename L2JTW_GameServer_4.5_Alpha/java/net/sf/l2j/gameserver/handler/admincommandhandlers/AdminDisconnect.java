@@ -24,6 +24,7 @@ import net.sf.l2j.gameserver.handler.IAdminCommandHandler;
 import net.sf.l2j.gameserver.model.GMAudit;
 import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.LeaveWorld;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
@@ -35,7 +36,7 @@ import net.sf.l2j.gameserver.serverpackets.SystemMessage;
  */
 public class AdminDisconnect implements IAdminCommandHandler {
 
-	private static String[] _adminCommands = {"admin_character_disconnect"};
+	private static final String[] ADMIN_COMMANDS = {"admin_character_disconnect"};
 	private static final int REQUIRED_LEVEL = Config.GM_KICK;
 
 	public boolean useAdminCommand(String command, L2PcInstance activeChar) {
@@ -53,7 +54,7 @@ public class AdminDisconnect implements IAdminCommandHandler {
 	}
 	
 	public String[] getAdminCommandList() {
-		return _adminCommands;
+		return ADMIN_COMMANDS;
 	}
 	
 	private boolean checkLevel(int level) {
@@ -72,14 +73,14 @@ public class AdminDisconnect implements IAdminCommandHandler {
 		
 		if (player.getObjectId() == activeChar.getObjectId())
 		{		
-			SystemMessage sm = new SystemMessage(614);
+			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 			sm.addString("SYS");
 			sm.addString("無法登出");
 			activeChar.sendPacket(sm);
 		}
 		else
 		{				
-			SystemMessage sm = new SystemMessage(614);
+			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 			sm.addString("SYS");
 			sm.addString("人物[" + player.getName() + "]從伺服器離線.");
 			activeChar.sendPacket(sm);

@@ -24,29 +24,30 @@ import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.model.L2Summon;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.skills.Formulas;
 import net.sf.l2j.gameserver.templates.StatsSet;
 
 public class L2SkillElemental extends L2Skill {
 
-	private final int[] seeds;
-	private final boolean seed_any;
+	private final int[] _seeds;
+	private final boolean _seedAny;
 	
 	public L2SkillElemental(StatsSet set) {
 		super(set);
 		
-		seeds = new int[3];
-		seeds[0] = set.getInteger("seed1",0);
-		seeds[1] = set.getInteger("seed2",0);
-		seeds[2] = set.getInteger("seed3",0);
+		_seeds = new int[3];
+		_seeds[0] = set.getInteger("seed1",0);
+		_seeds[1] = set.getInteger("seed2",0);
+		_seeds[2] = set.getInteger("seed3",0);
 		
 		if (set.getInteger("seed_any",0)==1)
-			seed_any = true;
+			_seedAny = true;
 		else
-			seed_any = false;
+			_seedAny = false;
+	
 	}
-
 	public void useSkill(L2Character activeChar, L2Object[] targets) {
 		if (activeChar.isAlikeDead())
 			return;
@@ -55,6 +56,7 @@ public class L2SkillElemental extends L2Skill {
 		boolean bss = false;
 		
 		L2ItemInstance weaponInst = activeChar.getActiveWeaponInstance();
+
 
 		if (weaponInst != null) 
         {
@@ -93,10 +95,12 @@ public class L2SkillElemental extends L2Skill {
 				continue;
 			
 			boolean charged = true;
-			if (!seed_any){
-				for (int i=0;i<seeds.length;i++){
-					if (seeds[i]!=0){
-						L2Effect e = activeChar.getEffect(seeds[i]);
+
+			if (!_seedAny){
+				for (int i=0;i<_seeds.length;i++){
+					if (_seeds[i]!=0){
+						L2Effect e = target.getEffect(_seeds[i]);
+
 						if (e==null || !e.getInUse()){
 							charged = false;
 							break;
@@ -106,9 +110,11 @@ public class L2SkillElemental extends L2Skill {
 			}
 			else {
 				charged = false;
-				for (int i=0;i<seeds.length;i++){
-					if (seeds[i]!=0){
-						L2Effect e = activeChar.getEffect(seeds[i]);
+
+				for (int i=0;i<_seeds.length;i++){
+					if (_seeds[i]!=0){
+						L2Effect e = target.getEffect(_seeds[i]);
+
 						if (e!=null && e.getInUse()){
 							charged = true;
 							break;
@@ -117,7 +123,7 @@ public class L2SkillElemental extends L2Skill {
 				}
 			}
 			if (!charged){
-				SystemMessage sm = new SystemMessage(614);
+				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 				sm.addString("SYS"); 
 				sm.addString("所需的元素不足."); 
 				activeChar.sendPacket(sm);
@@ -140,11 +146,8 @@ public class L2SkillElemental extends L2Skill {
 	                target.breakCast();
 	            }
 	
-				if (activeChar instanceof L2PcInstance) {
-					SystemMessage sm = new SystemMessage(SystemMessage.YOU_DID_S1_DMG);
-					sm.addNumber(damage); 
-					activeChar.sendPacket(sm);
-				}
+            	activeChar.sendDamageMessage(target, damage, false, false, false);
+
 			}
 			
 			// activate attacked effects, if any
@@ -154,4 +157,4 @@ public class L2SkillElemental extends L2Skill {
             this.getEffects(activeChar, target);
 		}
 	}
-}
+	}

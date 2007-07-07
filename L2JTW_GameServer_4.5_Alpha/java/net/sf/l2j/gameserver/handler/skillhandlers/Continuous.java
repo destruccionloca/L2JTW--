@@ -21,15 +21,19 @@ package net.sf.l2j.gameserver.handler.skillhandlers;
 import net.sf.l2j.gameserver.ai.CtrlEvent;
 import net.sf.l2j.gameserver.ai.CtrlIntention;
 import net.sf.l2j.gameserver.handler.ISkillHandler;
+import net.sf.l2j.gameserver.instancemanager.DuelManager;
 import net.sf.l2j.gameserver.model.L2Attackable;
 import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.L2Effect;
+import net.sf.l2j.gameserver.model.L2ItemInstance;
 import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2Skill;
+import net.sf.l2j.gameserver.model.L2Summon;
 import net.sf.l2j.gameserver.model.L2Skill.SkillType;
 import net.sf.l2j.gameserver.model.actor.instance.L2DoorInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PlayableInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.skills.Formulas;
 
@@ -43,7 +47,7 @@ public class Continuous implements ISkillHandler
 {
 	//private static Logger _log = Logger.getLogger(Continuous.class.getName());
 	
-	private static SkillType[] _skillIds = {
+	private static final SkillType[] SKILL_IDS = {
 		L2Skill.SkillType.BUFF,
 		L2Skill.SkillType.DEBUFF,
 		L2Skill.SkillType.DOT,
@@ -107,13 +111,60 @@ public class Continuous implements ISkillHandler
 			if (skill.isOffensive())
 			{
 
-				if (skill.getSkillType() != L2Skill.SkillType.BUFF && skill.getSkillType() != L2Skill.SkillType.HEAL && skill.getSkillType() != L2Skill.SkillType.RESURRECT)
-                if (target instanceof L2Attackable)
-                    ((L2Attackable)target).addDamageHate(activeChar, 0, 100);
-				boolean acted = Formulas.getInstance().calcMagicAffected(
-						activeChar, target, skill);
+
+				boolean ss = false;
+		        boolean sps = false;
+		        boolean bss = false;
+		        if (player != null)
+		        {
+		        	L2ItemInstance weaponInst = activeChar.getActiveWeaponInstance();
+		        	if (weaponInst != null)
+		        	{
+		        		if (weaponInst.getChargedSpiritshot() == L2ItemInstance.CHARGED_BLESSED_SPIRITSHOT)
+		                {
+		                    bss = true;
+		                    if (skill.getId() != 1020) // vitalize
+		                    	weaponInst.setChargedSpiritshot(L2ItemInstance.CHARGED_NONE);
+		                }
+		                else if (weaponInst.getChargedSpiritshot() == L2ItemInstance.CHARGED_SPIRITSHOT)
+		                {
+		                    sps = true;
+		                    if (skill.getId() != 1020) // vitalize
+		                    	weaponInst.setChargedSpiritshot(L2ItemInstance.CHARGED_NONE);
+		                }
+		                else if (weaponInst.getChargedSoulshot() == L2ItemInstance.CHARGED_SOULSHOT)
+		                {
+		                    ss = true;
+		                    if (skill.getId() != 1020) // vitalize
+		                    	weaponInst.setChargedSoulshot(L2ItemInstance.CHARGED_NONE);
+		                }		
+		        	}
+		        }
+		        else if (activeChar instanceof L2Summon)
+		        {
+		            L2Summon activeSummon = (L2Summon) activeChar;
+
+		            if (activeSummon.getChargedSpiritShot() == L2ItemInstance.CHARGED_BLESSED_SPIRITSHOT)
+		            {
+		                bss = true;
+		                activeSummon.setChargedSpiritShot(L2ItemInstance.CHARGED_NONE);
+		            }
+		            else if (activeSummon.getChargedSpiritShot() == L2ItemInstance.CHARGED_SPIRITSHOT)
+		            {
+		                sps = true;
+		                activeSummon.setChargedSpiritShot(L2ItemInstance.CHARGED_NONE);
+		            }
+		            else if (activeSummon.getChargedSoulShot() == L2ItemInstance.CHARGED_SOULSHOT)
+		            {
+		                ss = true;
+		                activeSummon.setChargedSoulShot(L2ItemInstance.CHARGED_NONE);
+		            }
+		        }
+		        
+				boolean acted = Formulas.getInstance().calcSkillSuccess(activeChar, target, skill, ss, sps, bss);
+
 				if (!acted) {
-					activeChar.sendPacket(new SystemMessage(SystemMessage.ATTACK_FAILED));
+					activeChar.sendPacket(new SystemMessage(SystemMessageId.ATTACK_FAILED));
 					continue;
 				}
 				
@@ -132,7 +183,20 @@ public class Continuous implements ISkillHandler
 			}
 			if (skill.isToggle() && stopped)
 				return;
-            skill.getEffects(activeChar, target);
+			
+			// if this is a debuff let the duel manager know about it
+			// so the debuff can be removed after the duel
+			// (player & target must be in the same duel)
+			if (target instanceof L2PcInstance && ((L2PcInstance)target).isInDuel() &&
+					skill.getSkillType() == L2Skill.SkillType.DEBUFF &&
+					player.getDuelId() == ((L2PcInstance)target).getDuelId())
+			{
+				DuelManager dm = DuelManager.getInstance();
+				for (L2Effect debuff : skill.getEffects(activeChar, target))
+					if (debuff != null) dm.onDebuff(((L2PcInstance)target), debuff);
+			}
+			else
+				skill.getEffects(activeChar, target);
 
         	if (skill.getSkillType() == L2Skill.SkillType.AGGDEBUFF)
 			{
@@ -159,6 +223,6 @@ public class Continuous implements ISkillHandler
 	
 	public SkillType[] getSkillIds()
 	{
-		return _skillIds;
+		return SKILL_IDS;
 	}
 }

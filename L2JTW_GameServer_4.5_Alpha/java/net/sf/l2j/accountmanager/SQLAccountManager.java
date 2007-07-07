@@ -47,7 +47,7 @@ public class SQLAccountManager
 
 	public static void main(String[] args) throws SQLException, IOException, NoSuchAlgorithmException
 	{
-		Server.SERVER_MODE = Server.MODE_LOGINSERVER;
+		Server.serverMode = Server.MODE_LOGINSERVER;
 		Config.load();
 		System.out.println("請選擇一個項目:");
         System.out.println("");
@@ -91,10 +91,10 @@ public class SQLAccountManager
 
 		if (_mode.equals("1")) {
 			// Add or Update
-			AddOrUpdateAccount(_uname,_pass,_level);		
+			addOrUpdateAccount(_uname,_pass,_level);		
 		} else if(_mode.equals("2")) {
 			// Change Level
-			ChangeAccountLevel(_uname,_level);			
+			changeAccountLevel(_uname,_level);			
 		} else if(_mode.equals("3")) {			
 			// Delete
 			System.out.print("確定要刪除這個帳號嗎?Y/N: ");
@@ -102,7 +102,7 @@ public class SQLAccountManager
 			if (yesno.equals("Y"))
 			{
 				// Yes		
-				DeleteAccount(_uname);
+				deleteAccount(_uname);
 			}
 			
 		} else if(_mode.equals("4")) {
@@ -130,7 +130,7 @@ public class SQLAccountManager
 		System.out.println("現存帳號總數: " + count + "個.");
 	}		
 	
-	private static void AddOrUpdateAccount(String account,String password, String level) throws IOException, SQLException, NoSuchAlgorithmException		
+	private static void addOrUpdateAccount(String account,String password, String level) throws IOException, SQLException, NoSuchAlgorithmException		
 	{
 		// Encode Password		
 		MessageDigest md = MessageDigest.getInstance("SHA");
@@ -149,7 +149,7 @@ public class SQLAccountManager
 		statement.close();
 	}
 
-	private static void ChangeAccountLevel(String account, String level) throws SQLException		
+	private static void changeAccountLevel(String account, String level) throws SQLException		
 	{		
 		java.sql.Connection con = null;
 		con = L2DatabaseFactory.getInstance().getConnection();		
@@ -183,7 +183,7 @@ public class SQLAccountManager
 		statement.close();		
 	}	
 
-	private static void DeleteAccount(String account) throws SQLException		
+	private static void deleteAccount(String account) throws SQLException		
 	{		
 		java.sql.Connection con = null;
 		con = L2DatabaseFactory.getInstance().getConnection();		
@@ -205,11 +205,13 @@ public class SQLAccountManager
 			statement.setEscapeProcessing(true);
 			statement.setString(1, account);
 			rset = statement.executeQuery();
+			
 			while (rset.next())
 			{
 				System.out.println("Deleting character " + rset.getString("char_name") + ".");			
 				
 				// Check If clan leader Remove Clan and remove all from it
+				statement.close();
 				statement = con.prepareStatement("SELECT COUNT(*) FROM clan_data WHERE leader_id=?;");
 				statement.setString(1, rset.getString("clanid"));
 				rcln = statement.executeQuery();
@@ -219,6 +221,7 @@ public class SQLAccountManager
 					// Clan Leader
 
 					// Get Clan Name
+					statement.close();
 					statement = con.prepareStatement("SELECT clan_name FROM clan_data WHERE leader_id=?;");
 					statement.setString(1, rset.getString("clanid"));
 					rcln = statement.executeQuery();
@@ -227,6 +230,7 @@ public class SQLAccountManager
 					System.out.println("Deleting clan " + rcln.getString("clan_name") + ".");			
 					
 					// Delete Clan Wars
+					statement.close();
 					statement = con.prepareStatement("DELETE FROM clan_wars WHERE clan1=? OR clan2=?;");
 					statement.setEscapeProcessing(true);
 					statement.setString(1, rcln.getString("clan_name"));
@@ -236,20 +240,24 @@ public class SQLAccountManager
 					rcln.close();
 					
 					// Remove All From clan
+					statement.close();
 					statement = con.prepareStatement("UPDATE characters SET clanid=0 WHERE clanid=?;");
 					statement.setString(1, rset.getString("clanid"));
 					statement.executeUpdate();
 
 					
 					// Delete Clan
+					statement.close();
 					statement = con.prepareStatement("DELETE FROM clan_data WHERE clan_id=?;");
 					statement.setString(1, rset.getString("clanid"));
 					statement.executeUpdate();
 					
+					statement.close();
 					statement = con.prepareStatement("DELETE FROM clan_privs WHERE clan_id=?;");
 					statement.setString(1, rset.getString("clanid"));
 					statement.executeUpdate();
 					
+					statement.close();
 					statement = con.prepareStatement("DELETE FROM clan_subpledges WHERE clan_id=?;");
 					statement.setString(1, rset.getString("clanid"));
 					statement.executeUpdate();
@@ -259,51 +267,61 @@ public class SQLAccountManager
 				}
 				
 				// skills
+				statement.close();
 				statement = con.prepareStatement("DELETE FROM character_skills WHERE char_obj_id=?;");
 				statement.setString(1, rset.getString("obj_Id"));
 				statement.executeUpdate();
 				
 				// shortcuts 
+				statement.close();
 				statement = con.prepareStatement("DELETE FROM character_shortcuts WHERE char_obj_id=?;");
 				statement.setString(1, rset.getString("obj_Id"));
 				statement.executeUpdate();
 
 				// items 
+				statement.close();
 				statement = con.prepareStatement("DELETE FROM items WHERE owner_id=?;");
 				statement.setString(1, rset.getString("obj_Id"));
 				statement.executeUpdate();
 
 				// recipebook 
+				statement.close();
 				statement = con.prepareStatement("DELETE FROM character_recipebook WHERE char_id=?;");
 				statement.setString(1, rset.getString("obj_Id"));
 				statement.executeUpdate();
 				
 				// quests 
+				statement.close();
 				statement = con.prepareStatement("DELETE FROM character_quests WHERE char_id=?;");
 				statement.setString(1, rset.getString("obj_Id"));
 				statement.executeUpdate();
 				
 				// macroses
+				statement.close();
 				statement = con.prepareStatement("DELETE FROM character_macroses WHERE char_obj_id=?;");
 				statement.setString(1, rset.getString("obj_Id"));
 				statement.executeUpdate();
 				
 				// friends
+				statement.close();
 				statement = con.prepareStatement("DELETE FROM character_friends WHERE char_id=?;");
 				statement.setString(1, rset.getString("obj_Id"));
 				statement.executeUpdate();
 
 				// merchant_lease 
+				statement.close();
 				statement = con.prepareStatement("DELETE FROM merchant_lease WHERE player_id=?;");
 				statement.setString(1, rset.getString("obj_Id"));
 				statement.executeUpdate();
 				
 				// boxaccess
+				statement.close();
 				statement = con.prepareStatement("DELETE FROM boxaccess WHERE charname=?;");
 				statement.setString(1, rset.getString("char_name"));
 				statement.executeUpdate();
 				
 				// characters 
+				statement.close();
 				statement = con.prepareStatement("DELETE FROM characters WHERE obj_Id=?;");
 				statement.setString(1, rset.getString("obj_Id"));
 				statement.executeUpdate();
@@ -311,12 +329,13 @@ public class SQLAccountManager
 			}			
 						
 			// Delete Account
+			statement.close();
 			statement = con.prepareStatement("DELETE FROM accounts WHERE login=?;");
 			statement.setEscapeProcessing(true);
 			statement.setString(1, account);
 			statement.executeUpdate();
-
 			System.out.println("帳號(" + account + ")的所有資料已成功刪除.");			
+
 
 		} else {		
 			// Not Exist		
@@ -324,7 +343,9 @@ public class SQLAccountManager
 		}
 		
 		// Close Connection
-		statement.close();		
+		rset.close();
+		statement.close();
+		con.close();
 	}	
 
 }

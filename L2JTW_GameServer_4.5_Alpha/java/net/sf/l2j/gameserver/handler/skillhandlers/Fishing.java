@@ -29,6 +29,7 @@ import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.model.L2Skill.SkillType;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.InventoryUpdate;
 import net.sf.l2j.gameserver.serverpackets.ItemList;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
@@ -40,7 +41,7 @@ public class Fishing implements ISkillHandler
 { 
     //private static Logger _log = Logger.getLogger(SiegeFlag.class.getName()); 
 	//protected SkillType[] _skillIds = {SkillType.FISHING};
-	protected SkillType[] _skillIds = {SkillType.FISHING}; 
+	private static final SkillType[] SKILL_IDS = {SkillType.FISHING}; 
     
     public void useSkill(L2Character activeChar, @SuppressWarnings("unused") L2Skill skill, @SuppressWarnings("unused") L2Object[] targets)
     {
@@ -50,35 +51,35 @@ public class Fishing implements ISkillHandler
 		
 		if (player.isFishing())
 		{
-			if (player.GetFishCombat() != null) player.GetFishCombat().DoDie(false);
+			if (player.GetFishCombat() != null) player.GetFishCombat().doDie(false);
 			else player.EndFishing(false);
 			//Cancels fishing			
-			player.sendPacket(new SystemMessage(SystemMessage.FISHING_ATTEMPT_CANCELLED));
+			player.sendPacket(new SystemMessage(SystemMessageId.FISHING_ATTEMPT_CANCELLED));
 			return;
 		}
         if (player.isInBoat())
 		{			
 			//You can't fish while you are on boat
-        	player.sendPacket(new SystemMessage(SystemMessage.CANNOT_FISH_ON_BOAT));
+        	player.sendPacket(new SystemMessage(SystemMessageId.CANNOT_FISH_ON_BOAT));
 			if (!player.isGM())
 				return;
 		}
 		if (!ZoneManager.getInstance().checkIfInZoneFishing(player))
 		{
             //You can't fish here
-			player.sendPacket(new SystemMessage(SystemMessage.CANNOT_FISH_HERE));
+			player.sendPacket(new SystemMessage(SystemMessageId.CANNOT_FISH_HERE));
 			if (!player.isGM())
 				return;
 		}
 		if (player.getZ() <= -3800)
 		{
             //You can't fish in water
-			player.sendPacket(new SystemMessage(SystemMessage.CANNOT_FISH_UNDER_WATER));
+			player.sendPacket(new SystemMessage(SystemMessageId.CANNOT_FISH_UNDER_WATER));
 			if (!player.isGM())
 				return;
 		}
 		if (player.isInCraftMode() || player.isInStoreMode()) {
-			player.sendPacket(new SystemMessage(SystemMessage.CANNOT_FISH_WHILE_USING_RECIPE_BOOK));
+			player.sendPacket(new SystemMessage(SystemMessageId.CANNOT_FISH_WHILE_USING_RECIPE_BOOK));
 			if (!player.isGM())
 				return;
 		}
@@ -86,14 +87,14 @@ public class Fishing implements ISkillHandler
 		if ((weaponItem==null || weaponItem.getItemType() != L2WeaponType.ROD))
 		{
 			//Fishing poles are not installed
-			player.sendPacket(new SystemMessage(SystemMessage.FISHING_POLE_NOT_EQUIPPED));
+			player.sendPacket(new SystemMessage(SystemMessageId.FISHING_POLE_NOT_EQUIPPED));
 			return;
 		}		
 		L2ItemInstance lure = player.getInventory().getPaperdollItem(Inventory.PAPERDOLL_LHAND);
 		if (lure == null)
 		{
 		    //Not enough bait
-			player.sendPacket(new SystemMessage(SystemMessage.BAIT_ON_HOOK_BEFORE_FISHING));
+			player.sendPacket(new SystemMessage(SystemMessageId.BAIT_ON_HOOK_BEFORE_FISHING));
             return;
 		}
 		if (!Config.ALLOWFISHING && !player.isGM())
@@ -108,7 +109,7 @@ public class Fishing implements ISkillHandler
 
 		if (lure2 == null || lure2.getCount() == 0)
 		{
-		    player.sendPacket(new SystemMessage(SystemMessage.NOT_ENOUGH_BAIT));
+		    player.sendPacket(new SystemMessage(SystemMessageId.NOT_ENOUGH_BAIT));
 			player.sendPacket(new ItemList(player,false));
 		}
 		else
@@ -117,8 +118,11 @@ public class Fishing implements ISkillHandler
 			iu.addModifiedItem(lure2);
 			player.sendPacket(iu);
 		}
+
         */
-		player.StartFishing();		
+		
+		player.startFishing();		
+
 	
 		
         
@@ -127,7 +131,7 @@ public class Fishing implements ISkillHandler
     
     public SkillType[] getSkillIds() 
     { 
-        return _skillIds; 
+        return SKILL_IDS; 
     } 
     
 }

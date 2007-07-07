@@ -22,6 +22,7 @@ import java.util.StringTokenizer;
 
 import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.instancemanager.SiegeManager;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.ActionFailed;
 import net.sf.l2j.gameserver.serverpackets.ItemList;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
@@ -64,7 +65,8 @@ public final class L2ObservationInstance extends L2FolkInstance
                                                                                                       player,
                                                                                                       val);
 
-            else player.sendPacket(new SystemMessage(SystemMessage.ONLY_VIEW_SIEGE)); 
+            else player.sendPacket(new SystemMessage(SystemMessageId.ONLY_VIEW_SIEGE)); 
+
 
 
 

@@ -38,6 +38,7 @@ import net.sf.l2j.gameserver.instancemanager.PetitionManager;
 import net.sf.l2j.gameserver.model.BlockList;
 import net.sf.l2j.gameserver.model.L2World;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.CreatureSay;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.L2DatabaseFactory;
@@ -68,7 +69,10 @@ public final class Say2 extends L2GameClientPacket
 	public final static int PARTYROOM_ALL = 15; //(yellow)
 	public final static int PARTYROOM_COMMANDER = 16; //(blue)
 	public final static int HERO_VOICE = 17;
- 	public final static String[] chatNames = {
+
+	
+	public final static String[] CHAT_NAMES = {
+
 	                                          "ALL  ",
 	                                          "SHOUT",
 	                                          "TELL ",
@@ -106,7 +110,7 @@ public final class Say2 extends L2GameClientPacket
 		if (Config.DEBUG) 
 			_log.info("Say2: Msg Type = '" + _type + "' Text = '" + _text + "'.");
 		
-		if(_type >= chatNames.length)
+		if(_type >= CHAT_NAMES.length)
 		{
 			_log.warning("Say2: Invalid type: "+_type);
 			return;
@@ -149,13 +153,16 @@ public final class Say2 extends L2GameClientPacket
 			record.setLoggerName("chat");
 			
 			if (_type == TELL)
+
             {
-				record.setParameters(new Object[]{chatNames[_type], "[" + activeChar.getName() + " to "+_target+"]"});
+				record.setParameters(new Object[]{CHAT_NAMES[_type], "[" + activeChar.getName() + " to "+_target+"]"});
+
 			    _log.warning("[" + activeChar.getName() + " to "+_target+"] : " + _text);
             }
 			else
             {
-				record.setParameters(new Object[]{chatNames[_type], "[" + activeChar.getName() + "]"});
+				record.setParameters(new Object[]{CHAT_NAMES[_type], "[" + activeChar.getName() + "]"});
+
                 _log.warning("[" + activeChar.getName() + "] : " + _text);
             }
 			_logChat.log(record);
@@ -178,12 +185,12 @@ public final class Say2 extends L2GameClientPacket
 					}
 					else
 					{
-						activeChar.sendPacket(new SystemMessage(SystemMessage.THE_PERSON_IS_IN_MESSAGE_REFUSAL_MODE));
+						activeChar.sendPacket(new SystemMessage(SystemMessageId.THE_PERSON_IS_IN_MESSAGE_REFUSAL_MODE));
 					}
 				}
 				else
 				{
-					SystemMessage sm = new SystemMessage(SystemMessage.S1_IS_NOT_ONLINE);
+					SystemMessage sm = new SystemMessage(SystemMessageId.S1_IS_NOT_ONLINE);
 					sm.addString(_target);
 					activeChar.sendPacket(sm);
 					sm = null;
@@ -312,7 +319,7 @@ public final class Say2 extends L2GameClientPacket
 			case PETITION_GM:
 				if (!PetitionManager.getInstance().isPlayerInConsultation(activeChar))
 				{
-					activeChar.sendPacket(new SystemMessage(745));
+					activeChar.sendPacket(new SystemMessage(SystemMessageId.YOU_ARE_NOT_IN_PETITION_CHAT));
 					break;
 				}
 				

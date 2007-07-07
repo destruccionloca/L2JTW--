@@ -28,6 +28,7 @@ import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PetInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PlayableInstance;
 import net.sf.l2j.gameserver.model.entity.Castle;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
 /** 
@@ -39,7 +40,7 @@ import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 public class ScrollOfResurrection implements IItemHandler 
 { 
     // all the items ids that this handler knows 
-    private final static int[] _itemIds = { 737, 3936, 3959, 6387 }; 
+    private static final int[] ITEM_IDS = { 737, 3936, 3959, 6387 }; 
     
     /* (non-Javadoc) 
      * @see net.sf.l2j.gameserver.handler.IItemHandler#useItem(net.sf.l2j.gameserver.model.L2PcInstance, net.sf.l2j.gameserver.model.L2ItemInstance) 
@@ -51,7 +52,7 @@ public class ScrollOfResurrection implements IItemHandler
         L2PcInstance activeChar = (L2PcInstance)playable;
         if (activeChar.isSitting())
         {
-        	activeChar.sendPacket(new SystemMessage(SystemMessage.CANT_MOVE_SITTING));
+        	activeChar.sendPacket(new SystemMessage(SystemMessageId.CANT_MOVE_SITTING));
         	return;
         }
         if (activeChar.isMovementDisabled()) return;
@@ -93,7 +94,7 @@ public class ScrollOfResurrection implements IItemHandler
             	{
 
                     condGood = false;
-                    activeChar.sendPacket(new SystemMessage(SystemMessage.CANNOT_BE_RESURRECTED_DURING_SIEGE));
+                    activeChar.sendPacket(new SystemMessage(SystemMessageId.CANNOT_BE_RESURRECTED_DURING_SIEGE));
 
             	}
                 
@@ -105,9 +106,9 @@ public class ScrollOfResurrection implements IItemHandler
                 		if (targetPet.getOwner().isReviveRequested())
                 		{
                 			if (targetPet.getOwner().isRevivingPet())
-                				activeChar.sendPacket(new SystemMessage(1513)); // Resurrection is already been proposed.
+                				activeChar.sendPacket(new SystemMessage(SystemMessageId.RES_HAS_ALREADY_BEEN_PROPOSED)); // Resurrection is already been proposed.
                 			else
-                				activeChar.sendPacket(new SystemMessage(1515)); // A pet cannot be resurrected while it's owner is in the process of resurrecting.
+                				activeChar.sendPacket(new SystemMessage(SystemMessageId.PET_CANNOT_RES)); // A pet cannot be resurrected while it's owner is in the process of resurrecting.
                             condGood = false;
                 		}
                     }
@@ -134,9 +135,9 @@ public class ScrollOfResurrection implements IItemHandler
                 	if (targetPlayer.isReviveRequested())
                 	{
                 		if (targetPlayer.isRevivingPet())
-                			activeChar.sendPacket(new SystemMessage(1511)); // While a pet is attempting to resurrect, it cannot help in resurrecting its master.
+                			activeChar.sendPacket(new SystemMessage(SystemMessageId.MASTER_CANNOT_RES)); // While a pet is attempting to resurrect, it cannot help in resurrecting its master.
                 		else
-                			activeChar.sendPacket(new SystemMessage(1513)); // Resurrection is already been proposed.
+                			activeChar.sendPacket(new SystemMessage(SystemMessageId.RES_HAS_ALREADY_BEEN_PROPOSED)); // Resurrection is already been proposed.
 
                         condGood = false;
                 	}
@@ -174,7 +175,7 @@ public class ScrollOfResurrection implements IItemHandler
                     	activeChar.sendPacket(sg);
                     	*/
 
-                    	SystemMessage sm = new SystemMessage(SystemMessage.S1_DISAPPEARED);
+                    	SystemMessage sm = new SystemMessage(SystemMessageId.S1_DISAPPEARED);
                     	sm.addItemName(itemId);
                     	activeChar.sendPacket(sm);
                     }
@@ -183,12 +184,12 @@ public class ScrollOfResurrection implements IItemHandler
         }
         else
         {
-        	activeChar.sendPacket(new SystemMessage(SystemMessage.TARGET_IS_INCORRECT));
+        	activeChar.sendPacket(new SystemMessage(SystemMessageId.TARGET_IS_INCORRECT));
         }
     } 
     	
     public int[] getItemIds() 
     { 
-        return _itemIds; 
+        return ITEM_IDS; 
     } 
 } 

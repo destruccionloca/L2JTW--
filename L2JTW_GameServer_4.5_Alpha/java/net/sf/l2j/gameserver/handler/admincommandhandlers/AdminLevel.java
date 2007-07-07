@@ -37,12 +37,13 @@ import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PlayableInstance;
 import net.sf.l2j.gameserver.model.base.Experience;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
 public class AdminLevel implements IAdminCommandHandler
 {
     private static final int REQUIRED_LEVEL = Config.GM_CHAR_EDIT;
-    public static final String[] ADMIN_COMMANDS =
+    private static final String[] ADMIN_COMMANDS =
     {
         "admin_add_level",
         "admin_set_level"
@@ -83,7 +84,7 @@ public class AdminLevel implements IAdminCommandHandler
             {
         		if (targetChar == null || !(targetChar instanceof L2PcInstance))
                 {
-                    activeChar.sendPacket(new SystemMessage(144));	// incorrect target!
+                    activeChar.sendPacket(new SystemMessage(SystemMessageId.TARGET_IS_INCORRECT));	// incorrect target!
                     return false;
         		}
         		L2PcInstance targetPlayer = (L2PcInstance)targetChar;

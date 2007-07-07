@@ -39,6 +39,7 @@ import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.model.L2Party;
 import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.NpcHtmlMessage;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
@@ -51,23 +52,25 @@ import net.sf.l2j.util.Rnd;
  */
 public abstract class Quest
 {
-	protected static Logger _log = Logger.getLogger(Quest.class.getName());
+	protected static final Logger _log = Logger.getLogger(Quest.class.getName());
 
 	/** HashMap containing events from String value of the event */
-	private static Map<String, Quest> allEventsS = new FastMap<String, Quest>();
+	private static Map<String, Quest> _allEventsS = new FastMap<String, Quest>();
+	/** HashMap containing lists of timers from the name of the timer */
+	private static Map<String, FastList<QuestTimer>> _allEventTimers = new FastMap<String, FastList<QuestTimer>>();
 
 	private final int _questId;
 	private final String _name;
 	private final String _descr;
-    private State initialState;
-    private Map<String, State> states;
+    private State _initialState;
+    private Map<String, State> _states;
 	
 	/**
 	 * Return collection view of the values contains in the allEventS
 	 * @return Collection<Quest>
 	 */
 	public static Collection<Quest> findAllEvents() {
-		return allEventsS.values();
+		return _allEventsS.values();
 	}
 	
     /**
@@ -81,14 +84,14 @@ public abstract class Quest
 		_questId = questId;
 		_name = name;
 		_descr = descr;
-        states = new FastMap<String, State>();
+        _states = new FastMap<String, State>();
 		if (questId != 0)
 		{
 			QuestManager.getInstance().addQuest(Quest.this);
 		}
 		else
 		{
-			allEventsS.put(name, this);
+			_allEventsS.put(name, this);
 		}
 	}
 	
@@ -129,7 +132,7 @@ public abstract class Quest
 	 * @param state
 	 */
 	public void setInitialState(State state) {
-		this.initialState = state;
+		this._initialState = state;
 	}
 	
 	/**
@@ -148,7 +151,7 @@ public abstract class Quest
 	 * @return State
 	 */
 	public State getInitialState() {
-		return initialState;
+		return _initialState;
 	}
     
 	/**
@@ -174,9 +177,71 @@ public abstract class Quest
 	 */
     public State addState(State state)
     {
-        states.put(state.getName(), state);
+        _states.put(state.getName(), state);
 		return state;
     }
+    
+    /**
+     * Add a timer to the quest, if it doesn't exist already
+     * @param name: name of the timer (also passed back as "event" in onAdvEvent)
+     * @param time: time in ms for when to fire the timer
+     * @param npc:  npc associated with this timer (can be null)
+     * @param player: player associated with this timer (can be null)
+     */
+    public void startQuestTimer(String name, long time, L2NpcInstance npc, L2PcInstance player)
+    {
+        // Add quest timer if timer doesn't already exist
+    	FastList<QuestTimer> timers = getQuestTimers(name);
+    	// no timer exists with the same name, at all 
+        if (timers == null)
+        {
+        	timers = new FastList<QuestTimer>();
+            timers.add(new QuestTimer(this, name, time, npc, player));
+        	_allEventTimers.put(name, timers);
+        }
+        // a timer with this name exists, but may not be for the same set of npc and player
+        else
+        {
+        	// if there exists a timer with this name, allow the timer only if the [npc, player] set is unique
+        	// nulls act as wildcards
+        	if(getQuestTimer(name, npc, player)==null)
+        		timers.add(new QuestTimer(this, name, time, npc, player));
+        }
+        // ignore the startQuestTimer in all other cases (timer is already started)
+    }
+    
+    public QuestTimer getQuestTimer(String name, L2NpcInstance npc, L2PcInstance player)
+    {
+    	if (_allEventTimers.get(name)==null)
+    		return null;
+    	for(QuestTimer timer: _allEventTimers.get(name))
+    		if (timer.isMatch(this, name, npc, player))
+    			return timer;
+    	return null;
+    }
+
+    public FastList<QuestTimer> getQuestTimers(String name)
+    {
+    	return _allEventTimers.get(name);
+    }
+    
+    public void cancelQuestTimer(String name, L2NpcInstance npc, L2PcInstance player)
+    {
+    	QuestTimer timer = getQuestTimer(name, npc, player);
+    	if (timer != null)
+    		timer.cancel();
+    }
+
+    public void removeQuestTimer(QuestTimer timer)
+    {
+    	if (timer == null)
+    		return;
+    	FastList<QuestTimer> timers = getQuestTimers(timer.getName());
+    	if (timers == null)
+    		return;
+    	timers.remove(timer);    		
+    }
+	
     
 	// these are methods to call from java
     public final boolean notifyAttack(L2NpcInstance npc, L2PcInstance attacker) {
@@ -184,15 +249,15 @@ public abstract class Quest
         try { res = onAttack(npc, attacker); } catch (Exception e) { return showError(attacker, e); }
         return showResult(attacker, res);
     } 
-    public final boolean notifyDeath(L2NpcInstance npc, L2Character character, QuestState qs) {
+    public final boolean notifyDeath(L2Character killer, L2Character victim, QuestState qs) {
         String res = null;
-        try { res = onDeath(npc, character, qs); } catch (Exception e) { return showError(qs.getPlayer(), e); }
+        try { res = onDeath(killer, victim, qs); } catch (Exception e) { return showError(qs.getPlayer(), e); }
         return showResult(qs.getPlayer(), res);
     } 
-    public final boolean notifyEvent(String event, QuestState qs) {
+    public final boolean notifyEvent(String event, L2NpcInstance npc, L2PcInstance player) {
         String res = null;
-        try { res = onEvent(event, qs); } catch (Exception e) { return showError(qs.getPlayer(), e); }
-        return showResult(qs.getPlayer(), res);
+        try { res = onAdvEvent(event, npc, player); } catch (Exception e) { return showError(player, e); }
+        return showResult(player, res);
     } 
 	public final boolean notifyKill (L2NpcInstance npc, L2PcInstance killer) {
 		String res = null;
@@ -225,7 +290,25 @@ public abstract class Quest
 
 	// these are methods that java calls to invoke scripts
     @SuppressWarnings("unused") public String onAttack(L2NpcInstance npc, L2PcInstance attacker) { return null; } 
-    @SuppressWarnings("unused") public String onDeath (L2NpcInstance npc, L2Character character, QuestState qs) { return onEvent("", qs); }
+    @SuppressWarnings("unused") public String onDeath (L2Character killer, L2Character victim, QuestState qs) 
+    { 	
+    	if (killer instanceof L2NpcInstance)
+    		return onAdvEvent("", (L2NpcInstance)killer,qs.getPlayer()); 
+    	else 
+    		return onAdvEvent("", null,qs.getPlayer());
+    }
+    
+    @SuppressWarnings("unused") public String onAdvEvent(String event, L2NpcInstance npc, L2PcInstance player) 
+    {
+    	// if not overriden by a subclass, then default to the returned value of the simpler (and older) onEvent override
+    	// if the player has a state, use it as parameter in the next call, else return null
+    	QuestState qs = player.getQuestState(getName());
+    	if (qs != null )
+    		return onEvent(event, qs);
+
+    	return null; 
+    } 
+    
     @SuppressWarnings("unused") public String onEvent(String event, QuestState qs) { return null; } 
     @SuppressWarnings("unused") public String onKill (L2NpcInstance npc, L2PcInstance killer) { return null; }
     @SuppressWarnings("unused") public String onTalk (L2NpcInstance npc, L2PcInstance talker) { return null; }
@@ -274,7 +357,7 @@ public abstract class Quest
 			player.sendPacket(npcReply);
 		}
 		else {
-			SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);
+			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 			sm.addString("SYS");
 			sm.addString(res);
 			player.sendPacket(sm);
@@ -331,9 +414,9 @@ public abstract class Quest
 				if(stateId.equals("Completed")) completed = true;
 				
 				// Create an object State containing the state of the quest
-				State state = q.states.get(stateId);
+				State state = q._states.get(stateId);
 				if (state == null) {
-					_log.finer("Unknown state "+state+" in quest "+questId+" for player "+player.getName());
+					_log.finer("Unknown state in quest "+questId+" for player "+player.getName());
 					if (Config.AUTODELETE_INVALID_QUEST_DATA){
 					    invalidQuestData.setInt(1, player.getObjectId());
                         invalidQuestData.setString(2, questId);
@@ -382,7 +465,7 @@ public abstract class Quest
         }
 		
 		// events
-		for (String name : allEventsS.keySet()) {
+		for (String name : _allEventsS.keySet()) {
 			player.processQuestEvent(name, "enter");
 		}
 	}

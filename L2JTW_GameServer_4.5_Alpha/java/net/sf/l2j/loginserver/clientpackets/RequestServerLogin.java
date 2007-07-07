@@ -87,8 +87,9 @@ public class RequestServerLogin extends L2LoginClientPacket
 		// if we didnt showed the license we cant check these values
 		if (!Config.SHOW_LICENCE || sk.checkLoginPair(_skey1, _skey2))
 		{
-			if (LoginController.getInstance().isLoginPossible(this.getClient().getAccessLevel(), _serverId))
+			if (LoginController.getInstance().isLoginPossible(this.getClient(), _serverId))
 			{
+				this.getClient().setJoinedGS(true);
 				this.getClient().sendPacket(new PlayOk(sk));
 			}
 			else

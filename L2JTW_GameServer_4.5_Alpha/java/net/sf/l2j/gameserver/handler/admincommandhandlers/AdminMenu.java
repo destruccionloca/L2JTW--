@@ -32,6 +32,7 @@ import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2World;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
 /**
@@ -44,7 +45,7 @@ public class AdminMenu implements IAdminCommandHandler
 {
 	private static final Logger _log = Logger.getLogger(AdminMenu.class.getName());
 
-	private static String[] _adminCommands = {
+	private static final String[] ADMIN_COMMANDS = {
 		"admin_char_manage",
 		"admin_teleport_character_to_menu",
 		"admin_recall_char_menu",
@@ -124,7 +125,7 @@ public class AdminMenu implements IAdminCommandHandler
                 String player = st.nextToken();
                 //System.out.println("Player1 "+player);
                 L2PcInstance plyr = L2World.getInstance().getPlayer(player);
-				SystemMessage sm = new SystemMessage(614);
+				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 
 				if (plyr != null)
 				{
@@ -174,7 +175,7 @@ public class AdminMenu implements IAdminCommandHandler
 	}
     public String[] getAdminCommandList() 
     {
-		return _adminCommands;
+		return ADMIN_COMMANDS;
 	}
 	private boolean checkLevel(int level) 
     {
@@ -193,7 +194,7 @@ public class AdminMenu implements IAdminCommandHandler
             {
                 obj = plyr;
             }
-			SystemMessage sm = new SystemMessage(614);
+			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 			sm.addString("SYS");
 			sm.addString("滅亡 " + plyr.getName() + " 人物.");
 			activeChar.sendPacket(sm);
@@ -206,7 +207,7 @@ public class AdminMenu implements IAdminCommandHandler
 		}
 		else
 		{
-			SystemMessage sm = new SystemMessage(614);
+			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 			sm.addString("SYS");
 			sm.addString("錯誤目標");
 			activeChar.sendPacket(sm);
@@ -216,7 +217,7 @@ public class AdminMenu implements IAdminCommandHandler
     private void teleportCharacter(L2PcInstance player, int x, int y, int z, L2PcInstance activeChar)
     {
         if (player != null) {
-            SystemMessage sm = new SystemMessage(614);
+            SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
             sm.addString("SYS");
             sm.addString("管理員進行傳送");
             player.sendPacket(sm);
@@ -234,7 +235,7 @@ public class AdminMenu implements IAdminCommandHandler
 		} 
 		else 
 		{
-			SystemMessage sm = new SystemMessage(614);
+			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 			sm.addString("SYS");
 			sm.addString("錯誤目標");
 			activeChar.sendPacket(sm);
@@ -243,7 +244,7 @@ public class AdminMenu implements IAdminCommandHandler
 		
 		if (player.getObjectId() == activeChar.getObjectId())
 		{	
-			SystemMessage sm = new SystemMessage(614);
+			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 			sm.addString("SYS");
 			sm.addString("無法傳送自己");
 			activeChar.sendPacket(sm);
@@ -256,7 +257,7 @@ public class AdminMenu implements IAdminCommandHandler
 			
 			activeChar.teleToLocation(x, y, z, true);
 		
-			SystemMessage sm = new SystemMessage(614);
+			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 			sm.addString("SYS");
 			sm.addString("傳送至 " + player.getName() + " 人物.");
 			activeChar.sendPacket(sm);
@@ -277,7 +278,7 @@ public class AdminMenu implements IAdminCommandHandler
             String acc_name = result.getString(1);
             statement.close();
             
-            SystemMessage sm = new SystemMessage(614);
+            SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 
             if(acc_name.length() > 0)
             {

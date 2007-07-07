@@ -34,6 +34,7 @@ import net.sf.l2j.gameserver.model.actor.instance.L2MercManagerInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2MerchantInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.ActionFailed;
 import net.sf.l2j.gameserver.serverpackets.InventoryUpdate;
 import net.sf.l2j.gameserver.serverpackets.StatusUpdate;
@@ -49,7 +50,7 @@ import net.sf.l2j.gameserver.util.Util;
 public final class RequestWearItem extends L2GameClientPacket
 {
     private static final String _C__C6_REQUESTWEARITEM = "[C] C6 RequestWearItem";
-    protected static Logger _log = Logger.getLogger(RequestWearItem.class.getName());
+    protected static final Logger _log = Logger.getLogger(RequestWearItem.class.getName());
     
     protected Future _removeWearItemsTask;
     
@@ -66,7 +67,7 @@ public final class RequestWearItem extends L2GameClientPacket
     private int[] _items;
     
     /** Player that request a Try on */
-    protected L2PcInstance _player;
+    protected L2PcInstance _activeChar;
     
     
     class RemoveWearItemsTask implements Runnable
@@ -76,7 +77,7 @@ public final class RequestWearItem extends L2GameClientPacket
             try
 
             {
-            	_player.destroyWearedItems("Wear", null, true);
+            	_activeChar.destroyWearedItems("Wear", null, true);
 
                 
             } catch (Throwable e){
@@ -94,7 +95,7 @@ public final class RequestWearItem extends L2GameClientPacket
     protected void readImpl()
     {
         // Read and Decrypt the RequestWearItem Client->Server Packet
-        _player = getClient().getActiveChar();
+    	_activeChar = getClient().getActiveChar();
         _unknow = readD();
         _listId = readD(); // List of ItemID to Wear
 		_count = readD();  // Number of Item to Wear
@@ -202,21 +203,21 @@ public final class RequestWearItem extends L2GameClientPacket
         // Check the weight
 		if (!player.getInventory().validateWeight(weight))
 		{
-			sendPacket(new SystemMessage(SystemMessage.WEIGHT_LIMIT_EXCEEDED));
+			sendPacket(new SystemMessage(SystemMessageId.WEIGHT_LIMIT_EXCEEDED));
 			return;
 		}
 
         // Check the inventory capacity
 		if (!player.getInventory().validateCapacity(slots))
 		{
-			sendPacket(new SystemMessage(SystemMessage.SLOTS_FULL));
+			sendPacket(new SystemMessage(SystemMessageId.SLOTS_FULL));
 			return;
 		}
 
 		// Charge buyer and add tax to castle treasury if not owned by npc clan because a Try On is not Free
 		if ((totalPrice < 0) || !player.reduceAdena("Wear", (int)totalPrice, player.getLastFolkNPC(), false))
 		{
-			sendPacket(new SystemMessage(SystemMessage.YOU_NOT_ENOUGH_ADENA));
+			sendPacket(new SystemMessage(SystemMessageId.YOU_NOT_ENOUGH_ADENA));
 			return;
 		}
 

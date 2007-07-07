@@ -4,13 +4,14 @@ import net.sf.l2j.gameserver.ai.CtrlEvent;
 import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PetInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
 public class PetStatus extends SummonStatus
 {
     // =========================================================
     // Data Field
-    private int _CurrentFed               = 0; //Current Fed of the L2PetInstance
+    private int _currentFed               = 0; //Current Fed of the L2PetInstance
     
     // =========================================================
     // Constructor
@@ -30,7 +31,7 @@ public class PetStatus extends SummonStatus
 
         if (attacker != null)
         {
-            SystemMessage sm = new SystemMessage(SystemMessage.S1_GAME_PET_S2_DMG);
+            SystemMessage sm = new SystemMessage(SystemMessageId.PET_RECEIVED_S2_DAMAGE_BY_S1);
             if (attacker instanceof L2NpcInstance)
                 sm.addNpcName(((L2NpcInstance)attacker).getTemplate().idTemplate);
             else
@@ -49,6 +50,6 @@ public class PetStatus extends SummonStatus
     // Property - Public
     public L2PetInstance getActiveChar() { return (L2PetInstance)super.getActiveChar(); }
 
-    public int getCurrentFed() { return _CurrentFed; }
-    public void setCurrentFed(int value) { _CurrentFed = value; }
+    public int getCurrentFed() { return _currentFed; }
+    public void setCurrentFed(int value) { _currentFed = value; }
 }

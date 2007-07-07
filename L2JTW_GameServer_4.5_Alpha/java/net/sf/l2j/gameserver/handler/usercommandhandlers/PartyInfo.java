@@ -21,6 +21,7 @@ package net.sf.l2j.gameserver.handler.usercommandhandlers;
 import net.sf.l2j.gameserver.handler.IUserCommandHandler;
 import net.sf.l2j.gameserver.model.L2Party;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
 /**
@@ -40,8 +41,9 @@ public class PartyInfo implements IUserCommandHandler
         
     	if (!activeChar.isInParty())
     	{
-    		SystemMessage sm = SystemMessage.sendString("不在隊伍裡面");
-    		activeChar.sendPacket(sm);
+    		SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);  
+            sm.addString("SYS");
+            sm.addString("不在隊伍內");
     		return false;	
     	}
     	
@@ -50,37 +52,40 @@ public class PartyInfo implements IUserCommandHandler
     	int lootDistribution = playerParty.getLootDistribution();
     	String partyLeader = playerParty.getPartyMembers().get(0).getName();
     	
-        activeChar.sendPacket(new SystemMessage(1030));
+        activeChar.sendPacket(new SystemMessage(SystemMessageId.PARTY_INFORMATION));
         
     		switch (lootDistribution) {
     		case L2Party.ITEM_LOOTER:
-    			activeChar.sendPacket(new SystemMessage(1031));
+    			activeChar.sendPacket(new SystemMessage(SystemMessageId.LOOTING_FINDERS_KEEPERS));
     			break;
     		case L2Party.ITEM_ORDER:
-                activeChar.sendPacket(new SystemMessage(1034));
+                activeChar.sendPacket(new SystemMessage(SystemMessageId.LOOTING_BY_TURN));
     			break;
     		case L2Party.ITEM_ORDER_SPOIL:
-                activeChar.sendPacket(new SystemMessage(1035));
+                activeChar.sendPacket(new SystemMessage(SystemMessageId.LOOTING_BY_TURN_INCLUDE_SPOIL));
     			break;
     		case L2Party.ITEM_RANDOM:
-                activeChar.sendPacket(new SystemMessage(1032));
+                activeChar.sendPacket(new SystemMessage(SystemMessageId.LOOTING_RANDOM));
     			break;
     		case L2Party.ITEM_RANDOM_SPOIL:
-                activeChar.sendPacket(new SystemMessage(1033));
+                activeChar.sendPacket(new SystemMessage(SystemMessageId.LOOTING_RANDOM_INCLUDE_SPOIL));
     			break;
     		}
     	
 
-        SystemMessage sm = new SystemMessage(1611);                
+        SystemMessage sm = new SystemMessage(SystemMessageId.PARTY_LEADER_S1);                
     	sm.addString(partyLeader);
     	activeChar.sendPacket(sm);
     	
+
     	sm = new SystemMessage(SystemMessage.S1_S2);  
-        sm.addString("SYS");
-        sm.addString("隊員: " + memberCount + "/9");
+        sm.addString("隊員");
+        sm.addString("" + memberCount + "/9");
 
 
-    	activeChar.sendPacket(new SystemMessage(1612));
+
+    	activeChar.sendPacket(new SystemMessage(SystemMessageId.WAR_LIST));
+
     	return true;
     }
 

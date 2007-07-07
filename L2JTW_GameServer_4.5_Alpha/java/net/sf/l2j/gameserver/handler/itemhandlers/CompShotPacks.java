@@ -22,6 +22,7 @@ import net.sf.l2j.gameserver.handler.IItemHandler;
 import net.sf.l2j.gameserver.model.L2ItemInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PlayableInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.ItemList;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
@@ -33,7 +34,7 @@ import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
 public class CompShotPacks implements IItemHandler
 {
-	private static int[] _itemIds ={
+	private static final int[] ITEM_IDS ={
 	                                 5134, 5135, 5136, 5137, 5138, 5139, /**/ 5250, 5251, 5252, 5253, 5254, 5255 // SS
 	                                 //5140, 5141, 5142, 5143, 5144, 5145, /**/ 5256, 5257, 5258, 5259, 5260, 5261, // SpS
 	                                 //5146, 5147, 5148, 5149, 5150, 5151, /**/ 5262, 5263, 5264, 5265, 5266, 5267  // BSpS
@@ -77,7 +78,7 @@ public class CompShotPacks implements IItemHandler
 		activeChar.getInventory().destroyItem("Extract", item, activeChar, null);
 		activeChar.getInventory().addItem("Extract", itemToCreateId, amount, activeChar, item);
 		
-	    SystemMessage sm = new SystemMessage(SystemMessage.EARNED_S2_S1_s); 
+	    SystemMessage sm = new SystemMessage(SystemMessageId.EARNED_S2_S1_S); 
 	    sm.addItemName(itemToCreateId);
 	    activeChar.sendPacket(sm);
 
@@ -87,6 +88,6 @@ public class CompShotPacks implements IItemHandler
 	
 	public int[] getItemIds()
 	{
-		return _itemIds;
+		return ITEM_IDS;
 	}
 }

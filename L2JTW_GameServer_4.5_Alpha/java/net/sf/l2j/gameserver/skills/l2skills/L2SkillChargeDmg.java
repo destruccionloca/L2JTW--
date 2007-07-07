@@ -23,6 +23,7 @@ import net.sf.l2j.gameserver.model.L2ItemInstance;
 import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.L2Skill;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.templates.L2WeaponType;
 import net.sf.l2j.gameserver.templates.StatsSet;
@@ -34,11 +35,14 @@ import net.sf.l2j.gameserver.skills.Formulas;
 public class L2SkillChargeDmg extends L2Skill 
 {
 
+
     final int num_charges;
     final int charge_skill_id;
     
     public L2SkillChargeDmg(StatsSet set)
+
     {
+
         super(set);
         
         num_charges = set.getInteger("num_charges", getLevel());
@@ -46,7 +50,10 @@ public class L2SkillChargeDmg extends L2Skill
         charge_skill_id = 4271;
     }
 
+
+
     public boolean checkCondition(L2Character activeChar)
+
 
 
     {
@@ -62,7 +69,6 @@ public class L2SkillChargeDmg extends L2Skill
                 return false;
             }
         }
-
 
         return super.checkCondition(activeChar, false);
     }
@@ -87,7 +93,9 @@ public class L2SkillChargeDmg extends L2Skill
 
 
 
+
         double modifier = 0;
+
 
         modifier = effect.num_charges*0.333;
         
@@ -103,6 +111,7 @@ public class L2SkillChargeDmg extends L2Skill
         
         L2ItemInstance weaponInst = caster.getActiveWeaponInstance();
         
+
 
 
 
@@ -141,11 +150,7 @@ public class L2SkillChargeDmg extends L2Skill
                 finalDamage = finalDamage+(modifier*finalDamage);
 				target.reduceCurrentHp(finalDamage, caster);
 				
-				if (crit) caster.sendPacket(new SystemMessage(SystemMessage.CRITICAL_HIT));
-				
-				SystemMessage sm = new SystemMessage(SystemMessage.YOU_DID_S1_DMG);
-				sm.addNumber((int)finalDamage);
-				caster.sendPacket(sm);
+				caster.sendDamageMessage(target, (int)finalDamage, false, crit, false);
 				
 				if (soul && weapon!= null)
 					weapon.setChargedSoulshot(L2ItemInstance.CHARGED_NONE);
@@ -153,10 +158,12 @@ public class L2SkillChargeDmg extends L2Skill
             else
             {
 
+
                 SystemMessage sm = new SystemMessage(SystemMessage.MISSED_TARGET);
                 caster.sendPacket(sm);
             }
         }   
+
 
         // effect self :]
         L2Effect seffect = caster.getEffect(getId());
@@ -166,7 +173,7 @@ public class L2SkillChargeDmg extends L2Skill
             seffect.exit();
         }
         // cast self effect if any
-        getEffectsSelf(caster);
+        //getEffectsSelf(caster);
 	}
 	
 }

@@ -116,8 +116,7 @@ public enum Stats
 	PARALYZE_RES 	("paralyzeRes"), 
 	ROOT_RES 		("rootRes"),
 	SLEEP_RES 		("sleepRes"),
-	CONFUSION_RES 	("confusionRes"),
-	MUTE_RES 		("muteRes"), 
+	CONFUSION_RES 	("confusionRes"), 
 	MOVEMENT_RES 	("movementRes"),
 	FIRE_RES 		("fireRes"),
 	WIND_RES 		("windRes"),
@@ -126,6 +125,8 @@ public enum Stats
 	HOLY_RES 		("holyRes"),
 	DARK_RES 		("darkRes"),
 	CANCEL_RES      ("cancelRes"), // Resistance for cancel type skills
+	DERANGEMENT_RES ("derangementRes"),
+	DEBUFF_RES		("debuffRes"),
 	
 
 	NONE_WPN_RES 	("noneWpnRes"), // Shields!!!

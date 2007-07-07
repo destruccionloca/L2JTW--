@@ -34,7 +34,9 @@ import net.sf.l2j.gameserver.model.actor.instance.L2FolkInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2VillageMasterInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.ExStorageMaxCount;
+import net.sf.l2j.gameserver.serverpackets.PledgeShowInfoUpdate;
 import net.sf.l2j.gameserver.serverpackets.ShortCutRegister;
 import net.sf.l2j.gameserver.serverpackets.StatusUpdate;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
@@ -52,8 +54,8 @@ public class RequestAquireSkill extends L2GameClientPacket
 	private static final String _C__6C_REQUESTAQUIRESKILL = "[C] 6C RequestAquireSkill";
 
 
-	private static Logger _log = Logger.getLogger(RequestAquireSkill.class
-			.getName());
+	private static Logger _log = Logger.getLogger(RequestAquireSkill.class.getName());
+
 
 	private int _id;
 
@@ -144,7 +146,7 @@ public class RequestAquireSkill extends L2GameClientPacket
 						{
 							// Haven't spellbook
 							player.sendPacket(new SystemMessage(
-									SystemMessage.ITEM_MISSING_TO_LEARN_SKILL));
+									SystemMessageId.ITEM_MISSING_TO_LEARN_SKILL));
 							return;
 						}
 
@@ -155,7 +157,7 @@ public class RequestAquireSkill extends L2GameClientPacket
 			} else
 			{
 				SystemMessage sm = new SystemMessage(
-						SystemMessage.NOT_ENOUGH_SP_TO_LEARN_SKILL);
+						SystemMessageId.NOT_ENOUGH_SP_TO_LEARN_SKILL);
 				player.sendPacket(sm);
 				sm = null;
 				
@@ -201,12 +203,12 @@ public class RequestAquireSkill extends L2GameClientPacket
 				{
 					// Haven't spellbook
 					player.sendPacket(new SystemMessage(
-							SystemMessage.ITEM_MISSING_TO_LEARN_SKILL));
+							SystemMessageId.ITEM_MISSING_TO_LEARN_SKILL));
 					return;
 				}
 
 				SystemMessage sm = new SystemMessage(
-						SystemMessage.DISSAPEARED_ITEM);
+						SystemMessageId.DISSAPEARED_ITEM);
 				sm.addNumber(costcount);
 				sm.addItemName(costid);
 				sendPacket(sm);
@@ -214,7 +216,7 @@ public class RequestAquireSkill extends L2GameClientPacket
 			} else
 			{
 				SystemMessage sm = new SystemMessage(
-						SystemMessage.NOT_ENOUGH_SP_TO_LEARN_SKILL);
+						SystemMessageId.NOT_ENOUGH_SP_TO_LEARN_SKILL);
 				player.sendPacket(sm);
 				sm = null;
 				return;
@@ -259,11 +261,11 @@ public class RequestAquireSkill extends L2GameClientPacket
                 if (!player.destroyItemByItemId("Consume", itemId, 1, trainer, false))
                 {
                     // Haven't spellbook
-                    player.sendPacket(new SystemMessage(SystemMessage.ITEM_MISSING_TO_LEARN_SKILL));
+                    player.sendPacket(new SystemMessage(SystemMessageId.ITEM_MISSING_TO_LEARN_SKILL));
                     return;
                 }
                 
-                SystemMessage sm = new SystemMessage(SystemMessage.DISSAPEARED_ITEM);
+                SystemMessage sm = new SystemMessage(SystemMessageId.DISSAPEARED_ITEM);
                 sm.addNumber(1);
                 sm.addItemName(itemId);
                 sendPacket(sm);
@@ -271,22 +273,30 @@ public class RequestAquireSkill extends L2GameClientPacket
             }
             else
             {
-                //SystemMessage sm = new SystemMessage(SystemMessage.NOT_ENOUGH_SP_TO_LEARN_SKILL);
-                player.sendMessage("Your clan doesn't have enough reputation points to learn this skill");
+
+                SystemMessage sm = new SystemMessage(SystemMessageId.ACQUIRE_SKILL_FAILED_BAD_CLAN_REP_SCORE);
+                player.sendPacket(sm);
+
                 //sm = null;
                 return;
             }
+            player.getClan().setReputationScore(player.getClan().getReputationScore()-repCost, true);
             player.getClan().addNewSkill(skill);
             
             if (Config.DEBUG) 
                 _log.fine("Learned pledge skill " + _id + " for " + _requiredSp + " SP.");
             
-            player.getClan().setReputationScore(player.getClan().getReputationScore()-repCost, true);
-            
-            SystemMessage sm = new SystemMessage(SystemMessage.LEARNED_SKILL_S1);
+
+            SystemMessage cr = new SystemMessage(SystemMessageId.S1_DEDUCTED_FROM_CLAN_REP);
+            cr.addNumber(repCost);
+            player.sendPacket(cr);
+            SystemMessage sm = new SystemMessage(SystemMessageId.CLAN_SKILL_S1_ADDED);
+
             sm.addSkillName(_id);
             player.sendPacket(sm);
             sm = null;
+            
+            player.getClan().broadcastToOnlineMembers(new PledgeShowInfoUpdate(player.getClan()));
             
             ((L2VillageMasterInstance)trainer).showPledgeSkillList(player); //Maybe we shoud add a check here...
             
@@ -312,7 +322,12 @@ public class RequestAquireSkill extends L2GameClientPacket
 		su.addAttribute(StatusUpdate.SP, player.getSp());
 		player.sendPacket(su);
 
-		SystemMessage sm = new SystemMessage(SystemMessage.LEARNED_SKILL_S1);
+
+        SystemMessage sp = new SystemMessage(SystemMessageId.SP_DECREASED_S1);
+        sp.addNumber(_requiredSp);
+        sendPacket(sp);
+
+		SystemMessage sm = new SystemMessage(SystemMessageId.LEARNED_SKILL_S1);
 		sm.addSkillName(_id);
 		player.sendPacket(sm);
 		sm = null;

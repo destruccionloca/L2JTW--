@@ -39,14 +39,14 @@ public class NpcInfo extends L2GameServerPacket
 	     
 	     
 	private static final String _S__22_NPCINFO = "[S] 16 NpcInfo";
-	private L2Character _cha;
+	private L2Character _activeChar;
 	private int _x, _y, _z, _heading;
 	private int _idTemplate;
 	private boolean _isAttackable, _isSummoned;
 	private int _mAtkSpd, _pAtkSpd;
 	private int _runSpd, _walkSpd, _swimRunSpd, _swimWalkSpd, _flRunSpd, _flWalkSpd, _flyRunSpd, _flyWalkSpd,_atkspdMul,_movespdMul;
 	private int _rhand, _lhand,_lrhand,enchlvl, armor, head, boot,pant, glove, charrace,charhair,charface,charcolor,charclass,charhero,charsex;
-    private int collisionHeight, collisionRadius;
+    private int _collisionHeight, _collisionRadius;
     private String _name = "";
     private String _title = "";
     private boolean IsChar;
@@ -56,19 +56,19 @@ public class NpcInfo extends L2GameServerPacket
 	 */
 	public NpcInfo(L2NpcInstance cha, L2Character attacker)
 	{
-		_cha = cha;
+		_activeChar = cha;
 		_idTemplate = cha.getTemplate().idTemplate;
 		_isAttackable = cha.isAutoAttackable(attacker);
 		_rhand = cha.getTemplate().rhand;
 		_lhand = cha.getTemplate().lhand;
 		_isSummoned = false;
-        collisionHeight = _cha.getTemplate().collisionHeight;
-        collisionRadius = _cha.getTemplate().collisionRadius;
-        if (_cha.getTemplate().basePAtkSpd>0 &&  _cha.getPAtkSpd()>0)
-        _atkspdMul = _cha.getPAtkSpd()/_cha.getTemplate().basePAtkSpd;
+        _collisionHeight = _activeChar.getTemplate().collisionHeight;
+        _collisionRadius = _activeChar.getTemplate().collisionRadius;
+        if (_activeChar.getTemplate().basePAtkSpd>0 &&  _activeChar.getPAtkSpd()>0)
+        _atkspdMul = _activeChar.getPAtkSpd()/_activeChar.getTemplate().basePAtkSpd;
         else _atkspdMul = 1;
-        if (_cha.getTemplate().baseRunSpd>0 && _cha.getRunSpeed()>0)
-        _movespdMul = _cha.getRunSpeed()/_cha.getTemplate().baseRunSpd;
+        if (_activeChar.getTemplate().baseRunSpd>0 && _activeChar.getRunSpeed()>0)
+        _movespdMul = cha.getRunSpeed()/cha.getTemplate().baseRunSpd;
         else _movespdMul = 1;
         if (_atkspdMul<1) _atkspdMul = 1;
         if (_movespdMul<1) _movespdMul = 1;
@@ -82,7 +82,7 @@ public class NpcInfo extends L2GameServerPacket
     	else
     		_title = cha.getTitle();
     	
-        if (Config.SHOW_NPC_LVL && _cha instanceof L2MonsterInstance)
+        if (Config.SHOW_NPC_LVL && _activeChar instanceof L2MonsterInstance)
 	    {
 			String t = "Lv " + cha.getLevel() + (cha.getAggroRange() > 0 ? "*" : "");
 			if (_title != null)
@@ -114,37 +114,38 @@ public class NpcInfo extends L2GameServerPacket
             else enchlvl= 0; 
         }
         
-        _x = _cha.getX();
-		_y = _cha.getY();
-		_z = _cha.getZ();
-		_heading = _cha.getHeading();
-		_mAtkSpd = _cha.getMAtkSpd();
-		_pAtkSpd = _cha.getPAtkSpd();
-		_runSpd = _cha.getRunSpeed();
-		_walkSpd = _cha.getWalkSpeed();
+        _x = _activeChar.getX();
+		_y = _activeChar.getY();
+		_z = _activeChar.getZ();
+		_heading = _activeChar.getHeading();
+		_mAtkSpd = _activeChar.getMAtkSpd();
+		_pAtkSpd = _activeChar.getPAtkSpd();
+		_runSpd = _activeChar.getRunSpeed();
+		_walkSpd = _activeChar.getWalkSpeed();
 		_swimRunSpd = _flRunSpd = _flyRunSpd = _runSpd;
 		_swimWalkSpd = _flWalkSpd = _flyWalkSpd = _walkSpd;
 	}
 	
 	public NpcInfo(L2Summon cha, L2Character attacker)
 	{
-		_cha = cha;
+		_activeChar = cha;
 		_idTemplate = cha.getTemplate().idTemplate;
 		_isAttackable = cha.isAutoAttackable(attacker); //(cha.getKarma() > 0);
 		_rhand = cha.getTemplate().rhand;
 		_lhand = cha.getTemplate().lhand;
 		_isSummoned = cha.isShowSummonAnimation();
-        collisionHeight = _cha.getTemplate().collisionHeight;
-        collisionRadius = _cha.getTemplate().collisionRadius;
-        _atkspdMul = _cha.getPAtkSpd()/_cha.getTemplate().basePAtkSpd;
-        _movespdMul = _cha.getRunSpeed()/_cha.getTemplate().baseRunSpd;
+        _collisionHeight = _activeChar.getTemplate().collisionHeight;
+        _collisionRadius = _activeChar.getTemplate().collisionRadius;
+        _atkspdMul = _activeChar.getPAtkSpd()/_activeChar.getTemplate().basePAtkSpd;
+        _movespdMul = _activeChar.getRunSpeed()/_activeChar.getTemplate().baseRunSpd;
         if (_atkspdMul<1) _atkspdMul = 1;
         if (_movespdMul<1) _movespdMul = 1;
         if (cha.getTemplate().serverSideName || cha instanceof L2PetInstance)
     	{
-            _name = _cha.getName();
+            _name = _activeChar.getName();
     		_title = cha.getTitle();
     	}
+
         if (cha.getTemplate().ischar > 0)
         {
             IsChar = true;
@@ -172,15 +173,17 @@ public class NpcInfo extends L2GameServerPacket
 	
 	
 
-		_x = _cha.getX();
 
-		_y = _cha.getY();
-		_z = _cha.getZ();
-		_heading = _cha.getHeading();
-		_mAtkSpd = _cha.getMAtkSpd();
-		_pAtkSpd = _cha.getPAtkSpd();
-		_runSpd = _cha.getRunSpeed();
-		_walkSpd = _cha.getWalkSpeed();
+        
+        _x = _activeChar.getX();
+		_y = _activeChar.getY();
+		_z = _activeChar.getZ();
+		_heading = _activeChar.getHeading();
+		_mAtkSpd = _activeChar.getMAtkSpd();
+		_pAtkSpd = _activeChar.getPAtkSpd();
+		_runSpd = _activeChar.getRunSpeed();
+		_walkSpd = _activeChar.getWalkSpeed();
+
 		_swimRunSpd = _flRunSpd = _flyRunSpd = _runSpd;
 		_swimWalkSpd = _flWalkSpd = _flyWalkSpd = _walkSpd;
 	}
@@ -195,8 +198,8 @@ public class NpcInfo extends L2GameServerPacket
             writeD(_y);
             writeD(_z);
             writeD(_heading);
-            writeD(_cha.getObjectId());
-            writeS(_cha.getName());
+            writeD(_activeChar.getObjectId());
+            writeS(_activeChar.getName());
             writeD(charrace);
             writeD(charsex);
             writeD(charclass);
@@ -232,8 +235,8 @@ public class NpcInfo extends L2GameServerPacket
             writeD(_flyWalkSpd);
             writeF(_movespdMul); // _cha.getProperMultiplier()
             writeF(_atkspdMul); // _cha.getAttackSpeedMultiplier()
-            writeF(collisionRadius);
-            writeF(collisionHeight);
+            writeF(_collisionRadius);
+            writeF(_collisionHeight);
 
             writeD(charhair);
             writeD(charcolor);
@@ -248,8 +251,8 @@ public class NpcInfo extends L2GameServerPacket
             
             writeC(1);   // standing = 1  sitting = 0
             writeC(1);   // running = 1   walking = 0
-            writeC(_cha.isInCombat() ? 1 : 0);
-            writeC(_cha.isAlikeDead() ? 1 : 0);
+            writeC(_activeChar.isInCombat() ? 1 : 0);
+            writeC(_activeChar.isAlikeDead() ? 1 : 0);
             
             writeC(0);    // invisible = 1  visible =0
             writeC(0);    // 1 on strider   2 on wyvern   0 no mount
@@ -260,7 +263,7 @@ public class NpcInfo extends L2GameServerPacket
             
             writeC(0x00);   // find party members
             
-            writeD(_cha.getAbnormalEffect());
+            writeD(_activeChar.getAbnormalEffect());
 
 //          Code that works for getEnchantEffect()
 
@@ -286,12 +289,13 @@ public class NpcInfo extends L2GameServerPacket
         }
         else
         {
-        if (_cha instanceof L2Summon)
-            if (((L2Summon)_cha).getOwner() != null 
-                    && ((L2Summon)_cha).getOwner().getAppearance().getInvisible())
+        if (_activeChar instanceof L2Summon)
+            if (((L2Summon)_activeChar).getOwner() != null 
+                    && ((L2Summon)_activeChar).getOwner().getAppearance().getInvisible())
+
                 return;
 		writeC(0x16);
-		writeD(_cha.getObjectId());
+		writeD(_activeChar.getObjectId());
 		writeD(_idTemplate+1000000);  // npctype id
 		writeD(_isAttackable ? 1 : 0); 
 		writeD(_x);
@@ -312,15 +316,15 @@ public class NpcInfo extends L2GameServerPacket
 		writeF(_movespdMul)/*_cha.getProperMultiplier()*/;
 		//writeF(1/*_cha.getAttackSpeedMultiplier()*/);
 		writeF(_atkspdMul);
-		writeF(collisionRadius);
-		writeF(collisionHeight);
+		writeF(_collisionRadius);
+		writeF(_collisionHeight);
 		writeD(_rhand); // right hand weapon
 		writeD(0);
 		writeD(_lhand); // left hand weapon
 		writeC(1);	// name above char 1=true ... ??
-		writeC(_cha.isRunning() ? 1 : 0);
-		writeC(_cha.isInCombat() ? 1 : 0);
-		writeC(_cha.isAlikeDead() ? 1 : 0);
+		writeC(_activeChar.isRunning() ? 1 : 0);
+		writeC(_activeChar.isInCombat() ? 1 : 0);
+		writeC(_activeChar.isAlikeDead() ? 1 : 0);
 		writeC(_isSummoned ? 2 : 0); // invisible ?? 0=false  1=true   2=summoned (only works if model has a summon animation)
 		writeS(_name);
 		writeS(_title);
@@ -328,7 +332,7 @@ public class NpcInfo extends L2GameServerPacket
 		writeD(0);
 		writeD(0000);  // hmm karma ??
 
-		writeD(_cha.getAbnormalEffect());  // C2
+		writeD(_activeChar.getAbnormalEffect());  // C2
 		writeD(0000);  // C2
 		writeD(0000);  // C2
 		writeD(0000);  // C2

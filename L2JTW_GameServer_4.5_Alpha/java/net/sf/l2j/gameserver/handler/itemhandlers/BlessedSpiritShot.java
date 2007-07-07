@@ -22,6 +22,7 @@ import net.sf.l2j.gameserver.handler.IItemHandler;
 import net.sf.l2j.gameserver.model.L2ItemInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PlayableInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.ExAutoSoulShot;
 import net.sf.l2j.gameserver.serverpackets.MagicSkillUser;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
@@ -38,8 +39,8 @@ import net.sf.l2j.gameserver.util.Broadcast;
 public class BlessedSpiritShot implements IItemHandler 
 { 
 	// all the items ids that this handler knowns 
-	private static int[] _itemIds = { 3947, 3948, 3949, 3950, 3951, 3952 };
-	private static int[] _skillIds = { 2061, 2160, 2161, 2162, 2163, 2164 };
+	private static final int[] ITEM_IDS  = { 3947, 3948, 3949, 3950, 3951, 3952 };
+	private static final int[] SKILL_IDS = { 2061, 2160, 2161, 2162, 2163, 2164 };
 
 	/* (non-Javadoc) 
 	 * @see net.sf.l2j.gameserver.handler.IItemHandler#useItem(net.sf.l2j.gameserver.model.L2PcInstance, net.sf.l2j.gameserver.model.L2ItemInstance) 
@@ -57,7 +58,7 @@ public class BlessedSpiritShot implements IItemHandler
         if (weaponInst == null || weaponItem.getSpiritShotCount() == 0)
         {
             if(!activeChar.getAutoSoulShot().containsKey(itemId)) 
-                activeChar.sendPacket(new SystemMessage(SystemMessage.CANNOT_USE_SPIRITSHOTS));
+                activeChar.sendPacket(new SystemMessage(SystemMessageId.CANNOT_USE_SPIRITSHOTS));
             return;
         }
 
@@ -74,23 +75,23 @@ public class BlessedSpiritShot implements IItemHandler
     		(weaponGrade == L2Item.CRYSTAL_S && itemId != 3952)) 
         { 
             if(!activeChar.getAutoSoulShot().containsKey(itemId)) 
-                activeChar.sendPacket(new SystemMessage(SystemMessage.SPIRITSHOTS_GRADE_MISMATCH));
+                activeChar.sendPacket(new SystemMessage(SystemMessageId.SPIRITSHOTS_GRADE_MISMATCH));
             return; 
         } 
 
         // Consume Blessed Spiritshot if player has enough of them 
-        if (!activeChar.destroyItem("Consume", item.getObjectId(), weaponItem.getSpiritShotCount(), null, false))
+        if (!activeChar.destroyItemWithoutTrace("Consume", item.getObjectId(), weaponItem.getSpiritShotCount(), null, false))
         { 
             if(activeChar.getAutoSoulShot().containsKey(itemId))
             {
                 activeChar.removeAutoSoulShot(itemId);
                 activeChar.sendPacket(new ExAutoSoulShot(itemId, 0));
                 
-                SystemMessage sm = new SystemMessage(SystemMessage.AUTO_USE_OF_S1_CANCELLED); 
+                SystemMessage sm = new SystemMessage(SystemMessageId.AUTO_USE_OF_S1_CANCELLED); 
                 sm.addString(item.getItem().getName());
                 activeChar.sendPacket(sm);
             }
-            else activeChar.sendPacket(new SystemMessage(SystemMessage.NOT_ENOUGH_SPIRITSHOTS));
+            else activeChar.sendPacket(new SystemMessage(SystemMessageId.NOT_ENOUGH_SPIRITSHOTS));
             return; 
         } 
 
@@ -98,13 +99,13 @@ public class BlessedSpiritShot implements IItemHandler
         weaponInst.setChargedSpiritshot(L2ItemInstance.CHARGED_BLESSED_SPIRITSHOT);
 
         // Send message to client
-        activeChar.sendPacket(new SystemMessage(SystemMessage.ENABLED_SPIRITSHOT));
-        Broadcast.toSelfAndKnownPlayersInRadius(activeChar, new MagicSkillUser(activeChar, activeChar, _skillIds[weaponGrade], 1, 0, 0), 360000/*600*/);
+        activeChar.sendPacket(new SystemMessage(SystemMessageId.ENABLED_SPIRITSHOT));
+        Broadcast.toSelfAndKnownPlayersInRadius(activeChar, new MagicSkillUser(activeChar, activeChar, SKILL_IDS[weaponGrade], 1, 0, 0), 360000/*600*/);
 
 	} 
 
 	public int[] getItemIds() 
 	{ 
-		return _itemIds; 
+		return ITEM_IDS; 
 	} 
 }

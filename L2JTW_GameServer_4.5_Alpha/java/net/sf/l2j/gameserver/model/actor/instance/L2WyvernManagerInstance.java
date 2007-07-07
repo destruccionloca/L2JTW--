@@ -1,6 +1,7 @@
 package net.sf.l2j.gameserver.model.actor.instance;
 
 import net.sf.l2j.gameserver.datatables.SkillTable;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.ActionFailed;
 import net.sf.l2j.gameserver.serverpackets.MyTargetSelected;
 import net.sf.l2j.gameserver.serverpackets.NpcHtmlMessage;
@@ -24,7 +25,7 @@ public class L2WyvernManagerInstance extends L2CastleChamberlainInstance
         	{   
         		if(player.isMounted())
         		{
-        			SystemMessage sm = new SystemMessage(614);
+        			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
                     sm.addString("SYS");
                     sm.addString("已經有使魔召喚.");
         			player.sendPacket(sm);
@@ -32,7 +33,7 @@ public class L2WyvernManagerInstance extends L2CastleChamberlainInstance
         		}
         		else
         		{
-        			SystemMessage sm = new SystemMessage(614);
+        			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
                     sm.addString("SYS");
                     sm.addString("使魔召喚.");
         			player.sendPacket(sm);
@@ -45,7 +46,7 @@ public class L2WyvernManagerInstance extends L2CastleChamberlainInstance
         		{
         			if (player.getPet().getLevel() < 55)
         			{
-        				SystemMessage sm = new SystemMessage(614);
+        				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
                         sm.addString("SYS");
                         sm.addString("座龍尚未達到需求的等級");
                 		player.sendPacket(sm);
@@ -61,7 +62,7 @@ public class L2WyvernManagerInstance extends L2CastleChamberlainInstance
         				player.broadcastPacket(mount);
         				player.setMountType(mount.getMountType());
         				player.addSkill(SkillTable.getInstance().getInfo(4289, 1));
-        				SystemMessage sm = new SystemMessage(614);
+        				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
                         sm.addString("SYS");
                         sm.addString("使魔召喚.");
                 		player.sendPacket(sm);
@@ -70,7 +71,7 @@ public class L2WyvernManagerInstance extends L2CastleChamberlainInstance
         		}
         		else
         		{
-        			SystemMessage sm = new SystemMessage(614);
+        			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
                     sm.addString("SYS");
                     sm.addString("需要10個B級-結晶");
             		player.sendPacket(sm);
@@ -80,7 +81,7 @@ public class L2WyvernManagerInstance extends L2CastleChamberlainInstance
 
         	else
         	{
-        		SystemMessage sm = new SystemMessage(614);
+        		SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
                 sm.addString("SYS");
                 sm.addString("使魔反召喚.");
         		player.sendPacket(sm);
@@ -102,9 +103,9 @@ public class L2WyvernManagerInstance extends L2CastleChamberlainInstance
         String filename = "data/html/wyvernmanager/wyvernmanager-no.htm";
         
         int condition = validateCondition(player);
-        if (condition > Cond_All_False)
+        if (condition > COND_ALL_FALSE)
         {
-            if (condition == Cond_Owner)                                     // Clan owns castle
+            if (condition == COND_OWNER)                                     // Clan owns castle
                 filename = "data/html/wyvernmanager/wyvernmanager.htm";      // Owner message window
         }
         NpcHtmlMessage html = new NpcHtmlMessage(1);

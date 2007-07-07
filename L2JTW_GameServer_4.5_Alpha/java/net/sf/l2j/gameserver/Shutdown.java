@@ -46,14 +46,16 @@ public class Shutdown extends Thread
 	private static Shutdown _instance;
 	private static Shutdown _counterInstance = null;
 	
-	private int secondsShut;	
+	private int _secondsShut;	
 	
-	private int shutdownMode;
+	private int _shutdownMode;
 	public static final int SIGTERM = 0;
 	public static final int GM_SHUTDOWN = 1;
 	public static final int GM_RESTART = 2;
 	public static final int ABORT = 3;
-	private static String[] _modeText = {"離線工作", "關閉工作", "重新啟動", "取消工作"};
+
+	private static final String[] MODE_TEXT = {"離線工作", "關閉工作", "重新啟動", "取消工作"};
+
     
     /**
      * This function starts a shutdown countdown from Telnet (Copied from Function startShutdown())
@@ -66,20 +68,22 @@ public class Shutdown extends Thread
     public void startTelnetShutdown(String IP, int seconds, boolean restart)
     {
         Announcements _an = Announcements.getInstance();
-        _log.warning("IP: " + IP + " issued shutdown command. " + _modeText[shutdownMode] + " in "+seconds+ " seconds!");
+        _log.warning("IP: " + IP + " issued shutdown command. " + MODE_TEXT[_shutdownMode] + " in "+seconds+ " seconds!");
         //_an.announceToAll("Server is " + _modeText[shutdownMode] + " in "+seconds+ " seconds!");
         
         if (restart) {
-            shutdownMode = GM_RESTART;
+            _shutdownMode = GM_RESTART;
         } else {
-            shutdownMode = GM_SHUTDOWN;
+            _shutdownMode = GM_SHUTDOWN;
         }
         
-        if(shutdownMode > 0)
+        if(_shutdownMode > 0)
         {
+
             _an.announceToAll("所有玩家請注意!");
-            _an.announceToAll("伺服器即將進行" + _modeText[shutdownMode] + ",將在"+seconds+ "秒後執行!");
-            if(shutdownMode == 1 || shutdownMode == 2)
+            _an.announceToAll("伺服器即將進行" + MODE_TEXT[_shutdownMode] + ",將在"+seconds+ "秒後執行!");
+            if(_shutdownMode == 1 || _shutdownMode == 2)
+
             {
                 _an.announceToAll("請玩家暫時避免使用傳送師以及任務進行.");
             }
@@ -97,10 +101,11 @@ public class Shutdown extends Thread
      * 
      * @param IP            IP Which Issued shutdown command
      */
-    public void Telnetabort(String IP) {
+    public void telnetAbort(String IP) {
         Announcements _an = Announcements.getInstance();
-        _log.warning("IP: " + IP + " issued shutdown ABORT. " + _modeText[shutdownMode] + " has been stopped!");
-        _an.announceToAll("伺服器取消 " + _modeText[shutdownMode] + " 將會繼續進行正常運作!");
+
+        _log.warning("IP: " + IP + " issued shutdown ABORT. " + MODE_TEXT[_shutdownMode] + " has been stopped!");
+        _an.announceToAll("伺服器取消 " + MODE_TEXT[_shutdownMode] + " 將會繼續進行正常運作!");
 
         if (_counterInstance != null) {
             _counterInstance._abort();
@@ -112,8 +117,8 @@ public class Shutdown extends Thread
 	 *
 	 */
 	public Shutdown() {
-		secondsShut = -1;
-		shutdownMode = SIGTERM;
+		_secondsShut = -1;
+		_shutdownMode = SIGTERM;
 	}
 	
 	/**
@@ -127,11 +132,11 @@ public class Shutdown extends Thread
 		if (seconds < 0) {
 			seconds = 0;
 		}
-		secondsShut = seconds;
+		_secondsShut = seconds;
 		if (restart) {
-			shutdownMode = GM_RESTART;
+			_shutdownMode = GM_RESTART;
 		} else {
-			shutdownMode = GM_SHUTDOWN;
+			_shutdownMode = GM_SHUTDOWN;
 		}
 	}
 
@@ -237,7 +242,7 @@ public class Shutdown extends Thread
 			}
 			
 			// server will quit, when this function ends.
-			if (_instance.shutdownMode == GM_RESTART)
+			if (_instance._shutdownMode == GM_RESTART)
 			{
 				Runtime.getRuntime().halt(2);
 			}
@@ -251,8 +256,8 @@ public class Shutdown extends Thread
 			// gm shutdown: send warnings and then call exit to start shutdown sequence
 			countdown();
 			// last point where logging is operational :(
-			_log.warning("GM shutdown countdown is over. " + _modeText[shutdownMode] + " NOW!");
-			switch (shutdownMode) {
+			_log.warning("GM shutdown countdown is over. " + MODE_TEXT[_shutdownMode] + " NOW!");
+			switch (_shutdownMode) {
 				case GM_SHUTDOWN:
 					_instance.setMode(GM_SHUTDOWN);
 					System.exit(0);
@@ -274,21 +279,25 @@ public class Shutdown extends Thread
 	 */
 	public void startShutdown(L2PcInstance activeChar, int seconds, boolean restart) {
 		Announcements _an = Announcements.getInstance();
-		_log.warning("GM: "+activeChar.getName()+"("+activeChar.getObjectId()+") issued shutdown command. " + _modeText[shutdownMode] + " in "+seconds+ " seconds!");
+		_log.warning("GM: "+activeChar.getName()+"("+activeChar.getObjectId()+") issued shutdown command. " + MODE_TEXT[_shutdownMode] + " in "+seconds+ " seconds!");
 		
 		if (restart) {
-            shutdownMode = GM_RESTART;
+            _shutdownMode = GM_RESTART;
         } else {
-            shutdownMode = GM_SHUTDOWN;
+            _shutdownMode = GM_SHUTDOWN;
         }
         
-        if(shutdownMode > 0)
+        if(_shutdownMode > 0)
         {
+
         	_an.announceToAll("所有玩家請注意!");
-            _an.announceToAll("伺服器即將進行" + _modeText[shutdownMode] + ",將在"+seconds+ "秒後執行!");
-            if(shutdownMode == 1 || shutdownMode == 2)
+            _an.announceToAll("伺服器即將進行" + MODE_TEXT[_shutdownMode] + ",將在"+seconds+ "秒後執行!");
+            if(_shutdownMode == 1 || _shutdownMode == 2)
+
             {
+
             	_an.announceToAll("請玩家暫時避免使用傳送師以及任務進行.");
+
             }
         }
 
@@ -308,8 +317,10 @@ public class Shutdown extends Thread
 	 */
 	public void abort(L2PcInstance activeChar) {
 		Announcements _an = Announcements.getInstance();
-		_log.warning("GM: "+activeChar.getName()+"("+activeChar.getObjectId()+") issued shutdown ABORT. " + _modeText[shutdownMode] + " has been stopped!");
-        _an.announceToAll("伺服器取消 " + _modeText[shutdownMode] + " 將會繼續進行正常運作!");
+
+		_log.warning("GM: "+activeChar.getName()+"("+activeChar.getObjectId()+") issued shutdown ABORT. " + MODE_TEXT[_shutdownMode] + " has been stopped!");
+        _an.announceToAll("伺服器取消 " + MODE_TEXT[_shutdownMode] + " 將會繼續進行正常運作!");
+
 
 		if (_counterInstance != null) {
 			_counterInstance._abort();
@@ -321,7 +332,7 @@ public class Shutdown extends Thread
 	 * @param mode	what mode shall be set
 	 */
 	private void setMode(int mode) {
-		shutdownMode = mode;
+		_shutdownMode = mode;
 	}
 
 	/**
@@ -329,7 +340,7 @@ public class Shutdown extends Thread
 	 *
 	 */
 	private void _abort() {
-		shutdownMode = ABORT;
+		_shutdownMode = ABORT;
 	}
 
 	/**
@@ -340,39 +351,41 @@ public class Shutdown extends Thread
 		Announcements _an = Announcements.getInstance();
 		
 		try {
-			while (secondsShut > 0) {
+			while (_secondsShut > 0) {
 				
-				switch (secondsShut)
+				switch (_secondsShut)
 				{
-					case 540:_an.announceToAll("伺服器即將 " + _modeText[shutdownMode] + " 將在 9 分鐘後執行.");break;
-                    case 480:_an.announceToAll("伺服器即將 " + _modeText[shutdownMode] + " 將在 8 分鐘後執行.");break;
-                    case 420:_an.announceToAll("伺服器即將 " + _modeText[shutdownMode] + " 將在 7 分鐘後執行.");break;
-                    case 360:_an.announceToAll("伺服器即將 " + _modeText[shutdownMode] + " 將在 6 分鐘後執行.");break;
-                    case 300:_an.announceToAll("伺服器即將 " + _modeText[shutdownMode] + " 將在 5 分鐘後執行.");break;
-                    case 240:_an.announceToAll("伺服器即將 " + _modeText[shutdownMode] + " 將在 4 分鐘後執行.");break;
-                    case 180:_an.announceToAll("伺服器即將 " + _modeText[shutdownMode] + " 將在 3 分鐘後執行.");break;
-                    case 120:_an.announceToAll("伺服器即將 " + _modeText[shutdownMode] + " 將在 2 分鐘後執行.");break;
-                    case 60:_an.announceToAll("伺服器即將 " + _modeText[shutdownMode] + " 將在 1 分鐘後執行.");
+
+					case 540:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 9 分鐘後執行.");break;
+                    case 480:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 8 分鐘後執行.");break;
+                    case 420:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 7 分鐘後執行.");break;
+                    case 360:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 6 分鐘後執行.");break;
+                    case 300:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 5 分鐘後執行.");break;
+                    case 240:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 4 分鐘後執行.");break;
+                    case 180:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 3 分鐘後執行.");break;
+                    case 120:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 2 分鐘後執行.");break;
+                    case 60:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 1 分鐘後執行.");
                     	LoginServerThread.getInstance().setServerStatus(ServerStatus.STATUS_DOWN);break; //avoids new players from logging in
-                    case 30:_an.announceToAll("伺服器即將 " + _modeText[shutdownMode] + " 將在 30 秒後執行, 請馬上離線, 以免造成損失.");break;
-                    case 10:_an.announceToAll("伺服器即將 " + _modeText[shutdownMode] + " 將在 10 秒後執行, 請馬上離開遊戲, 以免造成損失 !");break;
-                    case 9:_an.announceToAll("伺服器即將 " + _modeText[shutdownMode] + " 將在 9 秒後執行!");break;
-                    case 8:_an.announceToAll("伺服器即將 " + _modeText[shutdownMode] + " 將在 8 秒後執行!");break;
-                    case 7:_an.announceToAll("伺服器即將 " + _modeText[shutdownMode] + " 將在 7 秒後執行!");break;
-                    case 6:_an.announceToAll("伺服器即將 " + _modeText[shutdownMode] + " 將在 6 秒後執行!");break;
-                    case 5:_an.announceToAll("伺服器即將 " + _modeText[shutdownMode] + " 將在 5 秒後執行!");break;
-                    case 4:_an.announceToAll("伺服器即將 " + _modeText[shutdownMode] + " 將在 4 秒後執行!");break;
-                    case 3:_an.announceToAll("伺服器即將 " + _modeText[shutdownMode] + " 將在 3 秒後執行!");break;
-                    case 2:_an.announceToAll("伺服器即將 " + _modeText[shutdownMode] + " 將在 2 秒後執行!");break;
-                    case 1:_an.announceToAll("伺服器即將 " + _modeText[shutdownMode] + " 將在 1 秒後執行!");break;
+                    case 30:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 30 秒後執行, 請馬上離線, 以免造成損失.");break;
+                    case 10:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 10 秒後執行, 請馬上離開遊戲, 以免造成損失 !");break;
+                    case 9:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 9 秒後執行!");break;
+                    case 8:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 8 秒後執行!");break;
+                    case 7:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 7 秒後執行!");break;
+                    case 6:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 6 秒後執行!");break;
+                    case 5:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 5 秒後執行!");break;
+                    case 4:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 4 秒後執行!");break;
+                    case 3:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 3 秒後執行!");break;
+                    case 2:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 2 秒後執行!");break;
+                    case 1:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 1 秒後執行!");break;
 										}
+
 				
-				secondsShut--;
+				_secondsShut--;
 					
 				int delay = 1000; //milliseconds	
 				Thread.sleep(delay);
 				
-				if(shutdownMode == ABORT) break;
+				if(_shutdownMode == ABORT) break;
 			}				
 		} catch (InterruptedException e) {
 			//this will never happen
@@ -385,7 +398,7 @@ public class Shutdown extends Thread
 	 */
 	private void saveData() {
 		Announcements _an = Announcements.getInstance();
-		switch (shutdownMode)
+		switch (_shutdownMode)
 		{
 			case SIGTERM:
 				System.err.println("SIGTERM received. Shutting down NOW!");
@@ -402,7 +415,7 @@ public class Shutdown extends Thread
 			Universe.getInstance().implode(true);
 		try
 		{
-		    _an.announceToAll("Server is " + _modeText[shutdownMode] + " NOW!");
+		    _an.announceToAll("Server is " + MODE_TEXT[_shutdownMode] + " NOW!");
 		} catch (Throwable t) {
 			_log.log(Level.INFO, "", t);
 		}
@@ -460,7 +473,7 @@ public class Shutdown extends Thread
 			//Logout Character
 			try {
 				L2GameClient.saveCharToDisk(player);
-			//SystemMessage sm = new SystemMessage(217);
+			//SystemMessage sm = new SystemMessage(SystemMessage.YOU_HAVE_WON_THE_WAR_OVER_THE_S1_CLAN);
 			//player.sendPacket(sm);
 			LeaveWorld ql = new LeaveWorld();
 			player.sendPacket(ql);

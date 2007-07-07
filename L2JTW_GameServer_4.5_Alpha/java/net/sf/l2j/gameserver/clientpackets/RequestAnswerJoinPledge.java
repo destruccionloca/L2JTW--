@@ -20,6 +20,7 @@ package net.sf.l2j.gameserver.clientpackets;
 
 import net.sf.l2j.gameserver.model.L2Clan;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.JoinPledge;
 import net.sf.l2j.gameserver.serverpackets.PledgeShowInfoUpdate;
 import net.sf.l2j.gameserver.serverpackets.PledgeShowMemberListAdd;
@@ -59,11 +60,11 @@ public final class RequestAnswerJoinPledge extends L2GameClientPacket
 
 		if (_answer == 0)
 		{
-			SystemMessage sm = new SystemMessage(SystemMessage.YOU_DID_NOT_RESPOND_TO_S1_CLAN_INVITATION);
+			SystemMessage sm = new SystemMessage(SystemMessageId.YOU_DID_NOT_RESPOND_TO_S1_CLAN_INVITATION);
 			sm.addString(requestor.getName());
 			activeChar.sendPacket(sm);
 			sm = null;
-			sm = new SystemMessage(SystemMessage.S1_DID_NOT_RESPOND_TO_CLAN_INVITATION);
+			sm = new SystemMessage(SystemMessageId.S1_DID_NOT_RESPOND_TO_CLAN_INVITATION);
 			sm.addString(activeChar.getName());
 			requestor.sendPacket(sm);
 			sm = null;
@@ -78,7 +79,7 @@ public final class RequestAnswerJoinPledge extends L2GameClientPacket
 			RequestJoinPledge requestPacket = (RequestJoinPledge) requestor.getRequest().getRequestPacket();
 	        L2Clan clan = requestor.getClan();
 			// we must double check this cause during response time conditions can be changed, i.e. another player could join clan
-			if (clan.CheckClanJoinCondition(requestor, activeChar, requestPacket.getPledgeType()))
+			if (clan.checkClanJoinCondition(requestor, activeChar, requestPacket.getPledgeType()))
 	        {
 				JoinPledge jp = new JoinPledge(requestor.getClanId());
 				activeChar.sendPacket(jp);
@@ -94,13 +95,11 @@ public final class RequestAnswerJoinPledge extends L2GameClientPacket
 					activeChar.setPowerGrade(5); // new member starts at 5, not confirmed
 				}
 				clan.addClanMember(activeChar);
-				activeChar.setClan(clan);
-				clan.getClanMember(activeChar.getName()).setPlayerInstance(activeChar);
 				activeChar.setClanPrivileges(activeChar.getClan().getRankPrivs(activeChar.getPowerGrade()));
 
-				activeChar.sendPacket(new SystemMessage(SystemMessage.ENTERED_THE_CLAN));
+				activeChar.sendPacket(new SystemMessage(SystemMessageId.ENTERED_THE_CLAN));
 
-				SystemMessage sm = new SystemMessage(SystemMessage.S1_HAS_JOINED_CLAN);
+				SystemMessage sm = new SystemMessage(SystemMessageId.S1_HAS_JOINED_CLAN);
 				sm.addString(activeChar.getName());
 				clan.broadcastToOnlineMembers(sm);
 				sm = null;

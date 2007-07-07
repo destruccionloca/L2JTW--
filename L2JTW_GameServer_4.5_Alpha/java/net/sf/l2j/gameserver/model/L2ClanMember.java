@@ -19,6 +19,7 @@
 package net.sf.l2j.gameserver.model;
 
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 import net.sf.l2j.L2DatabaseFactory;
 import net.sf.l2j.gameserver.instancemanager.SiegeManager;
@@ -183,6 +184,43 @@ public class L2ClanMember
         return _pledgeType;
     }
 	
+	public void setPledgeType(int pledgeType)
+	{
+		_pledgeType = pledgeType;
+		if(_player != null)
+		{
+			_player.setPledgeType(pledgeType);
+		}
+		else
+		{
+			//db save if char not logged in
+			updatePledgeType();
+		}
+	}
+	
+	public void updatePledgeType()
+	{
+		java.sql.Connection con = null;
+		
+		try 
+        {
+			con = L2DatabaseFactory.getInstance().getConnection();
+			PreparedStatement statement = con.prepareStatement("UPDATE characters SET subpledge=? WHERE obj_id=?");
+			statement.setLong(1, _pledgeType);
+			statement.setInt(2, getObjectId());
+			statement.execute();
+			statement.close();
+		}
+		catch (Exception e)
+		{
+			//_log.warning("could not set char power_grade:"+e);
+		}
+		finally
+		{
+			try { con.close(); } catch (Exception e) {}
+		}
+	}
+	
 	public int getPowerGrade()
 	{
 		if(_player != null)
@@ -277,5 +315,162 @@ public class L2ClanMember
 	public L2Clan getClan() 
 	{ 
 		return _clan; 
-	} 
+	}
+	
+	public int calculatePledgeClass(L2PcInstance player){
+       int pledgeClass = 0;
+       L2Clan clan = player.getClan();
+       if (clan != null)
+       {
+           switch (player.getClan().getLevel())
+           {
+               case 4:
+                   if (player.isClanLeader())
+                       pledgeClass = 3;
+                   break;
+               case 5:
+                   if (player.isClanLeader())
+                       pledgeClass = 4;
+                   else
+                       pledgeClass = 2;
+                   break;
+               case 6:
+                   switch (player.getPledgeType())
+                   {
+                       case -1:
+                         pledgeClass = 1;
+                         break;
+                       case 100:
+                       case 200:
+                           pledgeClass = 2;
+                           break;
+                       case 0:
+                           if (player.isClanLeader())
+                               pledgeClass = 5;
+                           else
+                               switch (clan.getLeaderSubPledge(player.getName()))
+                               {
+                                   case 100:
+                                   case 200:
+                                       pledgeClass = 4;
+                                       break;
+                                   case -1:
+                                   default:
+                                       pledgeClass = 3;
+                                       break;
+                               }
+                           break;
+                   }
+                   break;
+               case 7:
+                   switch (player.getPledgeType())
+                   {
+                       case -1:
+                         pledgeClass = 1;
+                         break;
+                       case 100:
+                       case 200:
+                               pledgeClass = 3;
+                           break;
+                       case 1001:
+                       case 1002:
+                       case 2001:
+                       case 2002:
+                               pledgeClass = 2;
+                           break;
+                       case 0:
+                           if (player.isClanLeader())
+                               pledgeClass = 7;
+                           else
+                               switch (clan.getLeaderSubPledge(player.getName()))
+                               {
+                                   case 100:
+                                   case 200:
+                                       pledgeClass = 6;
+                                       break;
+                                   case 1001:
+                                   case 1002:
+                                   case 2001:
+                                   case 2002:
+                                       pledgeClass = 5;
+                                       break;
+                                   case -1:
+                                   default:
+                                       pledgeClass = 4;
+                                       break;
+                               }
+                           break;
+                   }
+                   break;
+               case 8:
+                   switch (player.getPledgeType())
+                   {
+                       case -1:
+                         pledgeClass = 1;
+                         break;
+                       case 100:
+                       case 200:
+                               pledgeClass = 4;
+                           break;
+                       case 1001:
+                       case 1002:
+                       case 2001:
+                       case 2002:
+                               pledgeClass = 3;
+                           break;
+                       case 0:
+                           if (player.isClanLeader())
+                               pledgeClass = 8;
+                           else
+                               switch (clan.getLeaderSubPledge(player.getName()))
+                               {
+                                   case 100:
+                                   case 200:
+                                       pledgeClass = 7;
+                                       break;
+                                   case 1001:
+                                   case 1002:
+                                   case 2001:
+                                   case 2002:
+                                       pledgeClass = 6;
+                                       break;
+                                   case -1:
+                                   default:
+                                       pledgeClass = 5;
+                                       break;
+                               }
+                           break;
+                   }
+                   break;
+               default:
+                   pledgeClass = 1;
+               break;
+           }
+       }
+       return pledgeClass;
+	}
+	
+	public void saveApprenticeAndSponsor(int apprentice, int sponsor)
+    {
+		java.sql.Connection con = null;
+         
+         try
+         {
+             con = L2DatabaseFactory.getInstance().getConnection();
+             PreparedStatement statement = con.prepareStatement("UPDATE characters SET apprentice=?,sponsor=? WHERE obj_Id=?");
+             statement.setInt(1, apprentice);
+             statement.setInt(2, sponsor);
+             statement.setInt(3, getObjectId());
+             statement.execute();
+             statement.close();                  
+         }
+         catch (SQLException e)
+         {
+             //_log.warning("could not set apprentice/sponsor:"+e.getMessage());
+         }
+         finally
+         {
+             try { con.close(); } catch (Exception e) {}
+         }
+    }
 }

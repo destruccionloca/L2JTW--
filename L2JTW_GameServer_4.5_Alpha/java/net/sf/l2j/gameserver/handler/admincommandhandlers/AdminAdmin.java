@@ -34,6 +34,7 @@ import net.sf.l2j.gameserver.instancemanager.Manager;
 import net.sf.l2j.gameserver.model.L2Multisell;
 import net.sf.l2j.gameserver.model.L2World;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.ExCaptureOrc;
 import net.sf.l2j.gameserver.serverpackets.L2GameServerPacket;
 import net.sf.l2j.gameserver.serverpackets.NpcHtmlMessage;
@@ -51,7 +52,7 @@ import net.sf.l2j.gameserver.serverpackets.SystemMessage;
  */
 public class AdminAdmin implements IAdminCommandHandler {
 
- private static String[] _adminCommands = {"admin_admin","admin_play_sounds","admin_play_sound",
+ private static final String[] ADMIN_COMMANDS = {"admin_admin","admin_play_sounds","admin_play_sound",
                                            "admin_gmliston","admin_gmlistoff","admin_silence",
                                            "admin_atmosphere","admin_diet","admin_tradeoff",
 
@@ -127,12 +128,12 @@ public class AdminAdmin implements IAdminCommandHandler {
 			if (activeChar.getMessageRefusal()) // already in message refusal mode
 			{
 				activeChar.setMessageRefusal(false);
-				activeChar.sendPacket(new SystemMessage(SystemMessage.MESSAGE_ACCEPTANCE_MODE));
+				activeChar.sendPacket(new SystemMessage(SystemMessageId.MESSAGE_ACCEPTANCE_MODE));
 			}
 		    else
 	        {
 		    	activeChar.setMessageRefusal(true);
-				activeChar.sendPacket(new SystemMessage(SystemMessage.MESSAGE_REFUSAL_MODE));
+				activeChar.sendPacket(new SystemMessage(SystemMessageId.MESSAGE_REFUSAL_MODE));
 	        }	    
 		}
         
@@ -204,14 +205,13 @@ public class AdminAdmin implements IAdminCommandHandler {
         {
             try
             {
-                StringTokenizer st = new StringTokenizer(command);
-                st.nextToken();
-                if(st.nextToken().equalsIgnoreCase("on"))
+                String mode = command.substring(15);
+                if (mode.equalsIgnoreCase("on"))
                 {
                     activeChar.setTradeRefusal(true);
                     activeChar.sendMessage("交易關閉啟動");
                 }
-                else if(st.nextToken().equalsIgnoreCase("off"))
+                else if (mode.equalsIgnoreCase("off"))
                 {
                     activeChar.setTradeRefusal(false);
                     activeChar.sendMessage("交易關閉取消");
@@ -312,7 +312,7 @@ public class AdminAdmin implements IAdminCommandHandler {
 
 	public String[] getAdminCommandList()
 	{
-		return _adminCommands;
+		return ADMIN_COMMANDS;
 	}
 
 	private boolean checkLevel(int level) 
@@ -353,7 +353,7 @@ public class AdminAdmin implements IAdminCommandHandler {
         }
         else
         {
-            SystemMessage sm = new SystemMessage(614);
+            SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
             sm.addString("SYS");
             sm.addString("單獨天空還有七封印氣候才可以");
             activeChar.sendPacket(sm);
@@ -374,7 +374,7 @@ public class AdminAdmin implements IAdminCommandHandler {
 		activeChar.sendPacket(_snd);
 		activeChar.broadcastPacket(_snd);
 		showMainPage(activeChar);
-		SystemMessage _sm = new SystemMessage(614);
+		SystemMessage _sm = new SystemMessage(SystemMessageId.S1_S2);
 		_sm.addString("SYS");
 		_sm.addString("Playing "+sound+".");
 		activeChar.sendPacket(_sm);

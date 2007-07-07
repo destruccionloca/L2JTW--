@@ -37,7 +37,9 @@ import net.sf.l2j.gameserver.serverpackets.SystemMessage;
  */
 public class AdminMammon implements IAdminCommandHandler {
 
-    private static String[] _adminCommands = {"admin_mammon_find", "admin_mammon_respawn", "admin_list_spawns", "admin_msg"};
+
+    private static String[] ADMIN_COMMANDS = {"admin_mammon_find", "admin_mammon_respawn", "admin_list_spawns", "admin_msg"};
+
     private static final int REQUIRED_LEVEL = Config.GM_MENU;
     
     private boolean _isSealValidation = SevenSigns.getInstance().isSealValidationPeriod();
@@ -120,7 +122,7 @@ public class AdminMammon implements IAdminCommandHandler {
                     teleportIndex = Integer.parseInt(params[2]);
             }
             catch (Exception e) {
-                activeChar.sendPacket(SystemMessage.sendString("指令為 //list_spawns <NPC_ID> <TELE_INDEX>"));
+                activeChar.sendMessage("指令為 //list_spawns <NPC_ID> <TELE_INDEX>");
             }
 
             findNPCInstances(activeChar, npcId, teleportIndex);
@@ -147,7 +149,7 @@ public class AdminMammon implements IAdminCommandHandler {
 
     public String[] getAdminCommandList()
     {
-        return _adminCommands;
+        return ADMIN_COMMANDS;
     }
 
     private boolean checkLevel(int level) 

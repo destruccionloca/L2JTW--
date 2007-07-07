@@ -28,6 +28,7 @@ import net.sf.l2j.gameserver.model.L2Skill.SkillType;
 import net.sf.l2j.gameserver.model.actor.instance.L2DoorInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.entity.Castle;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.skills.Formulas;
 import net.sf.l2j.gameserver.templates.L2WeaponType;
@@ -39,7 +40,7 @@ import net.sf.l2j.gameserver.templates.L2WeaponType;
 public class StrSiegeAssault implements ISkillHandler 
 { 
     //private static Logger _log = Logger.getLogger(StrSiegeAssault.class.getName()); 
-    protected SkillType[] _skillIds = {SkillType.STRSIEGEASSAULT}; 
+	private static final SkillType[] SKILL_IDS = {SkillType.STRSIEGEASSAULT}; 
     
     public void useSkill(L2Character activeChar, @SuppressWarnings("unused") L2Skill skill, @SuppressWarnings("unused") L2Object[] targets)
     {
@@ -92,12 +93,8 @@ public class StrSiegeAssault implements ISkillHandler
                 	if (soul && weapon!= null)
                 		weapon.setChargedSoulshot(L2ItemInstance.CHARGED_NONE);                
 
-                	if (activeChar instanceof L2PcInstance) 
-                	{
-                		SystemMessage sm = new SystemMessage(SystemMessage.YOU_DID_S1_DMG);
-                		sm.addNumber(damage); 
-                		activeChar.sendPacket(sm);
-                	}
+                	activeChar.sendDamageMessage(target, damage, false, false, false);
+
                 }
                 else activeChar.sendPacket(SystemMessage.sendString(skill.getName() + " failed."));
             }
@@ -110,7 +107,7 @@ public class StrSiegeAssault implements ISkillHandler
     
     public SkillType[] getSkillIds() 
     { 
-        return _skillIds; 
+        return SKILL_IDS; 
     }
 
     /**
@@ -130,7 +127,7 @@ public class StrSiegeAssault implements ISkillHandler
         if (activeChar == null || !(activeChar instanceof L2PcInstance))
             return false;
         
-        SystemMessage sm = new SystemMessage(614);
+        SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
         L2PcInstance player = (L2PcInstance)activeChar;
 
         if (castle == null || castle.getCastleId() <= 0)

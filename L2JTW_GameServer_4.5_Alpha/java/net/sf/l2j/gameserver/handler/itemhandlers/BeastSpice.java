@@ -21,16 +21,17 @@ package net.sf.l2j.gameserver.handler.itemhandlers;
 import net.sf.l2j.gameserver.datatables.SkillTable;
 import net.sf.l2j.gameserver.handler.IItemHandler;
 import net.sf.l2j.gameserver.model.L2ItemInstance;
-import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.L2Object;
+import net.sf.l2j.gameserver.model.actor.instance.L2FeedableBeastInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PlayableInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
 public class BeastSpice implements IItemHandler
 {
 	// Golden Spice, Crystal Spice
-    private static int[] _itemIds = { 6643, 6644 };
+    private static final int[] ITEM_IDS = { 6643, 6644 };
 
 	public void useItem(L2PlayableInstance playable, L2ItemInstance item)
 	{
@@ -39,9 +40,9 @@ public class BeastSpice implements IItemHandler
 		
 		L2PcInstance activeChar = (L2PcInstance)playable;
 
-		if (!(activeChar.getTarget() instanceof L2NpcInstance))
+		if (!(activeChar.getTarget() instanceof L2FeedableBeastInstance))
 		{
-			activeChar.sendPacket(new SystemMessage(SystemMessage.TARGET_IS_INCORRECT));
+			activeChar.sendPacket(new SystemMessage(SystemMessageId.TARGET_IS_INCORRECT));
 			return;				
 		}
 
@@ -59,6 +60,6 @@ public class BeastSpice implements IItemHandler
 
     public int[] getItemIds() 
 	{ 
-		return _itemIds; 
+		return ITEM_IDS; 
 	} 
 }

@@ -23,6 +23,7 @@ import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.model.L2Skill.SkillType;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.StatusUpdate;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 /**
@@ -38,7 +39,7 @@ public class CombatPointHeal implements ISkillHandler
     /* (non-Javadoc)
      * @see net.sf.l2j.gameserver.handler.IItemHandler#useItem(net.sf.l2j.gameserver.model.L2PcInstance, net.sf.l2j.gameserver.model.L2ItemInstance)
      */
-    private static SkillType[] _skillIds = {SkillType.COMBATPOINTHEAL};
+	private static final SkillType[] SKILL_IDS = {SkillType.COMBATPOINTHEAL};
     
     /* (non-Javadoc)
      * @see net.sf.l2j.gameserver.handler.IItemHandler#useItem(net.sf.l2j.gameserver.model.L2PcInstance, net.sf.l2j.gameserver.model.L2ItemInstance)
@@ -56,7 +57,7 @@ public class CombatPointHeal implements ISkillHandler
             double cp = skill.getPower(); 
             //int cLev = activeChar.getLevel();
             //hp += skill.getPower()/*+(Math.sqrt(cLev)*cLev)+cLev*/;
-            SystemMessage sm = new SystemMessage(SystemMessage.S1_CP_WILL_BE_RESTORED); 
+            SystemMessage sm = new SystemMessage(SystemMessageId.S1_CP_WILL_BE_RESTORED); 
             sm.addNumber((int)cp); 
             target.sendPacket(sm);            
             target.setCurrentCp(cp+target.getCurrentCp()); 
@@ -69,6 +70,6 @@ public class CombatPointHeal implements ISkillHandler
     
     public SkillType[] getSkillIds()
     {
-        return _skillIds;
+        return SKILL_IDS;
     }
 }

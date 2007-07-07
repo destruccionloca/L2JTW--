@@ -28,18 +28,21 @@ import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.model.actor.instance.L2ChestInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PlayableInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.ActionFailed;
 import net.sf.l2j.gameserver.serverpackets.PlaySound;
 import net.sf.l2j.gameserver.serverpackets.SocialAction;
+import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.util.Rnd;
 
 public class ChestKey implements IItemHandler
 {
 	public static final int INTERACTION_DISTANCE = 100;
 
-	private static int[] _itemIds = {5197, 5198, 5199, 5200, 5201, 5202, 5203, 5204, //chest key
-										6665, 6666, 6667, 6668, 6669, 6670, 6671, 6672 //deluxe key
-	};
+	private static final int[] ITEM_IDS = {
+											5197, 5198, 5199, 5200, 5201, 5202, 5203, 5204, //chest key
+											6665, 6666, 6667, 6668, 6669, 6670, 6671, 6672  //deluxe key
+										  };
 
 	public boolean useSkill(L2PcInstance activeChar, int magicId, int level)
 	{
@@ -63,7 +66,7 @@ public class ChestKey implements IItemHandler
 
 		if (!(target instanceof L2ChestInstance) || target == null)
 		{
-			activeChar.sendMessage("Invalid target.");
+			activeChar.sendPacket(new SystemMessage(SystemMessageId.INCORRECT_TARGET));
 			activeChar.sendPacket(new ActionFailed());
 		}
 		else
@@ -76,12 +79,14 @@ public class ChestKey implements IItemHandler
 				return;
 			}
 
+			
 			if (!(activeChar.isInsideRadius(chest, INTERACTION_DISTANCE, false, false)))
 			{
 				activeChar.sendMessage("Too far.");
 				activeChar.sendPacket(new ActionFailed());
 				return;
 			}
+			
 
 			if (!chest.isBox()) {
 				activeChar.sendMessage("Use " + item.getItem().getName() + ".");
@@ -434,7 +439,7 @@ public class ChestKey implements IItemHandler
 					return;
 				}
 			}
-
+			
 			// Remove the required item
 
 			if (openChance > 0 && Rnd.get(100) < openChance)
@@ -455,13 +460,15 @@ public class ChestKey implements IItemHandler
 				activeChar.broadcastPacket(new SocialAction(activeChar.getObjectId(), 13));
 				PlaySound playSound = new PlaySound("interfacesound.system_close_01");
 				activeChar.sendPacket(playSound);
-				activeChar.sendMessage("The key has been broken off!");
+				activeChar.sendMessage("Failed to open chest!");
+				activeChar.sendPacket(new ActionFailed());
 
 				// 50% chance of getting a trap
 				if (Rnd.get(10) < 5) chest.chestTrap(activeChar);
-				chest.setHaveToDrop(false);
 				chest.setMustRewardExpSp(false);
-				chest.doDie(activeChar);
+				chest.setOpenFailed();
+				chest.getAI().setIntention(CtrlIntention.AI_INTENTION_ACTIVE);
+				chest.getAI().notifyEvent(CtrlEvent.EVT_ATTACKED, activeChar);
 			}
 		}
 	}
@@ -472,12 +479,13 @@ public class ChestKey implements IItemHandler
 		PlaySound playSound = new PlaySound("interfacesound.system_close_01");
 		player.sendPacket(playSound);
 		player.sendPacket(new ActionFailed());
+		chest.setOpenFailed();
 		chest.getAI().setIntention(CtrlIntention.AI_INTENTION_ACTIVE);
 		chest.getAI().notifyEvent(CtrlEvent.EVT_ATTACKED, player);
 	}
 
 	public int[] getItemIds()
 	{
-		return _itemIds;
+		return ITEM_IDS;
 	}
 }

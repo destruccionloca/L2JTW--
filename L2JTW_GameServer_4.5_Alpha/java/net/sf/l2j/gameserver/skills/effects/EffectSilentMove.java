@@ -22,6 +22,7 @@ import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.L2Effect;
 import net.sf.l2j.gameserver.model.L2Skill.SkillType;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
 final class EffectSilentMove extends L2Effect
@@ -71,7 +72,7 @@ final class EffectSilentMove extends L2Effect
 		
 		if(manaDam > getEffected().getCurrentMp())
 		{
-			SystemMessage sm = new SystemMessage(140);
+			SystemMessage sm = new SystemMessage(SystemMessageId.SKILL_REMOVED_DUE_LACK_MP);
 			getEffected().sendPacket(sm);
 			return false;
 		}

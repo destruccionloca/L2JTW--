@@ -20,6 +20,8 @@ package net.sf.l2j.gameserver.serverpackets;
 
 import java.util.Vector;
 
+import net.sf.l2j.gameserver.network.SystemMessageId;
+
 /**
  * This class ...
  * 
@@ -39,17 +41,13 @@ public class SystemMessage extends L2GameServerPacket
 	private int _messageId;
 	private Vector<Integer> _types = new Vector<Integer>();
 	private Vector<Object> _values = new Vector<Object>();
-	private int _SkillLvL = 1;
+	private int _skillLvL = 1;
 	
-	//PeaceZones
-	public static final int TARGET_IN_PEACEZONE = 85;
-	public static final int CANT_ATK_PEACEZONE = 84;
-	
-	// magic related
-	public static final int NOT_ENOUGH_HP = 23;
-    public static final int NOT_ENOUGH_MP = 24;
-    public static final int NOT_ENOUGH_ITEMS = 351;
-    
+	public SystemMessage(SystemMessageId messageId)
+	{
+		_messageId = messageId.getId();
+	}
+
 	public static final int USE_S1 = 46;
 	public static final int S1_PREPARED_FOR_REUSE = 48;
 	public static final int YOU_FEEL_S1_EFFECT = 110;
@@ -69,6 +67,8 @@ public class SystemMessage extends L2GameServerPacket
     public static final int S2_MP_HAS_BEEN_DRAINED_BY_S1 = 970;
     public static final int YOUR_OPPONENTS_MP_WAS_REDUCED_BY_S1 = 1867;
 
+	
+	
     public static final int EARNED_S2_S1_s = 53;
     public static final int EARNED_ITEM = 54;
 	public static final int EARNED_ADENA = 52;
@@ -81,8 +81,9 @@ public class SystemMessage extends L2GameServerPacket
 	public static final int SOUL_CRYSTAL_ABSORBING_FAILED_RESONATION = 977;
 	public static final int SOUL_CRYSTAL_ABSORBING_REFUSED = 978;
 	
-	public static final int YOU_DID_S1_DMG = 0x23;
-	public static final int S1_GAVE_YOU_S2_DMG = 0x24;
+	public static final int YOU_DID_S1_DMG = 35;
+	public static final int S1_GAVE_YOU_S2_DMG = 36;
+	
 	public static final int EFFECT_S1_DISAPPEARED = 749;
 	public static final int YOU_EARNED_S1_EXP_AND_S2_SP = 0x5f;
 	public static final int YOU_INCREASED_YOUR_LEVEL = 0x60;
@@ -315,11 +316,14 @@ public class SystemMessage extends L2GameServerPacket
 	public static final int YOU_PICKED_UP_S1_ADENA = 28;
 	public static final int YOU_PICKED_UP_S1_S2 = 29;
 	public static final int YOU_PICKED_UP_S1 = 30;	
+	public static final int YOU_PICKED_UP_A_S1_S2 = 369; //enchanted item
 	public static final int S1_PICKED_UP_S2_S3 = 299;
 	public static final int S1_PICKED_UP_S2 = 300;
     public static final int FAILED_TO_PICKUP_S1_ADENA = 55;
     public static final int FAILED_TO_PICKUP_S1 = 56;
     public static final int FAILED_TO_PICKUP_S2_S1_s = 57;
+    public static final int ATTENTION_S1_PICKED_UP_S2 = 1533;
+    public static final int ATTENTION_S1_PICKED_UP_S2_S3 = 1534;
     
 	//GM LIST
 	public static final int GM_LIST = 703;
@@ -383,14 +387,13 @@ public class SystemMessage extends L2GameServerPacket
 	public static final int NAMING_PETNAME_CONTAINS_INVALID_CHARS = 591;		
     
 	//Pets
+	public static final int PET_HIT_FOR_S1_DAMAGE = 1015;
+	public static final int PET_RECEIVED_S2_DAMAGE_BY_S1 = 1016;
 	public static final int ITEM_NOT_FOR_PETS = 544;
     public static final int DEAD_PET_CANNOT_BE_RETURNED = 589;
 	public static final int CANNOT_GIVE_ITEMS_TO_DEAD_PET = 590;
 	public static final int CANNOT_EQUIP_PET_ITEM = 600;
     public static final int PET_EARNED_S1_EXP = 1014;
-    public static final int PET_RECEIVED_DAMAGE_OF_S2_BY_S1 = 1016;
-    public static final int PET_CRITICAL_HIT = 1017;
-	public static final int PET_DID_S1_DMG = 1015;
     public static final int S1_GAME_PET_S2_DMG = 1016;
     public static final int PET_CANNOT_USE_ITEM = 972;
     public static final int PET_TOOK_S1_BECAUSE_HE_WAS_HUNGRY = 1527;
@@ -409,9 +412,8 @@ public class SystemMessage extends L2GameServerPacket
     public static final int STRIDER_CAN_BE_RIDDEN_ONLY_WHILE_STANDING = 1013;
 	
     //Summoning
-    public static final int SUMMON_GAVE_DAMAGE_OF_S1 = 1026;
-    public static final int SUMMON_RECEIVED_DAMAGE_OF_S2_BY_S1 = 1027;
-    public static final int SUMMON_CRITICAL_HIT = 1028;
+	public static final int SUMMON_GAVE_DAMAGE_S1 = 1026;
+	public static final int SUMMON_RECEIVED_DAMAGE_S2_BY_S1 = 1027;
     public static final int SUMMON_A_PET = 547;
     public static final int CUBIC_SUMMONING_FAILED = 568;
     public static final int SUMMONING_SERVITOR_COSTS_S2_S1 = 1197;
@@ -804,10 +806,12 @@ public class SystemMessage extends L2GameServerPacket
 	/**
 	 * @param _characters
 	 */
+
 	public SystemMessage(int messageId)
 	{
 		_messageId = messageId;
 	}
+
     
     public static SystemMessage sendString(String msg)
     {
@@ -817,36 +821,39 @@ public class SystemMessage extends L2GameServerPacket
         
         return sm;
     }
+
 	
+
+ 	
 	public SystemMessage addString(String text)
 	{
 		_types.add(new Integer(TYPE_TEXT));
 		_values.add(text);
-        
-        return this;
+		
+		return this;
 	}
 
 	public SystemMessage addNumber(int number)
 	{
 		_types.add(new Integer(TYPE_NUMBER));
 		_values.add(new Integer(number));
-        return this;
+		return this;
 	}
 	
 	public SystemMessage addNpcName(int id)
 	{
 		_types.add(new Integer(TYPE_NPC_NAME));
 		_values.add(new Integer(1000000 + id));
-        
-        return this;
+		
+		return this;
 	}
 
 	public SystemMessage addItemName(int id)
 	{
 		_types.add(new Integer(TYPE_ITEM_NAME));
 		_values.add(new Integer(id));
-        
-        return this;
+		
+		return this;
 	}
 
 	public SystemMessage addZoneName(int x, int y, int z)
@@ -854,8 +861,8 @@ public class SystemMessage extends L2GameServerPacket
 		_types.add(new Integer(TYPE_ZONE_NAME));
 		int[] coord = {x, y, z};
 		_values.add(coord);
-        
-        return this;
+		
+		return this;
 	}
 
 	public SystemMessage addSkillName(int id){return addSkillName(id, 1);}
@@ -864,9 +871,9 @@ public class SystemMessage extends L2GameServerPacket
 	{
 		_types.add(new Integer(TYPE_SKILL_NAME));
 		_values.add(new Integer(id));
-		_SkillLvL = lvl;
-        
-        return this;
+		_skillLvL = lvl;
+		
+		return this;
 	}
 	
 	protected final void writeImpl()
@@ -901,7 +908,7 @@ public class SystemMessage extends L2GameServerPacket
 				{
 					int t1 = ((Integer)_values.get(i)).intValue();
 					writeD(t1); // Skill Id
-					writeD(_SkillLvL); // Skill lvl
+					writeD(_skillLvL); // Skill lvl
 					break;
 				}
 				case TYPE_ZONE_NAME:

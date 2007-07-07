@@ -31,7 +31,7 @@ public class EffectChargeSelf extends L2Effect
     {
         super(env, template);
         num_charges = 7;
-        env._player.updateEffectIcons();
+        env.player.updateEffectIcons();
         SystemMessage sm = new SystemMessage(323);
         sm.addNumber(num_charges);
         getEffected().sendPacket(sm);

@@ -294,8 +294,8 @@ public final class L2Weapon  extends L2Item
     	{
     		for (FuncTemplate t : _funcTemplates) {
 		    	Env env = new Env();
-		    	env._player = player;
-		    	env._item = instance;
+		    	env.player = player;
+		    	env.item = instance;
 		    	Func f = t.getFunc(env, instance);
 		    	if (f != null)
 		    		funcs.add(f);
@@ -378,8 +378,10 @@ public final class L2Weapon  extends L2Item
                 
                 if ((caster instanceof L2PcInstance) && (target instanceof L2NpcInstance))
                 {
-                	for (Quest quest: ((L2NpcInstance)target).getTemplate().getEventQuests(Quest.QuestEventType.MOB_TARGETED_BY_SKILL))
-                		quest.notifySkillUse ( (L2NpcInstance) target, (L2PcInstance) caster, skill);
+                	Quest[] quests = ((L2NpcInstance)target).getTemplate().getEventQuests(Quest.QuestEventType.MOB_TARGETED_BY_SKILL);
+                	if (quests != null)
+                		for (Quest quest: quests)
+                			quest.notifySkillUse ( (L2NpcInstance) target, (L2PcInstance) caster, skill);
                 }
             }
             catch (IOException e)

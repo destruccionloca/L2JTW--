@@ -32,6 +32,8 @@ import net.sf.l2j.gameserver.model.L2DropData;
 import net.sf.l2j.gameserver.model.L2ItemInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
+import net.sf.l2j.gameserver.serverpackets.ExShowQuestMark;
 import net.sf.l2j.gameserver.serverpackets.ItemList;
 import net.sf.l2j.gameserver.serverpackets.PlaySound;
 import net.sf.l2j.gameserver.serverpackets.QuestList;
@@ -45,7 +47,7 @@ import net.sf.l2j.util.Rnd;
  */
 public final class QuestState
 {
-	protected static Logger _log = Logger.getLogger(Quest.class.getName());
+	protected static final Logger _log = Logger.getLogger(Quest.class.getName());
 
 	/** Quest associated to the QuestState */
 	private final Quest _quest;
@@ -65,9 +67,6 @@ public final class QuestState
 	/** List of drops needed for quest according to the mob */
 	private Map<Integer, List<L2DropData>> _drops;
 	
-    /** List of timer for quest */
-    private List<QuestTimer> _questTimers;
-    
     /** Boolean flag letting QuestStateManager know to exit quest when cleaning up */
     private boolean _isExitQuestOnCleanUp = false;
 
@@ -227,7 +226,10 @@ public final class QuestState
 				_drops.putAll(newDrops);
 			}
 		}
-        
+		
+		if (getQuest().getQuestIntId() < 999 && isStarted())
+			getPlayer().sendPacket(new ExShowQuestMark(getQuest().getQuestIntId()));
+		
 		Quest.updateQuestInDb(this);
 		QuestList ql = new QuestList();
         
@@ -501,7 +503,7 @@ public final class QuestState
 		// If item for reward is gold, send message of gold reward to client
 		if (itemId == 57) 
         {
-			SystemMessage smsg = new SystemMessage(SystemMessage.EARNED_ADENA);
+			SystemMessage smsg = new SystemMessage(SystemMessageId.EARNED_ADENA);
 			smsg.addNumber(count);
 			getPlayer().sendPacket(smsg);
 		} 
@@ -511,13 +513,13 @@ public final class QuestState
 
             if (count > 1)
             {
-    			SystemMessage smsg = new SystemMessage(SystemMessage.EARNED_S2_S1_s);
+    			SystemMessage smsg = new SystemMessage(SystemMessageId.EARNED_S2_S1_S);
                 smsg.addItemName(item.getItemId());
     			smsg.addNumber(count);
     			getPlayer().sendPacket(smsg);
             } else
             {
-                SystemMessage smsg = new SystemMessage(SystemMessage.EARNED_ITEM);
+                SystemMessage smsg = new SystemMessage(SystemMessageId.EARNED_ITEM);
                 getPlayer().sendPacket(smsg);
                 smsg.addItemName(item.getItemId());
 
@@ -711,9 +713,7 @@ public final class QuestState
      */
     public void startQuestTimer(String name, long time)
     {
-        // Add quest timer if timer doesn't already exist
-        if (getQuestTimer(name) == null)
-            _questTimers.add(new QuestTimer(this, name, time));
+    	getQuest().startQuestTimer(name, time, null, getPlayer());
     }
     
     /**
@@ -722,23 +722,7 @@ public final class QuestState
      */
     public final QuestTimer getQuestTimer(String name)
     {
-        for (int i = 0; i < getQuestTimers().size(); i++)
-            if (getQuestTimers().get(i).getName() == name)
-                return  getQuestTimers().get(i);
-
-        return null;
-    }
-    
-    /**
-     * Return a list of QuestTimer
-     * @return FastList<QuestTimer>
-     */
-    public final List<QuestTimer> getQuestTimers()
-    {
-        if (_questTimers == null)
-            _questTimers = new FastList<QuestTimer>();
-        
-        return _questTimers;
+    	return getQuest().getQuestTimer(name, null, getPlayer());
     }
     
     /**

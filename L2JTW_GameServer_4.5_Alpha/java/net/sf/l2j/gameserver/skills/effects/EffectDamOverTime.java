@@ -21,7 +21,7 @@ import net.sf.l2j.gameserver.skills.Env;
 import net.sf.l2j.gameserver.model.L2Attackable;
 import net.sf.l2j.gameserver.model.L2Effect;
 import net.sf.l2j.gameserver.model.L2Skill.SkillTargetType;
-import net.sf.l2j.gameserver.model.L2Skill.SkillType;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
 class EffectDamOverTime extends L2Effect
@@ -48,7 +48,7 @@ class EffectDamOverTime extends L2Effect
 		{
 			if (getSkill().isToggle())
 			{
-				SystemMessage sm = new SystemMessage(140);
+				SystemMessage sm = new SystemMessage(SystemMessageId.SKILL_REMOVED_DUE_LACK_HP);
 				getEffected().sendPacket(sm);
 				return false;
 			}
@@ -63,6 +63,8 @@ class EffectDamOverTime extends L2Effect
         					&& !(getSkill().getTargetType() == SkillTargetType.TARGET_SELF 
         							&& getSkill().isToggle());
         
+
+/*
         if((getSkill().getSkillType() == SkillType.POISON || getSkill().getSkillType() == SkillType.BLEED || getSkill().getSkillType() == SkillType.DOT)&& getEffected().getCurrentHp() > damage)
         {
             getEffected().reduceCurrentHp(damage, getEffector(),awake,true);
@@ -71,7 +73,12 @@ class EffectDamOverTime extends L2Effect
         {
             getEffected().reduceCurrentHp(damage, getEffector());
         }
+*/
+
         
+        getEffected().reduceCurrentHp(damage, getEffector(),awake);
+
+
 		return true;
 	}
 }

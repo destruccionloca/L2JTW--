@@ -27,6 +27,7 @@ import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.model.L2Skill.SkillType;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.InventoryUpdate;
 import net.sf.l2j.gameserver.serverpackets.ItemList;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
@@ -40,7 +41,7 @@ import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 public class Sweep implements ISkillHandler 
 { 
     //private static Logger _log = Logger.getLogger(Sweep.class.getName()); 
-    protected SkillType[] _skillIds = {SkillType.SWEEP}; 
+	private static final SkillType[] SKILL_IDS = {SkillType.SWEEP}; 
     
     public void useSkill(L2Character activeChar, @SuppressWarnings("unused") L2Skill skill, L2Object[] targets) 
     { 
@@ -86,13 +87,14 @@ public class Sweep implements ISkillHandler
 						if (ritem.getCount() > 1)
 						{
 
-							smsg = new SystemMessage(SystemMessage.EARNED_S2_S1_s); // earned $s2$s1
+							smsg = new SystemMessage(SystemMessageId.EARNED_S2_S1_S); // earned $s2$s1
+
                             smsg.addItemName(ritem.getItemId());
                             smsg.addNumber(ritem.getCount());
 						}
 						else
 						{
-							smsg = new SystemMessage(SystemMessage.EARNED_ITEM); // earned $s1
+							smsg = new SystemMessage(SystemMessageId.EARNED_ITEM); // earned $s1
 							smsg.addItemName(ritem.getItemId());
 						}
 
@@ -116,6 +118,6 @@ public class Sweep implements ISkillHandler
     
     public SkillType[] getSkillIds() 
     { 
-        return _skillIds; 
+        return SKILL_IDS; 
     } 
 }

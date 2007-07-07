@@ -18,15 +18,14 @@
  */
 package net.sf.l2j.gameserver.model.actor.instance;
 
-import java.util.Iterator;
 import java.util.Map;
 
-import javolution.text.TextBuilder;
 import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.model.L2Clan;
 import net.sf.l2j.gameserver.model.PcFreight;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.ActionFailed;
-import net.sf.l2j.gameserver.serverpackets.NpcHtmlMessage;
+import net.sf.l2j.gameserver.serverpackets.PackageToList;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.serverpackets.WareHouseDepositList;
 import net.sf.l2j.gameserver.serverpackets.WareHouseWithdrawalList;
@@ -75,8 +74,14 @@ public final class L2WarehouseInstance extends L2FolkInstance
         player.sendPacket(new ActionFailed());
         player.setActiveWarehouse(player.getWarehouse());
 
+        if (player.getActiveWarehouse().getSize() == 0)
+        {
+        	player.sendPacket(new SystemMessage(SystemMessageId.NO_ITEM_DEPOSITED_IN_WH));
+        	return;
+        }
+        
         if (Config.DEBUG) _log.fine("Showing stored items");
-        player.sendPacket(new WareHouseWithdrawalList(player, WareHouseWithdrawalList.Private));
+        player.sendPacket(new WareHouseWithdrawalList(player, WareHouseWithdrawalList.PRIVATE));
     }
 
     private void showDepositWindow(L2PcInstance player)
@@ -86,55 +91,47 @@ public final class L2WarehouseInstance extends L2FolkInstance
         player.tempInvetoryDisable();
         if (Config.DEBUG) _log.fine("Showing items to deposit");
 
-        player.sendPacket(new WareHouseDepositList(player, WareHouseDepositList.Private));
+        player.sendPacket(new WareHouseDepositList(player, WareHouseDepositList.PRIVATE));
     }
 
     private void showDepositWindowClan(L2PcInstance player)
     {
         player.sendPacket(new ActionFailed());
-        if (player.getClan() != null)
-        {
+    	if (player.getClan() != null)
+    	{
             if (player.getClan().getLevel() == 0)
-                player.sendPacket(new SystemMessage(SystemMessage.ONLY_LEVEL_1_CLAN_OR_HIGHER_CAN_USE_WAREHOUSE));
+                player.sendPacket(new SystemMessage(SystemMessageId.ONLY_LEVEL_1_CLAN_OR_HIGHER_CAN_USE_WAREHOUSE));
             else
             {
-                if (!player.isClanLeader())
-                    player.sendPacket(new SystemMessage(SystemMessage.ONLY_CLAN_LEADER_CAN_RETRIEVE_ITEMS_FROM_CLAN_WAREHOUSE));
-
                 player.setActiveWarehouse(player.getClan().getWarehouse());
                 player.tempInvetoryDisable();
                 if (Config.DEBUG) _log.fine("Showing items to deposit - clan");
 
-                WareHouseDepositList dl = new WareHouseDepositList(player, WareHouseDepositList.Clan);
+                WareHouseDepositList dl = new WareHouseDepositList(player, WareHouseDepositList.CLAN);
                 player.sendPacket(dl);
             }
-        }
+    	}
     }
 
     private void showWithdrawWindowClan(L2PcInstance player)
     {
         player.sendPacket(new ActionFailed());
-        if (player.getClan() != null) 
-        {
+    	if ((player.getClanPrivileges() & L2Clan.CP_CL_VIEW_WAREHOUSE) != L2Clan.CP_CL_VIEW_WAREHOUSE)
+    	{
+    		player.sendPacket(new SystemMessage(SystemMessageId.YOU_DO_NOT_HAVE_THE_RIGHT_TO_USE_CLAN_WAREHOUSE));
+    		return;
+    	}
+    	else
+    	{
             if (player.getClan().getLevel() == 0)
-                player.sendPacket(new SystemMessage(SystemMessage.ONLY_LEVEL_1_CLAN_OR_HIGHER_CAN_USE_WAREHOUSE));
+                player.sendPacket(new SystemMessage(SystemMessageId.ONLY_LEVEL_1_CLAN_OR_HIGHER_CAN_USE_WAREHOUSE));
             else
             {
-            	if ((player.getClanPrivileges() & L2Clan.CP_CL_VIEW_WAREHOUSE) 
-            			!= L2Clan.CP_CL_VIEW_WAREHOUSE)
-            	{
-            		player.sendPacket(new SystemMessage(SystemMessage.YOU_DO_NOT_HAVE_THE_RIGHT_TO_USE_CLAN_WAREHOUSE));
-            		return;
-            	}
             	player.setActiveWarehouse(player.getClan().getWarehouse());
                 if (Config.DEBUG) _log.fine("Showing items to deposit - clan");
-                player.sendPacket(new WareHouseWithdrawalList(player, WareHouseWithdrawalList.Clan));
+                player.sendPacket(new WareHouseWithdrawalList(player, WareHouseWithdrawalList.CLAN));
             }
-        }
-        else
-        {
-            _log.warning("no items stored");
-        }
+    	}
     }
 
     private void showWithdrawWindowFreight(L2PcInstance player)
@@ -148,15 +145,22 @@ public final class L2WarehouseInstance extends L2FolkInstance
         if (freight != null && getZone() != null)
 
         {
-        	if (Config.ALT_GAME_FREIGHTS)
+        	if (freight.getSize() > 0)
         	{
-                freight.setActiveLocation(0);
-        	} else
-        	{
-        		freight.setActiveLocation(getZone().getId());
+	        	if (Config.ALT_GAME_FREIGHTS)
+	        	{
+	                freight.setActiveLocation(0);
+	        	} else
+	        	{
+	        		freight.setActiveLocation(getZone().getId());
+	        	}
+	            player.setActiveWarehouse(freight);
+	            player.sendPacket(new WareHouseWithdrawalList(player, WareHouseWithdrawalList.FREIGHT));
         	}
-            player.setActiveWarehouse(freight);
-            player.sendPacket(new WareHouseWithdrawalList(player, WareHouseWithdrawalList.Freight));
+        	else
+        	{
+            	player.sendPacket(new SystemMessage(SystemMessageId.NO_ITEM_DEPOSITED_IN_WH));
+        	}
         }
         else
         {
@@ -169,14 +173,9 @@ public final class L2WarehouseInstance extends L2FolkInstance
         // No other chars in the account of this player
         if (player.getAccountChars().size() == 0)
         {
-            NpcHtmlMessage npcReply = new NpcHtmlMessage(getObjectId());
 
-            TextBuilder replyMSG = new TextBuilder("<html><body>");
-            replyMSG.append("並無其他人物在這帳號可以傳送貨物");
-            replyMSG.append("</body></html>");
+            player.sendPacket(new SystemMessage(SystemMessageId.CHARACTER_DOES_NOT_EXIST));
 
-            npcReply.setHtml(replyMSG.toString());
-            player.sendPacket(npcReply);
         }
         // One or more chars other than this player for this account
         else
@@ -189,30 +188,8 @@ public final class L2WarehouseInstance extends L2FolkInstance
                 player.sendPacket(new ActionFailed());
                 return;
             }
-
-            NpcHtmlMessage npcReply = new NpcHtmlMessage(getObjectId());
-            TextBuilder replyMSG = new TextBuilder("<html><body>");
-            replyMSG.append("請選擇人物進行貨物傳送:<br><br>");
-            //replyMSG.append("<select>");
-            for (Iterator<Integer> iter = chars.keySet().iterator(); iter.hasNext();)
-            {
-                Integer objId = iter.next();
-                String charName = chars.get(objId);
-
-                /*
-                 replyMSG.append("<option action=\"bypass -h npc_" + String.valueOf(getObjectId()) + "_FreightChar_" + String.valueOf(objId) + "\">");
-                 replyMSG.append(charName);
-                 replyMSG.append("</option>");
-                 */
-                replyMSG.append("<a action=\"bypass -h npc_" + String.valueOf(getObjectId())
-                    + "_FreightChar_" + String.valueOf(objId) + "\">");
-                replyMSG.append(charName);
-                replyMSG.append("</a><br><br>");
-            }
-            //replyMSG.append("</select>");
-            replyMSG.append("</body></html>");
-            npcReply.setHtml(replyMSG.toString());
-            player.sendPacket(npcReply);
+            
+            player.sendPacket(new PackageToList(chars));
 
             if (Config.DEBUG)
                 _log.fine("Showing destination chars to freight - char src: " + player.getName());
@@ -252,7 +229,7 @@ public final class L2WarehouseInstance extends L2FolkInstance
         destChar.deleteMe();
 
         if (Config.DEBUG) _log.fine("Showing items to freight");
-        player.sendPacket(new WareHouseDepositList(player, WareHouseDepositList.Freight));
+        player.sendPacket(new WareHouseDepositList(player, WareHouseDepositList.FREIGHT));
     }
 
     public void onBypassFeedback(L2PcInstance player, String command)

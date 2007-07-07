@@ -8,6 +8,7 @@ import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.model.L2Skill.SkillType;
 import net.sf.l2j.gameserver.model.actor.instance.L2ChestInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2DoorInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.ActionFailed;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.skills.Formulas;
@@ -16,7 +17,7 @@ import net.sf.l2j.util.Rnd;
 public class Unlock implements ISkillHandler
 {
 	//private static Logger _log = Logger.getLogger(Unlock.class.getName()); 
-	protected SkillType[] _skillIds = {SkillType.UNLOCK};
+	private static final SkillType[] SKILL_IDS = {SkillType.UNLOCK};
 
 	public void useSkill(L2Character activeChar, L2Skill skill, @SuppressWarnings("unused")
 	L2Object[] targets)
@@ -35,7 +36,7 @@ public class Unlock implements ISkillHandler
 				L2DoorInstance door = (L2DoorInstance) target;
 				if (!door.isUnlockable())
 				{
-					activeChar.sendPacket(new SystemMessage(SystemMessage.UNABLE_TO_UNLOCK_DOOR));
+					activeChar.sendPacket(new SystemMessage(SystemMessageId.UNABLE_TO_UNLOCK_DOOR));
 					activeChar.sendPacket(new ActionFailed());
 					return;
 				}
@@ -44,14 +45,14 @@ public class Unlock implements ISkillHandler
 				{
 					door.openMe();
 					door.onOpen();
-					SystemMessage systemmessage = new SystemMessage(SystemMessage.S1_S2);
+					SystemMessage systemmessage = new SystemMessage(SystemMessageId.S1_S2);
 					systemmessage.addString("SYS");
 					systemmessage.addString("無法開啟");
 					activeChar.sendPacket(systemmessage);
 				}
 				else
 				{
-					activeChar.sendPacket(new SystemMessage(SystemMessage.FAILED_TO_UNLOCK_DOOR));
+					activeChar.sendPacket(new SystemMessage(SystemMessageId.FAILED_TO_UNLOCK_DOOR));
 				}
 			}
 			else if (target instanceof L2ChestInstance)
@@ -128,6 +129,9 @@ public class Unlock implements ISkillHandler
 					{
 						activeChar.sendPacket(SystemMessage.sendString("無法開啟!"));
 						activeChar.sendPacket(new ActionFailed());
+						if (Rnd.get(100) < chestTrapLimit) chest.chestTrap(activeChar);
+						chest.setMustRewardExpSp(false);
+						chest.setOpenFailed();
 						chest.getAI().notifyEvent(CtrlEvent.EVT_ATTACKED, activeChar);
 						return;
 					}
@@ -147,9 +151,9 @@ public class Unlock implements ISkillHandler
 						activeChar.sendPacket(SystemMessage.sendString("解鎖失敗!"));
 
 						if (Rnd.get(100) < chestTrapLimit) chest.chestTrap(activeChar);
-						chest.setHaveToDrop(false);
 						chest.setMustRewardExpSp(false);
-						chest.doDie(activeChar);
+						chest.setOpenFailed();
+						chest.getAI().notifyEvent(CtrlEvent.EVT_ATTACKED, activeChar);
 					}
 				}
 			}
@@ -158,6 +162,6 @@ public class Unlock implements ISkillHandler
 
 	public SkillType[] getSkillIds()
 	{
-		return _skillIds;
+		return SKILL_IDS;
 	}
 }

@@ -26,12 +26,13 @@ import net.sf.l2j.gameserver.handler.IAdminCommandHandler;
 import net.sf.l2j.gameserver.model.GMAudit;
 import net.sf.l2j.gameserver.model.L2World;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.LeaveWorld;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
 public class AdminKick implements IAdminCommandHandler {
     //private static Logger _log = Logger.getLogger(AdminKick.class.getName());
-    private static String[] _adminCommands = {"admin_kick" ,"admin_kick_non_gm"};
+    private static final String[] ADMIN_COMMANDS = {"admin_kick" ,"admin_kick_non_gm"};
     private static final int REQUIRED_LEVEL = Config.GM_KICK;
 	
 	public boolean useAdminCommand(String command, L2PcInstance activeChar)
@@ -63,7 +64,7 @@ public class AdminKick implements IAdminCommandHandler {
                 {
                     //System.out.println("Player2 "+plyr.getName());
                     plyr.logout();
-    				SystemMessage sm = new SystemMessage(614);
+    				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
     				sm.addString("You kicked " + plyr.getName() + " from the game.");
     				activeChar.sendPacket(sm);
     				//RegionBBSManager.getInstance().changeCommunityBoard();
@@ -90,7 +91,7 @@ public class AdminKick implements IAdminCommandHandler {
     }
 
     public String[] getAdminCommandList() {
-        return _adminCommands;
+        return ADMIN_COMMANDS;
     }
     
     private boolean checkLevel(int level) {

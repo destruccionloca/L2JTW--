@@ -24,9 +24,9 @@ import java.util.List;
 import javolution.text.TextBuilder;
 import javolution.util.FastList;
 import net.sf.l2j.Config;
+import net.sf.l2j.gameserver.datatables.ClanTable;
 import net.sf.l2j.gameserver.datatables.HelperBuffTable;
 import net.sf.l2j.gameserver.datatables.ItemTable;
-import net.sf.l2j.gameserver.datatables.NpcTable;
 import net.sf.l2j.gameserver.Olympiad;
 import net.sf.l2j.gameserver.SevenSigns;
 import net.sf.l2j.gameserver.SevenSignsFestival;
@@ -45,8 +45,8 @@ import net.sf.l2j.gameserver.model.L2Clan;
 import net.sf.l2j.gameserver.model.L2DropCategory;
 import net.sf.l2j.gameserver.model.L2DropData;
 import net.sf.l2j.gameserver.model.L2ItemInstance;
+import net.sf.l2j.gameserver.model.L2Multisell;
 import net.sf.l2j.gameserver.model.L2Object;
-import net.sf.l2j.gameserver.model.L2PetDataTable;
 import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.model.L2Spawn;
 import net.sf.l2j.gameserver.model.L2Summon;
@@ -62,13 +62,11 @@ import net.sf.l2j.gameserver.model.entity.CTF;
 import net.sf.l2j.gameserver.model.quest.Quest;
 import net.sf.l2j.gameserver.model.quest.QuestState;
 import net.sf.l2j.gameserver.network.L2GameClient;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.ActionFailed;
 import net.sf.l2j.gameserver.serverpackets.ExShowVariationMakeWindow;
 import net.sf.l2j.gameserver.serverpackets.ExShowVariationCancelWindow;
 import net.sf.l2j.gameserver.serverpackets.InventoryUpdate;
-import net.sf.l2j.gameserver.serverpackets.ItemList;
-import net.sf.l2j.gameserver.serverpackets.MagicSkillUser;
-import net.sf.l2j.gameserver.serverpackets.MultiSellList;
 import net.sf.l2j.gameserver.serverpackets.MyTargetSelected;
 import net.sf.l2j.gameserver.serverpackets.NpcHtmlMessage;
 import net.sf.l2j.gameserver.serverpackets.NpcInfo;
@@ -109,23 +107,23 @@ public class L2NpcInstance extends L2Character
     private L2Spawn _spawn;
 
     /** The flag to specify if this L2NpcInstance is busy */
-    private boolean _IsBusy = false;
+    private boolean _isBusy = false;
     
     /** The busy message for this L2NpcInstance */
-    private String _BusyMessage = "";
+    private String _busyMessage = "";
     
     /** True if endDecayTask has already been called */ 
     volatile boolean _isDecayed = false; 
     
     /** True if a Dwarf has used Spoil on this L2NpcInstance */
-    private boolean _IsSpoil = false;
+    private boolean _isSpoil = false;
     
     /** The castle index in the array of L2Castle this L2NpcInstance belongs to */
-    private int _CastleIndex = -2;
+    private int _castleIndex = -2;
     
     public boolean isEventMob = false,
     			   _isEventMobCTFJoiner = false;
-    private boolean _IsInTown = false;
+    private boolean _isInTown = false;
 
     private int _isSpoiledBy = 0;
     
@@ -463,7 +461,7 @@ public class L2NpcInstance extends L2Character
      */
     public boolean isSpoil() 
     {
-        return _IsSpoil;
+        return _isSpoil;
     }
     
     /**
@@ -471,7 +469,7 @@ public class L2NpcInstance extends L2Character
      */
     public void setSpoil(boolean isSpoil) 
     {
-        _IsSpoil = isSpoil;
+        _isSpoil = isSpoil;
     }
 
     public final int getIsSpoiledBy() 
@@ -489,7 +487,7 @@ public class L2NpcInstance extends L2Character
      */
     public final boolean isBusy()
     {
-        return _IsBusy;
+        return _isBusy;
     }
     
     /**
@@ -497,7 +495,7 @@ public class L2NpcInstance extends L2Character
      */
     public void setBusy(boolean isBusy)
     {
-        _IsBusy = isBusy;
+        _isBusy = isBusy;
     }
     
     /**
@@ -505,7 +503,7 @@ public class L2NpcInstance extends L2Character
      */
     public final String getBusyMessage()
     {
-        return _BusyMessage;
+        return _busyMessage;
     }
     
     /**
@@ -513,7 +511,7 @@ public class L2NpcInstance extends L2Character
      */
     public void setBusyMessage(String message)
     {
-        _BusyMessage = message;
+        _busyMessage = message;
     }
     
     /**
@@ -819,26 +817,27 @@ public class L2NpcInstance extends L2Character
     {
         // Get castle this NPC belongs to (excluding L2Attackable)
 
-		if (_CastleIndex < 0)
+		if (_castleIndex < 0)
+
 		{
-			_CastleIndex = CastleManager.getInstance().getCastleIndexByTown(this);
-			if (_CastleIndex < 0)
+			_castleIndex = CastleManager.getInstance().getCastleIndexByTown(this);
+			if (_castleIndex < 0)
 			{
-				_CastleIndex = CastleManager.getInstance().findNearestCastleIndex(this);
+				_castleIndex = CastleManager.getInstance().findNearestCastleIndex(this);
 			}
-			else _IsInTown = true; // Npc was spawned in town
+			else _isInTown = true; // Npc was spawned in town
 		}
 
-		if (_CastleIndex < 0) return null;
+		if (_castleIndex < 0) return null;
 
-		return CastleManager.getInstance().getCastles().get(_CastleIndex);
+		return CastleManager.getInstance().getCastles().get(_castleIndex);
 
     }
     
     public final boolean getIsInTown()
     {
-        if (_CastleIndex < 0) getCastle();
-        return _IsInTown;
+        if (_castleIndex < 0) getCastle();
+        return _isInTown;
     }
     
     /**
@@ -871,185 +870,7 @@ public class L2NpcInstance extends L2Character
                 html.replace("%playername%", player.getName());
                 player.sendPacket(html);
             }
-            else if (Config.ALLOW_WYVERN_UPGRADER && command.startsWith("upgrade") && player.getClan()!=null && player.getClan().getHasCastle()!=0)
-            {
-                String type = command.substring(8);
-                
-                if(type.equalsIgnoreCase("wyvern"))
-                {
-                    L2NpcTemplate wind = NpcTable.getInstance().getTemplate(L2PetDataTable.getStriderWindId());
-                    L2NpcTemplate star = NpcTable.getInstance().getTemplate(L2PetDataTable.getStriderStarId());
-                    L2NpcTemplate twilight = NpcTable.getInstance().getTemplate(L2PetDataTable.getStriderTwilightId());
-                    
-                    L2Summon summon = player.getPet();
-                    L2NpcTemplate myPet = summon.getTemplate();
-                               
-                    if ((myPet.equals(wind) || myPet.equals(star) || myPet.equals(twilight)) 
-                    		&& player.getAdena()>=20000000 
-                    		&& (player.getInventory().getItemByObjectId(summon.getControlItemId())!=null)
-                    	)
-                    {
-                        int exchangeItem = L2PetDataTable.getWyvernItemId();
-                        if (!player.reduceAdena("PetUpdate", 20000000, this, true)) return;
-                        player.getInventory().destroyItem("PetUpdate", summon.getControlItemId(), 1, player, this);
-                        
-                        L2NpcTemplate template1 = NpcTable.getInstance().getTemplate(629);
 
-                        try 
-                        {
-                        	L2Spawn spawn = new L2Spawn(template1);
-	                        
-	                        spawn.setLocx(getX()+20);
-	                        spawn.setLocy(getY()+20);
-	                        spawn.setLocz(getZ());
-	                        spawn.setAmount(1);
-	                        spawn.setHeading(player.getHeading());
-	                        spawn.setRespawnDelay(1);
-	                       
-	                        SpawnTable.getInstance().addNewSpawn(spawn, false);
-	                        
-	                        spawn.init();
-	                        spawn.getLastSpawn().setCurrentHp(999999999);
-	                        spawn.getLastSpawn().setName("巴爾");
-	                        spawn.getLastSpawn().setTitle("地獄之神");
-	                        spawn.getLastSpawn().isEventMob = true;
-	                        spawn.getLastSpawn().isAggressive();
-	                        spawn.getLastSpawn().decayMe();
-	                        spawn.getLastSpawn().spawnMe(spawn.getLastSpawn().getX(),spawn.getLastSpawn().getY(),spawn.getLastSpawn().getZ());
-	                        
-	                         
-	                        int level = summon.getLevel();
-	                        int chance = (level-54)*10;
-	                        spawn.getLastSpawn().broadcastPacket(new MagicSkillUser(spawn.getLastSpawn(), spawn.getLastSpawn(), 1034, 1, 1, 1));
-	                        spawn.getLastSpawn().broadcastPacket(new MagicSkillUser(spawn.getLastSpawn(), summon, 1034, 1, 1, 1));
-	                       
-	                        if(Rnd.nextInt(100)<chance) 
-	                        {
-	                        	ThreadPoolManager.getInstance().scheduleGeneral(new destroyTemporalSummon(summon, player), 6000);
-	                            player.getInventory().addItem("PetUpdate", exchangeItem, 1, player, this);
-	                            
-	                            NpcHtmlMessage adminReply = new NpcHtmlMessage(getObjectId());    
-	                            TextBuilder replyMSG = new TextBuilder("<html><body>");
-	                            replyMSG.append("恭喜.進化成功.");
-	                            replyMSG.append("</body></html>");
-	                            adminReply.setHtml(replyMSG.toString());
-	                            player.sendPacket(adminReply);
-	                        } else 
-	                        {
-	                            summon.reduceCurrentHp(summon.getCurrentHp(), player);
-	                        }
-	                        ThreadPoolManager.getInstance().scheduleGeneral(new destroyTemporalNPC(spawn), 15000);
-	                    
-	                        ItemList il = new ItemList(player, true);
-	                        player.sendPacket(il);
-                        } catch(Exception e) 
-                        {
-                        	e.printStackTrace();
-                        }
-                    }
-                    else
-                    {
-                        NpcHtmlMessage adminReply = new NpcHtmlMessage(getObjectId());      
-                        TextBuilder replyMSG = new TextBuilder("<html><body>");
-                       
-                        replyMSG.append("需要20.000.000並且需要召喚出寵物準備儀式 ...");
-                        replyMSG.append("</body></html>");
-                        
-                        adminReply.setHtml(replyMSG.toString());
-                        player.sendPacket(adminReply);
-                    }
-                }
-                else if (type.equalsIgnoreCase("strider")) 
-                {
-                    L2NpcTemplate wind = NpcTable.getInstance().getTemplate(L2PetDataTable.getHatchlingWindId());
-                    L2NpcTemplate star = NpcTable.getInstance().getTemplate(L2PetDataTable.getHatchlingStarId());
-                    L2NpcTemplate twilight = NpcTable.getInstance().getTemplate(L2PetDataTable.getHatchlingTwilightId());
-                    
-                    L2Summon summon = player.getPet();
-                    L2NpcTemplate myPet = summon.getTemplate();
-                               
-                    if ((myPet.equals(wind) || myPet.equals(star) || myPet.equals(twilight)) 
-                    		&& player.getAdena()>=6000000 
-                    		&& (player.getInventory().getItemByObjectId(summon.getControlItemId())!=null)
-                    	)
-                    {
-                        int exchangeItem = L2PetDataTable.getStriderTwilightItemId();
-                        if(myPet.equals(wind)) 
-                        	exchangeItem = L2PetDataTable.getStriderWindItemId();
-                        else if(myPet.equals(star)) 
-                        	exchangeItem = L2PetDataTable.getStriderStarItemId();
-                        
-                        if (!player.reduceAdena("PetUpdate", 6000000, this, true)) return;
-                        player.getInventory().destroyItem("PetUpdate", summon.getControlItemId(), 1, player, this);
-                        
-                        L2NpcTemplate template1 = NpcTable.getInstance().getTemplate(689);
-
-                        try 
-                        {
-                        	L2Spawn spawn = new L2Spawn(template1);
-	                        
-	                        spawn.setLocx(getX()+20);
-	                        spawn.setLocy(getY()+20);
-	                        spawn.setLocz(getZ());
-	                        spawn.setAmount(1);
-	                        spawn.setHeading(player.getHeading());
-	                        spawn.setRespawnDelay(1);
-	                       
-	                        SpawnTable.getInstance().addNewSpawn(spawn, false);
-	                        
-	                        spawn.init();
-	                        spawn.getLastSpawn().setCurrentHp(999999999);
-	                        spawn.getLastSpawn().setName("mercebu");
-	                        spawn.getLastSpawn().setTitle("baal's son");
-	                        
-	                        spawn.getLastSpawn().isAggressive();
-	                        spawn.getLastSpawn().decayMe();
-	                        spawn.getLastSpawn().spawnMe(spawn.getLastSpawn().getX(),spawn.getLastSpawn().getY(),spawn.getLastSpawn().getZ());
-	                        
-	                        spawn.getLastSpawn().broadcastPacket(new MagicSkillUser(spawn.getLastSpawn(), summon, 297, 1, 1, 1));
-	                        
-	                        int level = summon.getLevel();
-	                        int chance = (level-34)*10;
-	                        spawn.getLastSpawn().broadcastPacket(new MagicSkillUser(spawn.getLastSpawn(), spawn.getLastSpawn(), 1034, 1, 1, 1));
-	                        spawn.getLastSpawn().broadcastPacket(new MagicSkillUser(spawn.getLastSpawn(), summon, 1034, 1, 1, 1));
-	                        
-	                        if(Rnd.nextInt(100)<chance) 
-	                        {
-	                        	ThreadPoolManager.getInstance().scheduleGeneral(new destroyTemporalSummon(summon, player), 6000);
-	                            player.getInventory().addItem("PetUpdate", exchangeItem, 1, player, this);
-	                            NpcHtmlMessage adminReply = new NpcHtmlMessage(getObjectId());      
-	                            TextBuilder replyMSG = new TextBuilder("<html><body>");
-	                          
-	                            replyMSG.append("恭喜.進化成功.");
-	                            replyMSG.append("</body></html>");
-	                           
-	                            adminReply.setHtml(replyMSG.toString());
-	                            player.sendPacket(adminReply);
-	                        } else 
-	                        {
-	                            summon.reduceCurrentHp(summon.getCurrentHp(), player);
-	                        }
-	                        
-	                        ThreadPoolManager.getInstance().scheduleGeneral(new destroyTemporalNPC(spawn), 15000);
-	                        ItemList il = new ItemList(player, true);
-	                        player.sendPacket(il);
-                        } catch(Exception e) 
-                        {
-                        	e.printStackTrace();
-                        }
-                    }else
-                    {
-                        NpcHtmlMessage adminReply = new NpcHtmlMessage(getObjectId());      
-                        TextBuilder replyMSG = new TextBuilder("<html><body>");
-                       
-                         replyMSG.append("需要 6.000.000 並且召喚寵物準備儀式...");
-                        replyMSG.append("</body></html>");
-                        
-                        adminReply.setHtml(replyMSG.toString());
-                        player.sendPacket(adminReply);
-                    }
-                }
-            }
             else if (command.equalsIgnoreCase("TerritoryStatus"))
             {
 
@@ -1064,6 +885,7 @@ public class L2NpcInstance extends L2Character
                 {
                     if (getCastle().getOwnerId() > 0)
                     {
+
                        NpcHtmlMessage html = new NpcHtmlMessage(1);
                        html.setFile("data/html/territorystaus.htm");
                        html.replace("%objectId%", String.valueOf(getObjectId()));
@@ -1072,6 +894,7 @@ public class L2NpcInstance extends L2Character
                         html.replace("%castlename%", getCastle().getName());//fix chinese name of Castle by game
                         
                         L2Clan clan = new L2Clan(getCastle().getOwnerId());
+
                         html.replace("%clanname%", clan.getName());
                         html.replace("%clanleadername%", clan.getLeaderName());
                         html.replace("%taxpercent%", "" + getCastle().getTaxPercent());
@@ -1182,21 +1005,12 @@ public class L2NpcInstance extends L2Character
             else if (command.startsWith("multisell"))
     		{
 
-            	try
-            	{
-            		MultiSellList multisell=new MultiSellList(Integer.parseInt(command.substring(9).trim()), this);
-            		
-            		if(multisell!=null) 
-            			player.sendPacket(multisell);
-            	} catch (NumberFormatException nfe) 
-            	{
-            		player.sendMessage("指令錯誤");
-            	}
+            	L2Multisell.getInstance().SeparateAndSend(Integer.parseInt(command.substring(9).trim()), player, false, getCastle().getTaxRate());
 
     		}
             else if (command.startsWith("exc_multisell"))
             {
-            	player.sendPacket(new MultiSellList(Integer.parseInt(command.substring(13).trim()), this, true, player));
+            	L2Multisell.getInstance().SeparateAndSend(Integer.parseInt(command.substring(13).trim()), player, true, getCastle().getTaxRate());
             }
             else if (command.startsWith("Augment"))
             {
@@ -1204,11 +1018,11 @@ public class L2NpcInstance extends L2Character
             	switch (cmdChoice)
             	{
             		case 1:
-            			player.sendPacket(new SystemMessage(SystemMessage.SELECT_THE_ITEM_TO_BE_AUGMENTED));
+            			player.sendPacket(new SystemMessage(SystemMessageId.SELECT_THE_ITEM_TO_BE_AUGMENTED));
             			player.sendPacket(new ExShowVariationMakeWindow());
             			break;
             		case 2:
-            			player.sendPacket(new SystemMessage(SystemMessage.SELECT_THE_ITEM_FROM_WHICH_YOU_WISH_TO_REMOVE_AUGMENTATION));
+            			player.sendPacket(new SystemMessage(SystemMessageId.SELECT_THE_ITEM_FROM_WHICH_YOU_WISH_TO_REMOVE_AUGMENTATION));
             			player.sendPacket(new ExShowVariationCancelWindow());
             			break;
             	}
@@ -1427,7 +1241,8 @@ public class L2NpcInstance extends L2Character
         
         if (player.getWeightPenalty()>=3){	
 
-            player.sendPacket(new SystemMessage(1118));
+            player.sendPacket(new SystemMessage(SystemMessageId.INVENTORY_LESS_THAN_80_PERCENT));
+
             return;
         }
         
@@ -1593,13 +1408,13 @@ public class L2NpcInstance extends L2Character
         	if (!Lottery.getInstance().isStarted())
             {
                 //tickets can't be sold
-                player.sendPacket(new SystemMessage(930));
+                player.sendPacket(new SystemMessage(SystemMessageId.NO_LOTTERY_TICKETS_CURRENT_SOLD));
                 return;
             }
             if (!Lottery.getInstance().isSellableTickets())
             {
                 //tickets can't be sold
-                player.sendPacket(new SystemMessage(784));
+                player.sendPacket(new SystemMessage(SystemMessageId.NO_LOTTERY_TICKETS_AVAILABLE));
                 return;
             }
 
@@ -1658,13 +1473,13 @@ public class L2NpcInstance extends L2Character
             if (!Lottery.getInstance().isStarted())
             {
                 //tickets can't be sold
-                player.sendPacket(new SystemMessage(930));
+                player.sendPacket(new SystemMessage(SystemMessageId.NO_LOTTERY_TICKETS_CURRENT_SOLD));
                 return;
             }
             if (!Lottery.getInstance().isSellableTickets())
             {
                 //tickets can't be sold
-                player.sendPacket(new SystemMessage(784));
+                player.sendPacket(new SystemMessage(SystemMessageId.NO_LOTTERY_TICKETS_AVAILABLE));
                 return;
             }
                  
@@ -1682,14 +1497,14 @@ public class L2NpcInstance extends L2Character
             }
             if (player.getAdena() < price)
             {
-                     sm = new SystemMessage(SystemMessage.YOU_NOT_ENOUGH_ADENA);
+                     sm = new SystemMessage(SystemMessageId.YOU_NOT_ENOUGH_ADENA);
                      player.sendPacket(sm);
                      return;
             }
             if (!player.reduceAdena("Loto", price, this, true)) return;
             Lottery.getInstance().increasePrize(price);
 
-            sm = new SystemMessage(SystemMessage.ACQUIRED);
+            sm = new SystemMessage(SystemMessageId.ACQUIRED);
             sm.addNumber(lotonumber);
             sm.addItemName(4442);
             player.sendPacket(sm);
@@ -1772,7 +1587,7 @@ public class L2NpcInstance extends L2Character
             if (item == null || item.getItemId() != 4442 || item.getCustomType1() >= lotonumber) return;
             int[] check = Lottery.getInstance().checkTicket(item);
             
-            sm = new SystemMessage(SystemMessage.DISSAPEARED_ITEM);
+            sm = new SystemMessage(SystemMessageId.DISSAPEARED_ITEM);
             sm.addItemName(4442);
             player.sendPacket(sm);
             
@@ -1811,7 +1626,7 @@ public class L2NpcInstance extends L2Character
         if (!player.reduceAdena("RestoreCP", neededmoney, player.getLastFolkNPC(), true)) return;
         player.setCurrentCp(getCurrentCp()+5000);
         //cp restored
-        sm = new SystemMessage(1405);
+        sm = new SystemMessage(SystemMessageId.S1_CP_WILL_BE_RESTORED);
         sm.addString(player.getName());
         player.sendPacket(sm);
     }
@@ -1958,22 +1773,22 @@ public class L2NpcInstance extends L2Character
     {
     	if (player.getKarma() > 0)
         {	
-			if (this instanceof L2MerchantInstance && !Config.ALT_GAME_KARMA_PLAYER_CAN_SHOP)
+			if (!Config.ALT_GAME_KARMA_PLAYER_CAN_SHOP && this instanceof L2MerchantInstance)
 			{
 				if (showPkDenyChatWindow(player, "merchant"))
 					return;
 			}
-			else if (this instanceof L2TeleporterInstance && !Config.ALT_GAME_KARMA_PLAYER_CAN_USE_GK)
+			else if (!Config.ALT_GAME_KARMA_PLAYER_CAN_USE_GK && this instanceof L2TeleporterInstance)
 			{
 				if (showPkDenyChatWindow(player, "teleporter"))
 					return;
 			}
-			else if (this instanceof L2WarehouseInstance)
+			else if (!Config.ALT_GAME_KARMA_PLAYER_CAN_USE_WAREHOUSE && this instanceof L2WarehouseInstance)
 			{
-				if (showPkDenyChatWindow(player, "warehouse") && !Config.ALT_GAME_KARMA_PLAYER_CAN_USE_WAREHOUSE)
+				if (showPkDenyChatWindow(player, "warehouse"))
 					return;
 			}
-			else if (this instanceof L2FishermanInstance && !Config.ALT_GAME_KARMA_PLAYER_CAN_SHOP)
+			else if (!Config.ALT_GAME_KARMA_PLAYER_CAN_SHOP && this instanceof L2FishermanInstance)
 			{
 				if (showPkDenyChatWindow(player, "fisherman"))
 					return;
@@ -2093,11 +1908,11 @@ public class L2NpcInstance extends L2Character
 	                	switch (compWinner)
 	                	{
 	                		case SevenSigns.CABAL_DAWN:
-                                player.sendPacket(new SystemMessage(SystemMessage.CAN_BE_USED_BY_DAWN));
+                                player.sendPacket(new SystemMessage(SystemMessageId.CAN_BE_USED_BY_DAWN));
                                 filename += "necro_no.htm";
 	                			break;
 	                		case SevenSigns.CABAL_DUSK:
-                                player.sendPacket(new SystemMessage(SystemMessage.CAN_BE_USED_BY_DUSK));
+                                player.sendPacket(new SystemMessage(SystemMessageId.CAN_BE_USED_BY_DUSK));
                                 filename += "necro_no.htm";
 	                			break;
 	                		case SevenSigns.CABAL_NULL:
@@ -2129,11 +1944,11 @@ public class L2NpcInstance extends L2Character
 	                	switch (compWinner)
 	                	{
 	                		case SevenSigns.CABAL_DAWN:
-                                player.sendPacket(new SystemMessage(SystemMessage.CAN_BE_USED_BY_DAWN));
+                                player.sendPacket(new SystemMessage(SystemMessageId.CAN_BE_USED_BY_DAWN));
                                 filename += "cata_no.htm";
 	                			break;
 	                		case SevenSigns.CABAL_DUSK:
-                                player.sendPacket(new SystemMessage(SystemMessage.CAN_BE_USED_BY_DUSK));
+                                player.sendPacket(new SystemMessage(SystemMessageId.CAN_BE_USED_BY_DUSK));
                                 filename += "cata_no.htm";
 	                			break;
 	                		case SevenSigns.CABAL_NULL:
@@ -2199,14 +2014,14 @@ public class L2NpcInstance extends L2Character
                     case SevenSigns.CABAL_DAWN:
                         if (playerCabal != compWinner || playerCabal != sealAvariceOwner)
                         {
-                            player.sendPacket(new SystemMessage(SystemMessage.CAN_BE_USED_BY_DAWN));
+                            player.sendPacket(new SystemMessage(SystemMessageId.CAN_BE_USED_BY_DAWN));
                             return;
                         }
                         break;
                     case SevenSigns.CABAL_DUSK:
                         if (playerCabal != compWinner || playerCabal != sealAvariceOwner)
                         {
-                            player.sendPacket(new SystemMessage(SystemMessage.CAN_BE_USED_BY_DUSK));
+                            player.sendPacket(new SystemMessage(SystemMessageId.CAN_BE_USED_BY_DUSK));
                             return;
                         }
                         break;
@@ -2219,14 +2034,14 @@ public class L2NpcInstance extends L2Character
                     case SevenSigns.CABAL_DAWN:
                         if (playerCabal != compWinner || playerCabal != sealGnosisOwner)
                         {
-                            player.sendPacket(new SystemMessage(SystemMessage.CAN_BE_USED_BY_DAWN));
+                            player.sendPacket(new SystemMessage(SystemMessageId.CAN_BE_USED_BY_DAWN));
                             return;
                         }
                         break;
                     case SevenSigns.CABAL_DUSK:
                         if (playerCabal != compWinner || playerCabal != sealGnosisOwner)
                         {
-                            player.sendPacket(new SystemMessage(SystemMessage.CAN_BE_USED_BY_DUSK));
+                            player.sendPacket(new SystemMessage(SystemMessageId.CAN_BE_USED_BY_DUSK));
                             return;
                         }
                         break;

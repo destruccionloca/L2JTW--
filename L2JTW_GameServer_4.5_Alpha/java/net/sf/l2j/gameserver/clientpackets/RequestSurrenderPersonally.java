@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 import net.sf.l2j.gameserver.datatables.ClanTable;
 import net.sf.l2j.gameserver.model.L2Clan;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.ActionFailed;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
@@ -15,7 +16,7 @@ public final class RequestSurrenderPersonally extends L2GameClientPacket
 
     private String _pledgeName;
     private L2Clan _clan;
-    private L2PcInstance player;
+    private L2PcInstance _activeChar;
     
     protected void readImpl()
     {
@@ -24,9 +25,9 @@ public final class RequestSurrenderPersonally extends L2GameClientPacket
 
     protected void runImpl()
     {
-        player = getClient().getActiveChar();
-	if (player == null)
-	    return;
+    	_activeChar = getClient().getActiveChar();
+    	if (_activeChar == null)
+    		return;
         _log.info("RequestSurrenderPersonally by "+getClient().getActiveChar().getName()+" with "+_pledgeName);
         _clan = getClient().getActiveChar().getClan();
         L2Clan clan = ClanTable.getInstance().getClanByName(_pledgeName);
@@ -36,25 +37,29 @@ public final class RequestSurrenderPersonally extends L2GameClientPacket
         
         if(clan == null)
         {
-            player.sendMessage("無此血盟");
-            player.sendPacket(new ActionFailed());
+
+        	_activeChar.sendMessage("無此血盟");
+        	_activeChar.sendPacket(new ActionFailed());
+
             return;                        
         }
 
-        if(!_clan.isAtWarWith(clan.getClanId()) || player.getWantsPeace() == 1)
+        if(!_clan.isAtWarWith(clan.getClanId()) || _activeChar.getWantsPeace() == 1)
         {
-            player.sendMessage("並無與此血盟發生戰爭");
-            player.sendPacket(new ActionFailed());
+
+        	_activeChar.sendMessage("並無與此血盟發生戰爭");
+        	_activeChar.sendPacket(new ActionFailed());
+
             return;            
         }
         
-        player.setWantsPeace(1);
-        player.deathPenalty(false);
-        SystemMessage msg = new SystemMessage(SystemMessage.YOU_HAVE_PERSONALLY_SURRENDERED_TO_THE_S1_CLAN);
+        _activeChar.setWantsPeace(1);
+        _activeChar.deathPenalty(false);
+        SystemMessage msg = new SystemMessage(SystemMessageId.YOU_HAVE_PERSONALLY_SURRENDERED_TO_THE_S1_CLAN);
         msg.addString(_pledgeName);
-        player.sendPacket(msg);
+        _activeChar.sendPacket(msg);
         msg = null;
-        ClanTable.getInstance().CheckSurrender(_clan, clan);
+        ClanTable.getInstance().checkSurrender(_clan, clan);
     }
     
     public String getType()

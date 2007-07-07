@@ -30,6 +30,7 @@ import net.sf.l2j.gameserver.model.L2Skill.SkillType;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2SiegeFlagInstance;
 import net.sf.l2j.gameserver.model.entity.Castle;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
 /** 
@@ -41,7 +42,7 @@ import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 public class SiegeFlag implements ISkillHandler 
 { 
     //private static Logger _log = Logger.getLogger(SiegeFlag.class.getName()); 
-    protected SkillType[] _skillIds = {SkillType.SIEGEFLAG}; 
+	private static final SkillType[] SKILL_IDS = {SkillType.SIEGEFLAG}; 
     
     public void useSkill(L2Character activeChar, @SuppressWarnings("unused") L2Skill skill, @SuppressWarnings("unused") L2Object[] targets)
     {
@@ -73,7 +74,7 @@ public class SiegeFlag implements ISkillHandler
     
     public SkillType[] getSkillIds() 
     { 
-        return _skillIds; 
+        return SKILL_IDS; 
     }
 
     /**
@@ -93,7 +94,7 @@ public class SiegeFlag implements ISkillHandler
         if (activeChar == null || !(activeChar instanceof L2PcInstance))
             return false;
         
-        SystemMessage sm = new SystemMessage(614);
+        SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
         L2PcInstance player = (L2PcInstance)activeChar;
 
         if (castle == null || castle.getCastleId() <= 0)

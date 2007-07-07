@@ -31,6 +31,7 @@ import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.model.L2SkillLearn;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.ActionFailed;
 import net.sf.l2j.gameserver.serverpackets.MagicSkillUser;
 import net.sf.l2j.gameserver.serverpackets.NpcHtmlMessage;
@@ -53,7 +54,7 @@ import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 public class AdminSkill implements IAdminCommandHandler {
 	private static Logger _log = Logger.getLogger(AdminSkill.class.getName());
 	
-	private static String[] _adminCommands = {
+	private static final String[] ADMIN_COMMANDS = {
 			"admin_show_skills",
 			"admin_remove_skills",
 			"admin_skill_list",
@@ -114,7 +115,7 @@ public class AdminSkill implements IAdminCommandHandler {
 			}
 			catch (StringIndexOutOfBoundsException e)
 			{	//Case of empty character name
-				SystemMessage sm = new SystemMessage(614);
+				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 				sm.addString("SYS");
 				sm.addString("增加技能發生錯誤");
 				activeChar.sendPacket(sm);
@@ -131,7 +132,7 @@ public class AdminSkill implements IAdminCommandHandler {
 			}
 			catch (StringIndexOutOfBoundsException e)
 			{	//Case of empty character name
-				SystemMessage sm = new SystemMessage(614);
+				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 				sm.addString("SYS");
 				sm.addString("移除技能發生錯誤");
 				activeChar.sendPacket(sm);
@@ -178,7 +179,7 @@ public class AdminSkill implements IAdminCommandHandler {
         if (target instanceof L2PcInstance) {
             player = (L2PcInstance)target;
         } else {            
-            SystemMessage sm = new SystemMessage(614);
+            SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
             sm.addString("SYS");
             sm.addString("目標錯誤");
             activeChar.sendPacket(sm);
@@ -214,7 +215,7 @@ public class AdminSkill implements IAdminCommandHandler {
     }
 
     public String[] getAdminCommandList() {
-		return _adminCommands;
+		return ADMIN_COMMANDS;
 	}
 	
 	private boolean checkLevel(int level) {
@@ -229,7 +230,7 @@ public class AdminSkill implements IAdminCommandHandler {
 		if (target instanceof L2PcInstance) {
 			player = (L2PcInstance)target;
 		} else {
-			SystemMessage sm = new SystemMessage(614);
+			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 			sm.addString("SYS");
 			sm.addString("目標錯誤");
 			activeChar.sendPacket(sm);
@@ -302,7 +303,7 @@ public class AdminSkill implements IAdminCommandHandler {
 		if (target instanceof L2PcInstance) {
 			player = (L2PcInstance)target;
 		} else {
-			SystemMessage sm = new SystemMessage(614);
+			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 			sm.addString("SYS");
 			sm.addString("錯誤目標");
 			activeChar.sendPacket(sm);
@@ -342,7 +343,7 @@ public class AdminSkill implements IAdminCommandHandler {
 		if (target instanceof L2PcInstance) {
 			player = (L2PcInstance)target;
 		} else {			
-			SystemMessage sm = new SystemMessage(614);
+			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 			sm.addString("SYS");
 			sm.addString("錯誤目標");
 			activeChar.sendPacket(sm);
@@ -351,7 +352,7 @@ public class AdminSkill implements IAdminCommandHandler {
 
 		if (player.getName().equals(activeChar.getName()))
 		{
-			SystemMessage sm = new SystemMessage(614);
+			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 			sm.addString("SYS");
 			sm.addString("錯誤目標");
 			player.sendPacket(sm);
@@ -368,7 +369,7 @@ public class AdminSkill implements IAdminCommandHandler {
 			{
 				activeChar.addSkill(skills[i], true);
 			}
-			SystemMessage smA = new SystemMessage(614);
+			SystemMessage smA = new SystemMessage(SystemMessageId.S1_S2);
 			smA.addString("SYS");
 			smA.addString("取得 "+player.getName()+" 所有技能.");
 			activeChar.sendPacket(smA);
@@ -383,7 +384,7 @@ public class AdminSkill implements IAdminCommandHandler {
 		if (target instanceof L2PcInstance) {
 			player = (L2PcInstance)target;
 		} else {
-			SystemMessage sm = new SystemMessage(614);
+			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 			sm.addString("SYS");
 			sm.addString("目標錯誤");
 			activeChar.sendPacket(sm);
@@ -392,7 +393,7 @@ public class AdminSkill implements IAdminCommandHandler {
 
 		if (adminSkills==null)
 		{
-			SystemMessage smA = new SystemMessage(614);
+			SystemMessage smA = new SystemMessage(SystemMessageId.S1_S2);
 			smA.addString("SYS");
 			smA.addString("無法執行");
 			activeChar.sendPacket(smA);
@@ -416,11 +417,11 @@ public class AdminSkill implements IAdminCommandHandler {
 			{
 				activeChar.addSkill(adminSkills[i], true);
 			}
-			SystemMessage sm = new SystemMessage(614);
+			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 			sm.addString("[GM]");
 			sm.addString("重新整理該人物的技能");
 			player.sendPacket(sm);
-			SystemMessage smA = new SystemMessage(614);
+			SystemMessage smA = new SystemMessage(SystemMessageId.S1_S2);
 			smA.addString("SYS");
 			smA.addString("技能恢復");
 			activeChar.sendPacket(smA);
@@ -436,7 +437,7 @@ public class AdminSkill implements IAdminCommandHandler {
 		if (target instanceof L2PcInstance) {
 			player = (L2PcInstance)target;
 		} else {
-			SystemMessage sm = new SystemMessage(614);
+			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 			sm.addString("SYS");
 			sm.addString("錯誤目標");
 			activeChar.sendPacket(sm);
@@ -459,7 +460,7 @@ public class AdminSkill implements IAdminCommandHandler {
 		
 		if (skill != null)
 		{
-			SystemMessage sm = new SystemMessage(614);
+			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 			sm.addString("SYS");
 			sm.addString("管理員增加"+skill.getName()+"到該人物的技能表.");
 			player.sendPacket(sm);
@@ -467,7 +468,7 @@ public class AdminSkill implements IAdminCommandHandler {
 			player.addSkill(skill, true);
 			
 			//Admin information	
-			SystemMessage smA = new SystemMessage(614);
+			SystemMessage smA = new SystemMessage(SystemMessageId.S1_S2);
 			sm.addString("SYS");
 			smA.addString("增加"+skill.getName()+"給"+player.getName()+".");
 			
@@ -478,7 +479,7 @@ public class AdminSkill implements IAdminCommandHandler {
 		}
 		else
 		{
-			SystemMessage smA = new SystemMessage(614);
+			SystemMessage smA = new SystemMessage(SystemMessageId.S1_S2);
 			smA.addString("SYS");
 			smA.addString("錯誤資料");
 		}		
@@ -493,7 +494,7 @@ public class AdminSkill implements IAdminCommandHandler {
 		if (target instanceof L2PcInstance) {
 			player = (L2PcInstance)target;
 		} else {
-			SystemMessage sm = new SystemMessage(614);
+			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 			sm.addString("SYS");
 			sm.addString("錯誤目標");
 			activeChar.sendPacket(sm);
@@ -504,7 +505,7 @@ public class AdminSkill implements IAdminCommandHandler {
 				
 		if (skill != null)
 		{
-		SystemMessage sm = new SystemMessage(614);
+		SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 		sm.addString("SYS");
 		sm.addString("管理員移除"+skill.getName()+"此技能.");
 		player.sendPacket(sm);
@@ -512,7 +513,7 @@ public class AdminSkill implements IAdminCommandHandler {
 		player.removeSkill(skill);
 		
 		//Admin information	
-		SystemMessage smA = new SystemMessage(614);
+		SystemMessage smA = new SystemMessage(SystemMessageId.S1_S2);
 		smA.addString("SYS");
 		smA.addString("移除"+skill.getName()+"從"+player.getName()+".");
 		
@@ -523,7 +524,7 @@ public class AdminSkill implements IAdminCommandHandler {
 		}
 		else
 		{
-			SystemMessage smA = new SystemMessage(614);
+			SystemMessage smA = new SystemMessage(SystemMessageId.S1_S2);
 			smA.addString("SYS");
 			smA.addString("錯誤資料");
 		}

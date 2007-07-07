@@ -29,6 +29,7 @@ import net.sf.l2j.gameserver.model.Location;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.entity.Castle;
 import net.sf.l2j.gameserver.model.entity.ClanHall;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.Revive;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.util.IllegalPlayerAction;
@@ -45,13 +46,13 @@ public final class RequestRestartPoint extends L2GameClientPacket
     private static final String _C__6d_REQUESTRESTARTPOINT = "[C] 6d RequestRestartPoint";
     private static Logger _log = Logger.getLogger(RequestRestartPoint.class.getName());	
     
-    protected int     requestedPointType;
-    protected boolean continuation;
+    protected int     _requestedPointType;
+    protected boolean _continuation;
     
     
     protected void readImpl()
     {
-        requestedPointType = readD();
+        _requestedPointType = readD();
     }
     
     class DeathTask implements Runnable
@@ -70,7 +71,7 @@ public final class RequestRestartPoint extends L2GameClientPacket
                 Location loc = null;
                 if (activeChar.isInJail()) // to jail
                     loc = new Location(-114356, -249645, -2984);
-                else if (requestedPointType == 1) // to clanhall
+                else if (_requestedPointType == 1) // to clanhall
                 {
                     if (activeChar.getClan().getHasHideout() == 0)
                     {
@@ -84,7 +85,7 @@ public final class RequestRestartPoint extends L2GameClientPacket
                     if (ClanHallManager.getInstance().getClanHallByOwner(activeChar.getClan())!= null && ClanHallManager.getInstance().getClanHallByOwner(activeChar.getClan()).getFunction(ClanHall.FUNC_RESTORE_EXP)!= null)
                         activeChar.restoreExp(ClanHallManager.getInstance().getClanHallByOwner(activeChar.getClan()).getFunction(ClanHall.FUNC_RESTORE_EXP).getLvl());
                 }
-                else if (requestedPointType == 2) // to castle
+                else if (_requestedPointType == 2) // to castle
                 {
                     Boolean isInDefense = false;
                     Castle castle = CastleManager.getInstance().getCastle(activeChar);                	
@@ -104,7 +105,7 @@ public final class RequestRestartPoint extends L2GameClientPacket
                     }
                     loc = MapRegionTable.getInstance().getTeleToLocation(activeChar, MapRegionTable.TeleportWhereType.Castle);
                 }                    
-                else if (requestedPointType == 3) // to siege HQ
+                else if (_requestedPointType == 3) // to siege HQ
                 {
                     L2SiegeClan siegeClan = null;
                     Castle castle = CastleManager.getInstance().getCastle(activeChar);
@@ -120,7 +121,7 @@ public final class RequestRestartPoint extends L2GameClientPacket
                     }
                     loc = MapRegionTable.getInstance().getTeleToLocation(activeChar, MapRegionTable.TeleportWhereType.SiegeFlag);
                 }                    
-                else if (requestedPointType == 4 || // Fixed or
+                else if (_requestedPointType == 4 || // Fixed or
                         activeChar.isFestivalParticipant()) // Player is a festival participant
                 {
                     if (!activeChar.isGM() && !activeChar.isFestivalParticipant())
@@ -151,7 +152,7 @@ public final class RequestRestartPoint extends L2GameClientPacket
         
         if (activeChar == null)
             return;
-            //SystemMessage sm2 = new SystemMessage(614);
+            //SystemMessage sm2 = new SystemMessage(SystemMessage.S1_S2);
 	    //sm2.addString("type:"+requestedPointType);
 	    //activeChar.sendPacket(sm2);
         
@@ -171,7 +172,7 @@ public final class RequestRestartPoint extends L2GameClientPacket
         if (castle != null && castle.getSiege().getIsInProgress())
         {
             //DeathFinalizer df = new DeathFinalizer(10000);
-            SystemMessage sm = new SystemMessage(614);
+            SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
             if (activeChar.getClan() != null
                     && castle.getSiege().checkIsAttacker(activeChar.getClan()))
             {

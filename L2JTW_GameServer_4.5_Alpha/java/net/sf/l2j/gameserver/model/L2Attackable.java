@@ -43,6 +43,7 @@ import net.sf.l2j.gameserver.model.actor.instance.L2MonsterInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PetInstance;
+import net.sf.l2j.gameserver.model.actor.instance.L2PlayableInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2RaidBossInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2SiegeGuardInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2SummonInstance;
@@ -50,6 +51,7 @@ import net.sf.l2j.gameserver.model.actor.knownlist.AttackableKnownList;
 import net.sf.l2j.gameserver.model.base.ClassId;
 import net.sf.l2j.gameserver.model.base.SoulCrystal;
 import net.sf.l2j.gameserver.model.quest.Quest;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.InventoryUpdate;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.skills.Stats;
@@ -85,13 +87,13 @@ public class L2Attackable extends L2NpcInstance
     public final class AggroInfo
     {
         /** The attaker L2Character concerned by this AggroInfo of this L2Attackable */
-        L2Character attacker;
+    	protected L2Character _attacker;
         
         /** Hate level of this L2Attackable against the attaker L2Character (hate = damage) */
-        int hate;
+        protected int _hate;
         
         /** Number of damages that the attaker L2Character gave to this L2Attackable */
-        int damage;
+        protected int _damage;
         
         
         /**
@@ -99,7 +101,7 @@ public class L2Attackable extends L2NpcInstance
          */
         AggroInfo(L2Character pAttacker) 
         {
-            this.attacker = pAttacker;
+            this._attacker = pAttacker;
         }
         
         /**
@@ -107,7 +109,7 @@ public class L2Attackable extends L2NpcInstance
          */
         public boolean equals(Object obj) 
         {
-            return this == obj || this.attacker == attacker;
+            return this == obj || this._attacker == _attacker;
         }
         
         /**
@@ -115,7 +117,7 @@ public class L2Attackable extends L2NpcInstance
          */
         public int hashCode() 
         {
-            return this.attacker.getObjectId();
+            return this._attacker.getObjectId();
         }
         
     }
@@ -131,28 +133,28 @@ public class L2Attackable extends L2NpcInstance
      */
     protected final class RewardInfo
     {
-        protected L2Character attacker;
-        protected int dmg = 0;
+        protected L2Character _attacker;
+        protected int _dmg = 0;
         
         public RewardInfo(L2Character pAttacker, int pDmg)
         {
-            this.attacker = pAttacker;
-            this.dmg = pDmg;
+            this._attacker = pAttacker;
+            this._dmg = pDmg;
         }
         
         public void addDamage(int pDmg)
         {
-            this.dmg += pDmg;
+            this._dmg += pDmg;
         }
         
         public boolean equals(Object obj) 
         {
-            return this == obj || this.attacker == attacker;
+            return this == obj || this._attacker == _attacker;
         }
         
         public int hashCode() 
         {
-            return this.attacker.getObjectId();
+            return this._attacker.getObjectId();
         }
     }
     
@@ -166,18 +168,18 @@ public class L2Attackable extends L2NpcInstance
     public final class AbsorberInfo
     {
         /** The attaker L2Character concerned by this AbsorberInfo of this L2Attackable */
-        L2PcInstance absorber;
-        int crystalId;
-        double absorbedHP;
+    	protected L2PcInstance _absorber;
+    	protected int _crystalId;
+    	protected double _absorbedHP;
         
         /**
          * Constructor of AbsorberInfo.<BR><BR>
          */
         AbsorberInfo(L2PcInstance attacker, int pCrystalId, double pAbsorbedHP) 
         {
-            this.absorber = attacker;
-            this.crystalId = pCrystalId;
-            this.absorbedHP = pAbsorbedHP;
+            this._absorber = attacker;
+            this._crystalId = pCrystalId;
+            this._absorbedHP = pAbsorbedHP;
         }
         
         /**
@@ -185,7 +187,7 @@ public class L2Attackable extends L2NpcInstance
          */
         public boolean equals(Object obj) 
         {
-            return this == obj || this.absorber == absorber;
+            return this == obj || this._absorber == _absorber;
         }
         
         /**
@@ -193,7 +195,7 @@ public class L2Attackable extends L2NpcInstance
          */
         public int hashCode() 
         {
-            return this.absorber.getObjectId();
+            return this._absorber.getObjectId();
         }
     }
     
@@ -496,18 +498,23 @@ public class L2Attackable extends L2NpcInstance
             	if (info == null) continue;
 
                 // Get the L2Character corresponding to this attacker 
-                attacker = info.attacker;
+                attacker = info._attacker;
                     
                 // Get damages done by this attacker
-                damage = info.damage;
+                damage = info._damage;
                 
                 // Prevent unwanted behavior
                 if (damage > 1)
                 {
-                	if (attacker instanceof L2SummonInstance)
-                		ddealer = ((L2SummonInstance)attacker).getOwner();
+                	if ( (attacker instanceof L2SummonInstance) || 
+                		((attacker instanceof L2PetInstance) && ((L2PetInstance)attacker).getPetData().getOwnerExpTaken() > 0) )
+                		ddealer = ((L2Summon)attacker).getOwner();
                 	else
-                		ddealer = info.attacker;
+                		ddealer = info._attacker;
+                	
+                	// Check if ddealer isn't too far from this (killed monster)
+                	if (!Util.checkIfInRange(1600, this, ddealer, true)) continue;
+                	
                 	// Calculate real damages (Summoners should get own damage plus summon's damage)                    
                 	reward = rewards.get(ddealer);
                         
@@ -530,6 +537,7 @@ public class L2Attackable extends L2NpcInstance
         	long exp;
         	int levelDiff;
         	int partyDmg;
+        	int partyLvl;
         	float partyMul;
         	float penalty;
         	RewardInfo reward2;
@@ -538,7 +546,7 @@ public class L2Attackable extends L2NpcInstance
 
         	for (FastMap.Entry<L2Character, RewardInfo> entry = rewards.head(), end = rewards.tail(); (entry = entry.getNext()) != end;)
             {
-                if (entry == null) continue;
+        		if (entry == null) continue;
 
                 reward = entry.getValue();
                 if(reward == null) continue;
@@ -547,10 +555,10 @@ public class L2Attackable extends L2NpcInstance
                 penalty = 0;
                 
                 // Attacker to be rewarded
-                attacker = reward.attacker;
+                attacker = reward._attacker;
                 
                 // Total amount of damage done
-                damage = reward.dmg;
+                damage = reward._dmg;
                 
                 // If the attacker is a Pet, get the party of the owner
                 if (attacker instanceof L2PetInstance)
@@ -598,29 +606,31 @@ public class L2Attackable extends L2NpcInstance
                             L2PcInstance player = (L2PcInstance)attacker;
                             if (isOverhit() && attacker == getOverhitAttacker())
                             {
-                                player.sendPacket(new SystemMessage(SystemMessage.OVER_HIT));
+                                player.sendPacket(new SystemMessage(SystemMessageId.OVER_HIT));
                                 exp += calculateOverhitExp(exp);
                             }
                         }
                         
                         // Distribute the Exp and SP between the L2PcInstance and its L2Summon
-                        attacker.addExpAndSp(Math.round(attacker.calcStat(Stats.EXPSP_RATE, exp, null, null)), 
+                        if (!attacker.isDead())
+                        	attacker.addExpAndSp(Math.round(attacker.calcStat(Stats.EXPSP_RATE, exp, null, null)), 
                                              (int)attacker.calcStat(Stats.EXPSP_RATE, sp, null, null));
                     }
                 }
                 else
                 {
                     //share with party members
-                    partyDmg = 0;
+                	partyDmg = 0;
                     partyMul = 1.f;
+                    partyLvl = 0;
                     
-                    // Get all L2Character (including L2Summon) that can be rewarded in the party
-                    List<L2Character> rewardedMembers = new FastList<L2Character>();
+                    // Get all L2Character that can be rewarded in the party
+                    List<L2PlayableInstance> rewardedMembers = new FastList<L2PlayableInstance>();
                     
                     // Go through all L2PcInstance in the party
                     for (L2PcInstance pl : attackerParty.getPartyMembers())
                     {
-                        if (pl == null) continue;
+                        if (pl == null || pl.isDead()) continue;
 
                         // Get the RewardInfo of this L2PcInstance from L2Attackable rewards
                         reward2 = rewards.get(pl);
@@ -628,16 +638,39 @@ public class L2Attackable extends L2NpcInstance
                         // If the L2PcInstance is in the L2Attackable rewards add its damages to party damages
                         if (reward2 != null)
                         {
-                            // Add L2PcInstance damages to party damages
-                            partyDmg += reward2.dmg;
-                            
-                            // Remove the L2PcInstance from the L2Attackable rewards
-                            rewards.remove(pl);
+                        	if (Util.checkIfInRange(1600, this, pl, true))
+                        	{
+                        		partyDmg += reward2._dmg; // Add L2PcInstance damages to party damages
+                        		rewardedMembers.add(pl);
+                        		if (pl.getLevel() > partyLvl) partyLvl = pl.getLevel();
+                        	}
+                        	rewards.remove(pl); // Remove the L2PcInstance from the L2Attackable rewards
                         }
-                        
-                        // Add L2PcInstance of the party (that have attacked or not) to members that can be rewarded if it's not dead
-                        // and in range of the monster.
-                        if (!pl.isDead() && Util.checkIfInRange(1150, this, pl, true)) rewardedMembers.add(pl);
+                        else
+                        {
+                        	// Add L2PcInstance of the party (that have attacked or not) to members that can be rewarded
+                        	// and in range of the monster.
+                        	if (Util.checkIfInRange(1600, this, pl, true))
+                        	{
+                        		rewardedMembers.add(pl);
+                        		if (pl.getLevel() > partyLvl) partyLvl = pl.getLevel();
+                        	}
+                        }
+                        L2PlayableInstance summon = pl.getPet();
+                        if (summon != null && summon instanceof L2PetInstance)
+                        {
+                        	reward2 = rewards.get(summon);
+                        	if (reward2 != null) // Pets are only added if they have done damage
+                            {
+                            	if (Util.checkIfInRange(1600, this, summon, true))
+                            	{
+                            		partyDmg += reward2._dmg; // Add summon damages to party damages
+                            		rewardedMembers.add(summon);
+                            		if (summon.getLevel() > partyLvl) partyLvl = summon.getLevel();
+                            	}
+                            	rewards.remove(summon); // Remove the summon from the L2Attackable rewards
+                            }
+                        }
                     }
                     
                     // If the party didn't killed this L2Attackable alone
@@ -647,7 +680,7 @@ public class L2Attackable extends L2NpcInstance
                     if (partyDmg > getMaxHp()) partyDmg = getMaxHp();
                     
                     // Calculate the level difference between Party and L2Attackable
-                    levelDiff = attackerParty.getLevel() - getLevel();
+                    levelDiff = partyLvl - getLevel();
                     
                     // Calculate Exp and SP rewards
                     tmp = calculateExpAndSp(levelDiff, partyDmg);
@@ -671,7 +704,7 @@ public class L2Attackable extends L2NpcInstance
                         if (isOverhit() && attacker == getOverhitAttacker())
                         {
                         	int overHitExp = (int)calculateOverhitExp(exp);
-                        	SystemMessage sms = new SystemMessage(SystemMessage.ACQUIRED_BONUS_EXPERIENCE_THROUGH_OVER_HIT);
+                        	SystemMessage sms = new SystemMessage(SystemMessageId.ACQUIRED_BONUS_EXPERIENCE_THROUGH_OVER_HIT);
                         	sms.addNumber(overHitExp);
                             player.sendPacket(sms);
                             exp += overHitExp;
@@ -679,7 +712,7 @@ public class L2Attackable extends L2NpcInstance
                     }
                     
                     // Distribute Experience and SP rewards to L2PcInstance Party members in the known area of the last attacker
-                    if (partyDmg > 0) attackerParty.distributeXpAndSp(exp, sp, rewardedMembers, lastAttacker);
+                    if (partyDmg > 0) attackerParty.distributeXpAndSp(exp, sp, rewardedMembers, partyLvl);
                 }
             }
         }
@@ -812,15 +845,15 @@ public class L2Attackable extends L2NpcInstance
         if (ai != null) 
         {
             // Add new damage and aggro (=damage) to the AggroInfo object
-            ai.damage += damage;
-            ai.hate += aggro;
+            ai._damage += damage;
+            ai._hate += aggro;
         } 
         else 
         {
             // Create a AggroInfo object and Init it
             ai = new AggroInfo(attacker);
-            ai.damage = damage;
-            ai.hate = aggro;
+            ai._damage = damage;
+            ai._hate = aggro;
             
             // Add the attaker L2Character and the AggroInfo object in the _aggroList of the L2Attackable
             getAggroListRP().put(attacker, ai);
@@ -830,19 +863,22 @@ public class L2Attackable extends L2NpcInstance
         if (aggro > 0 && getAI().getIntention() == CtrlIntention.AI_INTENTION_IDLE) getAI().setIntention(CtrlIntention.AI_INTENTION_ACTIVE);
         
         // Notify the L2Attackable AI with EVT_ATTACKED
-        if (damage > 0) getAI().notifyEvent(CtrlEvent.EVT_ATTACKED, attacker);
-        
-        try {
-            if (attacker instanceof L2PcInstance || attacker instanceof L2Summon) 
-            {
-                L2PcInstance player = attacker instanceof L2PcInstance?(L2PcInstance)attacker:((L2Summon)attacker).getOwner();
-                
-                if (getTemplate().getEventQuests(Quest.QuestEventType.MOBGOTATTACKED) !=null)
-                	for (Quest quest: getTemplate().getEventQuests(Quest.QuestEventType.MOBGOTATTACKED))
-                		quest.notifyAttack(this, player);
-            }
-        } 
-        catch (Exception e) { _log.log(Level.SEVERE, "", e); }
+        if (damage > 0) 
+        {
+        	getAI().notifyEvent(CtrlEvent.EVT_ATTACKED, attacker);
+            
+            try {
+                if (attacker instanceof L2PcInstance || attacker instanceof L2Summon) 
+                {
+                    L2PcInstance player = attacker instanceof L2PcInstance?(L2PcInstance)attacker:((L2Summon)attacker).getOwner();
+                    
+                    if (getTemplate().getEventQuests(Quest.QuestEventType.MOBGOTATTACKED) !=null)
+                    	for (Quest quest: getTemplate().getEventQuests(Quest.QuestEventType.MOBGOTATTACKED))
+                    		quest.notifyAttack(this, player);
+                }
+            } 
+            catch (Exception e) { _log.log(Level.SEVERE, "", e); }
+        }
     }
     
     /**
@@ -862,12 +898,12 @@ public class L2Attackable extends L2NpcInstance
             for (AggroInfo ai : getAggroListRP().values())            
             {
             	if (ai == null) continue;
-            	if (ai.attacker.isAlikeDead() || !getKnownList().knowsObject(ai.attacker) ||!ai.attacker.isVisible())
-            		ai.hate = 0;
-            	if (ai.hate > maxHate)
+            	if (ai._attacker.isAlikeDead() || !getKnownList().knowsObject(ai._attacker) ||!ai._attacker.isVisible())
+            		ai._hate = 0;
+            	if (ai._hate > maxHate)
             	{
-            		mostHated = ai.attacker;
-            		maxHate = ai.hate;
+            		mostHated = ai._attacker;
+            		maxHate = ai._hate;
             	}        	
             }
         }                
@@ -886,24 +922,25 @@ public class L2Attackable extends L2NpcInstance
           
     	AggroInfo ai = getAggroListRP().get(target);
         if (ai == null) return 0;
-    	if (ai.attacker instanceof L2PcInstance && (((L2PcInstance)ai.attacker).getAppearance().getInvisible() || ai.attacker.isInvul()))
+    	if (ai._attacker instanceof L2PcInstance && (((L2PcInstance)ai._attacker).getAppearance().getInvisible() || ai._attacker.isInvul()))
     	{
     		//Remove Object Should Use This Method and Can be Blocked While Interating
     		getAggroList().remove(target);            	
     		return 0;            
     	}            
-    	if (!ai.attacker.isVisible())             
+    	if (!ai._attacker.isVisible())             
     	{            	
     		getAggroList().remove(target);                
     		return 0;           
     	}    	
-    	if (ai.attacker.isAlikeDead()) 
+    	if (ai._attacker.isAlikeDead()) 
         {
-            ai.hate = 0;
+            ai._hate = 0;
             return 0;
         }        
-    	return ai.hate;
+    	return ai._hate;
     }
+    
     public L2Character getRandomChar() 
     {
         if (getAggroList().size() == 0 || isAlikeDead()) return null;
@@ -926,11 +963,11 @@ public class L2Attackable extends L2NpcInstance
                 int randplayer = para.nextInt(100);
                 
                 // Reset their aggro for Raidboss
-                ai.hate = 1;
+                ai._hate = 1;
             
                 if (randplayer > maxHate) 
                 {
-                    mostHated = ai.attacker;
+                    mostHated = ai._attacker;
                     maxHate = randplayer;
                 }
             }
@@ -1297,7 +1334,7 @@ public class L2Attackable extends L2NpcInstance
 		             if(this instanceof L2RaidBossInstance)
 		             {
 		                 SystemMessage sm;
-		                 sm = new SystemMessage(SystemMessage.S1_DIED_DROPPED_S3_S2);
+		                 sm = new SystemMessage(SystemMessageId.S1_DIED_DROPPED_S3_S2);
 		                 sm.addString(getName());
 		                 sm.addItemName(item.getItemId());
 		                 sm.addNumber(item.getCount());
@@ -1588,7 +1625,7 @@ public class L2Attackable extends L2NpcInstance
     	if (getAggroListRP().isEmpty()) return;
     	AggroInfo ai = getAggroListRP().get(target);
     	if (ai == null) return;
-    	ai.hate = 0;
+    	ai._hate = 0;
     }
     
     /**
@@ -1741,9 +1778,9 @@ public class L2Attackable extends L2NpcInstance
         }
         else
         {
-            ai.absorber = attacker;
-            ai.crystalId = crystalId;
-            ai.absorbedHP = getCurrentHp();
+            ai._absorber = attacker;
+            ai._crystalId = crystalId;
+            ai._absorbedHP = getCurrentHp();
         }
         
         // Set this L2Attackable as absorbed
@@ -1794,11 +1831,11 @@ public class L2Attackable extends L2NpcInstance
             
             // Fail if the killer isn't in the _absorbersList of this L2Attackable and mob is not boss
             AbsorberInfo ai = _absorbersList.get(killer);
-            if (ai == null || ai.absorber.getObjectId() != killer.getObjectId())
+            if (ai == null || ai._absorber.getObjectId() != killer.getObjectId())
                 isSuccess = false;
             
             // Check if the soul crystal was used when HP of this L2Attackable wasn't higher than half of it
-            if (ai != null && ai.absorbedHP > (getMaxHp()/2))
+            if (ai != null && ai._absorbedHP > (getMaxHp()/2.0))
                 isSuccess = false;
             
             if (!isSuccess) {             
@@ -1933,13 +1970,15 @@ public class L2Attackable extends L2NpcInstance
                 if  (crystalQTY > 1)
                 {
 
-                    player.sendPacket(new SystemMessage(SystemMessage.SOUL_CRYSTAL_ABSORBING_FAILED_RESONATION));
+                    player.sendPacket(new SystemMessage(SystemMessageId.SOUL_CRYSTAL_ABSORBING_FAILED_RESONATION));
+
 
                 }
                 // The soul crystal stage of the player is way too high
                 else if (!doLevelup)
 
-                    player.sendPacket(new SystemMessage(SystemMessage.SOUL_CRYSTAL_ABSORBING_REFUSED));
+                    player.sendPacket(new SystemMessage(SystemMessageId.SOUL_CRYSTAL_ABSORBING_REFUSED));
+
 
                 
                 crystalQTY = 0;
@@ -1972,7 +2011,8 @@ public class L2Attackable extends L2NpcInstance
             }
             else
 
-                player.sendPacket(new SystemMessage(SystemMessage.SOUL_CRYSTAL_ABSORBING_FAILED));
+                player.sendPacket(new SystemMessage(SystemMessageId.SOUL_CRYSTAL_ABSORBING_FAILED));
+
 
         }
     }
@@ -1994,15 +2034,17 @@ public class L2Attackable extends L2NpcInstance
             if(broke)
             {
 
-                player.sendPacket(new SystemMessage(SystemMessage.SOUL_CRYSTAL_BROKE));
+                player.sendPacket(new SystemMessage(SystemMessageId.SOUL_CRYSTAL_BROKE));
+
 
             }
             else
 
-                player.sendPacket(new SystemMessage(SystemMessage.SOUL_CRYSTAL_ABSORBING_SUCCEEDED));
+                player.sendPacket(new SystemMessage(SystemMessageId.SOUL_CRYSTAL_ABSORBING_SUCCEEDED));
+
 
             // Send system message
-            SystemMessage sms = new SystemMessage(SystemMessage.EARNED_ITEM);
+            SystemMessage sms = new SystemMessage(SystemMessageId.EARNED_ITEM);
             sms.addItemName(giveid);
             player.sendPacket(sms);
                         
@@ -2047,7 +2089,11 @@ public class L2Attackable extends L2NpcInstance
                 
 
             if(diff > 5) // formula revised May 07
-            	xp = xp*Math.pow((double)5/6, diff-5);
+            {
+            	double pow = Math.pow((double)5/6, diff-5);
+            	xp = xp*pow;
+            	sp = sp*pow;
+            }
 
             }
             if (xp <= 0)
@@ -2150,6 +2196,6 @@ public class L2Attackable extends L2NpcInstance
     
     private int getAbsorbLevel()
     {
-        return getTemplate().absorb_level;
+        return getTemplate().absorbLevel;
     }
 }
