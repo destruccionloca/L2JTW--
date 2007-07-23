@@ -79,6 +79,8 @@ public class Disablers implements ISkillHandler
             
         }
 
+        _log.warning("Debug: Aura Skill Casting now...");
+        
         if (weaponInst != null)
         {
             if (weaponInst.getChargedSpiritshot() == L2ItemInstance.CHARGED_BLESSED_SPIRITSHOT)
@@ -558,7 +560,7 @@ public class Disablers implements ISkillHandler
                 }// end case                                    
             }//end switch
         }//end for        
-        
+        //_log.warning("Debug: Aura Skill Casting Finish...");
         // self Effect :]
         L2Effect effect = activeChar.getEffect(skill.getId());        
         if (effect != null && effect.isSelfEffect())        

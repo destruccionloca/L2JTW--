@@ -133,7 +133,7 @@ public final class L2ClassMasterInstance extends L2FolkInstance
 			{
 				NpcHtmlMessage html = new NpcHtmlMessage(getObjectId());
 				TextBuilder sb = new TextBuilder();
-				sb.append("<html><head><body>");
+				sb.append("<html><body>");
 				switch (jobLevel)
 				{
 					case 1:
@@ -217,7 +217,7 @@ public final class L2ClassMasterInstance extends L2FolkInstance
 
                 NpcHtmlMessage html = new NpcHtmlMessage(getObjectId());
                 TextBuilder sb = new TextBuilder();
-                sb.append("<html><head><body>");
+                sb.append("<html><body>");
                 sb.append("You have now become a <font color=\"LEVEL\">" + CharTemplateTable.getClassNameById(player.getClassId().getId()) + "</font>.");
                 sb.append("</body></html>");
                             
@@ -276,7 +276,7 @@ public final class L2ClassMasterInstance extends L2FolkInstance
 
             NpcHtmlMessage html = new NpcHtmlMessage(getObjectId());
             TextBuilder sb = new TextBuilder();
-            sb.append("<html><head><body>");
+            sb.append("<html><body>");
             sb.append("你成為了 <font color=\"LEVEL\">" + CharTemplateTable.getClassNameById(player.getClassId().getId()) + "</font>.");
             sb.append("</body></html>");
                         

@@ -147,11 +147,13 @@ import net.sf.l2j.gameserver.handler.itemhandlers.Seed;
 import net.sf.l2j.gameserver.handler.itemhandlers.SevenSignsRecord;
 import net.sf.l2j.gameserver.handler.itemhandlers.SoulCrystals;
 import net.sf.l2j.gameserver.handler.itemhandlers.SoulShots;
+import net.sf.l2j.gameserver.handler.itemhandlers.SpecialXMas;
 import net.sf.l2j.gameserver.handler.itemhandlers.SpiritShot;
 import net.sf.l2j.gameserver.handler.itemhandlers.SummonItems;
 import net.sf.l2j.gameserver.handler.itemhandlers.WorldMap;
 //import net.sf.l2j.gameserver.handler.skillhandlers.BalanceLife;
 import net.sf.l2j.gameserver.handler.skillhandlers.BeastFeed;
+import net.sf.l2j.gameserver.handler.skillhandlers.Blow;
 //import net.sf.l2j.gameserver.handler.skillhandlers.Charge;
 import net.sf.l2j.gameserver.handler.skillhandlers.CombatPointHeal;
 import net.sf.l2j.gameserver.handler.skillhandlers.Continuous;
@@ -175,6 +177,7 @@ import net.sf.l2j.gameserver.handler.skillhandlers.SummonTreasureKey;
 import net.sf.l2j.gameserver.handler.skillhandlers.Sweep;
 import net.sf.l2j.gameserver.handler.skillhandlers.TakeCastle;
 import net.sf.l2j.gameserver.handler.skillhandlers.Unlock;
+import net.sf.l2j.gameserver.handler.skillhandlers.DeluxeKey;
 import net.sf.l2j.gameserver.handler.usercommandhandlers.ClanPenalty;
 import net.sf.l2j.gameserver.handler.usercommandhandlers.ClanWarsList;
 import net.sf.l2j.gameserver.handler.usercommandhandlers.DisMount;
@@ -183,6 +186,7 @@ import net.sf.l2j.gameserver.handler.usercommandhandlers.Loc;
 import net.sf.l2j.gameserver.handler.usercommandhandlers.Mount;
 import net.sf.l2j.gameserver.handler.usercommandhandlers.PartyInfo;
 import net.sf.l2j.gameserver.handler.usercommandhandlers.Time;
+import net.sf.l2j.gameserver.handler.voicedcommandhandlers.Wedding;
 import net.sf.l2j.gameserver.handler.voicedcommandhandlers.stats;
 import net.sf.l2j.gameserver.idfactory.IdFactory;
 import net.sf.l2j.gameserver.instancemanager.ArenaManager;
@@ -190,6 +194,7 @@ import net.sf.l2j.gameserver.instancemanager.AuctionManager;
 import net.sf.l2j.gameserver.instancemanager.BoatManager;
 import net.sf.l2j.gameserver.instancemanager.CastleManager;
 import net.sf.l2j.gameserver.instancemanager.ClanHallManager;
+import net.sf.l2j.gameserver.instancemanager.CoupleManager;
 import net.sf.l2j.gameserver.instancemanager.CursedWeaponsManager;
 import net.sf.l2j.gameserver.instancemanager.DayNightSpawnManager;
 import net.sf.l2j.gameserver.instancemanager.ItemsOnGroundManager;
@@ -245,13 +250,13 @@ public class GameServer
 	private final AutoSpawnHandler _autoSpawnHandler;
 	private LoginServerThread _loginThread;
     private final HelperBuffTable _helperBuffTable;
-    
+
 	private static Status _statusServer;
 	@SuppressWarnings("unused")
 	private final ThreadPoolManager _threadpools;
 
     public static final Calendar dateTimeServerStarted = Calendar.getInstance();
-    
+
     public long getUsedMemoryMB()
 	{
 		return (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())/1048576; // 1024 * 1024 = 1048576;
@@ -296,17 +301,17 @@ public class GameServer
 
 		// keep the references of Singletons to prevent garbage collection
 		CharNameTable.getInstance();
-        
+
 		_itemTable = ItemTable.getInstance();
 		if (!_itemTable.isInitialized())
 		{
 		    _log.severe("Could not find the extraced files. Please Check Your Data.");
 		    throw new Exception("Could not initialize the item table");
 		}
-		
+
 		ExtractableItemsData.getInstance();
 		SummonItemsData.getInstance();
-		
+
 
 		TradeController.getInstance();
 		_skillTable = SkillTable.getInstance();
@@ -325,44 +330,44 @@ public class GameServer
 		CharTemplateTable.getInstance();
 		NobleSkillTable.getInstance();
 		HeroSkillTable.getInstance();
-        
+
         //Call to load caches
         HtmCache.getInstance();
         CrestCache.getInstance();
         ClanTable.getInstance();
 		_npcTable = NpcTable.getInstance();
-        
+
 		if (!_npcTable.isInitialized())
 		{
 		    _log.severe("Could not find the extraced files. Please Check Your Data.");
 		    throw new Exception("Could not initialize the npc table");
 		}
-        
+
 		_hennaTable = HennaTable.getInstance();
-        
+
 		if (!_hennaTable.isInitialized())
 		{
 		   throw new Exception("Could not initialize the Henna Table");
 		}
-        
+
 		HennaTreeTable.getInstance();
-        
+
 		if (!_hennaTable.isInitialized())
 		{
 		   throw new Exception("Could not initialize the Henna Tree Table");
 		}
-				
+
         _helperBuffTable = HelperBuffTable.getInstance();
-        
+
         if (!_helperBuffTable.isInitialized())
         {
            throw new Exception("Could not initialize the Helper Buff Table");
         }
-        
+
         GeoData.getInstance();
-        if (Config.GEODATA == 2) 
+        if (Config.GEODATA == 2)
         	GeoPathFinding.getInstance();
-        
+
 		TeleportLocationTable.getInstance();
 		LevelUpData.getInstance();
 		L2World.getInstance();
@@ -372,7 +377,7 @@ public class GameServer
 		Announcements.getInstance();
 		MapRegionTable.getInstance();
 		EventDroplist.getInstance();
-		
+
 		/** Load Manager */
 		ArenaManager.getInstance();
 		AuctionManager.getInstance();
@@ -389,16 +394,16 @@ public class GameServer
 		OlympiadStadiaManager.getInstance();
 		AugmentationData.getInstance();
 		if (Config.SAVE_DROPPED_ITEM)
-			ItemsOnGroundManager.getInstance();  
-        
+			ItemsOnGroundManager.getInstance();
+
 		if (Config.AUTODESTROY_ITEM_AFTER > 0 || Config.HERB_AUTO_DESTROY_TIME > 0)
     	    ItemsAutoDestroy.getInstance();
-        
+
         MonsterRace.getInstance();
-        
+
 		_doorTable = DoorTable.getInstance();
         StaticObjects.getInstance();
-        
+
 		_sevenSignsEngine = SevenSigns.getInstance();
         SevenSignsFestival.getInstance();
 		_autoSpawnHandler = AutoSpawnHandler.getInstance();
@@ -406,7 +411,7 @@ public class GameServer
 
         // Spawn the Orators/Preachers if in the Seal Validation period.
         _sevenSignsEngine.spawnSevenSignsNPC();
-      
+
         Olympiad.getInstance();
         Hero.getInstance();
         FaenorScriptEngine.getInstance();
@@ -446,11 +451,13 @@ public class GameServer
         _itemHandler.registerItemHandler(new MercTicket());
 		_itemHandler.registerItemHandler(new FishShots());
 		_itemHandler.registerItemHandler(new ExtractableItems());
+		_itemHandler.registerItemHandler(new SpecialXMas());
 		_itemHandler.registerItemHandler(new SummonItems());
 		_itemHandler.registerItemHandler(new BeastSpice());
         _log.config("ItemHandler: Loaded " + _itemHandler.size() + " handlers.");
 
 		_skillHandler = SkillHandler.getInstance();
+		_skillHandler.registerSkillHandler(new Blow());
 		_skillHandler.registerSkillHandler(new Pdam());
 		_skillHandler.registerSkillHandler(new Mdam());
 		_skillHandler.registerSkillHandler(new Heal());
@@ -465,17 +472,18 @@ public class GameServer
         _skillHandler.registerSkillHandler(new Sweep());
         _skillHandler.registerSkillHandler(new StrSiegeAssault());
         _skillHandler.registerSkillHandler(new SummonFriend());
-        _skillHandler.registerSkillHandler(new SummonTreasureKey()); 
+        _skillHandler.registerSkillHandler(new SummonTreasureKey());
         _skillHandler.registerSkillHandler(new Disablers());
 		_skillHandler.registerSkillHandler(new Recall());
         _skillHandler.registerSkillHandler(new SiegeFlag());
         _skillHandler.registerSkillHandler(new TakeCastle());
         _skillHandler.registerSkillHandler(new Unlock());
         _skillHandler.registerSkillHandler(new DrainSoul());
-        _skillHandler.registerSkillHandler(new Craft()); 
-		_skillHandler.registerSkillHandler(new Fishing()); 
-		_skillHandler.registerSkillHandler(new FishingSkill()); 
+        _skillHandler.registerSkillHandler(new Craft());
+		_skillHandler.registerSkillHandler(new Fishing());
+		_skillHandler.registerSkillHandler(new FishingSkill());
         _skillHandler.registerSkillHandler(new BeastFeed());
+        _skillHandler.registerSkillHandler(new DeluxeKey());
         _log.config("SkillHandler: Loaded " + _skillHandler.size() + " handlers.");
 
 		_adminCommandHandler = AdminCommandHandler.getInstance();
@@ -546,19 +554,27 @@ public class GameServer
         _userCommandHandler.registerUserCommandHandler(new Mount());
         _userCommandHandler.registerUserCommandHandler(new PartyInfo());
 		_userCommandHandler.registerUserCommandHandler(new Time());
-        
+
         _log.config("UserCommandHandler: Loaded " + _userCommandHandler.size() + " handlers.");
 
 		_voicedCommandHandler = VoicedCommandHandler.getInstance();
 		_voicedCommandHandler.registerVoicedCommandHandler(new stats());
-		
-        _log.config("VoicedCommandHandler: Loaded " + _voicedCommandHandler.size() + " handlers.");
+
+		if(Config.L2JMOD_ALLOW_WEDDING)
+			_voicedCommandHandler.registerVoicedCommandHandler(new Wedding());
+
+		_log.config("VoicedCommandHandler: Loaded " + _voicedCommandHandler.size() + " handlers.");
+
+		if(Config.L2JMOD_ALLOW_WEDDING)
+			CoupleManager.getInstance();
 
         TaskManager.getInstance();
-        GmListTable.getInstance();
+
+
+		GmListTable.getInstance();
 
         // read pet stats from db
-        L2PetDataTable.getInstance().loadPetsData(); 
+        L2PetDataTable.getInstance().loadPetsData();
 
         Universe.getInstance();
 
@@ -577,9 +593,9 @@ public class GameServer
             _doorTable.getDoor(23180004).openMe();
             _doorTable.getDoor(23180005).openMe();
             _doorTable.getDoor(23180006).openMe();
-            
+
             _doorTable.checkAutoOpen();
-        } 
+        }
         catch (NullPointerException e)
         {
             _log.warning("Door.csv does not contain the right door info. Update door.csv");
@@ -593,7 +609,7 @@ public class GameServer
         } catch (Exception ex) {
             _log.log(Level.WARNING, "DynamicExtension could not be loaded and initialized", ex);
         }
-        
+
         FloodProtector.getInstance();
         TvTManager.getInstance();
 		System.gc();
@@ -601,10 +617,10 @@ public class GameServer
 		long freeMem = (Runtime.getRuntime().maxMemory()-Runtime.getRuntime().totalMemory()+Runtime.getRuntime().freeMemory()) / 1048576; // 1024 * 1024 = 1048576;
 		long totalMem = Runtime.getRuntime().maxMemory() / 1048576;
 		_log.info("GameServer Started, free memory "+freeMem+" Mb of "+totalMem+" Mb");
-		
+
 		_loginThread = LoginServerThread.getInstance();
 		_loginThread.start();
-		
+
 		SelectorServerConfig ssc = new SelectorServerConfig(Config.PORT_GAME);
 		L2GamePacketHandler gph = new L2GamePacketHandler();
 		_selectorThread = new SelectorThread<L2GameClient>(ssc, gph, gph, gph);
@@ -612,29 +628,29 @@ public class GameServer
 		_selectorThread.start();
 		_log.config("Maximum Numbers of Connected Players: " + Config.MAXIMUM_ONLINE_USERS);
 	}
-	
+
 	public static void main(String[] args) throws Exception
     {
 		Server.serverMode = Server.MODE_GAMESERVER;
 //      Local Constants
 		final String LOG_FOLDER = "log"; // Name of folder for log file
 		final String LOG_NAME   = "./log.cfg"; // Name of log file
-		
+
 		/*** Main ***/
 		// Create log folder
-		File logFolder = new File(Config.DATAPACK_ROOT, LOG_FOLDER); 
+		File logFolder = new File(Config.DATAPACK_ROOT, LOG_FOLDER);
 		logFolder.mkdir();
-		
+
 		// Create input stream for log file -- or store file data into memory
-		InputStream is =  new FileInputStream(new File(LOG_NAME));  
+		InputStream is =  new FileInputStream(new File(LOG_NAME));
 		LogManager.getLogManager().readConfiguration(is);
 		is.close();
-		
-		// Initialize config 
+
+		// Initialize config
 		Config.load();
 		L2DatabaseFactory.getInstance();
 		gameServer = new GameServer();
-		
+
 		if ( Config.IS_TELNET_ENABLED ) {
 		    _statusServer = new Status(Server.serverMode);
 		    _statusServer.start();

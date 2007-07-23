@@ -19,6 +19,8 @@
 package net.sf.l2j.gameserver.serverpackets;
 
 import net.sf.l2j.Config;
+import net.sf.l2j.gameserver.datatables.NpcTable;
+import net.sf.l2j.gameserver.instancemanager.CursedWeaponsManager;
 import net.sf.l2j.gameserver.model.Inventory;
 import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.L2Summon;
@@ -27,6 +29,9 @@ import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PetInstance;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
+import net.sf.l2j.gameserver.model.L2NpcCharData;
+
+
 /**
  * This class ...
  * 
@@ -45,7 +50,7 @@ public class NpcInfo extends L2GameServerPacket
 	private boolean _isAttackable, _isSummoned;
 	private int _mAtkSpd, _pAtkSpd;
 	private int _runSpd, _walkSpd, _swimRunSpd, _swimWalkSpd, _flRunSpd, _flWalkSpd, _flyRunSpd, _flyWalkSpd,_atkspdMul,_movespdMul;
-	private int _rhand, _lhand,_lrhand,enchlvl, armor, head, boot,pant, glove, charrace,charhair,charface,charcolor,charclass,charhero,charsex;
+	private int _rhand, _lhand,_lrhand,enchlvl, armor, head, boot,pant, glove, charrace,charhair,charface,charcolor,charclass,charhero,charsex,dhair,hair,face;
     private int _collisionHeight, _collisionRadius;
     private String _name = "";
     private String _title = "";
@@ -90,26 +95,35 @@ public class NpcInfo extends L2GameServerPacket
 			
 			_title = t;
 	    }
-        if (cha.getTemplate().ischar > 0)
+        
+        L2NpcCharData chardata = new L2NpcCharData();
+        
+        if (chardata.getIsChar() > 0)
         {
+        	
             IsChar = true;
-            armor = cha.getTemplate().armor;
-            pant = cha.getTemplate().pant;
-            head = cha.getTemplate().head;
-            boot = cha.getTemplate().boot;
-            glove = cha.getTemplate().glove;
-            head = cha.getTemplate().head;
-            _lrhand = cha.getTemplate().lrhand;
-            charrace = cha.getTemplate().charrace;
-            charclass = cha.getTemplate().charclass;
-            charface = cha.getTemplate().charface;
-            charcolor = cha.getTemplate().charcolor;
-            charhair = cha.getTemplate().charhair;
-            charhero = cha.getTemplate().charhero;
-            charsex = cha.getTemplate().charsex;
-            if (cha.getTemplate().enchlvl>0)
+            armor = chardata.getArmor();
+            pant = chardata.getPant();
+            head = chardata.getHead();
+            boot = chardata.getBoot();
+            glove = chardata.getGlove();
+            face = chardata.getFace();
+            dhair = chardata.getDHair();
+            hair = chardata.getHair();
+            _lrhand = chardata.getLrhand();
+            charrace = chardata.getCharRace();
+            charclass = chardata.getCharClass();
+            charface = chardata.getCharFace();
+            charcolor = chardata.getCharColor();
+            charhair = chardata.getCharHair();
+            charhero = chardata.getCharHero();
+            charsex = chardata.getCharSex();
+            
+            
+            
+            if (chardata.getEnchLvl()>0)
             {
-                enchlvl = Math.min(127, cha.getTemplate().enchlvl);
+                enchlvl = Math.min(127, chardata.getEnchLvl());
             }
             else enchlvl= 0; 
         }
@@ -146,32 +160,35 @@ public class NpcInfo extends L2GameServerPacket
     		_title = cha.getTitle();
     	}
 
-        if (cha.getTemplate().ischar > 0)
+        L2NpcCharData chardata = new L2NpcCharData();
+        
+        if (chardata.getIsChar() > 0)
         {
+        	
             IsChar = true;
-            armor = cha.getTemplate().armor;
-            pant = cha.getTemplate().pant;
-            head = cha.getTemplate().head;
-            boot = cha.getTemplate().boot;
-            glove = cha.getTemplate().glove;
-            head = cha.getTemplate().head;
-            _lrhand = cha.getTemplate().lrhand;
-            charrace = cha.getTemplate().charrace;
-            charclass = cha.getTemplate().charclass;
-            charface = cha.getTemplate().charface;
-            charcolor = cha.getTemplate().charcolor;
-            charhair = cha.getTemplate().charhair;
-            charhero = cha.getTemplate().charhero;
-            charsex = cha.getTemplate().charsex;
-            if (cha.getTemplate().enchlvl>0)
+            armor = chardata.getArmor();
+            pant = chardata.getPant();
+            head = chardata.getHead();
+            boot = chardata.getBoot();
+            glove = chardata.getGlove();
+            face = chardata.getFace();
+            dhair = chardata.getDHair();
+            hair = chardata.getHair();
+            _lrhand = chardata.getLrhand();
+            charrace = chardata.getCharRace();
+            charclass = chardata.getCharClass();
+            charface = chardata.getCharFace();
+            charcolor = chardata.getCharColor();
+            charhair = chardata.getCharHair();
+            charhero = chardata.getCharHero();
+            charsex = chardata.getCharSex();
+
+            if (chardata.getEnchLvl()>0)
             {
-                enchlvl = Math.min(127, cha.getTemplate().enchlvl);
+                enchlvl = Math.min(127, chardata.getEnchLvl());
             }
             else enchlvl= 0; 
-            
         }
-	
-	
 
 
         
@@ -193,99 +210,134 @@ public class NpcInfo extends L2GameServerPacket
         
         if (IsChar)
         {
-            writeC(0x03);       
-            writeD(_x);
-            writeD(_y);
-            writeD(_z);
-            writeD(_heading);
-            writeD(_activeChar.getObjectId());
-            writeS(_activeChar.getName());
-            writeD(charrace);
-            writeD(charsex);
-            writeD(charclass);
-            
-            writeD(0); // unknown, maybe underwear?
-            writeD(head);
-            writeD(_rhand);
-            writeD(_lhand);
-            writeD(glove);
-            writeD(armor);
-            writeD(pant);
-            writeD(boot);
-            writeD(0);
-            writeD(_lrhand);
-            writeD(0);
-            
-            writeD(0);
-            writeD(0);
+        	writeC(0x03);		
+			writeD(_x);
+			writeD(_y);
+			writeD(_z);
+			writeD(_heading);
+			writeD(_activeChar.getObjectId());
+			writeS(_activeChar.getName());
+			writeD(charrace);
+			writeD(charsex);
+			writeD(charclass);
 
-            writeD(_mAtkSpd);
-            writeD(_pAtkSpd);
-            
-            writeD(0);
-            writeD(0);
-
-            writeD(_runSpd);
-            writeD(_walkSpd);
-            writeD(_swimRunSpd/*0x32*/);  // swimspeed
-            writeD(_swimWalkSpd/*0x32*/);  // swimspeed
-            writeD(_flRunSpd);
-            writeD(_flWalkSpd);
-            writeD(_flyRunSpd);
-            writeD(_flyWalkSpd);
-            writeF(_movespdMul); // _cha.getProperMultiplier()
-            writeF(_atkspdMul); // _cha.getAttackSpeedMultiplier()
-            writeF(_collisionRadius);
-            writeF(_collisionHeight);
-
-            writeD(charhair);
-            writeD(charcolor);
-            writeD(charface);
-            
-            writeS(_title);
-            writeD(0);
-            writeD(0);
-            writeD(0);
-            writeD(0);
-            writeD(0);  // new in rev 417   siege-flags
-            
-            writeC(1);   // standing = 1  sitting = 0
-            writeC(1);   // running = 1   walking = 0
-            writeC(_activeChar.isInCombat() ? 1 : 0);
-            writeC(_activeChar.isAlikeDead() ? 1 : 0);
-            
-            writeC(0);    // invisible = 1  visible =0
-            writeC(0);    // 1 on strider   2 on wyvern   0 no mount
-            writeC(0);   //  1 - sellshop
-            
-            writeH(0);
-            //writeH(0);
-            
-            writeC(0x00);   // find party members
-            
-            writeD(_activeChar.getAbnormalEffect());
-
-//          Code that works for getEnchantEffect()
-
-            writeC(0x00);                       //Changed by Thorgrim
-            writeH(0); //Blue value for name (0 = white, 255 = pure blue)
-            writeD(0x00);
-            
-            writeD(0x00); // unknown
-            writeD(0x00); // unknown
-            //writeC(_cha.isMounted() ? 0 :_cha.getEnchantEffect());
-            writeC(enchlvl);
-            writeC(0x00); //??
-            
-            writeD(0); 
-            writeC(0); // Symbol on char menu ctrl+I  
-            writeC(charhero); // Hero Aura 
-            
-            writeC(0); //0x01: Fishing Mode (Cant be undone by setting back to 0)
-            writeD(0);  
-            writeD(0);
-            writeD(0);
-            writeD(0x6d9aff);
+			
+			writeD(dhair);
+			writeD(head);
+			writeD(_rhand);
+			writeD(_lhand);
+			writeD(glove);
+			writeD(armor);
+			writeD(pant);
+			writeD(boot);
+			writeD(0);
+			writeD(_lrhand);
+			writeD(hair);
+			writeD(face);
+			
+			// c6 new h's
+			writeH(0x00);
+			writeH(0x00);
+			writeH(0x00);
+			writeH(0x00);
+			writeD(0x00);
+			writeH(0x00);
+			writeH(0x00);
+			writeH(0x00);
+			writeH(0x00);
+			writeH(0x00);
+			writeH(0x00);
+			writeH(0x00);
+			writeH(0x00);
+			writeH(0x00);
+			writeH(0x00);
+			writeH(0x00);
+			writeH(0x00);
+			writeD(0x00);
+			writeH(0x00);
+			writeH(0x00);
+			writeH(0x00);
+			writeH(0x00);
+			
+			writeD(0);
+			writeD(0);
+	
+			writeD(_mAtkSpd);
+			writeD(_pAtkSpd);
+			
+			writeD(0);
+			writeD(0);
+	
+			writeD(_runSpd);
+			writeD(_walkSpd);
+			writeD(_swimRunSpd/*0x32*/);  // swimspeed
+			writeD(_swimWalkSpd/*0x32*/);  // swimspeed
+			writeD(_flRunSpd);
+			writeD(_flWalkSpd);
+			writeD(_flyRunSpd);
+			writeD(_flyWalkSpd);
+			writeF(_activeChar.getMovementSpeedMultiplier()); // _activeChar.getProperMultiplier()
+			writeF(_activeChar.getAttackSpeedMultiplier()); // _activeChar.getAttackSpeedMultiplier()
+			writeF(_collisionRadius);
+			writeF(_collisionHeight);
+	
+			writeD(charhair);
+			writeD(charcolor);
+			writeD(charface);
+			
+			writeS(_activeChar.getTitle());
+			writeD(0x00);
+			writeD(0x00);
+			writeD(0x00);
+			writeD(0x00);
+			writeD(0);	// new in rev 417   siege-flags
+			
+			writeC(1);	// standing = 1  sitting = 0
+			writeC(_activeChar.isRunning() ? 1 : 0);	// running = 1   walking = 0
+			writeC(_activeChar.isInCombat() ? 1 : 0);
+			writeC(_activeChar.isAlikeDead() ? 1 : 0);
+			
+			writeC(0);	// invisible = 1  visible =0
+			writeC(0);	// 1 on strider   2 on wyvern   0 no mount
+			writeC(0);   //  1 - sellshop
+			
+			writeH(0);
+			writeH(0);
+			
+			writeC(0x00);	// find party members
+			
+	        writeD(_activeChar.getAbnormalEffect());
+			writeC(0);                       //Changed by Thorgrim
+			writeH(0); //Blue value for name (0 = white, 255 = pure blue)
+			writeD(charclass);
+			
+			writeD(0);
+			writeD((int) _activeChar.getCurrentCp());
+	        writeC(enchlvl);
+			
+        	writeC(0x00); //team circle around feet 1= Blue, 2 = red
+	        
+			writeD(0); 
+			writeC(0); // Symbol on char menu ctrl+I  
+			writeC(charhero); // Hero Aura
+			
+			writeC(0); //0x01: Fishing Mode (Cant be undone by setting back to 0)
+			writeD(0);  
+			writeD(0);
+			writeD(0);
+			
+	        writeD(0xFFFFFF);
+	        
+	        writeD(0x00); // ??
+	        
+	        writeD(0); 
+	        writeD(0x00); // ??
+	        
+	        writeD(0x00);
+	        
+	        writeD(0x00); // ??
+	        
+        	writeD(0x00);
         }
         else
         {

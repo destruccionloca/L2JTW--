@@ -85,6 +85,7 @@ public class Pdam implements ISkillHandler
 
         {
             L2Character target = (L2Character) targets[index];
+            Formulas f = Formulas.getInstance();
             if(target.reflectSkill(skill))
             	target = activeChar;
             L2ItemInstance weapon = activeChar.getActiveWeaponInstance();
@@ -97,20 +98,26 @@ public class Pdam implements ISkillHandler
 
 
             boolean dual = activeChar.isUsingDualWeapon();
-            boolean shld = Formulas.getInstance().calcShldUse(activeChar, target);
-            
-            boolean soul = (weapon != null && weapon.getChargedSoulshot() == L2ItemInstance.CHARGED_SOULSHOT);
 
-            if (!L2Skill.CRIT_ATTACK) damage = 0;
-            //_log.warning("CRIT ATTACK="+L2Skill.CRIT_ATTACK);
-            if (L2Skill.CRIT_ATTACK)
-            {
-            	
-                    damage = (int) Formulas.getInstance().calcPhysDam(activeChar, target, skill, shld, true, dual, soul);
-            }
-            else if (skill.getCondition() != 16 && skill.getCondition() != 17)
-            	damage = (int) Formulas.getInstance().calcPhysDam(activeChar, target, skill, shld, false, dual, soul);
+            boolean shld = f.calcShldUse(activeChar, target);
+            // PDAM critical chance not affected by buffs, only by STR. Only some skills are meant to crit.
+            boolean crit = false;
+            if (skill.getBaseCritRate() > 0) 
+            	crit = f.calcCrit(skill.getBaseCritRate() * 10 * f.getSTRBonus(activeChar)); 
             
+            boolean soul = (weapon != null
+                && weapon.getChargedSoulshot() == L2ItemInstance.CHARGED_SOULSHOT);
+
+
+
+			if (L2Skill.CRIT_ATTACK)
+				{
+	
+					damage = (int) f.calcPhysDam(activeChar, target, skill, shld, true, dual, soul);
+				}
+			else if (skill.getCondition() != 16 && skill.getCondition() != 17)
+				damage = (int) f.calcPhysDam(activeChar, target, skill, shld, false, dual, soul);
+
             if (skill.getSkillType() == SkillType.DEATHLINK_PDAM)   
             {   
                  double cur = 2*activeChar.getCurrentHp();   
@@ -119,6 +126,9 @@ public class Pdam implements ISkillHandler
                       damage *= Math.sqrt(max/cur);   
                  else damage *= Math.pow(max/cur, 4);   
             }
+
+            if (crit) damage *= 2; // PDAM Critical damage always 2x and not affected by buffs
+
             if (damage > 5000 && activeChar instanceof L2PcInstance)
             {
                 String name = "";
@@ -202,7 +212,9 @@ public class Pdam implements ISkillHandler
                     target.stopEffect(skill.getId());
                     if (target.getEffect(skill.getId()) != null)
                         target.removeEffect(target.getEffect(skill.getId()));
-                    if (Formulas.getInstance().calcSkillSuccess(activeChar, target, skill, false, false, false) || skill.willHit())
+
+                    if ((f.calcSkillSuccess(activeChar, target, skill, false, false, false)) || skill.willHit())
+
                     {
                         
                         if (skill.getChargeNum()>0)
@@ -233,7 +245,7 @@ public class Pdam implements ISkillHandler
                 if(!target.isRaid() && ( chance = Rnd.get(100)) < skill.getLethalChance1())
                 {
                 	// 1st lethal effect activate (cp to 1 or if target is npc then hp to 50%)
-                	if(chance >= skill.getLethalChance2())
+                	if(skill.getLethalChance2() > 0 && chance >= skill.getLethalChance2())
                 	{
               		   if (target instanceof L2PcInstance) 
              		   {
@@ -280,8 +292,13 @@ public class Pdam implements ISkillHandler
 	        				{
 	                	       if (damage >= player.getCurrentHp()) 
 	                	       {
-	                	    	   player.setCurrentHp(0);
-	                	    	   player.doDie(activeChar);
+	                	    	   if (player.isInDuel()) 
+	                	    		   player.setCurrentHp(1);
+	    	        	    	   else
+	    	        	    	   {
+	    	        	    		   player.setCurrentHp(0);
+	    	        	    		   player.doDie(activeChar);
+	    	        	    	   }
 	                	       }
 	                	       else 
 	                		      player.setCurrentHp(player.getCurrentHp() - damage);

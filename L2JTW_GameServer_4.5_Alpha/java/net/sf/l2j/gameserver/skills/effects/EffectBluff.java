@@ -17,10 +17,12 @@
  * http://www.gnu.org/copyleft/gpl.html
  */
 package net.sf.l2j.gameserver.skills.effects;
-import net.sf.l2j.gameserver.skills.Env;
+
+import net.sf.l2j.gameserver.ai.CtrlIntention;
+import net.sf.l2j.gameserver.model.L2CharPosition;
 import net.sf.l2j.gameserver.model.L2Effect;
-import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
+import net.sf.l2j.gameserver.skills.Env;
 
 /**
  * @author decad
@@ -41,35 +43,35 @@ final class EffectBluff extends L2Effect {
     
     /** Notify started */
     public void onStart()
-    {
+    { 
+        getEffected().startFear();
+        int posX = getEffected().getX();
+        int posY = getEffected().getY();
+        int posZ = getEffected().getZ();
+        int signx=-1;
+        int signy=-1;
+        if (getEffected().getX()>getEffector().getX())
+            signx=1;
+        if (getEffected().getY()>getEffector().getY())
+            signy=1;
+        
+        //posX += signx*40; //distance less than melee attacks (40)
+        //posY += signy*40;
+
+        getEffected().setRunning();
+        getEffected().getAI().setIntention(CtrlIntention.AI_INTENTION_MOVE_TO,
+                              new L2CharPosition(posX +(signx*40),posY + (signy*40),posZ,0));
+        getEffected().sendPacket(SystemMessage.sendString("You can feel Bluff's effect"));
         getEffected().setTarget(null);
-        int head = getEffector().getHeading();
-        getEffected().setHeading(head);
-        getEffected().setClientHeading(head);
-        int head2 = getEffected().getHeadingTo( getEffector(),true);
-        getEffected().setHeading(head2);
-        getEffected().setClientHeading(head2);
-        if (getEffected() instanceof L2PcInstance)
-        {
-        getEffected().setTarget(null);
-        getEffected().startStunning();
-        getEffected().sendPacket(SystemMessage.sendString("感受到捉弄的效果"));
-        }
-        else
-        {
-        getEffected().setTarget(null);
-        getEffected().startStunning();
-        }
         onActionTime();
     }
     public void onExit()
     {
-        getEffected().stopStunning(this);
+        getEffected().stopFear(this);
+        
     }
     public boolean onActionTime()
     {
-       
         return false;
     }
 }
-

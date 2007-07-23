@@ -1,3 +1,20 @@
+/* This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+ * 02111-1307, USA.
+ *
+ * http://www.gnu.org/copyleft/gpl.html
+ */
 package net.sf.l2j.gameserver.handler.skillhandlers;
 
 import net.sf.l2j.gameserver.ai.CtrlEvent;
@@ -16,14 +33,14 @@ import net.sf.l2j.util.Rnd;
 
 public class Unlock implements ISkillHandler
 {
-	//private static Logger _log = Logger.getLogger(Unlock.class.getName()); 
+	//private static Logger _log = Logger.getLogger(Unlock.class.getName());
 	private static final SkillType[] SKILL_IDS = {SkillType.UNLOCK};
 
 	public void useSkill(L2Character activeChar, L2Skill skill, @SuppressWarnings("unused")
 	L2Object[] targets)
 	{
 		L2Object[] targetList = skill.getTargetList(activeChar);
-		
+
 		if (targetList == null) return;
 
 		for (int index = 0; index < targetList.length; index++)
@@ -58,7 +75,7 @@ public class Unlock implements ISkillHandler
 			else if (target instanceof L2ChestInstance)
 			{
 				L2ChestInstance chest = (L2ChestInstance) targetList[index];
-				if (chest.getCurrentHp() <= 0 || chest.isOpen())
+				if (chest.getCurrentHp() <= 0 || chest.isInteracted())
 				{
 					activeChar.sendPacket(new ActionFailed());
 					return;
@@ -124,14 +141,13 @@ public class Unlock implements ISkillHandler
 						}
 							break;
 					}
-					chest.setOpen();
 					if (chestChance == 0)
 					{
 						activeChar.sendPacket(SystemMessage.sendString("無法開啟!"));
 						activeChar.sendPacket(new ActionFailed());
-						if (Rnd.get(100) < chestTrapLimit) chest.chestTrap(activeChar);
+						//if (Rnd.get(100) < chestTrapLimit) chest.chestTrap(activeChar);
+						chest.setInteracted();
 						chest.setMustRewardExpSp(false);
-						chest.setOpenFailed();
 						chest.getAI().notifyEvent(CtrlEvent.EVT_ATTACKED, activeChar);
 						return;
 					}
@@ -139,12 +155,12 @@ public class Unlock implements ISkillHandler
 					if (Rnd.get(120) < chestChance)
 					{
 						activeChar.sendPacket(SystemMessage.sendString("成功開啟寶箱!"));
-						
+
 						chest.setSpecialDrop();
 						chest.setHaveToDrop(true);
 						chest.setMustRewardExpSp(false);
 						chest.doItemDrop(activeChar);
-						chest.doDie(activeChar);
+						chest.onDecay();
 					}
 					else
 					{
@@ -152,7 +168,7 @@ public class Unlock implements ISkillHandler
 
 						if (Rnd.get(100) < chestTrapLimit) chest.chestTrap(activeChar);
 						chest.setMustRewardExpSp(false);
-						chest.setOpenFailed();
+						chest.setInteracted();
 						chest.getAI().notifyEvent(CtrlEvent.EVT_ATTACKED, activeChar);
 					}
 				}

@@ -386,6 +386,20 @@ public class L2CharacterAI extends AbstractAI
             return;
         }
         
+        if (_actor.isImobilised() || _actor.isRooted())
+        {
+            // Cancel action client side by sending Server->Client packet ActionFailed to the L2PcInstance actor
+            clientActionFailed();
+            return;
+        }
+
+        // Dead actors can`t follow
+        if (_actor.isDead())
+        {
+        	clientActionFailed();
+        	return;
+        }
+        
         // do not follow yourself
         if (_actor == target) 
         {
@@ -437,6 +451,11 @@ public class L2CharacterAI extends AbstractAI
 
         // Set the AI pick up target
         setTarget(object);
+        if(object.getX() == 0 && object.getY() == 0) // TODO: Find the drop&spawn bug
+        {
+        	_log.warning("Object in coords 0,0 - using a temporary fix");
+        	object.setXYZ(this.getActor().getX(), this.getActor().getY(), this.getActor().getZ()+5);
+        }
 
         // Move the actor to Pawn server side AND client side by sending Server->Client packet MoveToPawn (broadcast)
         moveToPawn(object, 20);

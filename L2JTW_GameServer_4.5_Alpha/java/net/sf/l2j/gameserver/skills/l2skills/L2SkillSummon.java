@@ -120,7 +120,7 @@ public class L2SkillSummon extends L2Skill {
 					if (player.getCubics().size() > mastery) continue;		
                     if (player.getCubics().containsKey(_npcId))
                     {
-                        player.sendMessage("You already have such cubic");
+                        player.sendMessage("已經召喚此晶體");
                     }
                     else
                     {

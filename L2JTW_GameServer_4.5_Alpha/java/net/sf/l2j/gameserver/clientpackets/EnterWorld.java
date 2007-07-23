@@ -38,6 +38,7 @@ import net.sf.l2j.gameserver.cache.HtmCache;
 import net.sf.l2j.gameserver.datatables.MapRegionTable;
 import net.sf.l2j.gameserver.handler.AdminCommandHandler;
 import net.sf.l2j.gameserver.instancemanager.PetitionManager;
+import net.sf.l2j.gameserver.instancemanager.CoupleManager;
 import net.sf.l2j.gameserver.model.L2Clan;
 import net.sf.l2j.gameserver.model.L2Effect;
 import net.sf.l2j.gameserver.model.L2ItemInstance;
@@ -47,6 +48,7 @@ import net.sf.l2j.gameserver.model.entity.Hero;
 import net.sf.l2j.gameserver.model.entity.L2Event;
 import net.sf.l2j.gameserver.model.entity.CTF;
 import net.sf.l2j.gameserver.model.entity.TvTEvent;
+import net.sf.l2j.gameserver.model.entity.Couple;
 import net.sf.l2j.gameserver.model.quest.Quest;
 import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.Die;
@@ -157,6 +159,13 @@ public class EnterWorld extends L2GameClientPacket
 		
         if (Config.STORE_SKILL_COOLTIME)
             activeChar.restoreEffects();
+
+        // engage and notify Partner
+        if(Config.L2JMOD_ALLOW_WEDDING)
+        {
+            engage(activeChar);
+            notifyPartner(activeChar,activeChar.getPartnerId());
+        }
         
         if (activeChar.getAllEffects() != null)
         {
@@ -203,7 +212,7 @@ public class EnterWorld extends L2GameClientPacket
         sm = new SystemMessage(614);
         sm.addString(getText("QnVpbGQ="));
         sm.addString(getText("TDJKVFcgU2VydmVyIDQuNSBBbHBoYQ=="));check =1;
-        
+		sendPacket(sm);
             
         Welcome_Path = "data/html/welcome/welcome.htm";
         File mainText = new File(Config.DATAPACK_ROOT, Welcome_Path);        // Return the pathfile of the HTML file
@@ -215,6 +224,7 @@ public class EnterWorld extends L2GameClientPacket
         }
 
         sm = null;
+
         SevenSigns.getInstance().sendCurrentPeriodMsg(activeChar);
         Announcements.getInstance().showAnnouncements(activeChar);
 
@@ -224,12 +234,13 @@ public class EnterWorld extends L2GameClientPacket
 
 		/*
 		String serverNews = HtmCache.getInstance().getHtm("data/html/servnews.htm");
+
 		
-		if (serverNews != null)
+		if (Config.SERVER_NEWS)
 		{
-			NpcHtmlMessage htmlMsg = new NpcHtmlMessage(0);
-			htmlMsg.setHtml(serverNews);
-			sendPacket(htmlMsg);
+			String serverNews = HtmCache.getInstance().getHtm("data/html/servnews.htm");
+			if (serverNews != null)
+				sendPacket(new NpcHtmlMessage(1, serverNews));
 		}
 		
 		
@@ -287,7 +298,7 @@ public class EnterWorld extends L2GameClientPacket
 		if (check != 1)  activeChar.logout();
 		
 		//RegionBBSManager.getInstance().changeCommunityBoard();
-		sendPacket(sm);
+
 
         /*if(Config.GAMEGUARD_ENFORCE) - disabled by KenM will be reenabled later
             activeChar.sendPacket(new GameGuardQuery());*/
@@ -299,6 +310,53 @@ public class EnterWorld extends L2GameClientPacket
         TvTEvent.onLogin(activeChar);
 
 	}
+
+    /**
+     * @param activeChar
+     */
+    private void engage(L2PcInstance cha)
+    {
+        int _chaid = cha.getObjectId();
+    
+        for(Couple cl: CoupleManager.getInstance().getCouples())
+        {
+           if(cl.getPlayer1Id()==_chaid || cl.getPlayer2Id()==_chaid)
+            {
+                if(cl.getMaried())
+                    cha.setMarried(true);
+
+                cha.setCoupleId(cl.getId());
+                
+                if(cl.getPlayer1Id()==_chaid)
+                {
+                    cha.setPartnerId(cl.getPlayer2Id());
+                }
+                else
+                {
+                    cha.setPartnerId(cl.getPlayer1Id());
+                }
+            }
+        }
+    }
+        
+    /**
+     * @param activeChar partnerid
+     */
+    private void notifyPartner(L2PcInstance cha,int partnerId)
+    {
+        if(cha.getPartnerId()!=0)
+        {
+            L2PcInstance partner;
+            partner = (L2PcInstance)L2World.getInstance().findObject(cha.getPartnerId());
+            
+            if (partner != null)
+            {
+                partner.sendMessage("Your Partner has logged in");
+            }
+            
+            partner = null;
+        }
+    }
     
 	/**
 	 * @param activeChar

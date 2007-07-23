@@ -45,6 +45,8 @@ import net.sf.l2j.gameserver.model.L2Clan;
 import net.sf.l2j.gameserver.model.L2DropCategory;
 import net.sf.l2j.gameserver.model.L2DropData;
 import net.sf.l2j.gameserver.model.L2ItemInstance;
+import net.sf.l2j.gameserver.model.L2NpcCharData;
+import net.sf.l2j.gameserver.model.L2NpcAIData;
 import net.sf.l2j.gameserver.model.L2Multisell;
 import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2Skill;
@@ -322,25 +324,135 @@ public class L2NpcInstance extends L2Character
         return getTemplate().factionRange;
     }
     
-    public int getIsChaos()
-    {
-        return getTemplate().ischaos;
-    }
-    
-    public String getEnemyClan()
-    {
-        return getTemplate().enemyClan;
-    }
-    
+
+
     public int getBaseAtkSpd()
     {
         return getTemplate().basePAtkSpd;
     }
+    /**
+     * This Data are use by Specialize NPC only, still underconstructtion...
+     * therefore dont expect it to work perfectly or more...
+     * @return
+     */
+    
+    
+    public int getIsChar()
+    {
+    	L2NpcCharData npcChar = new L2NpcCharData();
+        return npcChar.getIsChar();
+    }
+    
+    public int getCharClass()
+    {
+    	L2NpcCharData npcChar = new L2NpcCharData();
+        return npcChar.getCharClass();
+    }
+    
+    public int getCharRace()
+    {
+    	L2NpcCharData npcChar = new L2NpcCharData();
+        return npcChar.getCharRace();
+    }
+    
+    public int getLrHand()
+    {
+    	L2NpcCharData npcChar = new L2NpcCharData();
+        return npcChar.getLrhand();
+    }
+    
+    public int getEnchLvl()
+    {
+    	L2NpcCharData npcChar = new L2NpcCharData();
+        return npcChar.getEnchLvl();
+    }
+    public int getCharFace()
+    {
+    	L2NpcCharData npcChar = new L2NpcCharData();
+        return npcChar.getCharFace();
+    }
+    public int getCharHair()
+    {
+    	L2NpcCharData npcChar = new L2NpcCharData();
+        return npcChar.getCharHair();
+    }
+    public int getCharColor()
+    {
+    	L2NpcCharData npcChar = new L2NpcCharData();
+        return npcChar.getCharColor();
+    }
+    public int getCharSex()
+    {
+    	L2NpcCharData npcChar = new L2NpcCharData();
+        return npcChar.getCharSex();
+    }
+    
+    public int getCharHero()
+    {
+    	L2NpcCharData npcChar = new L2NpcCharData();
+        return npcChar.getCharColor();
+    }
+    
+    
+    
+    //-----------------------------------------------------------------------
+    //AI Recall
+    
+    
+    public int getSoulShot()
+    {
+    	L2NpcAIData AI = new L2NpcAIData();
+        return AI.getSoulShot();
+    }
+    public int getSpiritShot()
+    {
+    	L2NpcAIData AI = new L2NpcAIData();
+        return AI.getSpiritShot();
+    }
     
     public int getEnemyRange()
     {
-        return getTemplate().enemyRange;
+    	L2NpcAIData AI = new L2NpcAIData();
+        return AI.getEnemyRange();
     }
+    
+    public String getEnemyClan()
+    {
+    	L2NpcAIData AI = new L2NpcAIData();
+        return AI.getEnemyClan();
+    }
+    
+ // GET THE PRIMARY ATTACk
+    public int getPrimaryAttack()
+    {
+    	L2NpcAIData AI = new L2NpcAIData();
+        return AI.getPrimaryAttack();
+    }
+    
+    public int getSkillChance()
+    {
+    	L2NpcAIData AI = new L2NpcAIData();
+    	if(AI.getSkillChance()==0)
+    	{
+    		return 20;
+    	}
+        return AI.getSkillChance();
+    }
+    
+    public int getCanMove()
+    {
+    	L2NpcAIData AI = new L2NpcAIData();
+        return AI.getCanMove();
+    }
+    public int getIsChaos()
+    {
+    	
+    	L2NpcAIData AI = new L2NpcAIData();
+    	
+        return AI.getIsChaos();
+    }
+    
+    
     /**
      * Return True if this L2NpcInstance is undead in function of the L2NpcTemplate.<BR><BR>
      */
@@ -350,21 +462,7 @@ public class L2NpcInstance extends L2Character
     }
     
     
-    // GET THE PRIMARY ATTACk
-    public int getPrimaryAttack()
-    {
-        return getTemplate().primary_attack;
-    }
     
-    public int getSkillChance()
-    {
-        return getTemplate().skill_chance;
-    }
-    
-    public int getCanMove()
-    {
-        return getTemplate().canMove;
-    }
     /**
      * Send a packet NpcInfo with state of abnormal effect to all L2PcInstance in the _KnownPlayers of the L2NpcInstance.<BR><BR>
      */
@@ -876,7 +974,7 @@ public class L2NpcInstance extends L2Character
 
             	/*
                 NpcHtmlMessage html = new NpcHtmlMessage(getObjectId());
-                html.setFile("data/html/territorystaus.htm");
+                html.setFile("data/html/territorystatus.htm");
                 html.replace("%objectId%", String.valueOf(getObjectId()));
                 html.replace("%npcname%", getName());
                 */

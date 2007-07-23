@@ -28,6 +28,8 @@ import net.sf.l2j.gameserver.model.L2DropCategory;
 import net.sf.l2j.gameserver.model.L2DropData;
 import net.sf.l2j.gameserver.model.L2MinionData;
 import net.sf.l2j.gameserver.model.L2NpcChatData;
+import net.sf.l2j.gameserver.model.L2NpcCharData;
+import net.sf.l2j.gameserver.model.L2NpcAIData;
 import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.model.base.ClassId;
 import net.sf.l2j.gameserver.model.quest.Quest;
@@ -68,6 +70,15 @@ public final class L2NpcTemplate extends L2CharTemplate
 	public final int     aggroRange;
 	public final int     rhand;
 	public final int     lhand;
+	
+
+    
+	public final String  factionId;
+	public final int     factionRange;
+    public final int     absorbLevel;
+    
+    /*
+    
     public final int     lrhand;
     public final int     enchlvl;
 	public final int     armor;
@@ -75,9 +86,7 @@ public final class L2NpcTemplate extends L2CharTemplate
     public final int     head;
     public final int     boot;
     public final int     glove;
-	public final String  factionId;
-	public final int     factionRange;
-    public final int     absorbLevel;
+    
     public final int     primary_attack;
     public final int     skill_chance;
     public final int     canMove;
@@ -89,12 +98,14 @@ public final class L2NpcTemplate extends L2CharTemplate
     public final int     charcolor;
     public final int     charhero;
     public final int     charsex;
-    public final int     charsoulshot;
+    public final int     soulshot;
+    public final int	 spiritshot;
     public final int     ischaos;
     public final String  enemyClan;
     public final int     enemyRange;
-    public final int     baseShldRate;
-    public final int     baseShldDef;
+    //public final int     baseShldRate;
+    //public final int     baseShldDef;
+    */
 	private final StatsSet _npcStatsSet;
 
 	/** fixed skills*/
@@ -105,6 +116,8 @@ public final class L2NpcTemplate extends L2CharTemplate
 	private final FastList<L2DropCategory> _categories = new FastList<L2DropCategory>();
 	
 	private final List<L2NpcChatData> _chatdata = new FastList<L2NpcChatData>();
+	private final List<L2NpcCharData> _chardata = new FastList<L2NpcCharData>();
+	private final List<L2NpcAIData> _AIdata = new FastList<L2NpcAIData>();
 	/** The table containing all Minions that must be spawn with the L2NpcInstance using this L2NpcTemplate*/
 	private final List<L2MinionData>  _minions     = new FastList<L2MinionData>(0);
 	
@@ -137,6 +150,7 @@ public final class L2NpcTemplate extends L2CharTemplate
 		aggroRange= set.getInteger("aggroRange");
 		rhand     = set.getInteger("rhand");
 		lhand     = set.getInteger("lhand");
+		/*
         lrhand     = set.getInteger("lrhand");
         enchlvl     = set.getInteger("enchlvl");
 		armor     = set.getInteger("armor");
@@ -152,13 +166,19 @@ public final class L2NpcTemplate extends L2CharTemplate
         charcolor    = set.getInteger("charcolor");
         charhero     = set.getInteger("charhero");
         charsex     = set.getInteger("charsex");
-        charsoulshot    = set.getInteger("charsoulshot");
+        soulshot    = set.getInteger("charsoulshot");
+        spiritshot    = set.getInteger("soulshot");
         ischaos         = set.getInteger("ischaos");
         
         enemyRange      = set.getInteger("enemyRange");
         
-        baseShldRate         = set.getInteger("baseShldRate");        
-        baseShldDef     = set.getInteger("baseShldDef");
+        //baseShldRate         = set.getInteger("baseShldRate");        
+        //baseShldDef     = set.getInteger("baseShldDef");
+        
+        
+        primary_attack = set.getInteger("primary_attack");
+        skill_chance = set.getInteger("skill_chance");
+        canMove      = set.getInteger("canMove");
         
         String e  = set.getString("enemyClan", null);
         if (e == null)
@@ -166,7 +186,7 @@ public final class L2NpcTemplate extends L2CharTemplate
         else
             enemyClan = e.intern();
         
-        
+        */
 		String f  = set.getString("factionId", null);
 		if (f == null)
 			factionId = null;
@@ -175,9 +195,8 @@ public final class L2NpcTemplate extends L2CharTemplate
 		factionRange  = set.getInteger("factionRange");
         absorbLevel  = set.getInteger("absorb_level", 0);
         
-        primary_attack = set.getInteger("primary_attack");
-        skill_chance = set.getInteger("skill_chance");
-        canMove      = set.getInteger("canMove");
+
+        
 		//String r = set.getString("race", null);
 		//if (r == null)
 		//	race = null;
@@ -223,6 +242,28 @@ public final class L2NpcTemplate extends L2CharTemplate
 	{
 
     		_chatdata.add(chatdata);
+    	
+	}
+	//-----------------------------------------------------------------------
+	// Npc Char Data
+	// Under construction...
+	// By ShanSoft
+	
+	public void addCharData(L2NpcCharData chardata)
+	{
+
+    		_chardata.add(chardata);
+    	
+	}
+	//-----------------------------------------------------------------------
+	// Npc AI Data
+	// Under construction...
+	// By ShanSoft
+	
+	public void addAIData(L2NpcAIData aidata)
+	{
+
+    		_AIdata.add(aidata);
     	
 	}
 	
@@ -335,6 +376,15 @@ public final class L2NpcTemplate extends L2CharTemplate
 	public List<L2NpcChatData> getChatData()
 	{
 		return _chatdata;
+	}
+	
+	public List<L2NpcCharData> getCharData()
+	{
+		return _chardata;
+	}
+	public List<L2NpcAIData> getAIData()
+	{
+		return _AIdata;
 	}
 	
     public Map<Integer, L2Skill> getSkills()

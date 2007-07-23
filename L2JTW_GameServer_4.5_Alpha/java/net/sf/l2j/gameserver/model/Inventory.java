@@ -85,6 +85,40 @@ public abstract class Inventory extends ItemContainer
 	// used to quickly check for using of items of special type
 	private int _wearedMask;
 	
+	final class FormalWearListener implements PaperdollListener
+	{
+	    public void notifyUnequiped(int slot, L2ItemInstance item)
+	    {
+	        if (!(getOwner() != null
+	                && getOwner() instanceof L2PcInstance))
+	            return;
+	        
+	        L2PcInstance owner = (L2PcInstance)getOwner(); 
+	
+	        if (item.getItemId() == 6408)
+	            owner.setIsWearingFormalWear(false);
+	    }
+	    public void notifyEquiped(int slot, L2ItemInstance item)
+	    {
+	        if (!(getOwner() != null
+	                && getOwner() instanceof L2PcInstance))
+	            return;
+	        
+	        L2PcInstance owner = (L2PcInstance)getOwner(); 
+	
+	        // If player equip Formal Wear unequip weapons and abort cast/attack 
+	        if (item.getItemId() == 6408) 
+	        {
+	            owner.setIsWearingFormalWear(true);
+	        } 
+	        else 
+	        {
+	            if (!owner.isWearingFormalWear())
+	                return;
+	        }
+	    }
+	}	
+	
 	/**
 	 * Recorder of alterations in inventory
 	 */
@@ -724,23 +758,24 @@ public abstract class Inventory extends ItemContainer
 		
 		switch(location)
 		{
-			case PAPERDOLL_LEAR:		slot = L2Item.SLOT_L_EAR;	break;
-			case PAPERDOLL_REAR:		slot = L2Item.SLOT_R_EAR;	break;
-			case PAPERDOLL_NECK:		slot = L2Item.SLOT_NECK;	break;
+			case PAPERDOLL_UNDER:		slot = L2Item.SLOT_UNDERWEAR;	break;
+			case PAPERDOLL_LEAR:		slot = L2Item.SLOT_L_EAR;		break;
+			case PAPERDOLL_REAR:		slot = L2Item.SLOT_R_EAR;		break;
+			case PAPERDOLL_NECK:		slot = L2Item.SLOT_NECK;		break;
 			case PAPERDOLL_RFINGER:		slot = L2Item.SLOT_R_FINGER;	break;
 			case PAPERDOLL_LFINGER:		slot = L2Item.SLOT_L_FINGER;	break;
-			case PAPERDOLL_HAIR:		slot = L2Item.SLOT_HAIR;	break;
-			case PAPERDOLL_FACE:		slot = L2Item.SLOT_FACE;	break;
-			case PAPERDOLL_DHAIR:		slot = L2Item.SLOT_DHAIR;	break;
-			case PAPERDOLL_HEAD:		slot = L2Item.SLOT_HEAD;	break;
-			case PAPERDOLL_RHAND:		slot = L2Item.SLOT_R_HAND; break;
-			case PAPERDOLL_LHAND:		slot = L2Item.SLOT_L_HAND; break;
-			case PAPERDOLL_GLOVES:		slot = L2Item.SLOT_GLOVES; break;
+			case PAPERDOLL_HAIR:		slot = L2Item.SLOT_HAIR;		break;
+			case PAPERDOLL_FACE:		slot = L2Item.SLOT_FACE;		break;
+			case PAPERDOLL_DHAIR:		slot = L2Item.SLOT_DHAIR;		break;
+			case PAPERDOLL_HEAD:		slot = L2Item.SLOT_HEAD;		break;
+			case PAPERDOLL_RHAND:		slot = L2Item.SLOT_R_HAND; 		break;
+			case PAPERDOLL_LHAND:		slot = L2Item.SLOT_L_HAND; 		break;
+			case PAPERDOLL_GLOVES:		slot = L2Item.SLOT_GLOVES; 		break;
 			case PAPERDOLL_CHEST:		slot = item.getItem().getBodyPart(); break;// fall through
-			case PAPERDOLL_LEGS:		slot = L2Item.SLOT_LEGS;	break;
-			case PAPERDOLL_BACK:		slot = L2Item.SLOT_BACK;	break;
-			case PAPERDOLL_FEET:		slot = L2Item.SLOT_FEET;	break;
-			case PAPERDOLL_LRHAND:		slot = L2Item.SLOT_LR_HAND;	break;
+			case PAPERDOLL_LEGS:		slot = L2Item.SLOT_LEGS;		break;
+			case PAPERDOLL_BACK:		slot = L2Item.SLOT_BACK;		break;
+			case PAPERDOLL_FEET:		slot = L2Item.SLOT_FEET;		break;
+			case PAPERDOLL_LRHAND:		slot = L2Item.SLOT_LR_HAND;		break;
 		}
 		
 		return slot;
