@@ -236,7 +236,7 @@
     	    </fileset>
     	</copy>
 
-        <zip destfile="${build}/l2j-server.zip"
+        <zip destfile="${build}/L2JTW_Server_4.5_Alpha.zip"
              basedir="${build.dist}" />
     </target>   
     
