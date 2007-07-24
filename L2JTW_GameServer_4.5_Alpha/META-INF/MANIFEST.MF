@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: 5_Alpha
+Bundle-SymbolicName: L2JTW_GameServer_4.5_Alpha
+Bundle-Version: 1.0.0
