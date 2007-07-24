@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="L2_GameServer_It" default="dist" basedir=".">
+<project name="L2JTW 4.5 Alpha" default="dist" basedir=".">
     <description>
-        This script will build the L2J server.
+        This script will build the L2JTW server.
         
         This program is free software; you can redistribute it and/or modify
         it under the terms of the GNU General Public License as published by
