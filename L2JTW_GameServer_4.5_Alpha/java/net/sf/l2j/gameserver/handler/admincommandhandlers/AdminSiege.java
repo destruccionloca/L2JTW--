@@ -53,7 +53,7 @@ public class AdminSiege implements IAdminCommandHandler
             "admin_list_siege_clans", "admin_clear_siege_list",
             "admin_move_defenders", "admin_spawn_doors",
             "admin_endsiege", "admin_startsiege",
-            "admin_setcastle", 
+            "admin_setcastle", "admin_removecastle", 
             "admin_clanhall","admin_clanhallset","admin_clanhalldel",
 	    "admin_clanhallopendoors","admin_clanhallclosedoors",
 	    "admin_clanhallteleportself"
@@ -147,6 +147,14 @@ public class AdminSiege implements IAdminCommandHandler
                     activeChar.sendPacket(new SystemMessage(SystemMessageId.TARGET_IS_INCORRECT));
                 else
                     castle.setOwner(player.getClan());
+            }
+            else if (command.equalsIgnoreCase("admin_removecastle"))
+            {
+            	L2Clan clan = ClanTable.getInstance().getClan(castle.getOwnerId());
+            	if (clan != null)
+            	castle.removeOwner(clan);
+            	
+            	else activeChar.sendMessage("Unable to remove castle");
             }
             else if (command.equalsIgnoreCase("admin_clanhallset"))
             {

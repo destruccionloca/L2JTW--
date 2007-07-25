@@ -115,7 +115,7 @@ public class L2ClanHallManagerInstance extends L2FolkInstance
                     }
                 }
                 else
-                    player.sendMessage("You are not authorized to do this!");
+                    player.sendMessage("權限不足!");
             }
             else if (actualCommand.equalsIgnoreCase("functions"))
             {
@@ -181,7 +181,7 @@ public class L2ClanHallManagerInstance extends L2FolkInstance
                         if (st.countTokens() >= 1)
                         {
                         	if(getClanHall().getOwnerId() == 0){
-                        		player.sendMessage("This clan Hall have no owner, you cannot change configuration");
+                        		player.sendMessage("此血盟根據地並無任何主人,無法進行更改.");
                         		return;
                         	}
                             val = st.nextToken();
@@ -239,7 +239,7 @@ public class L2ClanHallManagerInstance extends L2FolkInstance
                                             break;
                                     }
                                     if (!getClanHall().updateFunctions(ClanHall.FUNC_RESTORE_HP, percent, fee, Config.CH_HPREG_FEE_RATIO, (getClanHall().getFunction(ClanHall.FUNC_RESTORE_HP) == null)))
-                                        player.sendMessage("You don't have enough adena in your clan's warehouse");
+                                        player.sendMessage("血盟倉庫金額不足.");
                                     else
                                     	revalidateDeco(player);
                                 }
@@ -274,7 +274,7 @@ public class L2ClanHallManagerInstance extends L2FolkInstance
                                             break;
                                     }
                                     if(!getClanHall().updateFunctions(ClanHall.FUNC_RESTORE_MP, percent, fee, Config.CH_MPREG_FEE_RATIO, (getClanHall().getFunction(ClanHall.FUNC_RESTORE_MP) == null)))
-                                        player.sendMessage("You don't have enough adena in your clan's warehouse");
+                                        player.sendMessage("血盟倉庫金額不足.");
                                     else
                                     	revalidateDeco(player);
                                 }
@@ -315,7 +315,7 @@ public class L2ClanHallManagerInstance extends L2FolkInstance
                                             break;
                                     }
                                     if (!getClanHall().updateFunctions(ClanHall.FUNC_RESTORE_EXP, percent, fee, Config.CH_EXPREG_FEE_RATIO, (getClanHall().getFunction(ClanHall.FUNC_RESTORE_EXP) == null)))
-                                        player.sendMessage("You don't have enough adena in your clan's warehouse");
+                                        player.sendMessage("血盟倉庫金額不足.");
                                     else
                                     	revalidateDeco(player);
                                 }
@@ -357,7 +357,7 @@ public class L2ClanHallManagerInstance extends L2FolkInstance
                         if (st.countTokens() >= 1)
                         {
                         	if(getClanHall().getOwnerId() == 0){
-                        		player.sendMessage("This clan Hall have no owner, you cannot change configuration");
+                        		player.sendMessage("此血盟根據地並無任何主人,無法進行更改.");
                         		return;
                         	}
                             val = st.nextToken();
@@ -366,7 +366,7 @@ public class L2ClanHallManagerInstance extends L2FolkInstance
                                 if (st.countTokens() >= 1)
                                 {
                                 	if(getClanHall().getOwnerId() == 0){
-                                		player.sendMessage("This clan Hall have no owner, you cannot change configuration");
+                                		player.sendMessage("此血盟根據地並無任何主人,無法進行更改.");
                                 		return;
                                 	}
                                 	if (Config.DEBUG) _log.warning("Item editing invoked");
@@ -389,7 +389,7 @@ public class L2ClanHallManagerInstance extends L2FolkInstance
                                             break;
                                     }
                                     if (!getClanHall().updateFunctions(ClanHall.FUNC_ITEM_CREATE, lvl, fee, Config.CH_ITEM_FEE_RATIO, (getClanHall().getFunction(ClanHall.FUNC_ITEM_CREATE) == null)))
-                                        player.sendMessage("You don't have enough adena in your clan's warehouse");
+                                        player.sendMessage("血盟倉庫金額不足.");
                                     else
                                     	revalidateDeco(player);
                                 }
@@ -415,7 +415,7 @@ public class L2ClanHallManagerInstance extends L2FolkInstance
                                             break;
                                     }
                                     if (!getClanHall().updateFunctions(ClanHall.FUNC_TELEPORT, lvl, fee, Config.CH_TELE_FEE_RATIO, (getClanHall().getFunction(ClanHall.FUNC_TELEPORT) == null)))
-                                        player.sendMessage("You don't have enough adena in your clan's warehouse");
+                                        player.sendMessage("血盟倉庫金額不足.");
                                     else
                                     	revalidateDeco(player);
                                 }
@@ -459,7 +459,7 @@ public class L2ClanHallManagerInstance extends L2FolkInstance
                                             break;
                                     }
                                     if (!getClanHall().updateFunctions(ClanHall.FUNC_SUPPORT, lvl, fee, Config.CH_SUPPORT_FEE_RATIO, (getClanHall().getFunction(ClanHall.FUNC_SUPPORT) == null)))
-                                        player.sendMessage("You don't have enough adena in your clan's warehouse");
+                                        player.sendMessage("血盟倉庫金額不足.");
                                     else
                                     	revalidateDeco(player);
                                 }
@@ -501,7 +501,7 @@ public class L2ClanHallManagerInstance extends L2FolkInstance
                         if (st.countTokens() >= 1)
                         {
                         	if(getClanHall().getOwnerId() == 0){
-                        		player.sendMessage("This clan Hall have no owner, you cannot change configuration");
+                        		player.sendMessage("此血盟根據地並無任何主人,無法進行更改.");
                         		return;
                         	}
                             val = st.nextToken();
@@ -549,7 +549,7 @@ public class L2ClanHallManagerInstance extends L2FolkInstance
 	                                        break;
 	                                }
 	                                if (!getClanHall().updateFunctions(ClanHall.FUNC_DECO_FRONTPLATEFORM, lvl, fee, Config.CH_FRONT_FEE_RATIO, (getClanHall().getFunction(ClanHall.FUNC_DECO_FRONTPLATEFORM) == null)))
-	                                    player.sendMessage("You don't have enough adena in your clan's warehouse");
+	                                    player.sendMessage("血盟倉庫金額不足.");
 	                                else
 	                                	revalidateDeco(player);
 	                            }
@@ -587,7 +587,7 @@ public class L2ClanHallManagerInstance extends L2FolkInstance
                     }
                 }
                 else
-                    player.sendMessage("You are not authorized to do this!");
+                    player.sendMessage("權限不足");
                 return;
             }
             else if (actualCommand.equalsIgnoreCase("support"))

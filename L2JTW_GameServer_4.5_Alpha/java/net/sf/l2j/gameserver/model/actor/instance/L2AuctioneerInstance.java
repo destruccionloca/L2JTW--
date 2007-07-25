@@ -71,13 +71,13 @@ public final class L2AuctioneerInstance extends L2FolkInstance
         if (condition == COND_ALL_FALSE)
         {
         	//TODO: html
-        	player.sendMessage("Wrong conditions.");
+        	player.sendMessage("目前無法進行競標.");
         	return;
         }
         if (condition == COND_BUSY_BECAUSE_OF_SIEGE)
         {
         	//TODO: html
-        	player.sendMessage("Busy because of siege.");
+        	player.sendMessage("攻城戰期間無法進行.");
         	return;
         }
         else if (condition == COND_REGULAR)
@@ -124,12 +124,12 @@ public final class L2AuctioneerInstance extends L2FolkInstance
                     }
                     catch (Exception e)
                     {
-                        player.sendMessage("Invalid bid!");
+                        player.sendMessage("競標錯誤!");
                     }
                 }
                 catch (Exception e)
                 {
-                    player.sendMessage("Invalid auction duration!");
+                    player.sendMessage("競標錯誤!");
                 }
                 return;
             }
@@ -184,7 +184,7 @@ public final class L2AuctioneerInstance extends L2FolkInstance
                 }
                 catch (Exception e)
                 {
-                    player.sendMessage("Invalid auction!");
+                    player.sendMessage("競標錯誤!");
                 }
 
                 return;
@@ -205,12 +205,12 @@ public final class L2AuctioneerInstance extends L2FolkInstance
                     }
                     catch (Exception e)
                     {
-                        player.sendMessage("Invalid bid!");
+                        player.sendMessage("競標錯誤!");
                     }
                 }
                 catch (Exception e)
                 {
-                    player.sendMessage("Invalid auction!");
+                    player.sendMessage("競標錯誤!");
                 }
 
                 return;
@@ -219,14 +219,14 @@ public final class L2AuctioneerInstance extends L2FolkInstance
             {
                 if (player.getClan() == null || player.getClan().getLevel() < 2)
                 {
-                    player.sendMessage("Your clan's level needs to be at least 2, before you can bid in an auction");
+                    player.sendMessage("血盟必須達到2級才能進行競標.");
                     return;
                 }
 
                 if (val == "") return;
                 if ((player.getClan().getAuctionBiddedAt() > 0 && player.getClan().getAuctionBiddedAt() != Integer.parseInt(val)) || player.getClan().getHasHideout() > 0)
                 {
-                    player.sendMessage("You can't bid at more than one auction");
+                    player.sendMessage("無法繼標超過一樣");
                     return;
                 }
 
@@ -248,7 +248,7 @@ public final class L2AuctioneerInstance extends L2FolkInstance
                 }
                 catch (Exception e)
                 {
-                    player.sendMessage("Invalid auction!");
+                    player.sendMessage("競標錯誤!");
                 }
                 return;
             }
@@ -271,7 +271,7 @@ public final class L2AuctioneerInstance extends L2FolkInstance
                 String items = "";
             	items+= "<table width=280 border=0><tr>";
                 for(int j=1;j<=npage;j++)
-                			items+= "<td><center><a action=\"bypass -h npc_"+getObjectId()+"_list "+j+"\"> Page "+j+" </a></center></td>";
+                			items+= "<td><center><a action=\"bypass -h npc_"+getObjectId()+"_list "+j+"\"> 第"+j+"頁 </a></center></td>";
                 items+= "</tr></table>" +
                 		"<table width=280 border=0>";
                 for(Auction a:auctions)
@@ -427,7 +427,7 @@ public final class L2AuctioneerInstance extends L2FolkInstance
                 if (AuctionManager.getInstance().getAuction(player.getClan().getAuctionBiddedAt()) != null)
                 {
                     AuctionManager.getInstance().getAuction(player.getClan().getAuctionBiddedAt()).cancelBid(player.getClanId());
-                    player.sendMessage("You have succesfully canceled your bidding at the auction");
+                    player.sendMessage("成功取消競標.");
                 }
                 return;
             }
@@ -435,7 +435,7 @@ public final class L2AuctioneerInstance extends L2FolkInstance
             {
                 if (!((player.getClanPrivileges() & L2Clan.CP_CH_AUCTION) == L2Clan.CP_CH_AUCTION))
                 {
-                    player.sendMessage("You don't have the right privilleges to do this");
+                    player.sendMessage("權限不足!");
                     return;
                 }
                 String filename = "data/html/auction/AgitSaleCancel.htm";
@@ -452,7 +452,7 @@ public final class L2AuctioneerInstance extends L2FolkInstance
                 if (AuctionManager.getInstance().getAuction(player.getClan().getHasHideout()) != null)
                 {
                     AuctionManager.getInstance().getAuction(player.getClan().getHasHideout()).cancelAuction();
-                    player.sendMessage("Your auction has been canceled");
+                    player.sendMessage("競標取消.");
                 }
                 return;
             }
@@ -471,7 +471,7 @@ public final class L2AuctioneerInstance extends L2FolkInstance
             {
                 if (!((player.getClanPrivileges() & L2Clan.CP_CH_AUCTION) == L2Clan.CP_CH_AUCTION))
                 {
-                    player.sendMessage("You don't have the right privilleges to do this");
+                    player.sendMessage("權限不足!");
                     return;
                 }
                 String filename = "data/html/auction/AgitSale1.htm";
@@ -489,7 +489,7 @@ public final class L2AuctioneerInstance extends L2FolkInstance
             	SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
                 if (!((player.getClanPrivileges() & L2Clan.CP_CH_AUCTION) == L2Clan.CP_CH_AUCTION))
                 {
-                    player.sendMessage("You don't have the right privilleges to do this");
+                    player.sendMessage("權限不足!");
                     return;
                 }
                 try
@@ -511,7 +511,7 @@ public final class L2AuctioneerInstance extends L2FolkInstance
                 }
                 catch (Exception e)
                 {
-                    player.sendMessage("Invalid auction!");
+                    player.sendMessage("競標錯誤!");
                 }
                 return;
             }
