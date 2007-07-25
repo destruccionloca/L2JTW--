@@ -1643,7 +1643,7 @@ public abstract class L2Character extends L2Object
 			//_Status.setCurrentMp(getMaxMp() * Config.RESPAWN_RESTORE_MP);
 
 			// Start broadcast status
-			broadcastPacket(new SocialAction(getObjectId(), 15));
+			//broadcastPacket(new SocialAction(getObjectId(), 15));
 			broadcastPacket(new Revive(this));
 		}
 		else

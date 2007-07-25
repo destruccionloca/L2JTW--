@@ -46,14 +46,10 @@ public class Resurrect implements ISkillHandler
 	public void useSkill(L2Character activeChar, L2Skill skill, L2Object[] targets)
 	{
         L2PcInstance player = null;
-        
-       // L2Attackable actor = null;
         if (activeChar instanceof L2PcInstance) player = (L2PcInstance)activeChar;
-        //else actor = (L2Attackable)activeChar;
 
         L2Character target = null;
         L2PcInstance targetPlayer;
-        //L2Attackable targetAttackable;
         List<L2Character> targetToRes = new FastList<L2Character>();
 		
         for (int index = 0; index < targets.length; index++)
@@ -69,33 +65,14 @@ public class Resurrect implements ISkillHandler
                 {
                     if (player.getClanId() != targetPlayer.getClanId()) continue;
                 }
-
             }
             if(target.isVisible()) targetToRes.add(target);
         }
-		/*
-        if (activeChar instanceof L2Attackable)
-            for (int index = 0; index < targets.length; index++)
-            {
-                target = (L2Character) targets[index];
-                if (target instanceof L2Attackable)
-                {               
-                    targetAttackable = (L2Attackable)target;
-                    
-                    // Check for same party or for same clan, if target is for clan.
-                    if (skill.getTargetType() == SkillTargetType.TARGET_CORPSE_CLAN)
-                    {
-                        if (actor.getFactionId() != targetAttackable.getFactionId()) continue;
-                    }
 
-                }
-                
-            }
-        */
         if (targetToRes.size() == 0)
         {
             activeChar.abortCast();
-            activeChar.sendPacket(SystemMessage.sendString("目標錯誤"));
+            activeChar.sendPacket(SystemMessage.sendString("目標錯誤."));
         }
         
         for (L2Character cha: targetToRes)
