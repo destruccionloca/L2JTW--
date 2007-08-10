@@ -101,7 +101,7 @@ public class StrSiegeAssault implements ISkillHandler
         }
         catch (Exception e)
         {
-            player.sendMessage("Error using siege assault:" + e);
+            player.sendMessage("§ð«°¾Ô§ðÀ»¥¢±Ñ:" + e);
         }
     } 
     

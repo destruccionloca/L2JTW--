@@ -19,7 +19,6 @@
 package net.sf.l2j.gameserver.model;
 
 import java.util.List;
-import java.util.Random;
 import java.util.logging.Level;
 
 import javolution.util.FastList;
@@ -35,7 +34,7 @@ import net.sf.l2j.gameserver.datatables.EventDroplist;
 import net.sf.l2j.gameserver.datatables.ItemTable;
 import net.sf.l2j.gameserver.datatables.EventDroplist.DateDrop;
 import net.sf.l2j.gameserver.instancemanager.CursedWeaponsManager;
-import net.sf.l2j.gameserver.model.L2Skill.SkillType;
+import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.model.actor.instance.L2DoorInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2FolkInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2MinionInstance;
@@ -58,6 +57,7 @@ import net.sf.l2j.gameserver.skills.Stats;
 import net.sf.l2j.gameserver.templates.L2EtcItemType;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
 import net.sf.l2j.gameserver.util.Util;
+import net.sf.l2j.util.Rnd;
 import net.sf.l2j.util.Rnd;
 
 /**
@@ -362,11 +362,7 @@ public class L2Attackable extends L2NpcInstance
         if (this.isEventMob) return;
             
         // Add damage and hate to the attacker AggroInfo of the L2Attackable _aggroList
-        if (attacker != null)
-        {
-            addDamage(attacker, (int)damage);
-            addBufferHate();
-        }
+        if (attacker != null) addDamage(attacker, (int)damage);
         
         // If this L2Attackable is a L2MonsterInstance and it has spawned minions, call its minions to battle
         if (this instanceof L2MonsterInstance)
@@ -375,11 +371,7 @@ public class L2Attackable extends L2NpcInstance
             if (this instanceof L2MinionInstance)
             {
                 master = ((L2MinionInstance)this).getLeader();
-                if (!master.isInCombat()&&!master.isDead())
-                {
-                    master.addDamage(attacker, 1);
-                    master.addBufferHate();
-                }
+                if (!master.isInCombat()&&!master.isDead()) master.addDamage(attacker, 1);
             }
             if (master.hasMinions())
                 master.callMinionsToAssist(attacker);
@@ -742,7 +734,7 @@ public class L2Attackable extends L2NpcInstance
         else
         addDamageHate(attacker, damage, damage);
     }
-    
+    /*
     public void addBufferHate()
     {
         L2Character target = getMostHated();
@@ -827,7 +819,7 @@ public class L2Attackable extends L2NpcInstance
         }
     }
     
-
+*/
     /**
      * Add damage and hate to the attacker AggroInfo of the L2Attackable _aggroList.<BR><BR>
      * 
@@ -846,14 +838,14 @@ public class L2Attackable extends L2NpcInstance
         {
             // Add new damage and aggro (=damage) to the AggroInfo object
             ai._damage += damage;
-            ai._hate += aggro;
+            ai._hate += (aggro*100)/(getLevel()+7);
         } 
         else 
         {
             // Create a AggroInfo object and Init it
             ai = new AggroInfo(attacker);
             ai._damage = damage;
-            ai._hate = aggro;
+            ai._hate = (aggro*100)/(getLevel()+7);
             
             // Add the attaker L2Character and the AggroInfo object in the _aggroList of the L2Attackable
             getAggroListRP().put(attacker, ai);
@@ -940,7 +932,7 @@ public class L2Attackable extends L2NpcInstance
         }        
     	return ai._hate;
     }
-    
+    /*
     public L2Character getRandomChar() 
     {
         if (getAggroList().size() == 0 || isAlikeDead()) return null;
@@ -975,6 +967,7 @@ public class L2Attackable extends L2NpcInstance
         
         return mostHated;
     }
+    */
     /**
      * Calculates quantity of items for specific drop acording to current situation <br>
      * 
@@ -1345,11 +1338,10 @@ public class L2Attackable extends L2NpcInstance
     	 }
    	 
     	 // Apply Special Item drop with rnd qty for champions
-    	 if (isChampion() && (player.getLevel() <= getLevel()) && Config.L2JMOD_CHAMPION_REWARD > 0 && (Rnd.get(100) < Config.L2JMOD_CHAMPION_REWARD))
+    	 if (Config.L2JMOD_CHAMPION_ENABLE && isChampion() && (player.getLevel() <= getLevel()) && Config.L2JMOD_CHAMPION_REWARD > 0 && (Rnd.get(100) < Config.L2JMOD_CHAMPION_REWARD))
 		 {
     		 int champqty = Rnd.get(Config.L2JMOD_CHAMPION_REWARD_QTY);
-    		 if (champqty == 0)  //do not allow for a zero drop
-    			 champqty = 1;
+   			 champqty++; //quantity should actually vary between 1 and whatever admin specified as max, inclusive.
     		 
     		 RewardItem item = new RewardItem(Config.L2JMOD_CHAMPION_REWARD_ID,champqty);
     		 if (Config.AUTO_LOOT) player.addItem("ChampionLoot", item.getItemId(), item.getCount(), this, true); // Give this or these Item(s) to the L2PcInstance that has killed the L2Attackable
@@ -2169,8 +2161,7 @@ public class L2Attackable extends L2NpcInstance
         // hi-lvl mobs bonus
         if (diff > 0 && diff < 5)//Config.MANOR_HARVEST_DIFF_BONUS)
         {
-            Random rnd = new Random();
-            count += rnd.nextInt(diff);
+            count += Rnd.nextInt(diff);
         }
 
         List<RewardItem> harvested = new FastList<RewardItem>();

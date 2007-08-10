@@ -20,7 +20,6 @@ package net.sf.l2j.gameserver.handler.admincommandhandlers;
 
 import java.util.StringTokenizer;
 
-import javolution.text.TextBuilder;
 import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.GmListTable;
 import net.sf.l2j.gameserver.Olympiad;
@@ -32,44 +31,50 @@ import net.sf.l2j.gameserver.datatables.TeleportLocationTable;
 import net.sf.l2j.gameserver.handler.IAdminCommandHandler;
 import net.sf.l2j.gameserver.instancemanager.Manager;
 import net.sf.l2j.gameserver.model.L2Multisell;
-import net.sf.l2j.gameserver.model.L2World;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.network.SystemMessageId;
-import net.sf.l2j.gameserver.serverpackets.ExCaptureOrc;
+import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.serverpackets.L2GameServerPacket;
 import net.sf.l2j.gameserver.serverpackets.NpcHtmlMessage;
-import net.sf.l2j.gameserver.serverpackets.PlaySound;
-import net.sf.l2j.gameserver.serverpackets.SignsSky;
-import net.sf.l2j.gameserver.serverpackets.SunRise;
-import net.sf.l2j.gameserver.serverpackets.SunSet;
-import net.sf.l2j.gameserver.serverpackets.SystemMessage;
+import javolution.text.TextBuilder;
+
 
 /**
  * This class handles following admin commands:
- * - admin = shows menu
- * 
- * @version $Revision: 1.3.2.1.2.4 $ $Date: 2005/04/11 10:06:06 $
+ * - admin|admin1/admin2/admin3/admin4/admin5 = slots for the 5 starting admin menus
+ * - gmliston/gmlistoff = includes/excludes active character from /gmlist results
+ * - silence = toggles private messages acceptance mode
+ * - diet = toggles weight penalty mode
+ * - tradeoff = toggles trade acceptance mode
+ * - reload = reloads specified component from multisell|skill|npc|htm|item|instancemanager
+ * - set/set_menu/set_mod = alters specified server setting
+ * - saveolymp = saves olympiad state manually
+ * - manualhero = cycles olympiad and calculate new heroes.
+ * @version $Revision: 1.3.2.1.2.4 $ $Date: 2007/07/28 10:06:06 $
  */
 public class AdminAdmin implements IAdminCommandHandler {
+
 
  private static final String[] ADMIN_COMMANDS = {"admin_admin","admin_play_sounds","admin_play_sound",
                                            "admin_gmliston","admin_gmlistoff","admin_silence",
                                            "admin_atmosphere","admin_diet","admin_tradeoff",
 
                                            "admin_config_option", "admin_config_altsetting", "admin_config_other", "admin_config_rate",
-                                           "admin_reload", "admin_set", "admin_admin2", "admin_cache", "admin_saveolymp", "admin_manualhero","admin_eventmenu"
-                                           ,"admin_manualhero", "admin_excaptureorc"};
+                                           "admin_reload", "admin_set", "admin_admin2","admin_admin3", "admin_admin4", "admin_admin5", "admin_cache", "admin_saveolymp", "admin_manualhero","admin_eventmenu"
+                                           ,"admin_manualhero","admin_set_mod", "admin_set", "admin_set_menu"};
+
 
 
 	private static final int REQUIRED_LEVEL = Config.GM_MENU;
 
-	public boolean useAdminCommand(String command, L2PcInstance activeChar) {
-        
+	public boolean useAdminCommand(String command, L2PcInstance activeChar) 
+	{
+
         if (!Config.ALT_PRIVILEGES_ADMIN)
             if (!(checkLevel(activeChar.getAccessLevel()) && activeChar.isGM())) return false;
         
         if (command.equals("admin_admin")) showMainPage(activeChar);
-        if (command.equals("admin_admin2")) showMainPage2(activeChar);
+        //if (command.equals("admin_admin2")) showMainPage2(activeChar);
         if (command.equals("admin_cache")) showMainPageCache(activeChar);
         if (command.equals("admin_eventmenu")) showMainPageEventMenu(activeChar);
         
@@ -79,63 +84,38 @@ public class AdminAdmin implements IAdminCommandHandler {
         if (command.equals("admin_config_rate"))        showRateConfigPage(activeChar);
         
         
-		if (command.equals("admin_excaptureorc"))
-		{
-			ExCaptureOrc eco = new ExCaptureOrc();
-			activeChar.sendPacket(eco);
-			activeChar.sendMessage("Sent ExCaptureOrc");
-		}
-		
-		if (command.equals("admin_play_sounds"))
-		{
-			AdminHelpPage.showHelpPage(activeChar, "songs/songs.htm");
-		}
 
-		else if (command.startsWith("admin_play_sounds"))
-		{
-            try
-            {
-                AdminHelpPage.showHelpPage(activeChar, "songs/songs"+command.substring(17)+".htm");
-            }
-            catch (StringIndexOutOfBoundsException e)
-            { }
-		}
+		if (!Config.ALT_PRIVILEGES_ADMIN)
+			if (!(checkLevel(activeChar.getAccessLevel()) && activeChar.isGM())) return false;
 
-		else if (command.startsWith("admin_play_sound"))
+		if (command.startsWith("admin_admin"))
 		{
-            try
-            {
-                playAdminSound(activeChar,command.substring(17));
-            }
-            catch (StringIndexOutOfBoundsException e)
-            { }
+			showPage(activeChar,command);
 		}
-		
 		else if(command.startsWith("admin_gmliston"))
 		{
 			GmListTable.getInstance().addGm(activeChar);
             activeChar.sendMessage("註冊GM列表");
 		}
-		
 		else if(command.startsWith("admin_gmlistoff"))
 		{
 		    GmListTable.getInstance().deleteGm(activeChar);
             activeChar.sendMessage("移除GM列表");
 		}
-       
-        else if(command.startsWith("admin_silence"))
-        {     	
+		else if(command.startsWith("admin_silence"))
+		{     	
 			if (activeChar.getMessageRefusal()) // already in message refusal mode
 			{
 				activeChar.setMessageRefusal(false);
 				activeChar.sendPacket(new SystemMessage(SystemMessageId.MESSAGE_ACCEPTANCE_MODE));
 			}
-		    else
-	        {
-		    	activeChar.setMessageRefusal(true);
+			else
+			{
+				activeChar.setMessageRefusal(true);
 				activeChar.sendPacket(new SystemMessage(SystemMessageId.MESSAGE_REFUSAL_MODE));
-	        }	    
+			}	    
 		}
+
         
         else if(command.startsWith("admin_saveolymp"))
         {
@@ -159,21 +139,6 @@ public class AdminAdmin implements IAdminCommandHandler {
             
             activeChar.sendMessage("設置英雄");
             
-        }
-        
-        else if(command.startsWith("admin_atmosphere"))
-        {
-            try
-            {
-                StringTokenizer st = new StringTokenizer(command);
-                st.nextToken();
-                String type = st.nextToken();
-                String state = st.nextToken();
-                adminAtmosphere(type,state,activeChar);
-            }
-            catch(Exception ex)
-            {
-            }
         }
         else if(command.startsWith("admin_diet"))
         {
@@ -225,91 +190,89 @@ public class AdminAdmin implements IAdminCommandHandler {
                     activeChar.sendMessage("交易關閉目前為取消");
             }            
         }
-        else if(command.startsWith("admin_reload"))
-        {
-            StringTokenizer st = new StringTokenizer(command);
-            st.nextToken();
 
-            try
-            {
-                String type = st.nextToken();
+		else if(command.startsWith("admin_reload"))
+		{
+			StringTokenizer st = new StringTokenizer(command);
+			st.nextToken();
+			try
+			{
+				String type = st.nextToken();
+				if(type.equals("multisell"))
+				{
+					L2Multisell.getInstance().reload();
+					activeChar.sendMessage("multisell 資料重新讀取");
+				}
+				else if(type.startsWith("teleport"))
+				{
+					TeleportLocationTable.getInstance().reloadAll();
+					activeChar.sendMessage("teleport 資料重新讀取");
+				}
+				else if(type.startsWith("skill"))
+				{
+					SkillTable.getInstance().reload();
+					activeChar.sendMessage("skills 資料重新讀取");
+				}
+				else if(type.equals("npc"))
+				{
+					NpcTable.getInstance().reloadAllNpc();
+					activeChar.sendMessage("npcs 資料重新讀取");
+				}
+				else if(type.startsWith("htm"))
+				{
+					HtmCache.getInstance().reload();
+					activeChar.sendMessage("Cache[HTML]: " + HtmCache.getInstance().getMemoryUsage()  + " megabytes 在 " + HtmCache.getInstance().getLoadedFiles() + " 個檔案讀取");
+				}
+				else if(type.startsWith("item"))
+				{
+					ItemTable.getInstance().reload();
+					activeChar.sendMessage("Item 資料重新讀取");
+				}
+				else if(type.startsWith("instancemanager"))
+				{
+					Manager.reloadAll();
+					activeChar.sendMessage("所有Instance重新讀取");
+				}
+			}
+			catch(Exception e)
+			{
+				activeChar.sendMessage("使用方法:  //reload <multisell|skill|npc|htm|item|instancemanager>");
+			}
+		}
 
-                if(type.equals("multisell"))
-                {
-                    L2Multisell.getInstance().reload();
-                    activeChar.sendMessage("Multisell 重新讀取");
-                }
-                else if(type.startsWith("teleport"))
-                {
-                    TeleportLocationTable.getInstance().reloadAll();
-                    activeChar.sendMessage("teleport 重新讀取");
-                }
-                else if(type.startsWith("skill"))
-                {
-                    SkillTable.getInstance().reload();
-                    activeChar.sendMessage("skills 重新讀取");
-                }
-                else if(type.equals("npc"))
-                {
-                    NpcTable.getInstance().reloadAllNpc();
-                    activeChar.sendMessage("npcs 重新讀取");
-                }
-                else if(type.startsWith("htm"))
-                {
-                    HtmCache.getInstance().reload();
-                    activeChar.sendMessage("Cache[HTML]: " + HtmCache.getInstance().getMemoryUsage()  + " MB " + HtmCache.getInstance().getLoadedFiles() + " 個檔案讀取");
 
-                }
-                else if(type.startsWith("item"))
-                {
-                	ItemTable.getInstance().reload();
-                	activeChar.sendMessage("Item 重新讀取");
-                }
-                else if(type.startsWith("instancemanager"))
-                {
+		else if(command.startsWith("admin_set"))
+		{
+			StringTokenizer st = new StringTokenizer(command);
+			String[] cmd=st.nextToken().split("_");
+			try
+			{
+				String[] parameter = st.nextToken().split("=");
+				String pName = parameter[0].trim();
+				String pValue = parameter[1].trim();
+				if (Config.setParameterValue(pName, pValue))
+					activeChar.sendMessage("設定資料成功");
+				else 
+					activeChar.sendMessage("錯誤設定值");
+			}
+			catch(Exception e)
+			{
+				activeChar.sendMessage("使用方法:  //set parameter=數值");
+			}
+			finally
+			{
+				if (cmd.length==3)
+				{
+					if (cmd[2].equalsIgnoreCase("menu"))
+						AdminHelpPage.showHelpPage(activeChar, "settings.htm");
+					else if (cmd[2].equalsIgnoreCase("mod"))
+						AdminHelpPage.showHelpPage(activeChar, "mods_menu.htm");
+				}
+			}
+		}
+				return true;
 
-                	Manager.reloadAll();
-                	activeChar.sendMessage("所有Instance資料重新讀取");
-
-                }
-            }
-            catch(Exception e)
-            {
-
-                activeChar.sendMessage("用法  //reload <multisell|skill|npc|htm|item|instancemanager>");
-
-            }
-        }
-
-        else if(command.startsWith("admin_set"))
-        {
-            StringTokenizer st = new StringTokenizer(command);
-            st.nextToken();
-
-            try
-            {
-                String pName = st.nextToken();
-                String pValue = st.nextToken();
-                
-                if (Config.setParameterValue(pName, pValue))
-                {
-                    showOptionConfigPage(activeChar);
-                    SystemMessage sm = new SystemMessage(614);
-                    sm.addString("伺服器設置"+pName);
-                    sm.addString(pValue+" 設制完成!");
-                    activeChar.sendPacket(sm);
-                }
-                else activeChar.sendMessage("無效的參數!");
-            }
-            catch(Exception e)
-            {
-                showOptionConfigPage(activeChar);
-                activeChar.sendMessage("//set [參數] [設定值]");
-            }
-        }
-		return true;
-	}
-
+		}
 	public String[] getAdminCommandList()
 	{
 		return ADMIN_COMMANDS;
@@ -319,66 +282,59 @@ public class AdminAdmin implements IAdminCommandHandler {
 	{
 		return (level >= REQUIRED_LEVEL);
 	}
-    
-    /**
-     * 
-     * @param type - atmosphere type (signssky,sky)
-     * @param state - atmosphere state(night,day)
-     */
-    public void adminAtmosphere(String type, String state, L2PcInstance activeChar)
-    {
-    	L2GameServerPacket packet = null;
-        
-        if(type.equals("signsky"))
-        {
-            if(state.equals("dawn"))
-            {
-                packet = new SignsSky(2);
-            }
-            else if(state.equals("dusk"))
-            {
-                packet = new SignsSky(1);
-            }
-        }
-        else if(type.equals("sky"))
-        {
-                if(state.equals("night"))
-                {
-                    packet = new SunSet();
-                }
-                else if(state.equals("day"))
-                {
-                    packet = new SunRise(); 
-                }
-        }
-        else
-        {
-            SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-            sm.addString("SYS");
-            sm.addString("單獨天空還有七封印氣候才可以");
-            activeChar.sendPacket(sm);
-        }
 
-        if(packet != null)
-        {
-            for (L2PcInstance player : L2World.getInstance().getAllPlayers())
-            {
-                player.sendPacket(packet);
-            }
-        }
-    }
-    
-	public void playAdminSound(L2PcInstance activeChar, String sound)
+
+	private void showPage(L2PcInstance activeChar, String command)
 	{
-		PlaySound _snd = new PlaySound(1,sound,0,0,0,0,0);
-		activeChar.sendPacket(_snd);
-		activeChar.broadcastPacket(_snd);
+
+		
+
+		int mode = 0;
+		String filename=null;
+		try
+		{
+			mode = Integer.parseInt(command.substring(11));
+		}
+		catch (Exception e) {}
+		switch (mode)
+		{
+		case 1:
+			{
+			showMainPage(activeChar);
+			break;
+			}
+		case 2:
+			{
+			filename="game";
+			break;
+			}
+		case 3:
+			{
+			filename="effects";
+			break;
+			}
+		case 4:
+			{
+			filename="server";
+			break;
+			}
+		case 5:
+			{
+			filename="mods";
+			break;
+			}
+		default:
+			showMainPage(activeChar);
+			
+		break;
+		}
+		if (filename!=null)
+		AdminHelpPage.showHelpPage(activeChar, filename+"_menu.htm");
+		else
 		showMainPage(activeChar);
-		SystemMessage _sm = new SystemMessage(SystemMessageId.S1_S2);
-		_sm.addString("SYS");
-		_sm.addString("Playing "+sound+".");
-		activeChar.sendPacket(_sm);
+
 	}
+
 
 	 public void showMainPage(L2PcInstance activeChar)
 	    {
@@ -387,8 +343,17 @@ public class AdminAdmin implements IAdminCommandHandler {
 
 
 
-	        StringBuffer replyMSG = new StringBuffer("<html><body>");
-            replyMSG.append("<center><table width=270><tr><td width=60><button value=\"操作\" action=\"bypass -h admin_admin2\" width=60 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td><td width=150><center><font color=\"LEVEL\">伺服器管理台</font></center></td><td width=60><button value=\"設置\" action=\"bypass -h admin_config_option\" width=60 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr></table></center><br>");
+	        StringBuffer replyMSG = new StringBuffer("<html><title>L2JTW 伺服器控制介面</title><body>");
+	        replyMSG.append("<br><table width=260>");
+	       	replyMSG.append("<tr>");
+	        replyMSG.append("<td><button value=\"設定\" action=\"bypass -h admin_config_option\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
+	        replyMSG.append("<td><button value=\"遊戲\" action=\"bypass -h admin_admin2\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
+	        replyMSG.append("<td><button value=\"效果\" action=\"bypass -h admin_admin3\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
+	        replyMSG.append("<td><button value=\"伺服器\" action=\"bypass -h admin_admin4\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
+	        replyMSG.append("<td><button value=\"外掛\" action=\"bypass -h admin_admin5\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
+	        replyMSG.append("</tr>");
+	        replyMSG.append("</table>");
+            //replyMSG.append("<center><table width=270><tr><td width=60><button value=\"操作\" action=\"bypass -h admin_admin2\" width=60 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td><td width=150><center><font color=\"LEVEL\">伺服器管理台</font></center></td><td width=60><button value=\"設置\" action=\"bypass -h admin_config_option\" width=60 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr></table></center><br>");
             replyMSG.append("<center><table width=200><tr><td>");
 	        replyMSG.append("<button value=\"線上玩家\" action=\"bypass -h admin_show_characters 0\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
 	        replyMSG.append("<button value=\"伺服器管理\" action=\"bypass -h admin_server_shutdown\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">"); 
@@ -404,18 +369,19 @@ public class AdminAdmin implements IAdminCommandHandler {
 	        replyMSG.append("<button value=\"傳送選單\" action=\"bypass -h admin_show_moves\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
 	        replyMSG.append("<br>");
 	        replyMSG.append("<button value=\"物品強化管理\" action=\"bypass -h admin_enchant\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
-	        replyMSG.append("<button value=\"攻城戰管理\" action=\"bypass -h admin_siege\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");    
-	        replyMSG.append("<button value=\"怪物群組選單\" action=\"bypass -h admin_mobmenu\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
-	        replyMSG.append("<button value=\"NPC 召喚\" action=\"bypass -h admin_show_spawns\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+	        replyMSG.append("<button value=\"Cache控制介面\" action=\"bypass -h admin_cache\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");    
+	        replyMSG.append("<button value=\"訴求管理介面\" action=\"bypass -h admin_view_petitions\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+	        replyMSG.append("<button value=\"NPC管理介面\" action=\"bypass -h admin_show_spawns\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
 	        replyMSG.append("<br>");
-	        replyMSG.append("</td></tr></table></center><br>");
+	        replyMSG.append("</td></tr></table></center>");
 	        replyMSG.append("<center><table><tr><td>");
-	        replyMSG.append("<button value=\"伺服器狀態\" action=\"bypass -h admin_server_login\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
-	        replyMSG.append("<button value=\"活動控制\" action=\"bypass -h admin_eventmenu\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
-	        replyMSG.append("<button value=\"Cache控制\" action=\"bypass -h admin_cache\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
-	        replyMSG.append("<button value=\"檢視訴求\" action=\"bypass -h admin_view_petitions\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+	        //replyMSG.append("<button value=\"伺服器狀態\" action=\"bypass -h admin_server_login\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+	        //replyMSG.append("<button value=\"多功能控制\" action=\"bypass -h admin_eventmenu\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+	        //replyMSG.append("<button value=\"Cache控制\" action=\"bypass -h admin_cache\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+	        //replyMSG.append("<button value=\"檢視訴求\" action=\"bypass -h admin_view_petitions\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
 	        //replyMSG.append("<button value=\"第二頁\" action=\"bypass -h admin_admin2\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
 	        replyMSG.append("</td></tr></table></center><br>");
+
 	        replyMSG.append("<center>玩家:</center>");
 	        replyMSG.append("<center><edit var=\"menu_command\" width=100 height=15></center><br>");
 	        replyMSG.append("<center><table><tr><td>");
@@ -426,7 +392,7 @@ public class AdminAdmin implements IAdminCommandHandler {
 	        replyMSG.append("<button value=\"聊天封鎖\" action=\"bypass -h admin_banchat $menu_command\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td><td>");
 	        replyMSG.append("<button value=\"解除聊天封鎖\" action=\"bypass -h admin_unbanchat $menu_command\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
 	        replyMSG.append("</td></tr></table></center><br><br>");
-	        replyMSG.append("<tr><td>伺服器版本: L2JTW Server 4.0</td></tr>");
+	        replyMSG.append("<font color=\"LEVEL\"><tr><td>伺服器版本: L2JTW Server 4.5</td></tr></font>");
 	        replyMSG.append("</body></html>");
 
 
@@ -498,7 +464,7 @@ public class AdminAdmin implements IAdminCommandHandler {
 	        replyMSG.append("<td><button value=\"黃昏天空\" action=\"bypass -h admin_atmosphere signsky dusk\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
 	        replyMSG.append("</table></center><br><br><br>");
 
-	        replyMSG.append("<tr><td>伺服器版本: L2JTW Server 4.0</td></tr>");
+	        replyMSG.append("<tr><td>伺服器版本: L2JTW Server 4.5</td></tr>");
 	        replyMSG.append("</body></html>");
 
 	        adminReply.setHtml(replyMSG.toString());
@@ -531,7 +497,7 @@ public class AdminAdmin implements IAdminCommandHandler {
 	        replyMSG.append("<br>");
 	        replyMSG.append("<br>");
 	        replyMSG.append("<br>");
-	        replyMSG.append("<tr><td>伺服器版本: L2JTW Server 4.0</td></tr>");
+	        replyMSG.append("<tr><td>伺服器版本: L2JTW Server 4.50</td></tr>");
 	        replyMSG.append("</body></html>");
 	        
 	        adminReply.setHtml(replyMSG.toString());
@@ -562,7 +528,7 @@ public class AdminAdmin implements IAdminCommandHandler {
 	        replyMSG.append("<br>");
 	        replyMSG.append("<br>");
 	        replyMSG.append("<br>");
-	        replyMSG.append("<tr><td>伺服器版本: L2JTW Server 4.0</td></tr>");
+	        replyMSG.append("<tr><td>伺服器版本: L2JTW Server 4.5</td></tr>");
 	        replyMSG.append("</body></html>");
 	        
 	        adminReply.setHtml(replyMSG.toString());
@@ -743,4 +709,5 @@ public class AdminAdmin implements IAdminCommandHandler {
             adminReply.setHtml(replyMSG.toString());
             activeChar.sendPacket(adminReply);
         }
+
 }

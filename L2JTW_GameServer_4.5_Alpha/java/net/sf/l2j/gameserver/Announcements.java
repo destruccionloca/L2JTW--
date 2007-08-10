@@ -32,6 +32,7 @@ import java.util.logging.Logger;
 import javolution.text.TextBuilder;
 import javolution.util.FastList;
 import net.sf.l2j.Config;
+import net.sf.l2j.gameserver.cache.HtmCache;
 import net.sf.l2j.gameserver.clientpackets.Say2;
 import net.sf.l2j.gameserver.model.L2World;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
@@ -56,7 +57,8 @@ public class Announcements
 	private List<String> _announcecycle = new FastList<String>();
 
 	private List<List<Object>> _eventAnnouncements = new FastList<List<Object>>();
-
+	private List<List<Object>> eventAnnouncements = new FastList<List<Object>>();
+	
 	private int _announcecyclesize = 0;
 
 
@@ -136,13 +138,13 @@ public class Announcements
 	{
 		for (int i = 0; i < _announcements.size(); i++)//修改為限定公告行數設置 by game
 		{
-			CreatureSay cs = new CreatureSay(0, Say2.ANNOUNCEMENT, activeChar.getName(), _announcements.get(i));
+			CreatureSay cs = new CreatureSay(0, Say2.ANNOUNCEMENT, activeChar.getName(), _announcements.get(i).toString());
 			activeChar.sendPacket(cs);
 		}
 		
-		for (int i = 0; i < _eventAnnouncements.size(); i++)
+		for (int i = 0; i < eventAnnouncements.size(); i++)
 		{
-		    List<Object> entry   = _eventAnnouncements.get(i);
+		    List<Object> entry   = eventAnnouncements.get(i);
             
             DateRange validDateRange  = (DateRange)entry.get(0);
             String[] msg              = (String[])entry.get(1);
@@ -150,7 +152,7 @@ public class Announcements
 		    
 		    if (!validDateRange.isValid() || validDateRange.isWithinRange(currentDate))
 		    {
-                SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
+                SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);
                 for (int j=0; j<msg.length; j++)
                 {
                     sm.addString(msg[j]);
@@ -160,6 +162,8 @@ public class Announcements
 		    
 		}
 	}
+	
+	
 	
 	/** 
 	* 顯示單項公告內容 
@@ -192,6 +196,8 @@ public class Announcements
     /** 開啟公告發布功能頁*/
 	public void listAnnouncements(L2PcInstance activeChar)
 	{		
+
+		/*
 		NpcHtmlMessage adminReply = new NpcHtmlMessage(5);
 		
         TextBuilder replyMSG = new TextBuilder("<html><body>");
@@ -210,6 +216,12 @@ public class Announcements
 		replyMSG.append("<button value=\"發佈公告\" action=\"bypass -h admin_announce_announcements\" width=60 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
 		replyMSG.append("</td></tr></table></center>");
 		replyMSG.append("<br>");
+*/
+        String content = HtmCache.getInstance().getHtmForce("data/html/admin/announce.htm");
+        NpcHtmlMessage adminReply = new NpcHtmlMessage(5);
+        adminReply.setHtml(content);
+        TextBuilder replyMSG = new TextBuilder("<br>");
+
 		for (int i = 0; i < _announcements.size(); i++)
 		{
 
@@ -221,9 +233,7 @@ public class Announcements
 			replyMSG.append("</td></tr></table>");
 
 		}
-		replyMSG.append("</body></html>");
-		
-		adminReply.setHtml(replyMSG.toString());
+        adminReply.replace("%announces%", replyMSG.toString());
 		activeChar.sendPacket(adminReply);
 	}
 	

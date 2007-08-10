@@ -30,61 +30,60 @@ import net.sf.l2j.gameserver.serverpackets.NpcHtmlMessage;
 /**
  * This class handles the admin commands that acts on the login
  * 
- * @version $Revision: 1.2.2.1.2.4 $ $Date: 2005/04/11 10:05:56 $
+ * @version $Revision: 1.2.2.1.2.4 $ $Date: 2007/07/31 10:05:56 $
  */
 public class AdminLogin implements IAdminCommandHandler
 {
 	//private static Logger _log = Logger.getLogger(AdminDelete.class.getName());
 
-    private static final String[] ADMIN_COMMANDS = { "admin_server_gm_only",
-                                               "admin_server_all",
-                                               "admin_server_max_player",
-                                               "admin_server_list_clock",
-                                               "admin_server_login"};
+	private static final String[] ADMIN_COMMANDS = { "admin_server_gm_only", "admin_server_all", 
+		"admin_server_max_player", "admin_server_list_clock", "admin_server_login"};
 
-    private static final int REQUIRED_LEVEL = Config.GM_ACCESSLEVEL;
-	
+	private static final int REQUIRED_LEVEL = Config.GM_ACCESSLEVEL;
+
 	/* (non-Javadoc)
 	 * @see net.sf.l2j.gameserver.handler.IAdminCommandHandler#useAdminCommand(java.lang.String, net.sf.l2j.gameserver.model.L2PcInstance)
 	 */
 	public boolean useAdminCommand(String command, L2PcInstance activeChar)
 	{
-        if (!Config.ALT_PRIVILEGES_ADMIN)
-        {
-    		if(activeChar.getAccessLevel() < REQUIRED_LEVEL)
-    			return false;
-        }
-        
+		if (!Config.ALT_PRIVILEGES_ADMIN)
+		{
+			if(activeChar.getAccessLevel() < REQUIRED_LEVEL)
+				return false;
+		}
+
 		if(command.equals("admin_server_gm_only"))
 		{
 			gmOnly();
 			activeChar.sendMessage("伺服器目前為GM專屬");
-			showWindow(activeChar);
+			showMainPage(activeChar);
 		}
 		else if(command.equals("admin_server_all"))
 		{
 			allowToAll();
 			activeChar.sendMessage("伺服器目前為開放");
-			showWindow(activeChar);
+			showMainPage(activeChar);
 		}
 		else if(command.startsWith("admin_server_max_player"))
 		{
 			StringTokenizer st = new StringTokenizer(command);
 			if (st.countTokens() > 1)
-            {
-                st.nextToken();
-                String number = st.nextToken();
-                try
-                {
-                	LoginServerThread.getInstance().setMaxPlayer(new Integer(number).intValue());
-                	activeChar.sendMessage("最大玩家數量設置為 "+new Integer(number).intValue());
-                	showWindow(activeChar);
-                }
-                catch(NumberFormatException e)
-                {
-                	activeChar.sendMessage("格式錯誤");
-                }
-            }
+
+			{
+				st.nextToken();
+				String number = st.nextToken();
+				try
+				{
+					LoginServerThread.getInstance().setMaxPlayer(new Integer(number).intValue());
+					activeChar.sendMessage("最大玩家數量設置為 "+new Integer(number).intValue());
+					showMainPage(activeChar);
+				}
+				catch(NumberFormatException e)
+				{
+					activeChar.sendMessage("格式錯誤.");
+				}
+			}
+
 			else
 			{
 				activeChar.sendMessage("格式為 //server_max_player <max>");
@@ -94,28 +93,28 @@ public class AdminLogin implements IAdminCommandHandler
 		{
 			StringTokenizer st = new StringTokenizer(command);
 			if (st.countTokens() > 1)
-            {
-                st.nextToken();
-                String mode = st.nextToken();
-                if(mode.equals("on"))
-                {
-                	LoginServerThread.getInstance().sendServerStatus(ServerStatus.SERVER_LIST_CLOCK,ServerStatus.ON);
-                	activeChar.sendMessage("在登入伺服器時將會看到時鐘");
-                	Config.SERVER_LIST_CLOCK = true;
-                	showWindow(activeChar);
-                }
-                else if(mode.equals("off"))
-                {
-                	LoginServerThread.getInstance().sendServerStatus(ServerStatus.SERVER_LIST_CLOCK,ServerStatus.OFF);
-                	Config.SERVER_LIST_CLOCK = false;
-                	activeChar.sendMessage("時鐘顯示關閉");
-                	showWindow(activeChar);
-                }
-                else
-                {
-                	activeChar.sendMessage("格式為 //server_list_clock <on/off>");
-                }
-            }
+			{
+				st.nextToken();
+				String mode = st.nextToken();
+				if(mode.equals("on"))
+				{
+					LoginServerThread.getInstance().sendServerStatus(ServerStatus.SERVER_LIST_CLOCK,ServerStatus.ON);
+					activeChar.sendMessage("在登入伺服器時將會看到時鐘");
+					Config.SERVER_LIST_CLOCK = true;
+					showMainPage(activeChar);
+				}
+				else if(mode.equals("off"))
+				{
+					LoginServerThread.getInstance().sendServerStatus(ServerStatus.SERVER_LIST_CLOCK,ServerStatus.OFF);
+					Config.SERVER_LIST_CLOCK = false;
+					activeChar.sendMessage("時鐘顯示關閉");
+					showMainPage(activeChar);
+				}
+				else
+				{
+					activeChar.sendMessage("格式為 //server_list_clock <on/off>");
+				}
+			}
 			else
 			{
 				activeChar.sendMessage("格式為 //server_list_clock <on/off>");
@@ -123,7 +122,7 @@ public class AdminLogin implements IAdminCommandHandler
 		}
 		else if(command.equals("admin_server_login"))
 		{
-			showWindow(activeChar);
+			showMainPage(activeChar);
 		}
 		return true;
 	}
@@ -131,7 +130,7 @@ public class AdminLogin implements IAdminCommandHandler
 	/**
 	 * 
 	 */
-	private void showWindow(L2PcInstance activeChar)
+	private void showMainPage(L2PcInstance activeChar)
 	{
 		NpcHtmlMessage html = new NpcHtmlMessage(1);
 		html.setFile("data/html/admin/login.htm");
@@ -141,7 +140,6 @@ public class AdminLogin implements IAdminCommandHandler
 		html.replace("%brackets%",String.valueOf(Config.SERVER_LIST_BRACKET));
 		html.replace("%max_players%",String.valueOf(LoginServerThread.getInstance().getMaxPlayer()));
 		activeChar.sendPacket(html);
-		
 	}
 
 	/**
@@ -169,5 +167,5 @@ public class AdminLogin implements IAdminCommandHandler
 	{
 		return ADMIN_COMMANDS;
 	}
-	
+
 }

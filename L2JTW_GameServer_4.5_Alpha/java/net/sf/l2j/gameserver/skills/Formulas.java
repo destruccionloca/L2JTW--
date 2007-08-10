@@ -903,7 +903,7 @@ public final class Formulas
 			// Mother Tree effect is calculated at last
 			if (player.getInMotherTreeZone()) mpRegenBonus += 1;
             
-            if (player.getIsInClanHall() == 2)
+            if (player.getIsInClanHall() == 2 && player.getClan() != null)
             {
             	int clanHallIndex = player.getClan().getHasHideout();
             	if (clanHallIndex > 0)
@@ -1020,7 +1020,7 @@ public final class Formulas
 		
 		//Multiplier should be removed, it's false ??
 		damage += 1.5*attacker.calcStat(Stats.CRITICAL_DAMAGE, damage+power, target, skill);
-		damage *= (double)attacker.getLevel()/target.getLevel();
+		//damage *= (double)attacker.getLevel()/target.getLevel();
 		//True with skill ?
 		defence = target.calcStat(Stats.DAGGER_WPN_RES, defence, target, null);
 		if (target instanceof L2NpcInstance)

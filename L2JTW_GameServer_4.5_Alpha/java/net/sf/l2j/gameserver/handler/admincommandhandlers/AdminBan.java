@@ -33,198 +33,222 @@ import net.sf.l2j.gameserver.model.GMAudit;
 import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2World;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
+import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
 /**
  * This class handles following admin commands:
- * - kill = kills target L2Character
+ * - ban account_name = changes account access level to -100 and logs him off. If no account is specified, target's account is used.
+ * - unban account_name = changes account access level to 0.
+ * - jail charname [penalty_time] = jails character. Time specified in minutes. For ever if no time is specified. 
+ * - unjail charname = Unjails player, teleport him to Floran.
  * 
  * @version $Revision: 1.1.6.3 $ $Date: 2005/04/11 10:06:06 $
  */
 public class AdminBan implements IAdminCommandHandler {
-    //private static Logger _log = Logger.getLogger(AdminBan.class.getName());
-    private static final String[] ADMIN_COMMANDS = {"admin_ban", "admin_unban","admin_jail","admin_unjail"};
-    private static final int REQUIRED_LEVEL = Config.GM_BAN;
+	private static final String[] ADMIN_COMMANDS = {"admin_ban", "admin_unban","admin_jail","admin_unjail"};
+	private static final int REQUIRED_LEVEL = Config.GM_BAN;
 
-    public boolean useAdminCommand(String command, L2PcInstance activeChar)
-    {
-        if (!Config.ALT_PRIVILEGES_ADMIN)
-        {
-            if (!(checkLevel(activeChar.getAccessLevel())))
-            {
-                return false;
-            }
-        }
-                
-        StringTokenizer st = new StringTokenizer(command);
-        st.nextToken();
-        String account_name = "";
-        String player = "";
-        L2PcInstance plyr = null;
-        if (command.startsWith("admin_ban"))
-        {   
-            try
-            {
-                plyr = L2World.getInstance().getPlayer(st.nextToken());
-            }
-            catch(Exception e)
-            {
+	public boolean useAdminCommand(String command, L2PcInstance activeChar)
+	{
+		if (!Config.ALT_PRIVILEGES_ADMIN)
+			if (!(checkLevel(activeChar.getAccessLevel())))
+				return false;
+		StringTokenizer st = new StringTokenizer(command);
+		st.nextToken();
+		String account_name = "";
+		String player = "";
+		L2PcInstance plyr = null;
+		if (command.startsWith("admin_ban"))
+		{
+			try
+			{
+				player = st.nextToken();
+				plyr = L2World.getInstance().getPlayer(player);
+			}
+			catch(Exception e)
+			{
+				L2Object target = activeChar.getTarget();
+				if (target!=null && target instanceof L2PcInstance)
+					plyr = (L2PcInstance)target;
+				else
+					activeChar.sendMessage("用法: //ban [帳號名稱] (如果是空的將會鎖定目標人物)");
+			}
+			if (plyr != null && plyr.equals(activeChar))
+				plyr.sendPacket(new SystemMessage(SystemMessageId.CANNOT_USE_ON_YOURSELF));
+			else if (plyr==null)
+			{
+				account_name=player;
+				LoginServerThread.getInstance().sendAccessLevel(account_name, 0);
+				activeChar.sendMessage("錯誤資料 "+account_name+". 請查詢 //ban_menu");
+			}
+			else
+			{
+				plyr.setAccountAccesslevel(-100);
+				account_name = plyr.getAccountName();
+				//RegionBBSManager.getInstance().changeCommunityBoard();
+				plyr.logout();
+				activeChar.sendMessage("帳號 "+account_name+" 封鎖.");
+			}
+		}
+		else if (command.startsWith("admin_unban"))
+		{
+			try
+			{
+				account_name = st.nextToken();
+				LoginServerThread.getInstance().sendAccessLevel(account_name, 0);
+				activeChar.sendMessage("解除封鎖 "+account_name+". 請查詢 //unban_menu");
+			}
+			catch(Exception e)
+			{
+				activeChar.sendMessage("使用方法: //unban <帳號名稱>");
+				if (Config.DEBUG)
+					e.printStackTrace();
+			}
+		}
+		else if (command.startsWith("admin_jail"))
+		{
+			try
+			{
+				player = st.nextToken();
+				int delay = 0;
+				try
+				{
+					delay = Integer.parseInt(st.nextToken());
+				}
+				catch (NumberFormatException nfe)
+				{
+					activeChar.sendMessage("使用方法: //jail <人物名稱> [逞罰時間]");
+				}
+				catch (NoSuchElementException nsee) {}
+				L2PcInstance playerObj = L2World.getInstance().getPlayer(player);
+				if (playerObj != null)
+				{
+					playerObj.setInJail(true, delay);
+					activeChar.sendMessage("人物 "+player+" 被鎖定 "+(delay>0 ? delay+" 分鐘." : "永遠!"));
+				}
+				else
+					jailOfflinePlayer(activeChar, player, delay);
+			}
+			catch (NoSuchElementException nsee) 
+			{
+				activeChar.sendMessage("使用方法: //jail <人物名稱> [逞罰時間]");
+			}
+			catch(Exception e)
+			{
+				if (Config.DEBUG)
+					e.printStackTrace();
+			}            
+		}
+		else if (command.startsWith("admin_unjail"))
+		{
+			try
+			{
+				player = st.nextToken();
+				L2PcInstance playerObj = L2World.getInstance().getPlayer(player);
 
-                L2Object target = activeChar.getTarget();
-                if (target!=null && target instanceof L2PcInstance)
-                    plyr = (L2PcInstance)target;
-                else
-                    activeChar.sendMessage("資料或目標錯誤");
-            }
-            
-            if (plyr!=null && !plyr.equals(activeChar)) // you cannot ban yourself!
-            {
-            	account_name = plyr.getAccountName();
-                LoginServerThread.getInstance().sendAccessLevel(account_name, -100);
-                //RegionBBSManager.getInstance().changeCommunityBoard();
-                plyr.logout();
-            }
-        }
-        else if (command.startsWith("admin_unban"))
-        {
-            try
-            {
-            	account_name = st.nextToken();
-            	LoginServerThread.getInstance().sendAccessLevel(account_name, 0);
-            }
-            catch(Exception e)
-            {
+				if (playerObj != null)
+				{
+					playerObj.setInJail(false, 0);
+					activeChar.sendMessage("人物 "+player+" 解除鎖定");
+				}
+				else
+					unjailOfflinePlayer(activeChar, player);
+			}
+			catch (NoSuchElementException nsee) 
+			{
+				activeChar.sendMessage("請輸入人物名稱.");
+			}
+			catch(Exception e)
+			{
+				if (Config.DEBUG)
+					e.printStackTrace();
+			}            
+		}
+		GMAudit.auditGMAction(activeChar.getName(), command, player, "");
+		return true;
+	}
 
-                if (Config.DEBUG) e.printStackTrace();
+	private void jailOfflinePlayer(L2PcInstance activeChar, String name, int delay)
+	{
+		Connection con = null;
+		try
+		{
+			con = L2DatabaseFactory.getInstance().getConnection();
 
-
-            }
-        }
-        else if (command.startsWith("admin_jail"))
-        {
-            try
-            {
-                player = st.nextToken();
-                int delay = 0;
-                try
-                {
-                    delay = Integer.parseInt(st.nextToken());
-                } catch (NumberFormatException nfe) {
-                } catch (NoSuchElementException nsee) {}
-                L2PcInstance playerObj = L2World.getInstance().getPlayer(player);
-
-                if (playerObj != null)
-                {
-                    playerObj.setInJail(true, delay);
-                    activeChar.sendMessage("Character "+player+" jailed for "+(delay>0 ? delay+" minutes." : "ever!"));
-                } else
-                	jailOfflinePlayer(activeChar, player, delay);
-            } catch (NoSuchElementException nsee) 
-            {
-                activeChar.sendMessage("Specify a character name.");
-            } catch(Exception e)
-            {
-                if (Config.DEBUG) e.printStackTrace();
-            }            
-        }
-        else if (command.startsWith("admin_unjail"))
-        {
-            try
-            {
-                player = st.nextToken();
-                L2PcInstance playerObj = L2World.getInstance().getPlayer(player);
-
-                if (playerObj != null)
-                {
-                    playerObj.setInJail(false, 0);
-                    activeChar.sendMessage("Character "+player+" removed from jail");
-                } else
-                	unjailOfflinePlayer(activeChar, player);
-            } catch (NoSuchElementException nsee) 
-            {
-                activeChar.sendMessage("Specify a character name.");
-            } catch(Exception e)
-            {
-                if (Config.DEBUG) e.printStackTrace();
-            }            
-        }
-        
-        if (!"".equals(player))
-            GMAudit.auditGMAction(activeChar.getName(), command, player, "");
-
-        return true;
-    }
-    
-    private void jailOfflinePlayer(L2PcInstance activeChar, String name, int delay)
-    {
-    	Connection con = null;
-    	try
-    	{
-    		con = L2DatabaseFactory.getInstance().getConnection();
-    		
-    		PreparedStatement statement = con.prepareStatement("UPDATE characters SET x=?, y=?, z=?, in_jail=?, jail_timer=? WHERE char_name=?");
-    		statement.setInt(1, -114356);
-    		statement.setInt(2, -249645);
-    		statement.setInt(3, -2984);
-    		statement.setInt(4, 1);
-    		statement.setLong(5, delay * 60000L);
-    		statement.setString(6, name);
+			PreparedStatement statement = con.prepareStatement("UPDATE characters SET x=?, y=?, z=?, in_jail=?, jail_timer=? WHERE char_name=?");
+			statement.setInt(1, -114356);
+			statement.setInt(2, -249645);
+			statement.setInt(3, -2984);
+			statement.setInt(4, 1);
+			statement.setLong(5, delay * 60000L);
+			statement.setString(6, name);
 
 			statement.execute();
 			int count = statement.getUpdateCount();
 			statement.close();
 
 			if (count == 0)
-				activeChar.sendMessage("Character not found!");
+				activeChar.sendMessage("人物無法查詢!");
 			else
-				activeChar.sendMessage("Character "+name+" jailed for "+(delay>0 ? delay+" minutes." : "ever!"));
-    	} catch (SQLException se)
-    	{
-    		activeChar.sendMessage("SQLException while jailing player");
-            if (Config.DEBUG) se.printStackTrace();
-    	} finally
-    	{
-    		try { con.close(); } catch (Exception e) {}
-    	}
-    }
-    
-    private void unjailOfflinePlayer(L2PcInstance activeChar, String name)
-    {
-    	Connection con = null;
-    	try
-    	{
-    		con = L2DatabaseFactory.getInstance().getConnection();
-    		
-    		PreparedStatement statement = con.prepareStatement("UPDATE characters SET x=?, y=?, z=?, in_jail=?, jail_timer=? WHERE char_name=?");
-       		statement.setInt(1, 17836);
-       		statement.setInt(2, 170178);
-       		statement.setInt(3, -3507);
-       		statement.setInt(4, 0);
-       		statement.setLong(5, 0);
-    		statement.setString(6, name);
+				activeChar.sendMessage("人物 "+name+" 鎖定為 "+(delay>0 ? delay+" 分鐘." : "永遠!"));
+		} catch (SQLException se)
+		{
+			activeChar.sendMessage("SQLException");
+			if (Config.DEBUG) se.printStackTrace();
+		} finally
+		{
+			try { con.close(); } catch (Exception e)
+			{
+				if (Config.DEBUG)
+					e.printStackTrace();
+			}
+		}
+	}
 
+	private void unjailOfflinePlayer(L2PcInstance activeChar, String name)
+	{
+		Connection con = null;
+		try
+		{
+			con = L2DatabaseFactory.getInstance().getConnection();
+			PreparedStatement statement = con.prepareStatement("UPDATE characters SET x=?, y=?, z=?, in_jail=?, jail_timer=? WHERE char_name=?");
+			statement.setInt(1, 17836);
+			statement.setInt(2, 170178);
+			statement.setInt(3, -3507);
+			statement.setInt(4, 0);
+			statement.setLong(5, 0);
+			statement.setString(6, name);
 			statement.execute();
 			int count = statement.getUpdateCount();
 			statement.close();
-
 			if (count == 0)
-				activeChar.sendMessage("Character not found!");
+				activeChar.sendMessage("無法查詢到人誤!");
 			else
-				activeChar.sendMessage("Character "+name+" removed from jail");
-    	} catch (SQLException se)
-    	{
-    		activeChar.sendMessage("SQLException while jailing player");
-            if (Config.DEBUG) se.printStackTrace();
-    	} finally
-    	{
-    		try { con.close(); } catch (Exception e) {}
-    	}
-    }
-    
-    public String[] getAdminCommandList() {
-        return ADMIN_COMMANDS;
-    }
-    
-    private boolean checkLevel(int level) {
-        return (level >= REQUIRED_LEVEL);
-    }
+				activeChar.sendMessage("人物 "+name+" 解除");
+		} catch (SQLException se)
+		{
+			activeChar.sendMessage("SQLException");
+			if (Config.DEBUG) se.printStackTrace();
+		} finally
+		{
+			try 
+			{
+				con.close();
+			}
+			catch (Exception e)
+			{
+				if (Config.DEBUG)
+					e.printStackTrace();
+			}
+		}
+	}
+
+	public String[] getAdminCommandList() {
+		return ADMIN_COMMANDS;
+	}
+
+	private boolean checkLevel(int level) {
+		return (level >= REQUIRED_LEVEL);
+	}
 }

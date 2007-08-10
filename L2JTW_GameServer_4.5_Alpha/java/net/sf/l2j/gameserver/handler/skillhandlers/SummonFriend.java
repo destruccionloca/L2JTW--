@@ -148,15 +148,15 @@ public class SummonFriend implements ISkillHandler
                     // Requires a Summoning Crystal
                     if (targetChar.getInventory().getItemByItemId(8615) == null)
                     {
-                    	((L2PcInstance)activeChar).sendMessage("Your target cannot be summoned while he hasn't got a Summoning Crystal");
-                    	targetChar.sendMessage("You cannot be summoned while you haven't got a Summoning Crystal");
+                    	((L2PcInstance)activeChar).sendMessage("目標無法召喚,對方並無擁有召喚水晶");
+                    	targetChar.sendMessage("目標無法召喚,並無擁有召喚水晶");
                     	continue;
                     }
                     
                     if (!Util.checkIfInRange(0, activeChar, target, false))
                     {
                     	targetChar.getInventory().destroyItemByItemId("Consume", 8615, 1, targetChar, activeChar);
-                    	targetChar.sendPacket(SystemMessage.sendString("You are summoned to a party member."));
+                    	targetChar.sendPacket(SystemMessage.sendString("隊伍成員成功召喚"));
                     	
                     	targetChar.teleToLocation(activeChar.getX(),activeChar.getY(),activeChar.getZ(), true);
                     }

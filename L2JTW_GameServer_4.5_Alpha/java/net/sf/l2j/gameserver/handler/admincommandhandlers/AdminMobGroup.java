@@ -39,33 +39,38 @@ import net.sf.l2j.gameserver.util.Broadcast;
 public class AdminMobGroup implements IAdminCommandHandler 
 {
 	private static final String[] ADMIN_COMMANDS = { "admin_mobmenu", "admin_mobgroup_list",
-	                                           "admin_mobgroup_create", "admin_mobgroup_remove", "admin_mobgroup_delete",
-	                                           "admin_mobgroup_spawn", "admin_mobgroup_unspawn",
-	                                           "admin_mobgroup_kill", "admin_mobgroup_idle",
-	                                           "admin_mobgroup_attack", "admin_mobgroup_rnd",
-	                                           "admin_mobgroup_return", "admin_mobgroup_follow",
-	                                           "admin_mobgroup_casting", "admin_mobgroup_nomove" ,
-	                                           "admin_mobgroup_attackgrp", "admin_mobgroup_invul", "admin_mobinst"};
+		"admin_mobgroup_create", "admin_mobgroup_remove", "admin_mobgroup_delete",
+		"admin_mobgroup_spawn", "admin_mobgroup_unspawn", "admin_mobgroup_kill", 
+		"admin_mobgroup_idle", "admin_mobgroup_attack", "admin_mobgroup_rnd",
+		"admin_mobgroup_return", "admin_mobgroup_follow", "admin_mobgroup_casting",
+		"admin_mobgroup_nomove" , "admin_mobgroup_attackgrp", "admin_mobgroup_invul", "admin_mobinst"};
 
 	private static final int REQUIRED_LEVEL = Config.GM_MIN;
 
 	public boolean useAdminCommand(String command, L2PcInstance activeChar) 
-    {
-        if (!Config.ALT_PRIVILEGES_ADMIN)
-    		if (!(checkLevel(activeChar.getAccessLevel()) && activeChar.isGM()))
-    			return false;
+	{
+		if (!Config.ALT_PRIVILEGES_ADMIN)
+			if (!(checkLevel(activeChar.getAccessLevel()) && activeChar.isGM()))
+				return false;
 
 		if (command.equals("admin_mobmenu")) 
-            AdminHelpPage.showHelpPage(activeChar, "mobgroup.htm");
-		else if (command.equals("admin_mobinst")) 
-            AdminHelpPage.showHelpPage(activeChar, "mobgrouphelp.htm");
-        else if (command.equals("admin_mobgroup_list")) 
-            showGroupList(activeChar);
+		{
+			//AdminHelpPage.showHelpPage(activeChar, "mobgroup.htm");
+			showMainPage(activeChar,command);
+			return true;
+		}
+		else if (command.equals("admin_mobinst"))
+		{
+			showMainPage(activeChar,command);
+			return true;
+		}
+		else if (command.equals("admin_mobgroup_list")) 
+			showGroupList(activeChar);
 		else if (command.startsWith("admin_mobgroup_create"))
 			createGroup(command, activeChar);
-        else if (command.startsWith("admin_mobgroup_delete") || 
-                command.startsWith("admin_mobgroup_remove"))
-            removeGroup(command, activeChar);
+		else if (command.startsWith("admin_mobgroup_delete") || 
+				command.startsWith("admin_mobgroup_remove"))
+			removeGroup(command, activeChar);
 		else if (command.startsWith("admin_mobgroup_spawn"))
 			spawnGroup(command, activeChar);
 		else if (command.startsWith("admin_mobgroup_unspawn"))
@@ -75,9 +80,9 @@ public class AdminMobGroup implements IAdminCommandHandler
 		else if (command.startsWith("admin_mobgroup_attackgrp"))
 			attackGrp(command, activeChar);
 		else if (command.startsWith("admin_mobgroup_attack")) 
-        {
+		{
 			if (activeChar.getTarget() instanceof L2Character) 
-            {
+			{
 				L2Character target = (L2Character) activeChar.getTarget();
 				attack(command, activeChar, target);
 			}
@@ -96,205 +101,215 @@ public class AdminMobGroup implements IAdminCommandHandler
 			noMove(command, activeChar);
 		else if (command.startsWith("admin_mobgroup_invul"))
 			invul(command, activeChar);
-        else if (command.startsWith("admin_mobgroup_teleport"))
-            teleportGroup(command, activeChar);
-
+		else if (command.startsWith("admin_mobgroup_teleport"))
+			teleportGroup(command, activeChar);
+		//AdminHelpPage.showHelpPage(activeChar, );
+		showMainPage(activeChar,command);
 		return true;
 	}
 
+	/**
+	 * @param activeChar
+	 */
+	private void showMainPage(L2PcInstance activeChar, String command)
+	{
+		String filename = "mobgroup.htm";
+		if (command.contains("mobinst"))
+			filename = "mobgrouphelp.htm";
+		AdminHelpPage.showHelpPage(activeChar, filename);
+	}
+
 	private void returnToChar(String command, L2PcInstance activeChar) 
-    {
+	{
 		int groupId;
-        
-		try {
+		try 
+		{
 			groupId = Integer.parseInt(command.split(" ")[1]); 
 		} 
-        catch (Exception e) {
+		catch (Exception e) 
+		{
 			activeChar.sendMessage("Incorrect command arguments.");
 			return;
 		}
-
 		MobGroup group = MobGroupTable.getInstance().getGroup(groupId);
-        
 		if (group == null) 
-        {
+		{
 			activeChar.sendMessage("Invalid group specified.");
 			return;
 		}
-        
 		group.returnGroup(activeChar);
 	}
 
 	private void idle(String command, L2PcInstance activeChar) 
-    {
+	{
 		int groupId;
-        
-		try {
+
+		try 
+		{
 			groupId = Integer.parseInt(command.split(" ")[1]);
 		} 
+
         catch (Exception e) 
         {
             activeChar.sendMessage("指令錯誤");
 			return;
 		}
-
 		MobGroup group = MobGroupTable.getInstance().getGroup(groupId);
-        
 		if (group == null) 
-        {
-            activeChar.sendMessage("Invalid group specified.");
+		{
+			activeChar.sendMessage("Invalid group specified.");
 			return;
 		}
-
 		group.setIdleMode();
 	}
 
 	private void setNormal(String command, L2PcInstance activeChar) 
-    {
+	{
 		int groupId;
-        
-		try {
+		try 
+		{
 			groupId = Integer.parseInt(command.split(" ")[1]);
 		} 
+
         catch (Exception e) {
             activeChar.sendMessage("指令錯誤");
+
 			return;
 		}
-
 		MobGroup group = MobGroupTable.getInstance().getGroup(groupId);
-        
 		if (group == null) 
-        {
-            activeChar.sendMessage("Invalid group specified.");
+		{
+			activeChar.sendMessage("Invalid group specified.");
 			return;
 		}
-
 		group.setAttackRandom();
 	}
 
 	private void attack(String command, L2PcInstance activeChar, L2Character target) 
-    {
+	{
 		int groupId;
-        
-		try {
+		try 
+		{
 			groupId = Integer.parseInt(command.split(" ")[1]);
 		} 
+
         catch (Exception e) {
             activeChar.sendMessage("指令錯誤");
+
 			return;
 		}
-
 		MobGroup group = MobGroupTable.getInstance().getGroup(groupId);
-        
 		if (group == null) 
-        {
-            activeChar.sendMessage("Invalid group specified.");
+		{
+			activeChar.sendMessage("指令錯誤");
 			return;
 		}
-
 		group.setAttackTarget(target);
 	}
 
 	private void follow(String command, L2PcInstance activeChar, L2Character target) 
-    {
+	{
 		int groupId;
-        
-		try {
+		try 
+		{
 			groupId = Integer.parseInt(command.split(" ")[1]);
 		} 
+
         catch (Exception e) {
             activeChar.sendMessage("指令錯誤");
+
 			return;
 		}
-
 		MobGroup group = MobGroupTable.getInstance().getGroup(groupId);
-        
 		if (group == null)
-        {
-            activeChar.sendMessage("Invalid group specified.");
+		{
+			activeChar.sendMessage("指令錯誤");
 			return;
 		}
-
 		group.setFollowMode(target);
 	}
 
 	public String[] getAdminCommandList() 
-    {
+	{
 		return ADMIN_COMMANDS;
 	}
 
 	private boolean checkLevel(int level) 
-    {
+	{
 		return (level >= REQUIRED_LEVEL);
 	}
 
 	private void createGroup(String command, L2PcInstance activeChar) 
-    {
+	{
 		int groupId;
 		int templateId;
 		int mobCount;
 
 		try {
-            String[] cmdParams = command.split(" ");
-            
+			String[] cmdParams = command.split(" ");
+
 			groupId = Integer.parseInt(cmdParams[1]); 
 			templateId = Integer.parseInt(cmdParams[2]);
 			mobCount = Integer.parseInt(cmdParams[3]);
 		} 
-        catch (Exception e) {
-            activeChar.sendMessage("指令錯誤");
+
+		catch (Exception e) {
+			activeChar.sendMessage("使用方法: //mobgroup_create <group> <npcid> <count>");
+
 			return;
 		}
 
-        if (MobGroupTable.getInstance().getGroup(groupId) != null)
-        {
-            activeChar.sendMessage("Mob group " + groupId + " already exists.");
-            return;
-        }
-        
+		if (MobGroupTable.getInstance().getGroup(groupId) != null)
+		{
+			activeChar.sendMessage("群組編號 " + groupId + " 已存在.");
+			return;
+		}
+
 		L2NpcTemplate template = NpcTable.getInstance().getTemplate(templateId);
-        
-        if (template == null)
-        {
-            activeChar.sendMessage("Invalid NPC ID specified.");
-            return;
-        }
-        
+
+		if (template == null)
+		{
+			activeChar.sendMessage("NPC編號錯誤.");
+			return;
+		}
+
 		MobGroup group = new MobGroup(groupId, template, mobCount);
 		MobGroupTable.getInstance().addGroup(groupId, group);
-        
-        activeChar.sendMessage("Mob group " + groupId + " created.");
+
+		activeChar.sendMessage("群組 " + groupId + " 創立成功.");
 	}
-    
-    private void removeGroup(String command, L2PcInstance activeChar)
-    {
-        int groupId;
 
-        try {
-            groupId = Integer.parseInt(command.split(" ")[1]); 
-        } 
-        catch (Exception e) {
-            activeChar.sendMessage("指令錯誤");
-            return;
-        }
 
-        MobGroup group = MobGroupTable.getInstance().getGroup(groupId);
-        
-        if (group == null) 
-        {
-            activeChar.sendMessage("Invalid group specified.");
-            return;
-        }
-        
-        doAnimation(activeChar);
-        group.unspawnGroup();
-        
-        if (MobGroupTable.getInstance().removeGroup(groupId))
-           activeChar.sendMessage("Mob group " + groupId + " unspawned and removed.");
-    }
+	private void removeGroup(String command, L2PcInstance activeChar)
+	{
+		int groupId;
+
+
+		try {
+			groupId = Integer.parseInt(command.split(" ")[1]); 
+		} 
+		catch (Exception e) {
+			activeChar.sendMessage("使用方法: //mobgroup_remove <groupId>");
+			return;
+		}
+
+		MobGroup group = MobGroupTable.getInstance().getGroup(groupId);
+
+		if (group == null) 
+		{
+			activeChar.sendMessage("指令錯誤");
+			return;
+		}
+
+		doAnimation(activeChar);
+		group.unspawnGroup();
+
+		if (MobGroupTable.getInstance().removeGroup(groupId))
+			activeChar.sendMessage("群組 " + groupId + " 移除.");
+	}
 
 	private void spawnGroup(String command, L2PcInstance activeChar) 
-    {
+	{
 		int groupId;
 		boolean topos = false;
 		int posx = 0;
@@ -302,7 +317,7 @@ public class AdminMobGroup implements IAdminCommandHandler
 		int posz = 0;
 
 		try {
-            String[] cmdParams = command.split(" ");
+			String[] cmdParams = command.split(" ");
 			groupId = Integer.parseInt(cmdParams[1]);
 
 			try { // we try to get a position
@@ -311,76 +326,76 @@ public class AdminMobGroup implements IAdminCommandHandler
 				posz = Integer.parseInt(cmdParams[4]);
 				topos = true;
 			} 
-            catch (Exception e) { 
-                // no position given
-            }
+			catch (Exception e) { 
+				// no position given
+			}
 		} 
-        catch (Exception e) {
-            activeChar.sendMessage("指令錯誤");
+		catch (Exception e) {
+			activeChar.sendMessage("使用方法: //mobgroup_spawn <group> [ x y z ]");
 			return;
 		}
 
 		MobGroup group = MobGroupTable.getInstance().getGroup(groupId);
-        
+
 		if (group == null) 
-        {
-            activeChar.sendMessage("Invalid group specified.");
+		{
+			activeChar.sendMessage("Invalid group specified.");
 			return;
 		}
 
 		doAnimation(activeChar);
-        
+
 		if (topos)
 			group.spawnGroup(posx, posy, posz);
 		else
 			group.spawnGroup(activeChar);
-        
-        activeChar.sendMessage("Mob group " + groupId + " spawned.");
+
+		activeChar.sendMessage("Mob group " + groupId + " spawned.");
 	}
 
 	private void unspawnGroup(String command, L2PcInstance activeChar) 
-    {
+	{
 		int groupId;
-        
+
 		try {
 			groupId = Integer.parseInt(command.split(" ")[1]);
 		} 
-        catch (Exception e) {
-            activeChar.sendMessage("指令錯誤");
+		catch (Exception e) {
+			activeChar.sendMessage("使用方法: //mobgroup_unspawn <groupId>");
 			return;
 		}
-        
+
 		MobGroup group = MobGroupTable.getInstance().getGroup(groupId);
-        
+
 		if (group == null)
-        {
-            activeChar.sendMessage("Invalid group specified.");
+		{
+			activeChar.sendMessage("指令錯誤");
 			return;
 		}
 
 		doAnimation(activeChar);
 		group.unspawnGroup();
-        
-        activeChar.sendMessage("Mob group " + groupId + " unspawned.");
+
+		activeChar.sendMessage("群組 " + groupId + " 移除");
 	}
 
 	private void killGroup(String command, L2PcInstance activeChar) 
-    {
+	{
 		int groupId;
-        
+
 		try {
 			groupId = Integer.parseInt(command.split(" ")[1]);
 		} 
-        catch (Exception e) {
-            activeChar.sendMessage("指令錯誤");
+		catch (Exception e) {
+			activeChar.sendMessage("使用方法: //mobgroup_kill <groupId>");
 			return;
 		}
-        
+
 		MobGroup group = MobGroupTable.getInstance().getGroup(groupId);
-        
+
 		if (group == null) 
-        {
-            activeChar.sendMessage("Invalid group specified.");
+		{
+			activeChar.sendMessage("指令錯誤");
 			return;
 		}
 
@@ -389,22 +404,23 @@ public class AdminMobGroup implements IAdminCommandHandler
 	}
 
 	private void setCasting(String command, L2PcInstance activeChar) 
-    {
+	{
 		int groupId;
-        
+
 		try {
 			groupId = Integer.parseInt(command.split(" ")[1]); 
 		} 
-        catch (Exception e) {
-            activeChar.sendMessage("指令錯誤");
+
+		catch (Exception e) {
+			activeChar.sendMessage("使用方法: //mobgroup_casting <groupId>");
 			return;
 		}
-        
+
 		MobGroup group = MobGroupTable.getInstance().getGroup(groupId);
-        
+
 		if (group == null) 
-        {
-            activeChar.sendMessage("Invalid group specified.");
+		{
+			activeChar.sendMessage("指令錯誤");
 			return;
 		}
 
@@ -412,96 +428,103 @@ public class AdminMobGroup implements IAdminCommandHandler
 	}
 
 	private void noMove(String command, L2PcInstance activeChar) 
-    {
+	{
 		int groupId;
 		String enabled;
-        
+
 		try {
 			groupId = Integer.parseInt(command.split(" ")[1]);
 			enabled = command.split(" ")[2];
 		} 
-        catch (Exception e) {
-            activeChar.sendMessage("指令錯誤");
+
+		catch (Exception e) {
+			activeChar.sendMessage("使用方法: //mobgroup_nomove <groupId> <on|off>");
+
 			return;
 		}
-        
+
 		MobGroup group = MobGroupTable.getInstance().getGroup(groupId);
-        
-        if (group == null) 
-        {
-            activeChar.sendMessage("Invalid group specified.");
+
+		if (group == null) 
+		{
+			activeChar.sendMessage("指令錯誤");
 			return;
 		}
-        
+
 		if (enabled.equalsIgnoreCase("on") || enabled.equalsIgnoreCase("true"))
 			group.setNoMoveMode(true);
 		else if (enabled.equalsIgnoreCase("off") || enabled.equalsIgnoreCase("false"))
 			group.setNoMoveMode(false);
 		else 
-            activeChar.sendMessage("指令錯誤");
+
+			activeChar.sendMessage("指令錯誤");
+
 	}
 
 	private void doAnimation(L2PcInstance activeChar) 
-    {
-        Broadcast.toSelfAndKnownPlayersInRadius(activeChar, new MagicSkillUser(activeChar, 1008, 1, 4000, 0), 2250000/*1500*/);
+	{
+		Broadcast.toSelfAndKnownPlayersInRadius(activeChar, new MagicSkillUser(activeChar, 1008, 1, 4000, 0), 2250000/*1500*/);
 		activeChar.sendPacket(new SetupGauge(0, 4000));
 	}
-	
+
 	private void attackGrp(String command, L2PcInstance activeChar) 
-    {
+	{
 		int groupId;
 		int othGroupId;
-        
+
 		try {
 			groupId = Integer.parseInt(command.split(" ")[1]);
 			othGroupId = Integer.parseInt(command.split(" ")[2]);
 		} 
-        catch (Exception e) {
-            activeChar.sendMessage("指令錯誤");
+
+		catch (Exception e) {
+			activeChar.sendMessage("使用方法: //mobgroup_attack_grp <groupId> <TargetGroupId>");
+
 			return;
 		}
-		
+
 		MobGroup group = MobGroupTable.getInstance().getGroup(groupId);
-        
+
 		if (group == null) 
         {
             activeChar.sendMessage("錯誤群組");
+
 			return;
 		}
-		
+
 		MobGroup othGroup = MobGroupTable.getInstance().getGroup(othGroupId);
-        
+
 		if (othGroup == null) 
         {
             activeChar.sendMessage("錯誤群組");
 			return;
 		}
-		
+
 		group.setAttackGroup(othGroup);
 	}
-	
+
 	private void invul(String command, L2PcInstance activeChar) 
-    {
+	{
 		int groupId;
 		String enabled;
-        
+
 		try {
 			groupId = Integer.parseInt(command.split(" ")[1]);
 			enabled = command.split(" ")[2];
 		} 
-        catch (Exception e) {
-            activeChar.sendMessage("指令錯誤");
+		catch (Exception e) {
+			activeChar.sendMessage("使用方法: //mobgroup_invul <groupId> <on|off>");
 			return;
 		}
-        
+
 		MobGroup group = MobGroupTable.getInstance().getGroup(groupId);
-        
+
 		if (group == null) 
         {
             activeChar.sendMessage("錯誤群組");
 			return;
 		}
-        
+
 		if (enabled.equalsIgnoreCase("on") || enabled.equalsIgnoreCase("true"))
 			group.setInvul(true);
 		else if (enabled.equalsIgnoreCase("off") || enabled.equalsIgnoreCase("false"))
@@ -510,48 +533,49 @@ public class AdminMobGroup implements IAdminCommandHandler
             activeChar.sendMessage("指令錯誤");
 	}
 
-    private void teleportGroup(String command, L2PcInstance activeChar)
-    {
-        int groupId;
-        String targetPlayerStr = null;
-        L2PcInstance targetPlayer = null;
-        
-        try {
-            groupId = Integer.parseInt(command.split(" ")[1]);
-            targetPlayerStr = command.split(" ")[2];
-            
-            if (targetPlayerStr != null)
-                targetPlayer = L2World.getInstance().getPlayer(targetPlayerStr);
+	private void teleportGroup(String command, L2PcInstance activeChar)
+	{
+		int groupId;
+		String targetPlayerStr = null;
+		L2PcInstance targetPlayer = null;
 
-            if (targetPlayer == null)
-                targetPlayer = activeChar;
-        }
-        catch (Exception e) {
-            activeChar.sendMessage("指令錯誤");
-            return;
-        }
-        
-        MobGroup group = MobGroupTable.getInstance().getGroup(groupId);
-        
-        if (group == null) 
-        {
-            activeChar.sendMessage("錯誤群組");
-            return;
-        }
-        
-        group.teleportGroup(activeChar);
-    }
-    
-    private void showGroupList(L2PcInstance activeChar)
-    {
-        MobGroup[] mobGroupList = MobGroupTable.getInstance().getGroups();
-        
-        activeChar.sendMessage("======= <怪物群組> =======");
-        
-        for (MobGroup mobGroup : mobGroupList)
-            activeChar.sendMessage(mobGroup.getGroupId() + ": " + mobGroup.getActiveMobCount() + " 個活下 " +  mobGroup.getMaxMobCount() + 
-                                   " NPC為 " + mobGroup.getTemplate().npcId + " (" + mobGroup.getStatus() + ")");
-        
-        activeChar.sendPacket(new SystemMessage(SystemMessageId.FRIEND_LIST_FOOT));
-    }
+
+		try {
+			groupId = Integer.parseInt(command.split(" ")[1]);
+			targetPlayerStr = command.split(" ")[2];
+
+			if (targetPlayerStr != null)
+				targetPlayer = L2World.getInstance().getPlayer(targetPlayerStr);
+
+			if (targetPlayer == null)
+				targetPlayer = activeChar;
+		}
+		catch (Exception e) {
+			activeChar.sendMessage("使用方法: //mobgroup_teleport <groupId> [playerName]");
+			return;
+		}
+
+		MobGroup group = MobGroupTable.getInstance().getGroup(groupId);
+
+		if (group == null) 
+		{
+			activeChar.sendMessage("指令錯誤");
+			return;
+		}
+
+		group.teleportGroup(activeChar);
+	}
+
+	private void showGroupList(L2PcInstance activeChar)
+	{
+		MobGroup[] mobGroupList = MobGroupTable.getInstance().getGroups();
+
+		activeChar.sendMessage("======= <怪物群組> =======");
+
+		for (MobGroup mobGroup : mobGroupList)
+			activeChar.sendMessage(mobGroup.getGroupId() + ": " + mobGroup.getActiveMobCount() + " 生存,最大值為 " +  mobGroup.getMaxMobCount() + 
+					". 編號為 " + mobGroup.getTemplate().npcId + " (" + mobGroup.getStatus() + ")");
+
+		activeChar.sendPacket(new SystemMessage(SystemMessageId.FRIEND_LIST_FOOT));
+	}
 }

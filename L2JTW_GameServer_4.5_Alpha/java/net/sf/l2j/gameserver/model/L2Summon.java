@@ -657,7 +657,10 @@ public abstract class L2Summon extends L2PlayableInstance
     		skillLevel = 1;
     	
     	L2Skill skillToCast = SkillTable.getInstance().getInfo(skill.getId(),skillLevel);
+
     	if (skillToCast != null)
     		super.doCast(skillToCast);
+    	else
+    		super.doCast(skill);
 	}
 }

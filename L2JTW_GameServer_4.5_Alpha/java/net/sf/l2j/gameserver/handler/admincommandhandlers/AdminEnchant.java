@@ -18,7 +18,6 @@
  */
 package net.sf.l2j.gameserver.handler.admincommandhandlers;
 
-import javolution.text.TextBuilder;
 import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.handler.IAdminCommandHandler;
 import net.sf.l2j.gameserver.model.GMAudit;
@@ -26,11 +25,16 @@ import net.sf.l2j.gameserver.model.Inventory;
 import net.sf.l2j.gameserver.model.L2ItemInstance;
 import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.CharInfo;
 import net.sf.l2j.gameserver.serverpackets.InventoryUpdate;
-import net.sf.l2j.gameserver.serverpackets.NpcHtmlMessage;
+import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.serverpackets.UserInfo;
+import javolution.text.TextBuilder;
+import net.sf.l2j.gameserver.serverpackets.NpcHtmlMessage;
+
+
 
 /**
  * This class handles following admin commands:
@@ -143,7 +147,7 @@ public class AdminEnchant implements IAdminCommandHandler
         }
         else
         {
-            activeChar.sendMessage("Wrong target type.");
+            activeChar.sendPacket(new SystemMessage(SystemMessageId.INCORRECT_TARGET));
             return;
         }
 
@@ -197,8 +201,9 @@ public class AdminEnchant implements IAdminCommandHandler
         }
     }
 
-    public void showMainPage(L2PcInstance activeChar)
+    private void showMainPage(L2PcInstance activeChar)
     {
+
         NpcHtmlMessage adminReply = new NpcHtmlMessage(5);
 
         TextBuilder replyMSG = new TextBuilder("<html><body>");
@@ -233,6 +238,9 @@ public class AdminEnchant implements IAdminCommandHandler
 
         adminReply.setHtml(replyMSG.toString());
         activeChar.sendPacket(adminReply);
+
+    	//AdminHelpPage.showHelpPage(activeChar, "enchant.htm");
+
     }
 
     public String[] getAdminCommandList()

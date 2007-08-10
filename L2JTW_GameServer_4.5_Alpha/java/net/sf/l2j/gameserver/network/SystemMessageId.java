@@ -160,7 +160,25 @@ public enum SystemMessageId
      * Message: Your opponent's MP was reduced by $s1.
      */
     YOUR_OPPONENTS_MP_WAS_REDUCED_BY_S1(1867),
-    
+	
+    /**
+	 * ID: 50<br>
+	 * Message: Your target cannot be found.
+	 */
+	TARGET_CANT_FOUND(50),
+	
+    /**
+     * ID: 51<br>
+     * Message: You cannot use this on yourself.
+     */
+	CANNOT_USE_ON_YOURSELF(51),
+	
+    /**
+     * ID: 52<br>
+     * Message: You have earned $s1 adena.
+     */
+	EARNED_ADENA(52),
+	
     /**
      * ID: 53<br>
      * Message: You have earned $s2 $s1(s).
@@ -172,12 +190,6 @@ public enum SystemMessageId
      * Message: You have earned $s1.
      */
     EARNED_ITEM(54),
-    
-    /**
-     * ID: 52<br>
-     * Message: You have earned $s1 adena.
-     */
-	EARNED_ADENA(52),
 	
 	/**
 	 * ID: 301<br>
@@ -312,16 +324,16 @@ public enum SystemMessageId
 	TARGET_IS_NOT_FOUND_IN_THE_GAME(145),
 	
 	/**
-	 * ID: 50<br>
-	 * Message: Your target cannot be found.
-	 */
-	TARGET_CANT_FOUND(50),
-	
-	/**
 	 * ID: 234<br>
 	 * Message: The target must be a clan member.
 	 */
 	TARGET_MUST_BE_IN_CLAN(234),
+	
+	/**
+	 * ID: 242<br>
+	 * Message: You must select a target
+	 */
+	YOU_MUST_SELECT_A_TARGET(242),
 	
 	/**
 	 * ID: 1053<br>
@@ -472,6 +484,12 @@ public enum SystemMessageId
 	 * Message: Your excellent shield defense was a success!
 	 */
 	YOUR_EXCELLENT_SHIELD_DEFENSE_WAS_A_SUCCESS(1281),
+
+	/**
+	 * ID: 1282<br>
+	 * Message: Your Karma has been changed to $s1
+	 */
+	YOUR_KARMA_HAS_BEEN_CHANGED_TO(1282),
 	
 	/**
 	 * ID: 361<br>
@@ -3266,6 +3284,11 @@ public enum SystemMessageId
      * Message: Petitions cannot exceed 255 characters.
      */
     PETITION_MAX_CHARS_255(971),
+    /**
+     * ID: 388<br>
+     * Message: Not under petition consultation.
+     */
+    NOT_UNDER_PETITION_CONSULTATION(388),
     
     /**
      * ID: 389<br>

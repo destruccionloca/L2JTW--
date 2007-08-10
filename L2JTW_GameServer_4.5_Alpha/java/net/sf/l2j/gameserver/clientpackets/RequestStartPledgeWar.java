@@ -17,8 +17,6 @@
  */
 package net.sf.l2j.gameserver.clientpackets;
 
-import java.util.logging.Logger;
-
 import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.datatables.ClanTable;
 import net.sf.l2j.gameserver.model.L2Clan;
@@ -31,7 +29,7 @@ import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 public final class RequestStartPledgeWar extends L2GameClientPacket
 {
     private static final String _C__4D_REQUESTSTARTPLEDGEWAR = "[C] 4D RequestStartPledgewar";
-    private static Logger _log = Logger.getLogger(RequestStartPledgeWar.class.getName());
+    //private static Logger _log = Logger.getLogger(RequestStartPledgeWar.class.getName());
 
     private String _pledgeName;
     private L2Clan _clan;
@@ -106,10 +104,9 @@ public final class RequestStartPledgeWar extends L2GameClientPacket
             sm = null;
             return;
         }
-        
 
-        _log.warning("RequestStartPledgeWar, leader: " + clan.getLeaderName() + " clan: "
-            + _clan.getName());
+        //_log.warning("RequestStartPledgeWar, leader: " + clan.getLeaderName() + " clan: "+ _clan.getName());
+
 
         //        L2PcInstance leader = L2World.getInstance().getPlayer(clan.getLeaderName());
 
@@ -142,6 +139,7 @@ public final class RequestStartPledgeWar extends L2GameClientPacket
         //        leader.setTransactionRequester(player);
         //        player.setTransactionRequester(leader);
         //        leader.sendPacket(new StartPledgeWar(_clan.getName(),player.getName()));
+
         ClanTable.getInstance().storeclanswars(player.getClanId(), clan.getClanId());
 
         for (L2PcInstance cha : L2World.getInstance().getAllPlayers()) {

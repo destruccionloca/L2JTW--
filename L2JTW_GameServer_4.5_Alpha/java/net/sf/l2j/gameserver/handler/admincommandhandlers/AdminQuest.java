@@ -56,7 +56,7 @@ public class AdminQuest implements IAdminCommandHandler
         	String[] parts = command.split(" ");
         	if (parts.length < 2)
         	{
-        		activeChar.sendMessage("Syntax: //quest_reload <questFolder> or //quest_reload <id>");
+        		activeChar.sendMessage("用法: //quest_reload <資料夾> 或者 //quest_reload <ID>");
         	}
         	else
         	{
@@ -66,22 +66,22 @@ public class AdminQuest implements IAdminCommandHandler
         			int questId = Integer.parseInt(parts[1]);
         			if (QuestManager.getInstance().reload(questId))
             		{
-            			activeChar.sendMessage("Quest Reloaded Successfully.");
+            			activeChar.sendMessage("任務資料成功重新讀取.");
             		}
             		else
             		{
-            			activeChar.sendMessage("Quest Reloaded Failed");
+            			activeChar.sendMessage("任務資料讀取失敗.");
             		}
         		}
         		catch (NumberFormatException e)
         		{
         			if (QuestManager.getInstance().reload(parts[1]))
             		{
-            			activeChar.sendMessage("Quest Reloaded Successfully.");
+            			activeChar.sendMessage("任務資料除新讀取成功.");
             		}
             		else
             		{
-            			activeChar.sendMessage("Quest Reloaded Failed");
+            			activeChar.sendMessage("任務資料重新讀取失敗");
             		}
         		}
         	}     

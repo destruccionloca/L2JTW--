@@ -171,8 +171,8 @@ public class CharStat
 		int criticalHit = (int) calcStat(Stats.CRITICAL_RATE, _activeChar.getTemplate().baseCritRate, target, skill);
 		
 		// Set a cap of Critical Hit at 500
-		if(criticalHit > 500)
-			criticalHit = 500;
+		//if(criticalHit > 500)
+			//criticalHit = 500;
 		
 		return criticalHit;
 	}

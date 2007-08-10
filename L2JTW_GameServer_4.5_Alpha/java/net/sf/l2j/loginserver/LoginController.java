@@ -29,7 +29,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Random;
 import java.util.logging.Logger;
 
 import javax.crypto.Cipher;
@@ -45,6 +44,7 @@ import net.sf.l2j.loginserver.GameServerTable.GameServerInfo;
 import net.sf.l2j.loginserver.crypt.ScrambledKeyPair;
 import net.sf.l2j.loginserver.gameserverpackets.ServerStatus;
 import net.sf.l2j.loginserver.serverpackets.LoginFail.LoginFailReason;
+import net.sf.l2j.util.Rnd;
 
 /**
  * This class ...
@@ -71,8 +71,6 @@ public class LoginController
 	private Map<InetAddress, FailedLoginAttempt> _hackProtection;
 
 	protected ScrambledKeyPair[] _keyPairs;
-
-	private Random _rnd = new Random();
 
 	protected byte[][] _blowfishKeys;
 	private static final int BLOWFISH_KEYS = 20;
@@ -142,7 +140,7 @@ public class LoginController
 		{
 			for (int j = 0; j < _blowfishKeys[i].length; j++)
 			{
-				_blowfishKeys[i][j] = (byte) (_rnd.nextInt(255)+1);
+				_blowfishKeys[i][j] = (byte) (Rnd.nextInt(255)+1);
 			}
 		}
 		_log.info("Stored "+_blowfishKeys.length+" keys for Blowfish communication");
@@ -176,7 +174,7 @@ public class LoginController
 	{
 		SessionKey key;
 
-		key = new SessionKey(_rnd.nextInt(), _rnd.nextInt(), _rnd.nextInt(), _rnd.nextInt());
+		key = new SessionKey(Rnd.nextInt(), Rnd.nextInt(), Rnd.nextInt(), Rnd.nextInt());
 		_loginServerClients.put(account, client);
 		return key;
 	}
@@ -425,7 +423,7 @@ public class LoginController
 		return false;
 	}
 
-	public void setAccountAccessLevel(String user, int banLevel)
+	public void setAccountAccessLevel(String account, int banLevel)
 	{
 		java.sql.Connection con = null;
 		PreparedStatement statement = null;
@@ -433,10 +431,10 @@ public class LoginController
 		{
 			con = L2DatabaseFactory.getInstance().getConnection();
 
-			String stmt = "UPDATE accounts, characters SET accounts.access_level = ? WHERE characters.account_name = accounts.login AND characters.char_name=?";
+			String stmt = "UPDATE accounts SET access_level=? WHERE login=?";
 			statement = con.prepareStatement(stmt);
 			statement.setInt(1, banLevel);
-			statement.setString(2, user);
+			statement.setString(2, account);
 			statement.executeUpdate();
 			statement.close();
 		}
@@ -448,14 +446,8 @@ public class LoginController
 		{
 			try
 			{
-				con.close();
-			}
-			catch (Exception e)
-			{
-			}
-			try
-			{
 				statement.close();
+				con.close();
 			}
 			catch (Exception e)
 			{
@@ -516,7 +508,7 @@ public class LoginController
 	 */
 	public ScrambledKeyPair getScrambledRSAKeyPair()
 	{
-		return _keyPairs[_rnd.nextInt(10)];
+		return _keyPairs[Rnd.nextInt(10)];
 	}
 
 	/**
@@ -659,8 +651,8 @@ public class LoginController
 
 			if (failedCount >= Config.LOGIN_TRY_BEFORE_BAN)
 			{
-				// TODO Configurable ban duration (10 mins for now)
-				this.addBanForAddress(address, 10*60*1000);
+				_log.info("Banning '"+address.getHostAddress()+"' for "+Config.LOGIN_BLOCK_AFTER_BAN+" seconds due to "+failedCount+" invalid user/pass attempts");
+				this.addBanForAddress(address, Config.LOGIN_BLOCK_AFTER_BAN*1000);
 			}
 		}
 		else

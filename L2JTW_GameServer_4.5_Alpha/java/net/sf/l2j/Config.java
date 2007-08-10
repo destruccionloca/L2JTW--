@@ -58,8 +58,10 @@ public final class Config
     public static int PORT_LOGIN;
     /** Login Server bind ip */
     public static String LOGIN_BIND_ADDRESS;
-    /** Number of trys of login before ban */
+    /** Number of login tries before IP ban gets activated, default 10*/
     public static int LOGIN_TRY_BEFORE_BAN;
+    /** Number of seconds the IP ban will last, default 10 minutes */
+    public static int LOGIN_BLOCK_AFTER_BAN;
     /** Hostname of the Game Server */
     public static String GAMESERVER_HOSTNAME;
 
@@ -1133,9 +1135,6 @@ public final class Config
                 EXTERNAL_HOSTNAME       = serverSettings.getProperty("ExternalHostname", "*");
                 INTERNAL_HOSTNAME       = serverSettings.getProperty("InternalHostname", "*");
 
-                PORT_LOGIN              = Integer.parseInt(serverSettings.getProperty("LoginserverPort", "2106"));
-                LOGIN_TRY_BEFORE_BAN    = Integer.parseInt(serverSettings.getProperty("LoginTryBeforeBan", "10"));
-
                 GAME_SERVER_LOGIN_PORT  = Integer.parseInt(serverSettings.getProperty("LoginPort","9014"));
                 GAME_SERVER_LOGIN_HOST  = serverSettings.getProperty("LoginHost","127.0.0.1");
 
@@ -2038,6 +2037,8 @@ public final class Config
 
                 LOGIN_TRY_BEFORE_BAN    = Integer.parseInt(serverSettings.getProperty("LoginTryBeforeBan", "10"));
 
+                LOGIN_BLOCK_AFTER_BAN   = Integer.parseInt(serverSettings.getProperty("LoginBlockAfterBan", "600"));
+
                 GM_MIN          = Integer.parseInt(serverSettings.getProperty("GMMinLevel", "100"));
 
                 DATAPACK_ROOT    = new File(serverSettings.getProperty("DatapackRoot", ".")).getCanonicalFile(); //FIXME: in login?
@@ -2304,7 +2305,11 @@ public final class Config
         else if (pName.equalsIgnoreCase("WeddingAllowSameSex")) L2JMOD_WEDDING_SAMESEX = Boolean.parseBoolean(pValue);
         else if (pName.equalsIgnoreCase("WeddingFormalWear")) L2JMOD_WEDDING_FORMALWEAR = Boolean.parseBoolean(pValue);
         else if (pName.equalsIgnoreCase("WeddingDivorceCosts")) L2JMOD_WEDDING_DIVORCE_COSTS = Integer.parseInt(pValue);
-
+        else if (pName.equalsIgnoreCase("TvTEventEnabled")) TVT_EVENT_ENABLED = Boolean.parseBoolean(pValue);
+        else if (pName.equalsIgnoreCase("TvTEventInterval")) TVT_EVENT_INTERVAL = Integer.parseInt(pValue);
+        else if (pName.equalsIgnoreCase("TvTEventParticipationTime")) TVT_EVENT_PARTICIPATION_TIME = Integer.parseInt(pValue);
+        else if (pName.equalsIgnoreCase("TvTEventRunningTime")) TVT_EVENT_RUNNING_TIME = Integer.parseInt(pValue);
+        else if (pName.equalsIgnoreCase("TvTEventParticipationNpcId")) TVT_EVENT_PARTICIPATION_NPC_ID = Integer.parseInt(pValue);
 
         // PvP settings
         else if (pName.equalsIgnoreCase("MinKarma")) KARMA_MIN_KARMA = Integer.parseInt(pValue);
