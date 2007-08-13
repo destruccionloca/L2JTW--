@@ -25,10 +25,12 @@ import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.SevenSigns;
 import net.sf.l2j.gameserver.cache.HtmCache;
 import net.sf.l2j.gameserver.datatables.ClanTable;
+import net.sf.l2j.gameserver.idfactory.IdFactory;
 import net.sf.l2j.gameserver.model.L2Clan;
 import net.sf.l2j.gameserver.model.L2ItemInstance;
 import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.InventoryUpdate;
+import net.sf.l2j.gameserver.serverpackets.ItemList;
 import net.sf.l2j.gameserver.serverpackets.NpcHtmlMessage;
 import net.sf.l2j.gameserver.serverpackets.StatusUpdate;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
@@ -118,21 +120,30 @@ public class L2SignsPriestInstance extends L2FolkInstance
                         player.sendPacket(new SystemMessage(SystemMessageId.YOU_NOT_ENOUGH_ADENA));
                         break;
                     }
-                    L2ItemInstance recordSevenSigns = player.getInventory().addItem(
+                   /* L2ItemInstance recordSevenSigns = player.getInventory().addItem(
                                                                                     "SevenSigns",
                                                                                     SevenSigns.RECORD_SEVEN_SIGNS_ID,
                                                                                     1, player, this);
-
+				   */
+                    
+                    L2ItemInstance item = new L2ItemInstance(IdFactory.getInstance().getNextId(), SevenSigns.RECORD_SEVEN_SIGNS_ID);
+                    if (item == null) return;
+                    item.setCount(1);
+                    player.getInventory().addItem("SevenSigns", item, player, player);
+                    
+                    ItemList il = new ItemList(player, false);
+                    player.sendPacket(il);
+                    /*
                     // Send inventory update packet
                     iu = new InventoryUpdate();
                     iu.addNewItem(recordSevenSigns);
                     iu.addItem(adenaItem);
                     sendPacket(iu);
-
+                    */
                     // Update current load as well
-                    su = new StatusUpdate(player.getObjectId());
-                    su.addAttribute(StatusUpdate.CUR_LOAD, player.getCurrentLoad());
-                    sendPacket(su);
+                    //su = new StatusUpdate(player.getObjectId());
+                    //su.addAttribute(StatusUpdate.CUR_LOAD, player.getCurrentLoad());
+                    //sendPacket(su);
 
                     sm = new SystemMessage(SystemMessageId.EARNED_ITEM);
                     sm.addItemName(SevenSigns.RECORD_SEVEN_SIGNS_ID);

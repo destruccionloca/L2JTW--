@@ -1980,7 +1980,6 @@ public final class L2PcInstance extends L2PlayableInstance
 						ss.getItem().getCrystalType() == unequipped.getItem().getCrystalType())
 				{
                     sendPacket(new ExAutoSoulShot(_itemId, 0));
-					
 					SystemMessage sm = new SystemMessage(SystemMessageId.AUTO_USE_OF_S1_CANCELLED);
                     sm.addString(ss.getItemName());
                     sendPacket(sm);
@@ -2872,7 +2871,6 @@ public final class L2PcInstance extends L2PlayableInstance
 		{
 			if (sendMessage)
                 sendPacket(new SystemMessage(SystemMessageId.NOT_ENOUGH_ITEMS));
-
 
 			return false;
 		}

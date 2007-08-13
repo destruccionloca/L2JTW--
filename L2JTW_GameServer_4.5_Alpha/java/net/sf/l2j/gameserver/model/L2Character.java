@@ -18,6 +18,8 @@
  */
 package net.sf.l2j.gameserver.model;
 
+import static net.sf.l2j.gameserver.ai.CtrlIntention.AI_INTENTION_ATTACK;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -38,7 +40,6 @@ import net.sf.l2j.gameserver.Olympiad;
 import net.sf.l2j.gameserver.ThreadPoolManager;
 import net.sf.l2j.gameserver.ai.CtrlEvent;
 import net.sf.l2j.gameserver.ai.CtrlIntention;
-import static net.sf.l2j.gameserver.ai.CtrlIntention.AI_INTENTION_ATTACK;
 import net.sf.l2j.gameserver.ai.L2AttackableAI;
 import net.sf.l2j.gameserver.ai.L2CharacterAI;
 import net.sf.l2j.gameserver.datatables.MapRegionTable;
@@ -63,12 +64,12 @@ import net.sf.l2j.gameserver.model.actor.instance.L2SiegeGuardInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance.SkillDat;
 import net.sf.l2j.gameserver.model.actor.instance.L2PetInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PlayableInstance;
+import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance.SkillDat;
 import net.sf.l2j.gameserver.model.actor.knownlist.CharKnownList;
 import net.sf.l2j.gameserver.model.actor.knownlist.ObjectKnownList.KnownListAsynchronousUpdateTask;
 import net.sf.l2j.gameserver.model.actor.stat.CharStat;
 import net.sf.l2j.gameserver.model.actor.status.CharStatus;
 import net.sf.l2j.gameserver.model.entity.Duel;
-import net.sf.l2j.gameserver.model.entity.TvTEvent;
 import net.sf.l2j.gameserver.model.entity.Zone;
 import net.sf.l2j.gameserver.model.entity.ZoneType;
 import net.sf.l2j.gameserver.model.quest.Quest;
@@ -173,10 +174,12 @@ public abstract class L2Character extends L2Object
 	private double _hpUpdateInterval = .0;
 
 	private boolean _champion = false;
+	/*
     private int _LastAttackChange = 0;
     private int _RaidPower = 0;
     private int _RaidAI = 0;
     private int _RPMin = 0;
+    */
     private boolean _isFirstAtk = false;
 	public static boolean _isNPC;
 	
