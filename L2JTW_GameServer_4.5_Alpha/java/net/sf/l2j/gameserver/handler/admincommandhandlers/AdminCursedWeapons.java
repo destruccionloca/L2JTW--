@@ -21,7 +21,6 @@ package net.sf.l2j.gameserver.handler.admincommandhandlers;
 import java.util.StringTokenizer;
 
 import javolution.text.TextBuilder;
-
 import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.handler.IAdminCommandHandler;
 import net.sf.l2j.gameserver.instancemanager.CursedWeaponsManager;
@@ -105,10 +104,11 @@ public class AdminCursedWeapons implements IAdminCommandHandler {
 					if (cw.isActivated())
 					{
 						L2PcInstance pl = cw.getPlayer();
-						replyMSG.append("<tr><td>持有者:</td><td>"+ pl==null ? "null" : pl.getName()+"</td></tr>");
+
+						replyMSG.append("<tr><td>持有者:</td><td>"+ (pl==null?"null" : pl.getName())+"</td></tr>");
 						replyMSG.append("<tr><td>性向:</td><td>"+String.valueOf(cw.getPlayerKarma())+"</td></tr>");
 						replyMSG.append("<tr><td>殺人數量:</td><td>"+String.valueOf(cw.getPlayerPkKills())+"/"+String.valueOf(cw.getNbKills())+"</td></tr>");
-						replyMSG.append("<tr><td>剩下時間:</td><td>"+String.valueOf(cw.getTimeLeft()/60000)+" min.</td></tr>");
+						replyMSG.append("<tr><td>剩下時間:</td><td>"+String.valueOf(cw.getTimeLeft()/60000)+" 分.</td></tr>");
 						replyMSG.append("<tr><td><button value=\"移除\" action=\"bypass -h admin_cw_remove "+String.valueOf(itemId)+"\" width=73 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
 						replyMSG.append("<td><button value=\"繼續\" action=\"bypass -h admin_cw_goto "+String.valueOf(itemId)+"\" width=73 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
 					}

@@ -28,6 +28,7 @@ import net.sf.l2j.gameserver.instancemanager.SiegeManager;
 import net.sf.l2j.gameserver.model.Inventory;
 import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.L2ItemInstance;
+import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2SiegeClan;
 import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.model.L2Summon;
@@ -1376,6 +1377,38 @@ public final class Formulas
 		return damage;
 	}
 
+	
+	//--------------------------------------------------------------------
+	// Calculate the Blow skill before skill cast, so the animation should 
+	// be fixed by this
+	
+	public final boolean calcBlowFirst(L2Character activeChar,L2Character target)
+	{
+		int _successChance;
+		
+		if(activeChar.isAlikeDead())
+			return false;
+		
+       
+			
+			if(target.isAlikeDead())
+				return false;
+			if(activeChar.isBehindTarget())
+				_successChance = 70;
+			else if(activeChar.isFrontTarget())
+				_successChance = 30;
+			else
+				_successChance = 50;
+			
+			return Formulas.getInstance().calcBlow(activeChar, target, _successChance);
+        
+
+	}
+	
+	
+	
+	//--------------------------------------------------------------------
+	
 	/** Returns true in case of critical hit */
 	public final boolean calcCrit(double rate)
 	{

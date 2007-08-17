@@ -365,7 +365,7 @@ public class AdminEditChar implements IAdminCommandHandler
 			}
 			catch (StringIndexOutOfBoundsException e)
 			{   //Case of empty color
-				activeChar.sendMessage("You need to specify the new color.");
+				activeChar.sendMessage("請指定新的顏色.");
 			}
 		}
 		else if (command.startsWith("admin_fullfood"))

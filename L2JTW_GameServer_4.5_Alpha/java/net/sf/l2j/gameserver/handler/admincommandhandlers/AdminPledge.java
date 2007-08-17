@@ -77,7 +77,7 @@ public class AdminPledge implements IAdminCommandHandler
 			}
 			catch (NoSuchElementException nse)
 			{
-				activeChar.sendMessage("使用方法: //pledge <create|info|dismiss|setlevel|rep> [name|level|points]");	
+
 			}
 			if (action.equals("create"))
 			{
@@ -126,18 +126,24 @@ public class AdminPledge implements IAdminCommandHandler
 			}
 			else if (action.startsWith("rep"))
 			{
-				int points = Integer.parseInt(parameter);
-				L2Clan clan = player.getClan();
-				if (clan.getLevel() < 5)
+				try
 				{
-					activeChar.sendMessage("只有等級5以上可以取得.");
-					showMainPage(activeChar);
-					return false;
+					int points = Integer.parseInt(parameter);
+					L2Clan clan = player.getClan();
+					if (clan.getLevel() < 5)
+					{
+						activeChar.sendMessage("只有等級5以上可以取得.");
+						showMainPage(activeChar);
+						return false;
+					}
+					clan.setReputationScore(clan.getReputationScore()+points, true);
+					activeChar.sendMessage("You "+(points>0?"add ":"remove ")+Math.abs(points)+" points "+(points>0?"to ":"from ")+clan.getName()+"'s reputation. Their current score is "+clan.getReputationScore());
 				}
 
-				clan.setReputationScore(clan.getReputationScore()+points, true);
-				activeChar.sendMessage(""+(points>0?"增加 ":"移除 ")+Math.abs(points)+" 分數至 "+clan.getName()+"");
-
+				catch (Exception e)
+				{
+					activeChar.sendMessage("用法: //pledge <rep> <number>");
+				}
 			}
 		}
 		showMainPage(activeChar);

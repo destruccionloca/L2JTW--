@@ -30,6 +30,7 @@ import net.sf.l2j.gameserver.datatables.SkillTable;
 import net.sf.l2j.gameserver.datatables.TeleportLocationTable;
 import net.sf.l2j.gameserver.handler.IAdminCommandHandler;
 import net.sf.l2j.gameserver.instancemanager.Manager;
+import net.sf.l2j.gameserver.model.GMAudit;
 import net.sf.l2j.gameserver.model.L2Multisell;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.network.SystemMessageId;
@@ -86,8 +87,11 @@ public class AdminAdmin implements IAdminCommandHandler {
         
 
 		if (!Config.ALT_PRIVILEGES_ADMIN)
-			if (!(checkLevel(activeChar.getAccessLevel()) && activeChar.isGM())) return false;
-
+			if (!(checkLevel(activeChar.getAccessLevel()) && activeChar.isGM()))
+				return false;
+		
+		GMAudit.auditGMAction(activeChar.getName(), command, (activeChar.getTarget() != null?activeChar.getTarget().getName():"no-target"), "");
+		
 		if (command.startsWith("admin_admin"))
 		{
 			showPage(activeChar,command);
@@ -251,13 +255,15 @@ public class AdminAdmin implements IAdminCommandHandler {
 				String pName = parameter[0].trim();
 				String pValue = parameter[1].trim();
 				if (Config.setParameterValue(pName, pValue))
-					activeChar.sendMessage("設定資料成功");
+					activeChar.sendMessage("數值 "+pName+" 成功設定為 "+pValue);
 				else 
 					activeChar.sendMessage("錯誤設定值");
 			}
 			catch(Exception e)
 			{
-				activeChar.sendMessage("使用方法:  //set parameter=數值");
+
+				if (cmd.length==2)
+					activeChar.sendMessage("使用方法:  //set parameter=數值");
 			}
 			finally
 			{
@@ -326,6 +332,12 @@ public class AdminAdmin implements IAdminCommandHandler {
 		default:
 			showMainPage(activeChar);
 			
+/*
+			if (Config.GM_ADMIN_MENU_STYLE.equals("modern"))
+				filename="main";
+			else
+				filename="classic";
+*/
 		break;
 		}
 		if (filename!=null)
@@ -345,13 +357,13 @@ public class AdminAdmin implements IAdminCommandHandler {
 
 	        StringBuffer replyMSG = new StringBuffer("<html><title>L2JTW 伺服器控制介面</title><body>");
 	        replyMSG.append("<br><table width=260>");
-	       	replyMSG.append("<tr>");
+	       	replyMSG.append("<tr><center>");
 	        replyMSG.append("<td><button value=\"設定\" action=\"bypass -h admin_config_option\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
 	        replyMSG.append("<td><button value=\"遊戲\" action=\"bypass -h admin_admin2\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
 	        replyMSG.append("<td><button value=\"效果\" action=\"bypass -h admin_admin3\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
 	        replyMSG.append("<td><button value=\"伺服器\" action=\"bypass -h admin_admin4\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
 	        replyMSG.append("<td><button value=\"外掛\" action=\"bypass -h admin_admin5\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
-	        replyMSG.append("</tr>");
+	        replyMSG.append("</tr></center>");
 	        replyMSG.append("</table>");
             //replyMSG.append("<center><table width=270><tr><td width=60><button value=\"操作\" action=\"bypass -h admin_admin2\" width=60 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td><td width=150><center><font color=\"LEVEL\">伺服器管理台</font></center></td><td width=60><button value=\"設置\" action=\"bypass -h admin_config_option\" width=60 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr></table></center><br>");
             replyMSG.append("<center><table width=200><tr><td>");
@@ -381,7 +393,6 @@ public class AdminAdmin implements IAdminCommandHandler {
 	        //replyMSG.append("<button value=\"檢視訴求\" action=\"bypass -h admin_view_petitions\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
 	        //replyMSG.append("<button value=\"第二頁\" action=\"bypass -h admin_admin2\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
 	        replyMSG.append("</td></tr></table></center><br>");
-
 	        replyMSG.append("<center>玩家:</center>");
 	        replyMSG.append("<center><edit var=\"menu_command\" width=100 height=15></center><br>");
 	        replyMSG.append("<center><table><tr><td>");
@@ -487,6 +498,10 @@ public class AdminAdmin implements IAdminCommandHandler {
 	        replyMSG.append("<button value=\"讀取HTML\" action=\"bypass -h admin_cache_htm_reload\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
 	        replyMSG.append("<button value=\"重制盟徽\" action=\"bypass -h admin_cache_crest_rebuild\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
 	        replyMSG.append("<button value=\"修正盟徽\" action=\"bypass -h admin_cache_crest_fix\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+	        replyMSG.append("<button value=\"讀取Skill\" action=\"bypass -h admin_reload skill\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+	        replyMSG.append("<button value=\"讀取Weapon\" action=\"bypass -h admin_reload weapon\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+	        replyMSG.append("<button value=\"讀取Armor\" action=\"bypass -h admin_reload armor\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+	        replyMSG.append("<button value=\"讀取Etc Item\" action=\"bypass -h admin_reload etcitem\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
 	        replyMSG.append("</center></td><td>");
 	        replyMSG.append("</td></tr></table></center><br>");
 	        replyMSG.append("<br>");
@@ -497,7 +512,7 @@ public class AdminAdmin implements IAdminCommandHandler {
 	        replyMSG.append("<br>");
 	        replyMSG.append("<br>");
 	        replyMSG.append("<br>");
-	        replyMSG.append("<tr><td>伺服器版本: L2JTW Server 4.50</td></tr>");
+	        replyMSG.append("<tr><td>伺服器版本: L2JTW Server 4.5</td></tr>");
 	        replyMSG.append("</body></html>");
 	        
 	        adminReply.setHtml(replyMSG.toString());

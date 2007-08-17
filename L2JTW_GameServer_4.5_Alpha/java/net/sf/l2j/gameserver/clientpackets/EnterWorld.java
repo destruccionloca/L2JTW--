@@ -39,6 +39,7 @@ import net.sf.l2j.gameserver.datatables.MapRegionTable;
 import net.sf.l2j.gameserver.handler.AdminCommandHandler;
 import net.sf.l2j.gameserver.instancemanager.PetitionManager;
 import net.sf.l2j.gameserver.instancemanager.CoupleManager;
+import net.sf.l2j.gameserver.instancemanager.SiegeManager;
 import net.sf.l2j.gameserver.model.L2Clan;
 import net.sf.l2j.gameserver.model.L2Effect;
 import net.sf.l2j.gameserver.model.L2ItemInstance;
@@ -47,6 +48,7 @@ import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.entity.Hero;
 import net.sf.l2j.gameserver.model.entity.L2Event;
 import net.sf.l2j.gameserver.model.entity.CTF;
+import net.sf.l2j.gameserver.model.entity.Siege;
 import net.sf.l2j.gameserver.model.entity.TvTEvent;
 import net.sf.l2j.gameserver.model.entity.Couple;
 import net.sf.l2j.gameserver.model.quest.Quest;
@@ -293,7 +295,18 @@ public class EnterWorld extends L2GameClientPacket
 		
 
 		if (activeChar.getClan() != null)
+		{
 			activeChar.sendPacket(new PledgeSkillList(activeChar.getClan()));
+			
+			for (Siege siege : SiegeManager.getInstance().getSieges())
+		    {
+		    	if (!siege.getIsInProgress()) continue;
+				if (siege.checkIsAttacker(activeChar.getClan()))
+		    		activeChar.setSiegeStateFlag(0x180);
+		    	if (siege.checkIsDefender(activeChar.getClan()))
+		    		activeChar.setSiegeStateFlag(0x80);
+		    }
+		}
 		
 		if (check != 1)  activeChar.logout();
 		

@@ -65,7 +65,7 @@ public class Blow implements ISkillHandler
 				_successChance = SIDE;
 			//If skill requires Crit or skill requires behind, 
 			//calculate chance based on DEX, Position and on self BUFF
-			if(((skill.getCondition() & L2Skill.COND_BEHIND) != 0) && _successChance == BEHIND || ((skill.getCondition() & L2Skill.COND_CRIT) != 0) && Formulas.getInstance().calcBlow(activeChar, target, _successChance))
+			if(((skill.getCondition() & L2Skill.COND_BEHIND) != 0) && _successChance == BEHIND || ((skill.getCondition() & L2Skill.COND_CRIT) != 0) && L2Skill.CRIT_ATTACK)
 			{
 				if(target.reflectSkill(skill))
 					target = activeChar;
@@ -77,6 +77,7 @@ public class Blow implements ISkillHandler
 	            boolean crit = false;
 				if(Formulas.getInstance().calcCrit(skill.getBaseCritRate()*10*Formulas.getInstance().getSTRBonus(activeChar)))
 					crit = true;
+
 				double damage = (int)Formulas.getInstance().calcBlowDamage(activeChar, target, skill, shld, soul);
 				if (crit)
 				{
@@ -164,12 +165,18 @@ public class Blow implements ISkillHandler
 	            	activeChar.sendPacket(new SystemMessage(SystemMessageId.LETHAL_STRIKE));   
 				}
 			}
+			if(L2Skill.CRIT_ATTACK)
+			{
             L2Effect effect = activeChar.getEffect(skill.getId());    
             //Self Effect
             if (effect != null && effect.isSelfEffect())                   
             	effect.exit();            
             skill.getEffectsSelf(activeChar);
-			activeChar.getAI().setIntention(CtrlIntention.AI_INTENTION_ATTACK, target, null);
+			}
+			//activeChar.getAI().setIntention(CtrlIntention.AI_INTENTION_ATTACK, target, null);
+            
+            
+            L2Skill.CRIT_ATTACK = false;
         }
 	}
 	

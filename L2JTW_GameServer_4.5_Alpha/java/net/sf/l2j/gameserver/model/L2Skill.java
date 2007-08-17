@@ -51,6 +51,7 @@ import net.sf.l2j.gameserver.model.entity.Castle;
 import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.skills.Env;
+import net.sf.l2j.gameserver.skills.Formulas;
 
 import net.sf.l2j.gameserver.skills.Stats;
 import net.sf.l2j.gameserver.taskmanager.DecayTaskManager;
@@ -1331,7 +1332,7 @@ public abstract class L2Skill
 
 
 
-        //L2Skill.CRIT_ATTACK = false;
+        //CRIT_ATTACK = false;
         
         if (activeChar.isSkillDisabled(this.getId()))
         {
@@ -1374,6 +1375,9 @@ public abstract class L2Skill
             }
         }
         
+        
+
+        
 		switch(targetType)
 		{
 			// The skill can only be used on the L2Character targeted, or on the caster itself
@@ -1405,7 +1409,16 @@ public abstract class L2Skill
                         activeChar.sendPacket(new SystemMessage(SystemMessage.TARGET_IS_INCORRECT));
                         return null;
                     }
+                    
+                    //------------------------------------------------------
+                    //Blow Skill
+                    if (skillType == SkillType.BLOW)
+                    {
+                    	CRIT_ATTACK = Formulas.getInstance().calcBlowFirst(activeChar, target);
+                    	
+                    }
                     //CRIT_ATTACK = 0;
+                    /*
                     if (this.getCondition() == 16 || this.getCondition() == 17)
                     {
                         int critBonus = 0;
@@ -1433,6 +1446,7 @@ public abstract class L2Skill
                          }
                          
                     }
+                    */
                     // If a target is found, return it in a table else send a system message TARGET_IS_INCORRECT
    				
                     return new L2Character[]{target};
