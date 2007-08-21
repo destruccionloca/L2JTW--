@@ -76,7 +76,7 @@ class EffectDamOverTime extends L2Effect
 */
 
         
-        getEffected().reduceCurrentHp(damage, getEffector(),awake);
+        getEffected().reduceCurrentHp(damage, getEffector(),awake,true);
 
 
 		return true;

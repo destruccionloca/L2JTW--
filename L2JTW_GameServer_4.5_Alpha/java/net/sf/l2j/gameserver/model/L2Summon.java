@@ -55,7 +55,7 @@ public abstract class L2Summon extends L2PlayableInstance
     private byte _pvpFlag;
     private L2PcInstance _owner;
     private int _karma = 0;
-    private int _attackRange = 36; //Melee range
+    private int _attackRange = 40; //Melee range
     private boolean _follow = true;
     private boolean _previousFollowStatus = true;
     private int _maxLoad;

@@ -4480,7 +4480,23 @@ public abstract class L2Character extends L2Object
 
                 if (this instanceof L2Summon)
                 {
-                    int mobId = ((L2Summon)this).getTemplate().npcId;
+                	boolean serversidename = ((L2Summon)this).getTemplate().serverSideName;
+                    int mobId = ((L2Summon)this).getTemplate().idTemplate;
+                    
+                    if (serversidename)
+                        sm.addString(((L2Summon)this).getTemplate().name);
+                    else
+                    sm.addNpcName(mobId);
+                }
+                else if (this instanceof L2NpcInstance)
+                {
+                    int mobId = ((L2NpcInstance)this).getTemplate().idTemplate;
+                    boolean serversidename = ((L2NpcInstance)this).getTemplate().serverSideName;
+                    if (Config.DEBUG) 
+                        _log.fine("mob id:" + mobId);
+                    if (serversidename||((L2NpcInstance)this).getIsChar() >0)
+                        sm.addString(((L2NpcInstance)this).getTemplate().name);
+                    else
                     sm.addNpcName(mobId);
                 }
                 else
@@ -4538,7 +4554,31 @@ public abstract class L2Character extends L2Object
                 L2Summon activeSummon = (L2Summon)target;
 
                 SystemMessage sm = new SystemMessage(SystemMessageId.PET_RECEIVED_S2_DAMAGE_BY_S1);
-                sm.addString(getName());
+                if (this instanceof L2Summon)
+                {
+                	boolean serversidename = ((L2Summon)this).getTemplate().serverSideName;
+                    int mobId = ((L2Summon)this).getTemplate().idTemplate;
+                    
+                    if (serversidename)
+                        sm.addString(((L2Summon)this).getTemplate().name);
+                    else
+                    sm.addNpcName(mobId);
+                }
+                else if (this instanceof L2NpcInstance)
+                {
+                    int mobId = ((L2NpcInstance)this).getTemplate().idTemplate;
+                    boolean serversidename = ((L2NpcInstance)this).getTemplate().serverSideName;
+                    if (Config.DEBUG) 
+                        _log.fine("mob id:" + mobId);
+                    if (serversidename||((L2NpcInstance)this).getIsChar() >0)
+                        sm.addString(((L2NpcInstance)this).getTemplate().name);
+                    else
+                    sm.addNpcName(mobId);
+                }
+                else
+                {
+                    sm.addString(getName());
+                }
                 sm.addNumber(damage);
                 activeSummon.getOwner().sendPacket(sm);
             }

@@ -30,6 +30,7 @@ import net.sf.l2j.gameserver.model.L2ItemInstance;
 import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.model.L2Effect;
+import net.sf.l2j.gameserver.model.L2Summon;
 import net.sf.l2j.gameserver.model.L2Skill.SkillType;
 import net.sf.l2j.gameserver.model.actor.instance.L2DoorInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2MonsterInstance;
@@ -235,6 +236,29 @@ public class Pdam implements ISkillHandler
                     else
                     {
                         SystemMessage sm = new SystemMessage(SystemMessageId.S1_WAS_UNAFFECTED_BY_S2);
+    					if(target instanceof L2NpcInstance || target instanceof L2Summon)
+    					{
+    						if(target instanceof L2NpcInstance)
+    						{
+    						if (((L2NpcInstance)target).getTemplate().serverSideName)
+    						{
+    							sm.addString(target.getName());
+    						}
+    						else
+    							sm.addNpcName(((L2NpcInstance)target).getTemplate().idTemplate);
+    						}
+    						if(target instanceof L2Summon)
+    						{
+    						if (((L2Summon)target).getTemplate().serverSideName)
+    						{
+    							sm.addString(target.getName());
+    						}
+    						else
+    							sm.addNpcName(((L2Summon)target).getTemplate().idTemplate);
+    						}
+    							
+    					}
+    					else
                         sm.addString(target.getName());
                         sm.addSkillName(skill.getDisplayId());
                         activeChar.sendPacket(sm);
@@ -309,6 +333,28 @@ public class Pdam implements ISkillHandler
 	        				}
 	                		
 	                		SystemMessage smsg = new SystemMessage(SystemMessageId.S1_GAVE_YOU_S2_DMG);
+	    					if(activeChar instanceof L2NpcInstance || activeChar instanceof L2Summon)
+	    					{
+	    						if(activeChar instanceof L2NpcInstance)
+	    						{
+	    						if (((L2NpcInstance)activeChar).getTemplate().serverSideName)
+	    						{
+	    							smsg.addString(activeChar.getName());
+	    						}
+	    						else
+	    							smsg.addNpcName(((L2NpcInstance)activeChar).getTemplate().idTemplate);
+	    						}
+	    						if(target instanceof L2Summon)
+	    						{
+	    						if (((L2Summon)activeChar).getTemplate().serverSideName)
+	    						{
+	    							smsg.addString(activeChar.getName());
+	    						}
+	    						else
+	    							smsg.addNpcName(((L2Summon)activeChar).getTemplate().idTemplate);
+	    						}
+	    							
+	    					}
 	                		smsg.addString(activeChar.getName());
 	                		smsg.addNumber(damage);
 	                		player.sendPacket(smsg);

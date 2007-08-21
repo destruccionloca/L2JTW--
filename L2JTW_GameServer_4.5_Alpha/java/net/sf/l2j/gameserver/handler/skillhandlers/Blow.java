@@ -173,6 +173,8 @@ public class Blow implements ISkillHandler
             	effect.exit();            
             skill.getEffectsSelf(activeChar);
 			}
+			else
+				activeChar.sendPacket(new SystemMessage(SystemMessageId.ATTACK_FAILED));
 			//activeChar.getAI().setIntention(CtrlIntention.AI_INTENTION_ATTACK, target, null);
             
             

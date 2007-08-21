@@ -246,14 +246,14 @@ public final class L2PcInstance extends L2PlayableInstance
 	private static final int RELATION_HAS_KARMA     = 0x00004; // karma ???
 	private static final int RELATION_UNKNOWN_1     = 0x00008; // ???
 	private static final int RELATION_UNKNOWN_2     = 0x00010; // ???
-	private static final int RELATION_UNKNOWN_3     = 0x00020; // siege flags ???
-	private static final int RELATION_UNKNOWN_4     = 0x00040; // siege flags ???
-	private static final int RELATION_UNKNOWN_5     = 0x00080; // siege flags ???
-	private static final int RELATION_UNKNOWN_6     = 0x00100; // siege flags ???
-	private static final int RELATION_UNKNOWN_7     = 0x00200; // siege flags ???
-	private static final int RELATION_UNKNOWN_8     = 0x00400; // siege flags ???
-	private static final int RELATION_UNKNOWN_9     = 0x00800; // siege flags ???
-	private static final int RELATION_UNKNOWN_10    = 0x01000; // siege flags ???
+	private static final int RELATION_UNKNOWN_3     = 0x00020; // ???
+	private static final int RELATION_UNKNOWN_4     = 0x00040; // ???
+	private static final int RELATION_LEADER 	    = 0x00080; // leader
+	private static final int RELATION_UNKNOWN_6     = 0x00100; // ???
+	private static final int RELATION_UNKNOWN_7     = 0x00200; // true if in siege
+	private static final int RELATION_UNKNOWN_8     = 0x00400; // true when attacker
+	private static final int RELATION_UNKNOWN_9     = 0x00800; // blue siege icon, cannot have if red
+	private static final int RELATION_UNKNOWN_10    = 0x01000; // true when red icon, doesn't matter with blue
 	private static final int RELATION_UNKNOWN_11    = 0x02000; // ???
 	private static final int RELATION_UNKNOWN_12    = 0x04000; // ???
 	private static final int RELATION_MUTUAL_WAR    = 0x08000; // double fist
@@ -362,7 +362,7 @@ public final class L2PcInstance extends L2PlayableInstance
 	/** The PvP Flag state of the L2PcInstance (0=White, 1=Purple) */
 	private byte _pvpFlag;
 	
-	/** The Siege Flag state of the L2PcInstance (0x180 sword over name, 0x80 shield, 0xC0 crown, 0x1C0 flag) */
+	/** The Siege Flag state of the L2PcInstance */
 	private int _siegeStateFlag = 0;
 
 	private int _curWeightPenalty = 0;
@@ -811,7 +811,7 @@ public final class L2PcInstance extends L2PlayableInstance
 
 	public int getRelation(L2PcInstance target)
 	{
-		// TODO: Fix, this part of the packet isn't working at the moment, even PVP flag.
+		// TODO: Add siege icons
 		int result = 0;
 
 		if (getPvpFlag() != 0)
@@ -1444,7 +1444,7 @@ public final class L2PcInstance extends L2PlayableInstance
 	
 	/**
 	 * Set the Siege Flag of the L2PcInstance.<BR><BR>
-	 * 0x180 sword over name, 0x80 shield, 0xC0 crown, 0x1C0 flag, none other found
+	 * 0x180 sword over name, 0x80 shield (if also leader, 0xC0 crown, 0x1C0 flag)
 	 */
 	public void setSiegeStateFlag(int siegeStateFlag)
 	{
@@ -2004,7 +2004,7 @@ public final class L2PcInstance extends L2PlayableInstance
 				{
                     sendPacket(new ExAutoSoulShot(_itemId, 0));
 					SystemMessage sm = new SystemMessage(SystemMessageId.AUTO_USE_OF_S1_CANCELLED);
-                    sm.addString(ss.getItemName());
+					sm.addItemName(_itemId);
                     sendPacket(sm);
 				}
 			}
@@ -2311,7 +2311,7 @@ public final class L2PcInstance extends L2PlayableInstance
 			skills = SkillTreeTable.getInstance().getAvailableSkills(this, getClassId());
 		}
 
-		sendMessage("You have learned " + skillCounter + " new skills.");
+		sendMessage("習得 " + skillCounter + " 種技能.");
 	}
 
 	/** Set the Experience value of the L2PcInstance. */
@@ -4148,10 +4148,10 @@ public final class L2PcInstance extends L2PlayableInstance
                 if (answer == 1)
                 {
                     CoupleManager.getInstance().createCouple(ptarget, L2PcInstance.this);
-                    ptarget.sendMessage("Request to Engage has been >ACCEPTED<");
+                    ptarget.sendMessage("挑戰被 >接受<");
                 }
                 else
-                    ptarget.sendMessage("Request to Engage has been >DENIED<!");
+                    ptarget.sendMessage("挑戰被 >拒絕<!");
             }
         }
     }
@@ -4223,7 +4223,7 @@ public final class L2PcInstance extends L2PlayableInstance
 				{
 					if (CTF._teleport || CTF._started)
 					{
-						sendMessage("You will be revived and teleported to team flag in 20 seconds!");
+						sendMessage("20秒後將復活並且傳送至各隊伍陣旗!");
 						
 						if (_haveFlagCTF)
 						{
@@ -4232,7 +4232,7 @@ public final class L2PcInstance extends L2PlayableInstance
 							setTitle(_originalTitleCTF);
 							broadcastUserInfo();
 							_haveFlagCTF = false;
-							Announcements.getInstance().announceToAll(CTF._eventName + "(CTF): " + _teamNameHaveFlagCTF + "'s flag returned.");
+							Announcements.getInstance().announceToAll(CTF._eventName + "(CTF): " + _teamNameHaveFlagCTF + "隊的陣旗返回.");
 						}
 						
 						ThreadPoolManager.getInstance().scheduleGeneral(new Runnable()
@@ -8834,7 +8834,7 @@ public final class L2PcInstance extends L2PlayableInstance
         updateJailState();
 
         if (_isInvul)
-        	sendMessage("Entering world in Invulnerable mode.");
+        	sendMessage("無敵模式啟動.");
         if (getAppearance().getInvisible())
             sendMessage("隱形模式啟動");
         if (getMessageRefusal())

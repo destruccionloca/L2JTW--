@@ -369,8 +369,6 @@ public class CharStat
 		return (int) mrate;
 	}
 
-
-
 	/**
 	 * Return the MDef (base+modifier) of the L2Character against a skill in
 	 * function of abnormal effects in progress.<BR>

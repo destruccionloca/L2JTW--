@@ -211,7 +211,31 @@ public class Mdam implements ISkillHandler
                     else
                     {
                         SystemMessage sm = new SystemMessage(SystemMessageId.S1_WAS_UNAFFECTED_BY_S2);
-                        sm.addString(target.getName());
+    					if(target instanceof L2NpcInstance || target instanceof L2Summon)
+    					{
+    						if(target instanceof L2NpcInstance)
+    						{
+    						if (((L2NpcInstance)target).getTemplate().serverSideName)
+    						{
+    							sm.addString(target.getName());
+    						}
+    						else
+    							sm.addNpcName(((L2NpcInstance)target).getTemplate().idTemplate);
+    						}
+    						
+    						if(target instanceof L2Summon)
+    						{
+    						if (((L2Summon)target).getTemplate().serverSideName)
+    						{
+    							sm.addString(target.getName());
+    						}
+    						else
+    							sm.addNpcName(((L2Summon)target).getTemplate().idTemplate);
+    						}
+    							
+    					}
+    					else
+    					sm.addString(target.getName());
                         sm.addSkillName(skill.getId());
 
                         activeChar.sendPacket(sm);

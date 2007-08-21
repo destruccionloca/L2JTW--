@@ -39,12 +39,12 @@ public class ClanPenalty implements IUserCommandHandler
     {
         if (id != COMMAND_IDS[0]) return false;
         
-        String penaltyStr = "No current penalties in effect.";
+        String penaltyStr = "目前沒有任何逞罰.";
         
         TextBuilder htmlContent = new TextBuilder("<html><body>");
         htmlContent.append("<center><table width=\"270\" border=\"0\" bgcolor=\"111111\">");
-        htmlContent.append("<tr><td width=\"170\">Penalty</td>");
-        htmlContent.append("<td width=\"100\" align=\"center\">Expiration Date</td></tr>");
+        htmlContent.append("<tr><td width=\"170\">逞罰</td>");
+        htmlContent.append("<td width=\"100\" align=\"center\">期限</td></tr>");
         htmlContent.append("</table><table width=\"270\" border=\"0\">");
         htmlContent.append("<tr><td>" + penaltyStr + "</td></tr>");
         htmlContent.append("</table></center>");

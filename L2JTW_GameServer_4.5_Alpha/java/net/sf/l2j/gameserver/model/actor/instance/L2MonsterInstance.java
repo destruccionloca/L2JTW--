@@ -32,6 +32,8 @@ import net.sf.l2j.gameserver.serverpackets.StopMove;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
 import net.sf.l2j.gameserver.util.MinionList;
 import net.sf.l2j.util.Rnd;
+import net.sf.l2j.gameserver.model.L2Spawn;
+
 
 /**
  * This class manages all Monsters.
@@ -128,6 +130,14 @@ public class L2MonsterInstance extends L2Attackable
     		catch ( NullPointerException e )
     		{
     		}
+            if (getTemplate().npcId == 29025) { // Baium statue acts like a statue
+                startAbnormalEffect((short)0x0400);
+                setIsParalyzed(true); 
+                StopMove sm = new StopMove(this);
+                sendPacket(sm);
+                broadcastPacket(sm);
+                
+            }
 
 
 
@@ -213,6 +223,27 @@ public class L2MonsterInstance extends L2Attackable
         if (_minionMaintainTask != null)
             _minionMaintainTask.cancel(true); // doesn't do it?
         
+        if (getTemplate().npcId == 29025) {
+            try {
+                L2NpcTemplate BaiumSpawn = NpcTable.getInstance().getTemplate(29020);
+                L2Spawn Baium = new L2Spawn(BaiumSpawn);
+                
+                Baium.setAmount(1);
+                //Baium.setRespawnDelay(604800);
+                Baium.setRespawnDelay(1);
+                Baium.setLocx(getX());
+                Baium.setLocy(getY());
+                Baium.setLocz(getZ());
+                Baium.setHeading(getHeading());
+                Baium.doSpawn();
+
+            }
+            catch (Exception e) {
+                _log.warning("RaidBoss: Error while spawning Baium: " + e);
+            }
+            this.deleteMe();
+            return;
+        }
 
         if (this instanceof L2RaidBossInstance)
         	deleteSpawnedMinions();

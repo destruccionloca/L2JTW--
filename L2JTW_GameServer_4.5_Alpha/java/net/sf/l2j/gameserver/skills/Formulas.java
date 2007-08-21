@@ -49,6 +49,7 @@ import net.sf.l2j.gameserver.skills.conditions.ConditionPlayerState.CheckPlayerS
 import net.sf.l2j.gameserver.skills.funcs.Func;
 import net.sf.l2j.gameserver.templates.L2Armor;
 import net.sf.l2j.gameserver.templates.L2PcTemplate;
+import net.sf.l2j.gameserver.templates.L2NpcTemplate;
 import net.sf.l2j.gameserver.templates.L2Weapon;
 import net.sf.l2j.gameserver.templates.L2WeaponType;
 import net.sf.l2j.gameserver.util.Util;
@@ -1338,10 +1339,8 @@ public final class Formulas
 				}
 				else
 				{
-					SystemMessage sm = new SystemMessage(SystemMessageId.S1_WAS_UNAFFECTED_BY_S2);
-					sm.addString(target.getName());
-					sm.addSkillName(skill.getId());
-					attacker.sendPacket(sm);
+					//SystemMessage sm = new SystemMessage(SystemMessageId.S1_WAS_UNAFFECTED_BY_S2);
+					attacker.sendPacket(new SystemMessage(SystemMessageId.ATTACK_FAILED));
 
 					damage = 1;
 				}
@@ -1352,12 +1351,58 @@ public final class Formulas
 				if (skill.getSkillType() == SkillType.DRAIN)
 				{
 					SystemMessage sm = new SystemMessage(SystemMessageId.RESISTED_S1_DRAIN);
+					if(attacker instanceof L2NpcInstance || attacker instanceof L2Summon)
+					{
+						if(attacker instanceof L2NpcInstance)
+						{
+						if (((L2NpcInstance)attacker).getTemplate().serverSideName)
+						{
+							sm.addString(attacker.getName());
+						}
+						else
+							sm.addNpcName(((L2NpcInstance)attacker).getTemplate().idTemplate);
+						}
+						if(attacker instanceof L2Summon)
+						{
+						if (((L2Summon)attacker).getTemplate().serverSideName)
+						{
+							sm.addString(attacker.getName());
+						}
+						else
+							sm.addNpcName(((L2Summon)attacker).getTemplate().idTemplate);
+						}
+							
+					}
+					else
 					sm.addString(attacker.getName());
 					target.sendPacket(sm);
 				}
 				else
 				{
 					SystemMessage sm = new SystemMessage(SystemMessageId.RESISTED_S1_MAGIC);
+					if(attacker instanceof L2NpcInstance || attacker instanceof L2Summon)
+					{
+						if(attacker instanceof L2NpcInstance)
+						{
+						if (((L2NpcInstance)attacker).getTemplate().serverSideName)
+						{
+							sm.addString(attacker.getName());
+						}
+						else
+							sm.addNpcName(((L2NpcInstance)attacker).getTemplate().idTemplate);
+						}
+						if(attacker instanceof L2Summon)
+						{
+						if (((L2Summon)attacker).getTemplate().serverSideName)
+						{
+							sm.addString(attacker.getName());
+						}
+						else
+							sm.addNpcName(((L2Summon)attacker).getTemplate().idTemplate);
+						}
+							
+					}
+					else
 					sm.addString(attacker.getName());
 					target.sendPacket(sm);
 				}

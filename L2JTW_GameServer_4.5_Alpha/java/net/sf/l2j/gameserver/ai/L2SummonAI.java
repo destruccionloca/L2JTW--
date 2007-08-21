@@ -92,7 +92,7 @@ public class L2SummonAI extends L2CharacterAI
     {
         if (_actor.isAllSkillsDisabled()) return;
         if (checkTargetLost(getTarget())) return;
-        if (maybeMoveToPawn(getTarget(), 36)) return;
+        if (maybeMoveToPawn(getTarget(), 100)) return;
         setIntention(AI_INTENTION_IDLE);
         return;
     }

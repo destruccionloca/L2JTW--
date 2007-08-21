@@ -1616,6 +1616,9 @@ public abstract class L2Skill
 
                     if (!GeoData.getInstance().canSeeTarget(activeChar, target))
             			continue;
+                    
+                    if(obj==src)
+                    	continue;
 
                     if(!target.isAlikeDead() && (target != activeChar))
                     {

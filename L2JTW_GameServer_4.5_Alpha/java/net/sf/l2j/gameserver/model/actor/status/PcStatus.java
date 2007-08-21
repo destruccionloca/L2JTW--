@@ -169,15 +169,19 @@ public class PcStatus extends PlayableStatus
                 boolean serversidename = ((L2NpcInstance)attacker).getTemplate().serverSideName;
                 if (Config.DEBUG) 
                     _log.fine("mob id:" + mobId);
-                if (((L2NpcInstance)attacker).getIsChar() >0)
+                if (serversidename||((L2NpcInstance)attacker).getIsChar() >0)
                     smsg.addString(((L2NpcInstance)attacker).getTemplate().name);
                 else
                 smsg.addNpcName(mobId);
             }
             else if (attacker instanceof L2Summon)
             {
+            	boolean serversidename = ((L2Summon)attacker).getTemplate().serverSideName;
                 int mobId = ((L2Summon)attacker).getTemplate().idTemplate;
                 
+                if (serversidename)
+                    smsg.addString(((L2Summon)attacker).getTemplate().name);
+                else
                 smsg.addNpcName(mobId);
             }
             else

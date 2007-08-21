@@ -32,6 +32,7 @@ import net.sf.l2j.gameserver.ThreadPoolManager;
 import net.sf.l2j.gameserver.datatables.NpcTable;
 import net.sf.l2j.gameserver.instancemanager.ZoneManager;
 import net.sf.l2j.gameserver.model.L2Attackable;
+import net.sf.l2j.gameserver.model.L2Summon;
 import net.sf.l2j.gameserver.model.L2CharPosition;
 import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.L2Effect;
@@ -1925,12 +1926,27 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
    	 for (L2Object obj : _actor.getKnownList().getKnownCharactersInRadius(_actor.getPhysicalAttackRange()))
      {
 		 
-		 
-		 if(((L2Attackable)_actor).getHating((L2Character)obj)>0 && obj != _actor)
+		 if(obj instanceof L2Character)
+		 {
+		 //if(((L2Attackable)_actor).getHating((L2Character)obj)>0 && obj != _actor)
+		 //{
+			 
+             ((L2Attackable)_actor).addDamageHate(((L2Character)obj), 5000,5000);
+             //((L2Attackable)_actor).addBufferHate();
+		 //}
+		 }
+		 if(obj instanceof L2Attackable)
+		 {
+			 if(((L2Attackable)_actor).getEnemyClan() == ((L2Attackable)obj).getFactionId())
+			 {
+				 ((L2Attackable)_actor).addDamageHate(((L2Attackable)obj), 5000,5000);
+			 }
+		 }
+		 if(obj instanceof L2Summon)
 		 {
 			 
-             ((L2Attackable)_actor).addDamageHate(((L2Character)obj), 2000,2000);
-             //((L2Attackable)_actor).addBufferHate();
+				 ((L2Attackable)_actor).addDamageHate(((L2Summon)obj), 5000,5000);
+
 		 }
 		 
 		 

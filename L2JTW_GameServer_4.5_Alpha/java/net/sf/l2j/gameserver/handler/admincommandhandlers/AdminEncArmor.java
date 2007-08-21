@@ -355,7 +355,7 @@ public class AdminEncArmor implements IAdminCommandHandler {
         else {
             // inform our gm of their mistake
             SystemMessage smA = new SystemMessage(614);
-            smA.addString("You must set the enchant level to be between 0-65535.");     
+            smA.addString("½d³ò¬° 0-65535.");     
             activeChar.sendPacket(smA);         
         }
     }

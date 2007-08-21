@@ -78,7 +78,7 @@ public final class RequestAutoSoulShot extends L2GameClientPacket
 	
 	                        //start the auto soulshot use
 	                        SystemMessage sm = new SystemMessage(SystemMessageId.USE_OF_S1_WILL_BE_AUTO);
-	                        sm.addString(item.getItemName());
+	                        sm.addItemName(item.getItemId());
 	                        activeChar.sendPacket(sm);
 	                        sm = null;
 	                        
@@ -94,7 +94,7 @@ public final class RequestAutoSoulShot extends L2GameClientPacket
 	
 	                            //start the auto soulshot use
 	                            SystemMessage sm = new SystemMessage(SystemMessageId.USE_OF_S1_WILL_BE_AUTO);
-	                            sm.addString(item.getItemName());
+	                            sm.addItemName(item.getItemId());
 	                            activeChar.sendPacket(sm);
 	                            sm = null;
 	                            
@@ -117,7 +117,7 @@ public final class RequestAutoSoulShot extends L2GameClientPacket
 
                     //cancel the auto soulshot use
                     SystemMessage sm = new SystemMessage(SystemMessageId.AUTO_USE_OF_S1_CANCELLED);
-                    sm.addString(item.getItemName());
+                    sm.addItemName(item.getItemId());
                     activeChar.sendPacket(sm);
                     sm = null;
                 }

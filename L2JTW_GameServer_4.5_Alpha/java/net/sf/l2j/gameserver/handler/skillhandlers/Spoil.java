@@ -25,8 +25,10 @@ import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.L2ItemInstance;
 import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2Skill;
+import net.sf.l2j.gameserver.model.L2Summon;
 import net.sf.l2j.gameserver.model.L2Skill.SkillType;
 import net.sf.l2j.gameserver.model.actor.instance.L2MonsterInstance;
+import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
@@ -92,6 +94,20 @@ public class Spoil implements ISkillHandler
 				else 
 				{
 					SystemMessage sm = new SystemMessage(SystemMessageId.S1_WAS_UNAFFECTED_BY_S2);
+					if(target instanceof L2NpcInstance)
+					{
+						if(target instanceof L2NpcInstance)
+						{
+						if (((L2NpcInstance)target).getTemplate().serverSideName)
+						{
+							sm.addString(target.getName());
+						}
+						else
+							sm.addNpcName(((L2NpcInstance)target).getTemplate().idTemplate);
+						}
+			
+					}
+					else
 					sm.addString(target.getName());
 					sm.addSkillName(skill.getDisplayId());
 					activeChar.sendPacket(sm);

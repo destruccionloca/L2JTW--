@@ -33,6 +33,7 @@ import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.model.L2Summon;
 import net.sf.l2j.gameserver.model.L2Skill.SkillType;
+import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.base.Experience;
 import net.sf.l2j.gameserver.network.SystemMessageId;
@@ -182,6 +183,29 @@ public class Disablers implements ISkillHandler
                         if (activeChar instanceof L2PcInstance)
                         {
                             SystemMessage sm = new SystemMessage(SystemMessageId.S1_WAS_UNAFFECTED_BY_S2);
+        					if(target instanceof L2NpcInstance || target instanceof L2Summon)
+        					{
+        						if(target instanceof L2NpcInstance)
+        						{
+        						if (((L2NpcInstance)target).getTemplate().serverSideName)
+        						{
+        							sm.addString(target.getName());
+        						}
+        						else
+        							sm.addNpcName(((L2NpcInstance)target).getTemplate().idTemplate);
+        						}
+        						if(target instanceof L2Summon)
+        						{
+        						if (((L2Summon)target).getTemplate().serverSideName)
+        						{
+        							sm.addString(target.getName());
+        						}
+        						else
+        							sm.addNpcName(((L2Summon)target).getTemplate().idTemplate);
+        						}
+        							
+        					}
+        					else
                             sm.addString(target.getName());
                             sm.addSkillName(skill.getDisplayId());
                             activeChar.sendPacket(sm);
@@ -216,6 +240,29 @@ public class Disablers implements ISkillHandler
                         if (activeChar instanceof L2PcInstance)
                         {
                             SystemMessage sm = new SystemMessage(SystemMessageId.S1_WAS_UNAFFECTED_BY_S2);
+        					if(target instanceof L2NpcInstance || target instanceof L2Summon)
+        					{
+        						if(target instanceof L2NpcInstance)
+        						{
+        						if (((L2NpcInstance)target).getTemplate().serverSideName)
+        						{
+        							sm.addString(target.getName());
+        						}
+        						else
+        							sm.addNpcName(((L2NpcInstance)target).getTemplate().idTemplate);
+        						}
+        						if(target instanceof L2Summon)
+        						{
+        						if (((L2Summon)target).getTemplate().serverSideName)
+        						{
+        							sm.addString(target.getName());
+        						}
+        						else
+        							sm.addNpcName(((L2Summon)target).getTemplate().idTemplate);
+        						}
+        							
+        					}
+        					else
                             sm.addString(target.getName());
                             sm.addSkillName(skill.getDisplayId());
                             activeChar.sendPacket(sm);
@@ -260,6 +307,29 @@ public class Disablers implements ISkillHandler
                             if (activeChar instanceof L2PcInstance)
                             {
                                 SystemMessage sm = new SystemMessage(SystemMessageId.S1_WAS_UNAFFECTED_BY_S2);
+            					if(target instanceof L2NpcInstance || target instanceof L2Summon)
+            					{
+            						if(target instanceof L2NpcInstance)
+            						{
+            						if (((L2NpcInstance)target).getTemplate().serverSideName)
+            						{
+            							sm.addString(target.getName());
+            						}
+            						else
+            							sm.addNpcName(((L2NpcInstance)target).getTemplate().idTemplate);
+            						}
+            						if(target instanceof L2Summon)
+            						{
+            						if (((L2Summon)target).getTemplate().serverSideName)
+            						{
+            							sm.addString(target.getName());
+            						}
+            						else
+            							sm.addNpcName(((L2Summon)target).getTemplate().idTemplate);
+            						}
+            							
+            					}
+            					else
                                 sm.addString(target.getName());
                                 sm.addSkillName(skill.getDisplayId());
                                 activeChar.sendPacket(sm);
@@ -271,6 +341,29 @@ public class Disablers implements ISkillHandler
                         if (activeChar instanceof L2PcInstance)
                         {
                             SystemMessage sm = new SystemMessage(SystemMessageId.S1_WAS_UNAFFECTED_BY_S2);
+        					if(target instanceof L2NpcInstance || target instanceof L2Summon)
+        					{
+        						if(target instanceof L2NpcInstance)
+        						{
+        						if (((L2NpcInstance)target).getTemplate().serverSideName)
+        						{
+        							sm.addString(target.getName());
+        						}
+        						else
+        							sm.addNpcName(((L2NpcInstance)target).getTemplate().idTemplate);
+        						}
+        						if(target instanceof L2Summon)
+        						{
+        						if (((L2Summon)target).getTemplate().serverSideName)
+        						{
+        							sm.addString(target.getName());
+        						}
+        						else
+        							sm.addNpcName(((L2Summon)target).getTemplate().idTemplate);
+        						}
+        							
+        					}
+        					else
                             sm.addString(target.getName());
                             sm.addSkillName(skill.getDisplayId());
                             activeChar.sendPacket(sm);
@@ -328,6 +421,29 @@ public class Disablers implements ISkillHandler
                 		if (activeChar instanceof L2PcInstance)
                 		{
                 			SystemMessage sm = new SystemMessage(SystemMessageId.S1_WAS_UNAFFECTED_BY_S2);
+        					if(target instanceof L2NpcInstance || target instanceof L2Summon)
+        					{
+        						if(target instanceof L2NpcInstance)
+        						{
+        						if (((L2NpcInstance)target).getTemplate().serverSideName)
+        						{
+        							sm.addString(target.getName());
+        						}
+        						else
+        							sm.addNpcName(((L2NpcInstance)target).getTemplate().idTemplate);
+        						}
+        						if(target instanceof L2Summon)
+        						{
+        						if (((L2Summon)target).getTemplate().serverSideName)
+        						{
+        							sm.addString(target.getName());
+        						}
+        						else
+        							sm.addNpcName(((L2Summon)target).getTemplate().idTemplate);
+        						}
+        							
+        					}
+        					else
                 			sm.addString(target.getName());
                 			sm.addSkillName(skill.getId());
                 			activeChar.sendPacket(sm);
@@ -355,6 +471,29 @@ public class Disablers implements ISkillHandler
                 			if (activeChar instanceof L2PcInstance)
                 			{
                 				SystemMessage sm = new SystemMessage(SystemMessageId.S1_WAS_UNAFFECTED_BY_S2);
+            					if(target instanceof L2NpcInstance || target instanceof L2Summon)
+            					{
+            						if(target instanceof L2NpcInstance)
+            						{
+            						if (((L2NpcInstance)target).getTemplate().serverSideName)
+            						{
+            							sm.addString(target.getName());
+            						}
+            						else
+            							sm.addNpcName(((L2NpcInstance)target).getTemplate().idTemplate);
+            						}
+            						if(target instanceof L2Summon)
+            						{
+            						if (((L2Summon)target).getTemplate().serverSideName)
+            						{
+            							sm.addString(target.getName());
+            						}
+            						else
+            							sm.addNpcName(((L2Summon)target).getTemplate().idTemplate);
+            						}
+            							
+            					}
+            					else
                 				sm.addString(target.getName());
                 				sm.addSkillName(skill.getId());
                 				activeChar.sendPacket(sm);
@@ -506,6 +645,29 @@ public class Disablers implements ISkillHandler
                             if (activeChar instanceof L2PcInstance)
                             {
                                 SystemMessage sm = new SystemMessage(SystemMessageId.S1_WAS_UNAFFECTED_BY_S2);
+            					if(target instanceof L2NpcInstance || target instanceof L2Summon)
+            					{
+            						if(target instanceof L2NpcInstance)
+            						{
+            						if (((L2NpcInstance)target).getTemplate().serverSideName)
+            						{
+            							sm.addString(target.getName());
+            						}
+            						else
+            							sm.addNpcName(((L2NpcInstance)target).getTemplate().idTemplate);
+            						}
+            						if(target instanceof L2Summon)
+            						{
+            						if (((L2Summon)target).getTemplate().serverSideName)
+            						{
+            							sm.addString(target.getName());
+            						}
+            						else
+            							sm.addNpcName(((L2Summon)target).getTemplate().idTemplate);
+            						}
+            							
+            					}
+            					else
                                 sm.addString(target.getName());
                                 sm.addSkillName(skill.getDisplayId());
                                 activeChar.sendPacket(sm);

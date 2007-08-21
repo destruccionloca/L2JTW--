@@ -154,12 +154,23 @@ public class NpcInfo extends L2GameServerPacket
         _movespdMul = _activeChar.getRunSpeed()/_activeChar.getTemplate().baseRunSpd;
         if (_atkspdMul<1) _atkspdMul = 1;
         if (_movespdMul<1) _movespdMul = 1;
-        if (cha.getTemplate().serverSideName || cha instanceof L2PetInstance)
+        //if (cha.getTemplate().serverSideName || cha instanceof L2PetInstance)
+        if (cha.getTemplate().serverSideName)
     	{
             _name = _activeChar.getName();
+    	}
+        else
+        {
+        	_name ="";
+        }
+        if (cha.getTemplate().serverSideTitle)
+    	{
     		_title = cha.getTitle();
     	}
-
+        else
+        {
+        	_title = "";
+        }
         L2NpcCharData chardata = new L2NpcCharData();
         
         if (chardata.getIsChar() > 0)

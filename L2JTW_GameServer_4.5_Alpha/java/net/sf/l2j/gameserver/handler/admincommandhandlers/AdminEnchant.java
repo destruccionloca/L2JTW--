@@ -112,19 +112,19 @@ public class AdminEnchant implements IAdminCommandHandler
                     
                     // check value
                     if (ench < 0 || ench > 65535)
-                        activeChar.sendMessage("You must set the enchant level to be between 0-65535.");
+                        activeChar.sendMessage("範圍為 0-65535.");
                     else
                         setEnchant(activeChar, ench, armorType);
                 }
                 catch (StringIndexOutOfBoundsException e)
                 {
                     if (Config.DEVELOPER) System.out.println("Set enchant error: " + e);
-                    activeChar.sendMessage("Please specify a new enchant value.");
+                    activeChar.sendMessage("請輸入強化數值.");
                 }
                 catch (NumberFormatException e)
                 {
                     if (Config.DEVELOPER) System.out.println("Set enchant error: " + e);
-                    activeChar.sendMessage("Please specify a valid new enchant value.");
+                    activeChar.sendMessage("請輸入新的數值.");
                 }
             }
             

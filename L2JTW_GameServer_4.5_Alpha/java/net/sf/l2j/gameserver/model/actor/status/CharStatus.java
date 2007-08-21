@@ -249,6 +249,40 @@ public class CharStatus
     } else {
             if (getActiveChar().isDead()) return; // Disabled == null check so skills like Body to Mind work again untill another solution is found
     }
+    
+    
+	if (getActiveChar() instanceof L2PcInstance)
+	{
+		if (((L2PcInstance)getActiveChar()).isInDuel())
+		{
+			// the duel is finishing - players do not recive damage
+			if (((L2PcInstance)getActiveChar()).getDuelState() == Duel.DUELSTATE_DEAD) return;
+			else if (((L2PcInstance)getActiveChar()).getDuelState() == Duel.DUELSTATE_WINNER) return;
+			
+			// cancel duel if player got hit by another player, that is not part of the duel or a monster
+			if ( !(attacker instanceof L2SummonInstance) && !(attacker instanceof L2PcInstance
+					&& ((L2PcInstance)attacker).getDuelId() == ((L2PcInstance)getActiveChar()).getDuelId()) )
+			{
+				((L2PcInstance)getActiveChar()).setDuelState(Duel.DUELSTATE_INTERRUPTED);
+			}
+		}
+	    if (getActiveChar().isDead() && !getActiveChar().isFakeDeath()) return; // Disabled == null check so skills like Body to Mind work again untill another solution is found
+	}
+	else
+	{
+	    if (getActiveChar().isDead()) return; // Disabled == null check so skills like Body to Mind work again untill another solution is found
+	    
+	    if (attacker instanceof L2PcInstance && ((L2PcInstance)attacker).isInDuel() &&
+	    		!(getActiveChar() instanceof L2SummonInstance &&
+	    		((L2SummonInstance)getActiveChar()).getOwner().getDuelId() == ((L2PcInstance)attacker).getDuelId()) ) // Duelling player attacks mob
+	    {
+	    	((L2PcInstance)attacker).setDuelState(Duel.DUELSTATE_INTERRUPTED);
+	    }
+	}
+    
+    
+    
+    
         if (awake && getActiveChar().isSleeping()) getActiveChar().stopSleeping(null);
         if (getActiveChar().isStunned() && Rnd.get(10) == 0) getActiveChar().stopStunning(null);
 

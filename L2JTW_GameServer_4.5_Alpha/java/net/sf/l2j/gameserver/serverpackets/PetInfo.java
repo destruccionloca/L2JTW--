@@ -103,8 +103,22 @@ public class PetInfo extends L2GameServerPacket
 		writeC(_summon.isInCombat() ? 1 : 0);	// attacking 1=true
 		writeC(_summon.isAlikeDead() ? 1 : 0);  // dead 1=true
 		writeC(_isSummoned ? 2 : 0); // invisible ?? 0=false  1=true   2=summoned (only works if model has a summon animation)
-		writeS(_summon.getName());
-		writeS(_summon.getTitle());
+		 if (!_summon.getTemplate().serverSideName)
+	    	{
+			 writeS("");
+	    	}
+		 else
+		 {
+			 writeS(_summon.getName());
+		 }
+		 if (!_summon.getTemplate().serverSideTitle)
+	    	{
+			 writeS("");
+	    	}
+		 else
+		 {
+			 writeS(_summon.getTitle());
+		 }
 		writeD(1);
 		writeD(_summon.getPvpFlag());	//0 = white,2= purpleblink, if its greater then karma = purple 
 		writeD(_summon.getKarma());  // hmm karma ??

@@ -185,6 +185,9 @@ public class L2SummonInstance extends L2Summon
         SystemMessage sm = new SystemMessage(SystemMessageId.SUMMON_RECEIVED_DAMAGE_S2_BY_S1);
         if (attacker instanceof L2NpcInstance)
         {
+        	if(((L2NpcInstance)attacker).getTemplate().serverSideName)
+        	sm.addString(attacker.getName());
+        		else
             sm.addNpcName(((L2NpcInstance) attacker).getTemplate().npcId);
         }
         else

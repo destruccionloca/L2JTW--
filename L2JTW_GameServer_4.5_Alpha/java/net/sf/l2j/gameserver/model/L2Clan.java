@@ -2000,7 +2000,6 @@ public class L2Clan
                 {
                     if (player.reduceAdena("ClanLvl", 650000, player.getTarget(), true))
                     {
-
 	                    player.setSp(player.getSp() - 30000);
 	                    SystemMessage sp = new SystemMessage(SystemMessageId.SP_DECREASED_S1);
 	                    sp.addNumber(30000);
@@ -2019,12 +2018,10 @@ public class L2Clan
                     if (player.reduceAdena("ClanLvl", 2500000, player.getTarget(), true))
                     {
 	                    player.setSp(player.getSp() - 150000);
-
 	                    SystemMessage sp = new SystemMessage(SystemMessageId.SP_DECREASED_S1);
 	                    sp.addNumber(150000);
 	                    player.sendPacket(sp);
                         sp = null;
-
 	                    increaseClanLevel = true;
                     }
                 }
@@ -2039,7 +2036,6 @@ public class L2Clan
                     if (player.destroyItemByItemId("ClanLvl", 1419, 1, player.getTarget(), false))
                     {
 	                    player.setSp(player.getSp() - 500000);
-
 	                    SystemMessage sp = new SystemMessage(SystemMessageId.SP_DECREASED_S1);
 	                    sp.addNumber(500000);
 	                    player.sendPacket(sp);
@@ -2049,7 +2045,6 @@ public class L2Clan
                         sm.addNumber(1);
                         player.sendPacket(sm);
                         sm = null;
-
 	                    increaseClanLevel = true;
                     }
                 }
@@ -2064,7 +2059,6 @@ public class L2Clan
                 	if (player.destroyItemByItemId("ClanLvl", 3874, 1, player.getTarget(), false))
                 	{
 	                    player.setSp(player.getSp() - 1400000);
-
 	                    SystemMessage sp = new SystemMessage(SystemMessageId.SP_DECREASED_S1);
 	                    sp.addNumber(1400000);
 	                    player.sendPacket(sp);
@@ -2074,7 +2068,6 @@ public class L2Clan
                         sm.addNumber(1);
                         player.sendPacket(sm);
                         sm = null;
-
 	                    increaseClanLevel = true;
                 	}
                 }
@@ -2099,7 +2092,6 @@ public class L2Clan
                         sm.addNumber(1);
                         player.sendPacket(sm);
                         sm = null;
-
                         increaseClanLevel = true;
                 	}
                 }
@@ -2113,7 +2105,6 @@ public class L2Clan
                     SystemMessage cr = new SystemMessage(SystemMessageId.S1_DEDUCTED_FROM_CLAN_REP);
                     cr.addNumber(10000);
                     player.sendPacket(cr);
-
                     increaseClanLevel = true;
                 }
                 break;

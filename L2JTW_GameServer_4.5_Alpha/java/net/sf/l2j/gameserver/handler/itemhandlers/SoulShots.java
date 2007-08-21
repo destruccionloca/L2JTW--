@@ -96,7 +96,7 @@ public class SoulShots implements IItemHandler
         			activeChar.sendPacket(new ExAutoSoulShot(itemId, 0));
 
         			SystemMessage sm = new SystemMessage(SystemMessageId.AUTO_USE_OF_S1_CANCELLED); 
-        			sm.addString(item.getItem().getName());
+        			sm.addItemName(item.getItem().getItemId());
         			activeChar.sendPacket(sm);
         		}
         		else activeChar.sendPacket(new SystemMessage(SystemMessageId.NOT_ENOUGH_SOULSHOTS));
