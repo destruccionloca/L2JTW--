@@ -31,12 +31,14 @@ public final class AllyDismiss extends L2GameClientPacket
     
     private String _clanName;
     
-    protected void readImpl()
+    @Override
+	protected void readImpl()
     {
     	_clanName = readS();
     }
     
-    protected void runImpl()
+    @Override
+	protected void runImpl()
     {
         if (_clanName == null)
         {
@@ -98,7 +100,8 @@ public final class AllyDismiss extends L2GameClientPacket
 
     }
     
-    public String getType()
+    @Override
+	public String getType()
     {
         return _C__85_ALLYDISMISS;
     }

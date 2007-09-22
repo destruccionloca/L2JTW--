@@ -59,6 +59,7 @@ public class MagicEffectIcons extends L2GameServerPacket
 		_effects.add(new Effect(skillId, level, duration));		
 	}
 	
+	@Override
 	protected final void writeImpl()
 	{
 		writeC(0x7f);
@@ -80,6 +81,7 @@ public class MagicEffectIcons extends L2GameServerPacket
 	/* (non-Javadoc)
 	 * @see net.sf.l2j.gameserver.serverpackets.ServerBasePacket#getType()
 	 */
+	@Override
 	public String getType()
 	{
 		return _S__97_MAGICEFFECTICONS;

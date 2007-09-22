@@ -39,11 +39,13 @@ public final class RequestPetUseItem extends L2GameClientPacket
 	private int _objectId;
 	
 	
+	@Override
 	protected void readImpl()
 	{
 		_objectId = readD();
 	}
 
+	@Override
 	protected void runImpl()
 	{
 		L2PcInstance activeChar = getClient().getActiveChar();
@@ -118,6 +120,11 @@ public final class RequestPetUseItem extends L2GameClientPacket
 				feed(activeChar, pet, item);
 				return;
 			}
+			if (L2PetDataTable.isSinEater(pet.getNpcId()) && L2PetDataTable.isSinEaterFood(itemId)) 
+			{ 
+				feed(activeChar, pet, item); 
+				return; 
+			} 
 			else if (L2PetDataTable.isHatchling(pet.getNpcId()) && L2PetDataTable.isHatchlingFood(itemId))
 			{
 				feed(activeChar, pet, item);
@@ -168,6 +175,8 @@ public final class RequestPetUseItem extends L2GameClientPacket
 			
 			PetInfo pi = new PetInfo(pet);
 			activeChar.sendPacket(pi);
+			// The PetInfo packet wipes the PartySpelled (list of active spells' icons).  Re-add them
+			pet.updateEffectIcons(true);
 		}
 		else
 		{
@@ -197,6 +206,7 @@ public final class RequestPetUseItem extends L2GameClientPacket
 	/* (non-Javadoc)
 	 * @see net.sf.l2j.gameserver.clientpackets.ClientBasePacket#getType()
 	 */
+	@Override
 	public String getType()
 	{
 		return _C__8A_REQUESTPETUSEITEM;

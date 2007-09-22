@@ -52,11 +52,13 @@ public final class RequestBypassToServer extends L2GameClientPacket
 	/**
 	 * @param decrypt
 	 */
+	@Override
 	protected void readImpl()
 	{
 		_command = readS();
 	}
 
+	@Override
 	protected void runImpl()
 	{
 		L2PcInstance activeChar = getClient().getActiveChar();
@@ -208,6 +210,7 @@ public final class RequestBypassToServer extends L2GameClientPacket
 	/* (non-Javadoc)
 	 * @see net.sf.l2j.gameserver.clientpackets.ClientBasePacket#getType()
 	 */
+	@Override
 	public String getType()
 	{
 		return _C__21_REQUESTBYPASSTOSERVER;

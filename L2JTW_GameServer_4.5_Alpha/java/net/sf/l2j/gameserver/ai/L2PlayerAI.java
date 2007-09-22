@@ -69,7 +69,8 @@ public class L2PlayerAI extends L2CharacterAI
      * @param arg1 The second parameter of the Intention
      *
      */
-    synchronized void changeIntention(CtrlIntention intention, Object arg0, Object arg1)
+    @Override
+	synchronized void changeIntention(CtrlIntention intention, Object arg0, Object arg1)
     {
         /*
          if (Config.DEBUG)
@@ -96,9 +97,7 @@ public class L2PlayerAI extends L2CharacterAI
          */
 
         // push current intention to stack
-
         _interuptedIntentions.push(new IntentionCommand(_intention, _intentionArg0, _intentionArg1));
-
         super.changeIntention(intention, arg0, arg1);
     }
 
@@ -109,7 +108,8 @@ public class L2PlayerAI extends L2CharacterAI
      * Check if actual intention is set to CAST and, if so, retrieves latest intention
      * before the actual CAST and set it as the current intention for the player
      */
-    protected void onEvtFinishCasting()
+    @Override
+	protected void onEvtFinishCasting()
     {
         // forget interupted actions after offensive skill
         if (_skill != null && _skill.isOffensive()) _interuptedIntentions.clear();
@@ -119,7 +119,6 @@ public class L2PlayerAI extends L2CharacterAI
             // run interupted intention if it remain.
             if (!_interuptedIntentions.isEmpty())
             {
-
                 IntentionCommand cmd = null;
                 try
                 {
@@ -129,22 +128,16 @@ public class L2PlayerAI extends L2CharacterAI
                 {
                 }
 
-
                 /*
                  if (Config.DEBUG)
                  _log.warning("L2PlayerAI: onEvtFinishCasting -> " + cmd._intention + " " + cmd._arg0 + " " + cmd._arg1);
                  */
 
-
                 if (cmd != null && cmd._crtlIntention != AI_INTENTION_CAST) // previous state shouldn't be casting 
-
                 {
                 	setIntention(cmd._crtlIntention, cmd._arg0, cmd._arg1);
                 }
-                
                 else setIntention(AI_INTENTION_IDLE);
-
-
             }
             else
             {
@@ -158,7 +151,8 @@ public class L2PlayerAI extends L2CharacterAI
         }
     }
 
-    protected void onIntentionRest()
+    @Override
+	protected void onIntentionRest()
     {
         if (getIntention() != AI_INTENTION_REST)
         {
@@ -173,12 +167,14 @@ public class L2PlayerAI extends L2CharacterAI
         }
     }
 
-    protected void onIntentionActive()
+    @Override
+	protected void onIntentionActive()
     {
         setIntention(AI_INTENTION_IDLE);
     }
 
-    protected void clientNotifyDead()
+    @Override
+	protected void clientNotifyDead()
     {
         _clientMovingToPawnOffset = 0;
         _clientMoving = false;
@@ -265,7 +261,8 @@ public class L2PlayerAI extends L2CharacterAI
         return;
     }
 
-    protected void onEvtThink()
+    @Override
+	protected void onEvtThink()
     {
         if (_thinking || _actor.isAllSkillsDisabled()) return;
 
@@ -288,7 +285,8 @@ public class L2PlayerAI extends L2CharacterAI
         }
     }
 
-    protected void onEvtArrivedRevalidate()
+    @Override
+	protected void onEvtArrivedRevalidate()
     {
         ThreadPoolManager.getInstance().executeTask(new KnownListAsynchronousUpdateTask(_actor));
         super.onEvtArrivedRevalidate();

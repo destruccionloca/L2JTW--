@@ -311,6 +311,31 @@ public final class Config
     /** How much adena receive characters who pick two or less of the winning number */
     public static int ALT_LOTTERY_2_AND_1_NUMBER_PRIZE;
 
+    /** Minimum siz e of a party that may enter dimensional rift */
+    public static int RIFT_MIN_PARTY_SIZE;
+
+    /** Time in ms the party has to wait until the mobs spawn when entering a room */
+    public static int RIFT_SPAWN_DELAY;
+
+    /** Amount of random rift jumps before party is ported back */
+    public static int RIFT_MAX_JUMPS;
+
+    /** Random time between two jumps in dimensional rift - in seconds */
+    public static int RIFT_AUTO_JUMPS_TIME_MIN;
+    public static int RIFT_AUTO_JUMPS_TIME_MAX;
+
+    /** Dimensional Fragment cost for entering rift */
+    public static int RIFT_ENTER_COST_RECRUIT;
+    public static int RIFT_ENTER_COST_SOLDIER;
+    public static int RIFT_ENTER_COST_OFFICER;
+    public static int RIFT_ENTER_COST_CAPTAIN;
+    public static int RIFT_ENTER_COST_COMMANDER;
+    public static int RIFT_ENTER_COST_HERO;
+
+    /** time multiplier for boss room */
+    public static float RIFT_BOSS_ROOM_TIME_MUTIPLY;
+
+
     /* **************************************************************************
      * GM CONFIG General GM AccessLevel *
      ************************************************************************* */
@@ -319,7 +344,7 @@ public final class Config
     /** General GM Minimal AccessLevel */
     public static int     GM_MIN;
     /** Minimum privileges level for a GM to do Alt+G*/
-	public static int     GM_ALTG_MIN_LEVEL;
+    public static int     GM_ALTG_MIN_LEVEL;
     /** General GM AccessLevel to change announcements */
     public static int     GM_ANNOUNCE;
     /** General GM AccessLevel can /ban /unban */
@@ -457,7 +482,9 @@ public final class Config
     public static float         PET_XP_RATE; 
     /** Rate for food consumption of the pet */
     public static int           PET_FOOD_RATE;
-
+    /** Rate for experience rewards of the Sin Eater */ 
+    public static float         SINEATER_XP_RATE; 
+    
     // Karma Drop Rate control
     /** Karma drop limit */
     public static int   KARMA_DROP_LIMIT;
@@ -594,6 +621,10 @@ public final class Config
     public static int MIN_NPC_ANIMATION;
     /** Maximal time between 2 animations of a NPC */
     public static int MAX_NPC_ANIMATION;
+    /** Minimal time between animations of a MONSTER */
+    public static int MIN_MONSTER_ANIMATION;
+    /** Maximal time between animations of a MONSTER */
+    public static int MAX_MONSTER_ANIMATION;
 
     /** Activate position recorder ? */
     public static boolean ACTIVATE_POSITION_RECORDER;
@@ -814,10 +845,11 @@ public final class Config
     public static int[] TVT_EVENT_TEAM_1_COORDINATES = new int[3];
     public static String TVT_EVENT_TEAM_2_NAME;
     public static int[] TVT_EVENT_TEAM_2_COORDINATES = new int[3];
-    public static int[] TVT_EVENT_REWARD = new int[2];
+    public static List<int[]> TVT_EVENT_REWARDS = new FastList<int[]>();
     public static boolean TVT_EVENT_TARGET_TEAM_MEMBERS_ALLOWED;
     public static boolean TVT_EVENT_POTIONS_ALLOWED;
     public static boolean TVT_EVENT_SUMMON_BY_ITEM_ALLOWED;
+    public static List<Integer> TVT_EVENT_DOOR_IDS = new FastList<Integer>();
 
     /** L2JMOD Wedding system  */
     public static boolean L2JMOD_ALLOW_WEDDING;
@@ -1116,7 +1148,11 @@ public final class Config
     public static boolean ALT_DEV_NO_QUESTS;
     public static boolean ALT_DEV_NO_SPAWNS;
 
+    /** Decay Time */
 
+    public static int DECAY_TIME;
+    
+    
     /**
      * This class initializes all global variables for configuration.<br>
      * If key doesn't appear in properties file, a default value is setting on by this class.
@@ -1253,8 +1289,10 @@ public final class Config
 
                 MAX_DRIFT_RANGE                 = Integer.parseInt(optionsSettings.getProperty("MaxDriftRange", "300"));
 
-                MIN_NPC_ANIMATION               = Integer.parseInt(optionsSettings.getProperty("MinNPCAnimation", "0"));
-                MAX_NPC_ANIMATION               = Integer.parseInt(optionsSettings.getProperty("MaxNPCAnimation", "0"));
+                MIN_NPC_ANIMATION               = Integer.parseInt(optionsSettings.getProperty("MinNPCAnimation", "10"));
+                MAX_NPC_ANIMATION               = Integer.parseInt(optionsSettings.getProperty("MaxNPCAnimation", "20"));
+                MIN_MONSTER_ANIMATION           = Integer.parseInt(optionsSettings.getProperty("MinMonsterAnimation", "5"));
+                MAX_MONSTER_ANIMATION           = Integer.parseInt(optionsSettings.getProperty("MaxMonsterAnimation", "20"));
 
                 SHOW_NPC_LVL					= Boolean.valueOf(optionsSettings.getProperty("ShowNpcLevel", "False"));
 
@@ -1314,6 +1352,9 @@ public final class Config
                 MINIMUN_UPDATE_TIME             = Integer.parseInt(optionsSettings.getProperty("MinimumUpdateTime", "500"));
                 CHECK_KNOWN                     = Boolean.valueOf(optionsSettings.getProperty("CheckKnownList", "false"));
                 KNOWNLIST_FORGET_DELAY          = Integer.parseInt(optionsSettings.getProperty("KnownListForgetDelay", "10000"));
+                
+                
+                DECAY_TIME          = Integer.parseInt(optionsSettings.getProperty("decaytime", "8500"));
             }
             catch (Exception e)
             {
@@ -1551,6 +1592,7 @@ public final class Config
 
                 PET_XP_RATE                     = Float.parseFloat(ratesSettings.getProperty("PetXpRate", "1."));
                 PET_FOOD_RATE                   = Integer.parseInt(ratesSettings.getProperty("PetFoodRate", "1")); 
+                SINEATER_XP_RATE                = Float.parseFloat(ratesSettings.getProperty("SinEaterXpRate", "1.")); 
 
                 KARMA_DROP_LIMIT                = Integer.parseInt(ratesSettings.getProperty("KarmaDropLimit", "10"));
                 KARMA_RATE_DROP                 = Integer.parseInt(ratesSettings.getProperty("KarmaRateDrop", "70"));
@@ -1661,6 +1703,20 @@ public final class Config
                 ALT_DEV_NO_QUESTS                = Boolean.parseBoolean(altSettings.getProperty("AltDevNoQuests", "False"));
                 ALT_DEV_NO_SPAWNS                = Boolean.parseBoolean(altSettings.getProperty("AltDevNoSpawns", "False"));
 
+
+                // Dimensional Rift Config
+                RIFT_MIN_PARTY_SIZE              = Integer.parseInt(altSettings.getProperty("RiftMinPartySize", "5")); 
+                RIFT_MAX_JUMPS                   = Integer.parseInt(altSettings.getProperty("MaxRiftJumps", "4")); 
+				RIFT_SPAWN_DELAY                 = Integer.parseInt(altSettings.getProperty("RiftSpawnDelay", "10000"));
+                RIFT_AUTO_JUMPS_TIME_MIN         = Integer.parseInt(altSettings.getProperty("AutoJumpsDelayMin", "480")); 
+                RIFT_AUTO_JUMPS_TIME_MAX         = Integer.parseInt(altSettings.getProperty("AutoJumpsDelayMax", "600")); 
+                RIFT_ENTER_COST_RECRUIT          = Integer.parseInt(altSettings.getProperty("RecruitCost", "18")); 
+                RIFT_ENTER_COST_SOLDIER          = Integer.parseInt(altSettings.getProperty("SoldierCost", "21")); 
+                RIFT_ENTER_COST_OFFICER          = Integer.parseInt(altSettings.getProperty("OfficerCost", "24")); 
+                RIFT_ENTER_COST_CAPTAIN          = Integer.parseInt(altSettings.getProperty("CaptainCost", "27")); 
+                RIFT_ENTER_COST_COMMANDER        = Integer.parseInt(altSettings.getProperty("CommanderCost", "30")); 
+                RIFT_ENTER_COST_HERO             = Integer.parseInt(altSettings.getProperty("HeroCost", "33")); 
+                RIFT_BOSS_ROOM_TIME_MUTIPLY      = Float.parseFloat(altSettings.getProperty("BossRoomTimeMultiply", "1.5"));
 
             }
             catch (Exception e)
@@ -1849,21 +1905,45 @@ public final class Config
                                 TVT_EVENT_TEAM_2_COORDINATES[0]    = Integer.parseInt(propertySplit[0]);
                                 TVT_EVENT_TEAM_2_COORDINATES[1]    = Integer.parseInt(propertySplit[1]);
                                 TVT_EVENT_TEAM_2_COORDINATES[2]    = Integer.parseInt(propertySplit[2]);
-                                propertySplit                    = L2JModSettings.getProperty("TvTEventReward", "57,100000").split(",");
+                                propertySplit                    = L2JModSettings.getProperty("TvTEventReward", "57,100000").split(";");
 
-                                if (propertySplit.length < 2)
+                                for (String reward : propertySplit)
                                 {
-                                    TVT_EVENT_ENABLED = false;
-                                    System.out.println("TvTEventEngine[Config.load()]: invalid config property -> TvTEventReward");
+                                	String[] rewardSplit = reward.split(",");
+
+                                	if (rewardSplit.length != 2)
+                                		System.out.println("TvTEventEngine[Config.load()]: invalid config property -> TvTEventReward \"" + reward + "\"");
+                                	else
+                                	{
+                                		try
+                                		{
+                                			TVT_EVENT_REWARDS.add(new int[]{Integer.valueOf(rewardSplit[0]), Integer.valueOf(rewardSplit[1])});
+                                		}
+                                		catch (NumberFormatException nfe)
+                                		{
+                                			if (!reward.equals(""))
+                                				System.out.println("TvTEventEngine[Config.load()]: invalid config property -> TvTEventReward \"" + reward + "\"");
+                                		}
+                                	}
                                 }
-                                else
-                                {
-                                    TVT_EVENT_REWARD[0] = Integer.parseInt(propertySplit[0]);
-                                    TVT_EVENT_REWARD[1] = Integer.parseInt(propertySplit[1]);
-                                    TVT_EVENT_TARGET_TEAM_MEMBERS_ALLOWED = Boolean.parseBoolean(L2JModSettings.getProperty("TvTEventTargetTeamMembersAllowed", "true"));
-                                    TVT_EVENT_POTIONS_ALLOWED = Boolean.parseBoolean(L2JModSettings.getProperty("TvTEventPotionsAllowed", "false"));
-                                    TVT_EVENT_SUMMON_BY_ITEM_ALLOWED = Boolean.parseBoolean(L2JModSettings.getProperty("TvTEventSummonByItemAllowed", "false"));
-                                }
+                                
+                                TVT_EVENT_TARGET_TEAM_MEMBERS_ALLOWED	= Boolean.parseBoolean(L2JModSettings.getProperty("TvTEventTargetTeamMembersAllowed", "true"));
+                        		TVT_EVENT_POTIONS_ALLOWED				= Boolean.parseBoolean(L2JModSettings.getProperty("TvTEventPotionsAllowed", "false"));
+                        		TVT_EVENT_SUMMON_BY_ITEM_ALLOWED		= Boolean.parseBoolean(L2JModSettings.getProperty("TvTEventSummonByItemAllowed", "false"));
+                        		propertySplit							= L2JModSettings.getProperty("TvTEventDoorsCloseOpenOnStartEnd", "").split(";");
+                        		
+                        		for (String door : propertySplit)
+                        		{
+                        			try
+                        			{
+                        				TVT_EVENT_DOOR_IDS.add(Integer.valueOf(door));
+                        			}
+                        			catch (NumberFormatException nfe)
+                        			{
+                        				if (!door.equals(""))
+                        					System.out.println("TvTEventEngine[Config.load()]: invalid config property -> TvTEventDoorsCloseOpenOnStartEnd \"" + door + "\"");
+                        			}
+                        		}
                             }
                         }
                     }

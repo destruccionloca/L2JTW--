@@ -31,8 +31,7 @@ import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 public class ExOlympiadUserInfo extends L2GameServerPacket
 {
 	// chcdSddddd
-	private static final String _S__FE_29_OLYMPIADUSERINFO = "[S] FE:29 OlympiadUserInfo";
-	private static int _side;
+	private static final String _S__FE_29_OLYMPIADUSERINFO = "[S] FE:2C OlympiadUserInfo";
 	private static L2PcInstance _activeChar;
 	
 
@@ -40,30 +39,30 @@ public class ExOlympiadUserInfo extends L2GameServerPacket
 	 * @param _player
 	 * @param _side (1 = right, 2 = left)
 	 */
-	public ExOlympiadUserInfo(L2PcInstance player, int side)
+	public ExOlympiadUserInfo(L2PcInstance player)
 	{
 		_activeChar = player;
-		_side = side;
 	}
 	
 
+	@Override
 	protected final void writeImpl()
 	{
-		writeC(0xfe);
-		writeH(0x29);
-		writeC(_side);
+		/*writeC(0xfe);
+		writeH(0x2c);
 		writeD(_activeChar.getObjectId());
 		writeS(_activeChar.getName());
 		writeD(_activeChar.getClassId().getId());
 		writeD((int)_activeChar.getCurrentHp());
 		writeD(_activeChar.getMaxHp());
 		writeD((int)_activeChar.getCurrentCp());
-		writeD(_activeChar.getMaxCp());
+		writeD(_activeChar.getMaxCp());*/
 	}
 	
 	/* (non-Javadoc)
 	 * @see net.sf.l2j.gameserver.serverpackets.ServerBasePacket#getType()
 	 */
+	@Override
 	public String getType()
 	{
 		return _S__FE_29_OLYMPIADUSERINFO;

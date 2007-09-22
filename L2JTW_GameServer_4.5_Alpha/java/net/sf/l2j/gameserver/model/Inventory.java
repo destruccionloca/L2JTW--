@@ -28,8 +28,6 @@ import net.sf.l2j.L2DatabaseFactory;
 import net.sf.l2j.gameserver.datatables.ArmorSetsTable;
 import net.sf.l2j.gameserver.datatables.ItemTable;
 import net.sf.l2j.gameserver.datatables.SkillTable;
-import net.sf.l2j.gameserver.model.L2ArmorSet;
-import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.model.L2ItemInstance.ItemLocation;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.templates.L2Armor;
@@ -492,15 +490,21 @@ public abstract class Inventory extends ItemContainer
 	 */
 	public L2ItemInstance dropItem(String process, L2ItemInstance item, L2PcInstance actor, L2Object reference)
 	{
-		if (!_items.contains(item)) return null;
+		synchronized (item)
+		{
+			if (!_items.contains(item))
+			{
+				return null;
+			}
 
-		removeItem(item);
-		item.setOwnerId(process, 0, actor, reference);
-        item.setLocation(ItemLocation.VOID);
-        item.setLastChange(L2ItemInstance.REMOVED);
+			removeItem(item);
+			item.setOwnerId(process, 0, actor, reference);
+			item.setLocation(ItemLocation.VOID);
+			item.setLastChange(L2ItemInstance.REMOVED);
 
-		item.updateDatabase();
-		refreshWeight();
+			item.updateDatabase();
+			refreshWeight();
+		}
 		return item;
 	}
 
@@ -540,7 +544,8 @@ public abstract class Inventory extends ItemContainer
      * 
      * @param item : L2ItemInstance to be added from inventory
      */
-    protected void addItem(L2ItemInstance item)
+    @Override
+	protected void addItem(L2ItemInstance item)
     {
     	super.addItem(item);
     	if (item.isEquipped())
@@ -551,7 +556,8 @@ public abstract class Inventory extends ItemContainer
      * Removes item from inventory for further adjustments.
      * @param item : L2ItemInstance to be removed from inventory
      */
-    protected void removeItem(L2ItemInstance item)
+    @Override
+	protected void removeItem(L2ItemInstance item)
     {
     	// Unequip item if equiped
 //    	if (item.isEquipped()) unEquipItemInSlotAndRecord(item.getEquipSlot());
@@ -1084,6 +1090,7 @@ public abstract class Inventory extends ItemContainer
 	/**
 	 * Refresh the weight of equipment loaded
 	 */
+	@Override
 	protected void refreshWeight()
 	{
 		int weight = 0;
@@ -1133,6 +1140,7 @@ public abstract class Inventory extends ItemContainer
 	/**
 	 * Get back items in inventory from database
 	 */
+	@Override
 	public void restore()
 	{
 	    java.sql.Connection con = null;

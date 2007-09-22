@@ -53,6 +53,7 @@ public final class L2ClassMasterInstance extends L2FolkInstance
 		super(objectId, template);
 	}
 	
+	@Override
 	public void onAction(L2PcInstance player)
 	{
 		if (getObjectId() != player.getTargetId())
@@ -159,11 +160,13 @@ public final class L2ClassMasterInstance extends L2FolkInstance
 		}
 	}
 	
+	@Override
 	public String getHtmlPath(@SuppressWarnings("unused") int npcId, int val)
 	{
 		return "data/html/classmaster/" + val + ".htm";
 	}
 
+	@Override
 	public void onBypassFeedback(L2PcInstance player, String command)
 	{
 		if(command.startsWith("1stClass"))
@@ -359,6 +362,7 @@ public final class L2ClassMasterInstance extends L2FolkInstance
         sb.append("<tr><td><a action=\"bypass -h npc_"+getObjectId()+"_change_class 3\">Advance to "+CharTemplateTable.getClassNameById(3)+"</a></td></tr>");
         sb.append("<tr><td><a action=\"bypass -h npc_"+getObjectId()+"_change_class 5\">Advance to "+CharTemplateTable.getClassNameById(5)+"</a></td></tr>");
         sb.append("<tr><td><a action=\"bypass -h npc_"+getObjectId()+"_change_class 6\">Advance to "+CharTemplateTable.getClassNameById(6)+"</a></td></tr>");
+        sb.append("<tr><td><a action=\"bypass -h npc_"+getObjectId()+"_change_class 8\">Advance to "+CharTemplateTable.getClassNameById(8)+"</a></td></tr>");
         sb.append("<tr><td><a action=\"bypass -h npc_"+getObjectId()+"_change_class 9\">Advance to "+CharTemplateTable.getClassNameById(9)+"</a></td></tr>");
         sb.append("<tr><td><a action=\"bypass -h npc_"+getObjectId()+"_change_class 12\">Advance to "+CharTemplateTable.getClassNameById(12)+"</a></td></tr>");
         sb.append("<tr><td><a action=\"bypass -h npc_"+getObjectId()+"_change_class 13\">Advance to "+CharTemplateTable.getClassNameById(13)+"</a></td></tr>");

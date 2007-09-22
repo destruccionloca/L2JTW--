@@ -32,6 +32,7 @@ public final class RequestStopPledgeWar extends L2GameClientPacket
 
 	private String _pledgeName;
 
+	@Override
 	protected void readImpl()
 
 	{
@@ -39,6 +40,7 @@ public final class RequestStopPledgeWar extends L2GameClientPacket
 	}
 
 
+	@Override
 	protected void runImpl()
 
 	{
@@ -96,6 +98,7 @@ public final class RequestStopPledgeWar extends L2GameClientPacket
         }
 	}
 
+	@Override
 	public String getType()
 	{
 		return _C__4F_REQUESTSTOPPLEDGEWAR;

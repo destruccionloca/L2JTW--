@@ -468,7 +468,9 @@ public class AdminMobGroup implements IAdminCommandHandler
 		} 
 
 		catch (Exception e) {
-			activeChar.sendMessage("使用方法: //mobgroup_attack_grp <groupId> <TargetGroupId>");
+
+			activeChar.sendMessage("使用方法: //mobgroup_attackgrp <groupId> <TargetGroupId>");
+
 
 			return;
 		}

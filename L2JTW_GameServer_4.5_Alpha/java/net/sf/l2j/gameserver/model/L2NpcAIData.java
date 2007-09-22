@@ -50,6 +50,7 @@ public class L2NpcAIData
     private int _enemyRange;
     private int _baseShldRate;
     private int _baseShldDef;
+    private int _dodge;
 
 
 	private FastList<L2NpcAIData> npcAIdata;
@@ -135,6 +136,10 @@ public class L2NpcAIData
     	_enemyRange = enemyRange;
     	
     }
+    public void setDodge (int dodge)
+    {
+    	_dodge = dodge;
+    }
     
     /*
     
@@ -208,6 +213,13 @@ public class L2NpcAIData
     {
     	
     	return _enemyRange;
+    	
+    }
+    
+    public int getDodge()
+    {
+    	
+    	return _dodge;
     	
     }
     

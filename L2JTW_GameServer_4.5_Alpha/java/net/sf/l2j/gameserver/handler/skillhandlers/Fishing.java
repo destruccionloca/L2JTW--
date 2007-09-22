@@ -21,7 +21,6 @@ package net.sf.l2j.gameserver.handler.skillhandlers;
 import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.handler.ISkillHandler;
 import net.sf.l2j.gameserver.instancemanager.ZoneManager;
-import net.sf.l2j.util.Rnd;
 import net.sf.l2j.gameserver.model.Inventory;
 import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.L2ItemInstance;
@@ -35,7 +34,6 @@ import net.sf.l2j.gameserver.serverpackets.ItemList;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.templates.L2Weapon;
 import net.sf.l2j.gameserver.templates.L2WeaponType;
-import net.sf.l2j.gameserver.util.Util;
 
 public class Fishing implements ISkillHandler 
 { 
@@ -102,8 +100,6 @@ public class Fishing implements ISkillHandler
 			player.sendMessage("Not Working Yet");
 			return;
 		}		
-        
-/*
 		player.SetLure(lure);
 		L2ItemInstance lure2 = player.getInventory().destroyItem("Consume", player.getInventory().getPaperdollObjectId(Inventory.PAPERDOLL_LHAND), 1, player, null);
 
@@ -118,12 +114,8 @@ public class Fishing implements ISkillHandler
 			iu.addModifiedItem(lure2);
 			player.sendPacket(iu);
 		}
-
-        */
-		
 		player.startFishing();		
-
-	
+		
 		
         
         

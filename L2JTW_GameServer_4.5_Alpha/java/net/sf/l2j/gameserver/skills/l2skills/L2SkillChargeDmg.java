@@ -53,9 +53,6 @@ public class L2SkillChargeDmg extends L2Skill
 
 
     public boolean checkCondition(L2Character activeChar)
-
-
-
     {
         if (activeChar instanceof L2PcInstance)
         {
@@ -63,11 +60,13 @@ public class L2SkillChargeDmg extends L2Skill
             EffectCharge e = (EffectCharge)player.getEffect(charge_skill_id);
             if(e == null || e.num_charges < this.num_charges)
             {
+            	//_log.warning("CHARGE 1");
                 SystemMessage sm = new SystemMessage(113);
                 sm.addSkillName(this.getId());
                 activeChar.sendPacket(sm);
                 return false;
             }
+            
         }
 
         return super.checkCondition(activeChar, false);
@@ -84,14 +83,13 @@ public class L2SkillChargeDmg extends L2Skill
         EffectCharge effect = (EffectCharge) caster.getEffect(charge_skill_id);
         if (effect == null || effect.num_charges < this.num_charges)
         {
+        	//_log.warning("CHARGE 2");
             SystemMessage sm = new SystemMessage(113);
             sm.addSkillName(this.getId());
             caster.sendPacket(sm);
             return;
         }
         
-
-
 
 
         double modifier = 0;
@@ -111,6 +109,7 @@ public class L2SkillChargeDmg extends L2Skill
         
         L2ItemInstance weaponInst = caster.getActiveWeaponInstance();
         
+
 
 
 

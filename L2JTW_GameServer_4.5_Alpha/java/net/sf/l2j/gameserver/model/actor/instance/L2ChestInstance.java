@@ -20,13 +20,13 @@
  */
 package net.sf.l2j.gameserver.model.actor.instance;
 
+import net.sf.l2j.gameserver.datatables.NpcTable;
 import net.sf.l2j.gameserver.datatables.SkillTable;
 import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.serverpackets.MagicSkillUser;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
-import net.sf.l2j.gameserver.datatables.NpcTable;
 import net.sf.l2j.util.Rnd;
 
 /**
@@ -44,6 +44,7 @@ public final class L2ChestInstance extends L2MonsterInstance
 		_specialDrop = false;
 	}
 
+	@Override
 	public void onSpawn()
 	{
 		super.onSpawn();
@@ -71,24 +72,30 @@ public final class L2ChestInstance extends L2MonsterInstance
 		_specialDrop = true;
 	}
 
+	@Override
 	public void doItemDrop(L2NpcTemplate npcTemplate, L2Character lastAttacker)
 	{
 		int id = getTemplate().npcId;
-		if (id>=18265 && id<=18286)
-			id = id - 18265;
-		else
-			id = id - 21801;
 
-		if (_specialDrop)
+		if (!_specialDrop)
 		{
-			id = id + 18265;
-			super.doItemDrop(NpcTable.getInstance().getTemplate(id),lastAttacker);
+			if (id >= 18265 && id <= 18286)
+				id += 3536;
+			else if (id == 18287 || id == 18288)
+				id = 21671;
+			else if (id == 18289 || id == 18290)
+				id = 21694;
+			else if (id == 18291 || id == 18292)
+				id = 21717;
+			else if (id == 18293 || id == 18294)
+				id = 21740;
+			else if (id == 18295 || id == 18296)
+				id = 21763;
+			else if (id == 18297 || id == 18298)
+				id = 21786;
 		}
-		else
-		{
-			id = id + 21801;
-			super.doItemDrop(NpcTable.getInstance().getTemplate(id),lastAttacker);
-		}
+
+		super.doItemDrop(NpcTable.getInstance().getTemplate(id),lastAttacker);
 	}
 	//cast - trap chest
 	public void chestTrap(L2Character player)
@@ -155,10 +162,17 @@ public final class L2ChestInstance extends L2MonsterInstance
 		return false;
 	}
 	
- 	public boolean isMovementDisabled() {
- 		if (super.isMovementDisabled()) return true;
- 		if (isInteracted()) return false;
- 		return true;
- 	}	
+	@Override
+	public boolean isMovementDisabled()
+	{
+		if (super.isMovementDisabled()) return true;
+		if (isInteracted()) return false;
+		return true;
+	}
 
+	@Override
+	public boolean hasRandomAnimation()
+	{
+		return false;
+	}
 }

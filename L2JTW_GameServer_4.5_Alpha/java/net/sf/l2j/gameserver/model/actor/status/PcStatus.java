@@ -44,6 +44,7 @@ public class PcStatus extends PlayableStatus
 
     // =========================================================
     // Method - Public
+
     public final void reduceHp(double value, L2Character attacker, boolean awake, boolean isDOT)
     {
         if (getActiveChar().isInvul()) return;
@@ -201,5 +202,6 @@ public class PcStatus extends PlayableStatus
 
     // =========================================================
     // Property - Public
-    public L2PcInstance getActiveChar() { return (L2PcInstance)super.getActiveChar(); }
+    @Override
+	public L2PcInstance getActiveChar() { return (L2PcInstance)super.getActiveChar(); }
 }

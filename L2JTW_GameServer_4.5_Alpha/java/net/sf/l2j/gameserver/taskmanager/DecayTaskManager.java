@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.logging.Logger;
 
+import net.sf.l2j.Config;
+
 import javolution.util.FastMap;
 import net.sf.l2j.gameserver.ThreadPoolManager;
 import net.sf.l2j.gameserver.model.L2Character;
@@ -86,7 +88,7 @@ public class DecayTaskManager
             		for(L2Character actor : _decayTasks.keySet())
             		{
             			if(actor instanceof L2RaidBossInstance) delay = 30000;
-            			else delay = 8500;
+            			else delay = Config.DECAY_TIME;
             			if((current - _decayTasks.get(actor)) > delay)
             			{
             				actor.onDecay();
@@ -100,7 +102,8 @@ public class DecayTaskManager
         }
     }
 
-    public String toString()
+    @Override
+	public String toString()
     {
         String ret = "============= DecayTask Manager Report ============\r\n";
         ret += "Tasks count: "+_decayTasks.size()+"\r\n";

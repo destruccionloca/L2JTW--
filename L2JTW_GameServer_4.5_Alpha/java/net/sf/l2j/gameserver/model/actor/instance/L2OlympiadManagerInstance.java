@@ -49,7 +49,8 @@ public class L2OlympiadManagerInstance extends L2FolkInstance
         super(objectId, template);
     }
     
-    public void onBypassFeedback (L2PcInstance player, String command)
+    @Override
+	public void onBypassFeedback (L2PcInstance player, String command)
     {  
         if (command.startsWith("OlympiadDesc"))
         {
@@ -59,7 +60,7 @@ public class L2OlympiadManagerInstance extends L2FolkInstance
         }
         else if (command.startsWith("OlympiadNoble"))
         {
-            if (!player.isNoble())
+        	if (!player.isNoble() || player.getClassId().getId()<88)
                 return;
             
             int val = Integer.parseInt(command.substring(14));

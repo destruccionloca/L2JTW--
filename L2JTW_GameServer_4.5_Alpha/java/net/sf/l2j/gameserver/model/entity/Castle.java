@@ -43,6 +43,7 @@ import net.sf.l2j.gameserver.model.actor.instance.L2DoorInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PlayableInstance;
 import net.sf.l2j.gameserver.serverpackets.PledgeShowInfoUpdate;
+import net.sf.l2j.gameserver.SevenSigns;
 
 public class Castle
 {
@@ -76,8 +77,8 @@ public class Castle
 	public Castle(int castleId)
 	{
 		_castleId = castleId;
-        this.load();
-		this.loadDoor();
+        load();
+		loadDoor();
 	}
 
 	// =========================================================
@@ -251,15 +252,35 @@ public class Castle
 		updateClansReputation();
 	}
 
-	// This method updates the castle tax rate
-	public void setTaxPercent(L2PcInstance activeChar, int taxPercent)
-	{
-	    if (taxPercent < 0 || taxPercent > 15)
-	    {
-	        activeChar.sendMessage("稅率只能在1-15之間.");
-	        return;
-	    }
-	    
+
+    // This method updates the castle tax rate
+    public void setTaxPercent(L2PcInstance activeChar, int taxPercent)
+    {
+        int maxTax;
+        switch(SevenSigns.getInstance().getSealOwner(SevenSigns.SEAL_STRIFE))
+        {
+            case SevenSigns.CABAL_DAWN:
+                maxTax = 25;
+                break;
+            case SevenSigns.CABAL_DUSK:
+                maxTax = 5;
+                break;
+            default: // no owner
+            	maxTax = 15;
+        }
+        
+        if (taxPercent < 0 || taxPercent > maxTax)
+        {
+            activeChar.sendMessage("稅率數值只能在 0 至 "+maxTax+" 之間.");
+            return;
+        }
+        
+        setTaxPercent(taxPercent);
+        activeChar.sendMessage(getName() + " 城堡更改稅率為 " + taxPercent + "%.");
+    }
+
+    public void setTaxPercent(int taxPercent)
+    {
         _taxPercent = taxPercent;
         _taxRate = _taxPercent / 100.0;
 
@@ -276,8 +297,7 @@ public class Castle
         catch (Exception e) {} 
         finally {try { con.close(); } catch (Exception e) {}}
 
-        activeChar.sendMessage(getName() + " 城堡稅率改為 " + taxPercent + "%.");
-	}
+    }
     
 	/**
 	 * Respawn all doors on castle grounds<BR><BR>

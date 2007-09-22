@@ -67,6 +67,7 @@ public class PetInfo extends L2GameServerPacket
 		}
 	}
 	
+	@Override
 	protected final void writeImpl()
 	{
 		writeC(0xb1);
@@ -159,13 +160,14 @@ public class PetInfo extends L2GameServerPacket
         // Following all added in C4.
         writeH(0); // ??
         writeC(0); // team aura (1 = blue, 2 = red)
-		writeD(_summon.getUsedSoulShots()); 
-        writeD(_summon.getUsedSpiritShots());
+		writeD(_summon.getSoulShotsPerHit()); // How many soulshots this servitor uses per hit
+        writeD(_summon.getSpiritShotsPerHit()); // How many spiritshots this servitor uses per hit
 	}
 	
 	/* (non-Javadoc)
 	 * @see net.sf.l2j.gameserver.serverpackets.ServerBasePacket#getType()
 	 */
+	@Override
 	public String getType()
 	{
 		return _S__CA_PETINFO;

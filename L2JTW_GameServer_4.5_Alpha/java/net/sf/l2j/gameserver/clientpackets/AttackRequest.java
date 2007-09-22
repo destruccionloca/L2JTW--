@@ -43,6 +43,7 @@ public final class AttackRequest extends L2GameClientPacket
 
 	private static final String _C__0A_ATTACKREQUEST = "[C] 0A AttackRequest";
 	
+	@Override
 	protected void readImpl()
 	{
 		_objectId  = readD();
@@ -52,13 +53,18 @@ public final class AttackRequest extends L2GameClientPacket
 		_attackId  = readC(); 	 // 0 for simple click   1 for shift-click
 	}
 
+	@Override
 	protected void runImpl()
 	{
 		L2PcInstance activeChar = getClient().getActiveChar();
-		L2Object target = L2World.getInstance().findObject(_objectId);
-		if (activeChar == null || target == null)
-		    return;
-
+		if (activeChar == null) return;
+		// avoid using expensive operations if not needed
+		L2Object target;
+		if (activeChar.getTargetId() == _objectId)
+			target = activeChar.getTarget();
+		else
+			target = L2World.getInstance().findObject(_objectId);
+		if (target == null) return;
 		if (activeChar.getTarget() != target)
 		{
 			target.onAction(activeChar);
@@ -83,6 +89,7 @@ public final class AttackRequest extends L2GameClientPacket
 	/* (non-Javadoc)
 	 * @see net.sf.l2j.gameserver.clientpackets.ClientBasePacket#getType()
 	 */
+	@Override
 	public String getType()
 	{
 		return _C__0A_ATTACKREQUEST;

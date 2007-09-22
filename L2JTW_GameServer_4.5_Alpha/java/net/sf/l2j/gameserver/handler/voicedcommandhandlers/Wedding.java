@@ -15,11 +15,13 @@ import net.sf.l2j.gameserver.instancemanager.CoupleManager;
 import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.model.L2World;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.model.entity.TvTEvent;
+import net.sf.l2j.gameserver.network.SystemMessageId;
+import net.sf.l2j.gameserver.serverpackets.ActionFailed;
 import net.sf.l2j.gameserver.serverpackets.ConfirmDlg;
 import net.sf.l2j.gameserver.serverpackets.MagicSkillUser;
 import net.sf.l2j.gameserver.serverpackets.SetupGauge;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
-import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.util.Broadcast;
 
 import org.apache.commons.logging.Log;
@@ -213,7 +215,7 @@ public class Wedding implements IVoicedCommandHandler
     }
     
     public boolean GoToLove(L2PcInstance activeChar)
-    {   
+    {
         if(!activeChar.isMarried())
         {
             activeChar.sendMessage("You're not married."); 
@@ -259,11 +261,11 @@ public class Wedding implements IVoicedCommandHandler
             activeChar.sendMessage("Your partner is in a festival.");
             return false;
         }
-        //else if (partner.isInParty() && partner.getParty().isInDimensionalRift()) 
-        //{
-        //    activeChar.sendMessage("Your partner is in dimensional rift.");
-        //    return false;
-        //}
+        else if (partner.isInParty() && partner.getParty().isInDimensionalRift()) 
+        {
+            activeChar.sendMessage("Your partner is in dimensional rift.");
+            return false;
+        }
         
         
         else if(activeChar.isInJail())
@@ -291,11 +293,17 @@ public class Wedding implements IVoicedCommandHandler
             activeChar.sendMessage("You are in a festival.");
             return false;
         }
-        //else if (activeChar.isInParty() && activeChar.getParty().isInDimensionalRift()) 
-        //{
-        //    activeChar.sendMessage("You are in the dimensional rift.");
-        //    return false;
-        //}
+        else if (activeChar.isInParty() && activeChar.getParty().isInDimensionalRift()) 
+        {
+            activeChar.sendMessage("You are in the dimensional rift.");
+            return false;
+        }
+        // Thanks nbd
+        else if (!TvTEvent.onEscapeUse(activeChar.getName()))
+        {
+        	activeChar.sendPacket(new ActionFailed());
+        	return false;
+        }
         
         
         int teleportTimer = Config.L2JMOD_WEDDING_TELEPORT_DURATION*1000;

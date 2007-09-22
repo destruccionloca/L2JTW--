@@ -236,9 +236,9 @@ public enum PlayerClass
     PlayerClass(PlayerRace pRace, ClassType pType, ClassLevel pLevel)
     {
 
-        this._race = pRace;
-        this._level = pLevel;
-        this._type = pType;
+        _race = pRace;
+        _level = pLevel;
+        _type = pType;
 
     }
     
@@ -246,14 +246,14 @@ public enum PlayerClass
     {
         Set<PlayerClass> subclasses = null;
         
-        if (this._level == Third)
+        if (_level == Third)
         {
             subclasses  = EnumSet.copyOf(mainSubclassSet);
             
             subclasses.removeAll(neverSubclassed);
             subclasses.remove(this);
             
-            switch (this._race)
+            switch (_race)
             {
                 case LightElf:
                     subclasses.removeAll(getSet(DarkElf, Third));
@@ -295,21 +295,21 @@ public enum PlayerClass
     public final boolean isOfRace(PlayerRace pRace)
     {
 
-        return this._race == pRace;
+        return _race == pRace;
 
     }
     
     public final boolean isOfType(ClassType pType)
     {
 
-        return this._type == pType;
+        return _type == pType;
 
     }
     
     public final boolean isOfLevel(ClassLevel pLevel)
     {
 
-        return this._level == pLevel;
+        return _level == pLevel;
 
     }
     public final ClassLevel getLevel()

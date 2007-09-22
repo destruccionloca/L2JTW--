@@ -38,11 +38,12 @@ public class MonsterKnownList extends AttackableKnownList
 
     // =========================================================
     // Method - Public
-    public boolean addKnownObject(L2Object object) { return addKnownObject(object, null); }
-    public boolean addKnownObject(L2Object object, L2Character dropper)
+    @Override
+	public boolean addKnownObject(L2Object object) { return addKnownObject(object, null); }
+    @Override
+	public boolean addKnownObject(L2Object object, L2Character dropper)
     {
         if (!super.addKnownObject(object, dropper)) return false;
-        
 
         // Set the L2MonsterInstance Intention to AI_INTENTION_ACTIVE if the state was AI_INTENTION_IDLE
         if (object instanceof L2PcInstance && getActiveChar().getAI().getIntention() == CtrlIntention.AI_INTENTION_IDLE) 
@@ -50,7 +51,8 @@ public class MonsterKnownList extends AttackableKnownList
         return true;
     }
 
-    public boolean removeKnownObject(L2Object object)
+    @Override
+	public boolean removeKnownObject(L2Object object)
     {
         if (!super.removeKnownObject(object)) return false;
 
@@ -91,5 +93,6 @@ public class MonsterKnownList extends AttackableKnownList
 
     // =========================================================
     // Property - Public
-    public final L2MonsterInstance getActiveChar() { return (L2MonsterInstance)super.getActiveChar(); }
+    @Override
+	public final L2MonsterInstance getActiveChar() { return (L2MonsterInstance)super.getActiveChar(); }
 }

@@ -152,9 +152,10 @@ public class NpcHtmlMessage extends L2GameServerPacket
 		_npcObjId = npcObjId;
 	}
 	
+	@Override
 	public void runImpl()
 	{
-		this.buildBypassCache(this.getClient().getActiveChar());
+		buildBypassCache(getClient().getActiveChar());
 	}
 	
 	public void setHtml(String text)
@@ -162,7 +163,7 @@ public class NpcHtmlMessage extends L2GameServerPacket
         if(text.length() > 8192)
 		{
 			_log.warning("Html is too long! this will crash the client!");
-			_html = "<html><body>Html was too long</body></html>";
+			_html = "<html><body>Html 資料過長</body></html>";
 			return;
 		}
 		_html = text; // html code must not exceed 8192 bytes 
@@ -174,7 +175,7 @@ public class NpcHtmlMessage extends L2GameServerPacket
 
 		if (content == null)
 		{
-			setHtml("<html><body>My Text is missing:<br>"+path+"</body></html>");
+			setHtml("<html><body>對話資料遺失:<br>"+path+"</body></html>");
 			_log.warning("missing html page "+path);
 			return false;
 		}
@@ -214,6 +215,7 @@ public class NpcHtmlMessage extends L2GameServerPacket
 		}		
 	}
 	
+	@Override
 	protected final void writeImpl()
 	{
 		writeC(0x0f);
@@ -226,6 +228,7 @@ public class NpcHtmlMessage extends L2GameServerPacket
 	/* (non-Javadoc)
 	 * @see net.sf.l2j.gameserver.serverpackets.ServerBasePacket#getType()
 	 */
+	@Override
 	public String getType()
 	{
 		return _S__1B_NPCHTMLMESSAGE;

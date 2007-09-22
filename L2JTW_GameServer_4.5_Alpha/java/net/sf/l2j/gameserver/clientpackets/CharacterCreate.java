@@ -18,14 +18,12 @@
  */
 package net.sf.l2j.gameserver.clientpackets;
 
-import java.nio.ByteBuffer;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import net.sf.l2j.Config;
-import net.sf.l2j.gameserver.TaskPriority;
 import net.sf.l2j.gameserver.datatables.CharNameTable;
 import net.sf.l2j.gameserver.datatables.CharTemplateTable;
 import net.sf.l2j.gameserver.datatables.ItemTable;
@@ -71,6 +69,7 @@ public final class CharacterCreate extends L2GameClientPacket
 	private byte _hairColor;
 	private byte _face;
 	
+	@Override
 	protected void readImpl()
 	{
 		_name      = readS();
@@ -88,6 +87,7 @@ public final class CharacterCreate extends L2GameClientPacket
 		_face      = (byte)readD();
 	}
 
+	@Override
 	protected void runImpl()
 	{
         if (CharNameTable.getInstance().accountCharNumber(getClient().getAccountName()) >= Config.MAX_CHARACTERS_NUMBER_PER_ACCOUNT && Config.MAX_CHARACTERS_NUMBER_PER_ACCOUNT != 0)
@@ -234,6 +234,7 @@ public final class CharacterCreate extends L2GameClientPacket
 	/* (non-Javadoc)
 	 * @see net.sf.l2j.gameserver.clientpackets.ClientBasePacket#getType()
 	 */
+	@Override
 	public String getType()
 	{
 		return _C__0B_CHARACTERCREATE;

@@ -96,6 +96,7 @@ public final class Say2 extends L2GameClientPacket
 	private String _text;
 	private int _type;
 	private String _target;
+	@Override
 	protected void readImpl()
 	{
 		_text = readS();
@@ -103,6 +104,7 @@ public final class Say2 extends L2GameClientPacket
 		_target = (_type == TELL) ? readS() : null;
 	}
 	
+	@Override
 	protected void runImpl()
 	{
 		if (Config.DEBUG) 
@@ -124,7 +126,7 @@ public final class Say2 extends L2GameClientPacket
 		
 		if (activeChar.isChatBanned())
 		{
-			if (_type == ALL || _type == SHOUT || _type == TRADE)
+			if (_type == ALL || _type == SHOUT || _type == TRADE || _type == HERO_VOICE)
 			{
 				activeChar.sendMessage("聊天封鎖中");
 				return;
@@ -133,7 +135,7 @@ public final class Say2 extends L2GameClientPacket
         
         if (activeChar.isInJail() && Config.JAIL_DISABLE_CHAT)
         {
-            if (_type == TELL || _type == SHOUT || _type == TRADE)
+            if (_type == TELL || _type == SHOUT || _type == TRADE || _type == HERO_VOICE)
             {
                 activeChar.sendMessage("GM詢問處無法與外界通訊");
                 return;
@@ -346,7 +348,8 @@ public final class Say2 extends L2GameClientPacket
 	/* (non-Javadoc)
 	 * @see net.sf.l2j.gameserver.clientpackets.ClientBasePacket#getType()
 	 */
-   
+
+	@Override
 	public String getType()
 	{
 		return _C__38_SAY2;

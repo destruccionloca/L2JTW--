@@ -165,7 +165,8 @@ public class L2SiegeGuardAI extends L2CharacterAI implements Runnable
      * @param arg1 The second parameter of the Intention
      * 
      */
-    synchronized void changeIntention(CtrlIntention intention, Object arg0, Object arg1)
+    @Override
+	synchronized void changeIntention(CtrlIntention intention, Object arg0, Object arg1)
     {
         if (Config.DEBUG)
             _log.info("L2SiegeAI.changeIntention(" + intention + ", " + arg0 + ", " + arg1 + ")");
@@ -217,7 +218,8 @@ public class L2SiegeGuardAI extends L2CharacterAI implements Runnable
      * @param target The L2Character to attack
      *
      */
-    protected void onIntentionAttack(L2Character target)
+    @Override
+	protected void onIntentionAttack(L2Character target)
     {
         // Calculate the attack timeout
         _attackTimeout = MAX_ATTACK_TIMEOUT + GameTimeController.getGameTicks();
@@ -318,7 +320,7 @@ public class L2SiegeGuardAI extends L2CharacterAI implements Runnable
         if(_attackTarget instanceof L2PcInstance && sGuard.getCastle().getSiege().checkIsDefender(((L2PcInstance)_attackTarget).getClan())) 
         {
         	// Cancel the target
-        	sGuard.clearHating(_attackTarget);
+        	sGuard.stopHating(_attackTarget);
         	_actor.setTarget(null);
         	setIntention(AI_INTENTION_IDLE, null, null);
         	return;
@@ -328,7 +330,7 @@ public class L2SiegeGuardAI extends L2CharacterAI implements Runnable
     	{
         	// Siege guards differ from normal mobs currently:
         	// If target cannot seen, don't attack any more
-        	sGuard.clearHating(_attackTarget); 
+        	sGuard.stopHating(_attackTarget); 
         	_actor.setTarget(null);
         	setIntention(AI_INTENTION_IDLE, null, null);
         	return;
@@ -537,8 +539,7 @@ public class L2SiegeGuardAI extends L2CharacterAI implements Runnable
             if (_attackTarget != null)
             {
                 L2Attackable npc = (L2Attackable) _actor;
-                int hate = npc.getHating(_attackTarget);
-                if (hate > 0) npc.addDamageHate(_attackTarget, 0, -hate);
+                npc.stopHating(_attackTarget);
             }
 
             // Cancel target and timeout
@@ -607,7 +608,8 @@ public class L2SiegeGuardAI extends L2CharacterAI implements Runnable
     /**
      * Manage AI thinking actions of a L2Attackable.<BR><BR>
      */
-    protected void onEvtThink()
+    @Override
+	protected void onEvtThink()
     {
         //      if(getIntention() != AI_INTENTION_IDLE && (!_actor.isVisible() || !_actor.hasAI() || !_actor.isKnownPlayers()))
         //          setIntention(AI_INTENTION_IDLE);
@@ -642,7 +644,8 @@ public class L2SiegeGuardAI extends L2CharacterAI implements Runnable
      * @param attacker The L2Character that attacks the actor
      * 
      */
-    protected void onEvtAttacked(L2Character attacker)
+    @Override
+	protected void onEvtAttacked(L2Character attacker)
     {
         // Calculate the attack timeout
         _attackTimeout = MAX_ATTACK_TIMEOUT + GameTimeController.getGameTicks();
@@ -676,7 +679,8 @@ public class L2SiegeGuardAI extends L2CharacterAI implements Runnable
      * @param aggro The value of hate to add to the actor against the target
      * 
      */
-    protected void onEvtAggression(L2Character target, int aggro)
+    @Override
+	protected void onEvtAggression(L2Character target, int aggro)
     {
         if (_actor == null) return;
         L2Attackable me = (L2Attackable) _actor;
@@ -740,7 +744,8 @@ public class L2SiegeGuardAI extends L2CharacterAI implements Runnable
         }
     }
     
-    protected void onEvtDead()
+    @Override
+	protected void onEvtDead()
     {
     	stopAITask();
     	super.onEvtDead();

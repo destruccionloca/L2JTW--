@@ -32,8 +32,8 @@ import net.sf.l2j.L2DatabaseFactory;
 import net.sf.l2j.gameserver.SevenSigns;
 import net.sf.l2j.gameserver.ThreadPoolManager;
 import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
-import net.sf.l2j.gameserver.model.actor.instance.L2SiegeGuardInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.model.actor.instance.L2SiegeGuardInstance;
 import net.sf.l2j.gameserver.serverpackets.CreatureSay;
 import net.sf.l2j.util.Rnd;
 
@@ -50,7 +50,7 @@ public class AutoChatHandler implements SpawnListener
     protected static final Logger _log = Logger.getLogger(AutoChatHandler.class.getName());
     private static AutoChatHandler _instance;
 
-    private static final long DEFAULT_CHAT_DELAY = 180000; // 3 mins by default
+    private static final long DEFAULT_CHAT_DELAY = 30000; // 30 secs by default
 
     protected Map<Integer, AutoChatInstance> _registeredChats;
 

@@ -80,7 +80,7 @@ public class NpcTable
 			{
 				con = L2DatabaseFactory.getInstance().getConnection();
 				PreparedStatement statement;
-				statement = con.prepareStatement("SELECT " + L2DatabaseFactory.getInstance().safetyString(new String[] {"id", "idTemplate", "name", "serverSideName", "title", "serverSideTitle", "class", "collision_radius", "collision_height", "level", "sex", "type", "attackrange", "hp", "mp", "hpreg", "mpreg", "str", "con", "dex", "int", "wit", "men", "exp", "sp", "patk", "pdef", "matk", "mdef", "atkspd", "aggro", "matkspd", "rhand", "lhand", "armor", "walkspd", "runspd", "faction_id", "faction_range", "isUndead", "absorb_level"}) + " FROM npc");
+				statement = con.prepareStatement("SELECT " + L2DatabaseFactory.getInstance().safetyString(new String[] {"id", "idTemplate", "name", "serverSideName", "title", "serverSideTitle", "class", "collision_radius", "collision_height", "level", "sex", "type", "attackrange", "hp", "mp", "hpreg", "mpreg", "str", "con", "dex", "int", "wit", "men", "exp", "sp", "patk", "pdef", "matk", "mdef", "atkspd", "aggro", "matkspd", "rhand", "lhand", "armor", "walkspd", "runspd", "faction_id", "faction_range", "isUndead", "absorb_level", "absorb_type"}) + " FROM npc");
 				ResultSet npcdata = statement.executeQuery();
 
 				fillNpcTable(npcdata);
@@ -268,7 +268,7 @@ public class NpcTable
 			try 
             {
 			    PreparedStatement statement10 = con.prepareStatement("SELECT " + L2DatabaseFactory.getInstance().safetyString(new String[] 
-			    {"npc_id", "ischar","charclass","charrace","charface","charhair","charcolor","charsex","charhero","lrhand","armor","pant","head","boot","glove","dhair","hair","face","enchlvl"}) + " FROM npcCharData ORDER BY npc_id");
+			    {"npc_id", "ischar","charclass","charrace","charface","charhair","charcolor","charsex","charhero","lrhand","armor","pant","head","boot","glove","dhair","hair","face","enchlvl","augmentation"}) + " FROM npcCharData ORDER BY npc_id");
 			    ResultSet NpcCharDataTable = statement10.executeQuery();
 			    L2NpcCharData npcCharDat = null;
 			    L2NpcTemplate npcDat = null;
@@ -302,6 +302,7 @@ public class NpcTable
                     npcCharDat.setDHair(NpcCharDataTable.getInt("dhair"));
                     npcCharDat.setFace(NpcCharDataTable.getInt("face"));
                     npcCharDat.setEnchLvl(NpcCharDataTable.getInt("enchlvl"));
+                    npcCharDat.setAugmentation(NpcCharDataTable.getInt("augmentation"));
                     
 		            npcDat.addCharData(npcCharDat);
 		            cont++;
@@ -323,7 +324,7 @@ public class NpcTable
 			try 
             {
 			    PreparedStatement statement10 = con.prepareStatement("SELECT " + L2DatabaseFactory.getInstance().safetyString(new String[] 
-			    {"npc_id", "primary_attack","skill_chance","canMove","soulshot","spiritshot","ischaos","enemyClan","enemyRange"}) + " FROM npcAIData ORDER BY npc_id");
+			    {"npc_id", "primary_attack","skill_chance","canMove","soulshot","spiritshot","ischaos","enemyClan","enemyRange","dodge"}) + " FROM npcAIData ORDER BY npc_id");
 			    ResultSet NpcAIDataTable = statement10.executeQuery();
 			    L2NpcAIData npcAIDat = null;
 			    L2NpcTemplate npcDat = null;
@@ -347,6 +348,7 @@ public class NpcTable
                     npcAIDat.setIsChaos(NpcAIDataTable.getInt("ischaos"));
                     npcAIDat.setEnemyClan(NpcAIDataTable.getString("enemyClan"));
                     npcAIDat.setEnemyRange(NpcAIDataTable.getInt("enemyRange"));
+                    npcAIDat.setDodge(NpcAIDataTable.getInt("dodge"));
                     //npcAIDat.setBaseShldRate(NpcAIDataTable.getInt("baseShldRate"));
                     //npcAIDat.setBaseShldDef(NpcAIDataTable.getInt("baseShldDef"));
 
@@ -524,6 +526,7 @@ public class NpcTable
 			npcDat.set("isUndead", NpcData.getString("isUndead"));
 
 			npcDat.set("absorb_level", NpcData.getString("absorb_level"));
+			npcDat.set("absorb_type", NpcData.getString("absorb_type"));
 
 			L2NpcTemplate template = new L2NpcTemplate(npcDat);
 			template.addResist(Stats.POWER_DEFENCE,100);

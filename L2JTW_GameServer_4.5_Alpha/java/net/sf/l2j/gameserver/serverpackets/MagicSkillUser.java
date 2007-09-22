@@ -83,6 +83,7 @@ public class MagicSkillUser extends L2GameServerPacket
         
 	}
 	
+	@Override
 	protected final void writeImpl()
 	{
 		writeC(0x48);
@@ -95,21 +96,24 @@ public class MagicSkillUser extends L2GameServerPacket
 		writeD(_x);
 		writeD(_y);
 		writeD(_z);
+
+		writeH(0x00); // unknown loop but not AoE
         if (L2Skill.CRIT_ATTACK)
-        writeC(_flags);
-        
-		//writeH(0x00); // size of the mighty loop :)
+            writeC(_flags);
 		//for()
 		//{
-			//writeD(0x00);
-			//writeD(0x00);
-			//writeD(0x00);
+
+			writeH(0x00);
+			writeH(0x00);
+			writeH(0x00);
+
 		//}
 	}
     
 	/* (non-Javadoc)
 	 * @see net.sf.l2j.gameserver.serverpackets.ServerBasePacket#getType()
 	 */
+	@Override
 	public String getType()
 	{
 		return _S__5A_MAGICSKILLUSER;

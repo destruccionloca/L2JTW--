@@ -74,7 +74,7 @@ public class AdminAdmin implements IAdminCommandHandler {
         if (!Config.ALT_PRIVILEGES_ADMIN)
             if (!(checkLevel(activeChar.getAccessLevel()) && activeChar.isGM())) return false;
         
-        if (command.equals("admin_admin")) showMainPage(activeChar);
+        //if (command.equals("admin_admin")) showMainPage(activeChar);
         //if (command.equals("admin_admin2")) showMainPage2(activeChar);
         if (command.equals("admin_cache")) showMainPageCache(activeChar);
         if (command.equals("admin_eventmenu")) showMainPageEventMenu(activeChar);

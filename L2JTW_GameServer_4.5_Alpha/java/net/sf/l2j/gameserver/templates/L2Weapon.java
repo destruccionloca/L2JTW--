@@ -33,8 +33,8 @@ import net.sf.l2j.gameserver.model.L2Skill.SkillType;
 import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.quest.Quest;
-import net.sf.l2j.gameserver.skills.conditions.ConditionGameChance;
 import net.sf.l2j.gameserver.skills.Env;
+import net.sf.l2j.gameserver.skills.conditions.ConditionGameChance;
 import net.sf.l2j.gameserver.skills.funcs.Func;
 import net.sf.l2j.gameserver.skills.funcs.FuncTemplate;
 
@@ -132,6 +132,7 @@ public final class L2Weapon  extends L2Item
 	 * Returns the type of Weapon
 	 * @return L2WeaponType
 	 */
+	@Override
 	public L2WeaponType getItemType()
 	{
 		return (L2WeaponType)super._type;
@@ -141,6 +142,7 @@ public final class L2Weapon  extends L2Item
 	 * Returns the ID of the Etc item after applying the mask.
 	 * @return int : ID of the Weapon
 	 */
+	@Override
 	public int getItemMask()
 	{
 		return getItemType().mask();
@@ -287,6 +289,7 @@ public final class L2Weapon  extends L2Item
 	 * @param player : L2Character pointing out the player
 	 * @return Func[] : array of functions
 	 */
+	@Override
 	public Func[] getStatFuncs(L2ItemInstance instance, L2Character player)
     {
     	List<Func> funcs = new FastList<Func>();

@@ -106,6 +106,17 @@ public final class L2NpcTemplate extends L2CharTemplate
     //public final int     baseShldRate;
     //public final int     baseShldDef;
     */
+
+    public final AbsorbCrystalType absorbType;
+    
+    public static enum AbsorbCrystalType
+    {
+        LAST_HIT,
+        FULL_PARTY,
+        PARTY_ONE_RANDOM
+    }
+    	
+
 	private final StatsSet _npcStatsSet;
 
 	/** fixed skills*/
@@ -194,9 +205,9 @@ public final class L2NpcTemplate extends L2CharTemplate
 			factionId = f.intern();
 		factionRange  = set.getInteger("factionRange");
         absorbLevel  = set.getInteger("absorb_level", 0);
+    	absorbType = AbsorbCrystalType.valueOf(set.getString("absorb_type"));
         
 
-        
 		//String r = set.getString("race", null);
 		//if (r == null)
 		//	race = null;
@@ -423,7 +434,7 @@ public final class L2NpcTemplate extends L2CharTemplate
 			}
 			else
 			{
-				_log.warning("Quest event not allowed in multiple quests.  Skipped addition of Event Type \""+EventType+"\" for NPC \""+this.name +"\" and quest \""+q.getName()+"\".");
+				_log.warning("Quest event not allowed in multiple quests.  Skipped addition of Event Type \""+EventType+"\" for NPC \""+name +"\" and quest \""+q.getName()+"\".");
 			}
 		}
     }

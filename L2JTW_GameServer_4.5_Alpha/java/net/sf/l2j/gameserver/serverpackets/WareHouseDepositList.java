@@ -19,8 +19,8 @@
 package net.sf.l2j.gameserver.serverpackets;
 
 import java.util.logging.Logger;
-import javolution.util.FastList;
 
+import javolution.util.FastList;
 import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.model.L2ItemInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
@@ -64,6 +64,7 @@ public class WareHouseDepositList extends L2GameServerPacket
 		}
 	}
 	
+	@Override
 	protected final void writeImpl()
 	{
 		writeC(0x41);
@@ -102,6 +103,7 @@ public class WareHouseDepositList extends L2GameServerPacket
 	/* (non-Javadoc)
 	 * @see net.sf.l2j.gameserver.serverpackets.ServerBasePacket#getType()
 	 */
+	@Override
 	public String getType()
 	{
 		return _S__53_WAREHOUSEDEPOSITLIST;

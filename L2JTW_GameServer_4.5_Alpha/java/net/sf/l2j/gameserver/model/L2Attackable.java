@@ -35,6 +35,7 @@ import net.sf.l2j.gameserver.datatables.ItemTable;
 import net.sf.l2j.gameserver.datatables.EventDroplist.DateDrop;
 import net.sf.l2j.gameserver.instancemanager.CursedWeaponsManager;
 import net.sf.l2j.gameserver.model.L2Skill;
+import net.sf.l2j.gameserver.model.actor.instance.L2BossInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2DoorInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2FolkInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2MinionInstance;
@@ -100,23 +101,25 @@ public class L2Attackable extends L2NpcInstance
          */
         AggroInfo(L2Character pAttacker) 
         {
-            this._attacker = pAttacker;
+            _attacker = pAttacker;
         }
         
         /**
          * Verify is object is equal to this AggroInfo.<BR><BR>
          */
-        public boolean equals(Object obj) 
+        @Override
+		public boolean equals(Object obj) 
         {
-            return this == obj || this._attacker == _attacker;
+            return this == obj || _attacker == _attacker;
         }
         
         /**
          * Return the Identifier of the attaker L2Character.<BR><BR>
          */
-        public int hashCode() 
+        @Override
+		public int hashCode() 
         {
-            return this._attacker.getObjectId();
+            return _attacker.getObjectId();
         }
         
     }
@@ -137,23 +140,25 @@ public class L2Attackable extends L2NpcInstance
         
         public RewardInfo(L2Character pAttacker, int pDmg)
         {
-            this._attacker = pAttacker;
-            this._dmg = pDmg;
+            _attacker = pAttacker;
+            _dmg = pDmg;
         }
         
         public void addDamage(int pDmg)
         {
-            this._dmg += pDmg;
+            _dmg += pDmg;
         }
         
-        public boolean equals(Object obj) 
+        @Override
+		public boolean equals(Object obj) 
         {
-            return this == obj || this._attacker == _attacker;
+            return this == obj || _attacker == _attacker;
         }
         
-        public int hashCode() 
+        @Override
+		public int hashCode() 
         {
-            return this._attacker.getObjectId();
+            return _attacker.getObjectId();
         }
     }
     
@@ -176,25 +181,27 @@ public class L2Attackable extends L2NpcInstance
          */
         AbsorberInfo(L2PcInstance attacker, int pCrystalId, double pAbsorbedHP) 
         {
-            this._absorber = attacker;
-            this._crystalId = pCrystalId;
-            this._absorbedHP = pAbsorbedHP;
+            _absorber = attacker;
+            _crystalId = pCrystalId;
+            _absorbedHP = pAbsorbedHP;
         }
         
         /**
          * Verify is object is equal to this AbsorberInfo.<BR><BR>
          */
-        public boolean equals(Object obj) 
+        @Override
+		public boolean equals(Object obj) 
         {
-            return this == obj || this._absorber == _absorber;
+            return this == obj || _absorber == _absorber;
         }
         
         /**
          * Return the Identifier of the absorber L2Character.<BR><BR>
          */
-        public int hashCode() 
+        @Override
+		public int hashCode() 
         {
-            return this._absorber.getObjectId();
+            return _absorber.getObjectId();
         }
     }
     
@@ -208,8 +215,8 @@ public class L2Attackable extends L2NpcInstance
         
         public RewardItem(int itemId, int count)
         {
-            this._itemId = itemId;
-            this._count = count;
+            _itemId = itemId;
+            _count = count;
         }
         
         public int getItemId() { return _itemId;}
@@ -274,22 +281,24 @@ public class L2Attackable extends L2NpcInstance
     public L2Attackable(int objectId, L2NpcTemplate template)
     {
         super(objectId, template);
-        this.getKnownList(); // init knownlist
+        getKnownList(); // init knownlist
         _haveToDrop = true;
         _mustGiveExpSp = true;
     }
 
-    public AttackableKnownList getKnownList()
+    @Override
+	public AttackableKnownList getKnownList()
     {
     	if(super.getKnownList() == null || !(super.getKnownList() instanceof AttackableKnownList))
-    		this.setKnownList(new AttackableKnownList(this));
+    		setKnownList(new AttackableKnownList(this));
     	return (AttackableKnownList)super.getKnownList();
     }
     
     /**
      * Return the L2Character AI of the L2Attackable and if its null create a new one.<BR><BR>
      */
-    public L2CharacterAI getAI() 
+    @Override
+	public L2CharacterAI getAI() 
     {
         if (_ai == null)
         {
@@ -332,7 +341,8 @@ public class L2Attackable extends L2NpcInstance
      * @param attacker The L2Character who attacks
      * 
      */
-    public void reduceCurrentHp(double damage, L2Character attacker)
+    @Override
+	public void reduceCurrentHp(double damage, L2Character attacker)
     {
         reduceCurrentHp(damage, attacker, true);
     }
@@ -345,7 +355,8 @@ public class L2Attackable extends L2NpcInstance
      * @param awake The awake state (If True : stop sleeping)
      * 
      */
-    public void reduceCurrentHp(double damage, L2Character attacker, boolean awake)
+    @Override
+	public void reduceCurrentHp(double damage, L2Character attacker, boolean awake)
     {
     	/*
         if ((this instanceof L2SiegeGuardInstance) && (attacker instanceof L2SiegeGuardInstance))
@@ -358,7 +369,7 @@ public class L2Attackable extends L2NpcInstance
         
 
         */
-        if (this.isEventMob) return;
+        if (isEventMob) return;
             
         // Add damage and hate to the attacker AggroInfo of the L2Attackable _aggroList
         if (attacker != null) addDamage(attacker, (int)damage);
@@ -405,6 +416,8 @@ public class L2Attackable extends L2NpcInstance
      * @param killer The L2Character that has killed the L2Attackable
      * 
      */
+
+    @Override
 	public void doDie(L2Character killer) 
     {
         // Enhance soul crystals of the attacker if this L2Attackable had its soul absorbed
@@ -694,11 +707,8 @@ public class L2Attackable extends L2NpcInstance
                         L2PcInstance player = (L2PcInstance)attacker;
                         if (isOverhit() && attacker == getOverhitAttacker())
                         {
-                        	int overHitExp = (int)calculateOverhitExp(exp);
-                        	SystemMessage sms = new SystemMessage(SystemMessageId.ACQUIRED_BONUS_EXPERIENCE_THROUGH_OVER_HIT);
-                        	sms.addNumber(overHitExp);
-                            player.sendPacket(sms);
-                            exp += overHitExp;
+                        	player.sendPacket(new SystemMessage(SystemMessageId.OVER_HIT));
+                            exp += calculateOverhitExp(exp);
                         }
                     }
                     
@@ -833,23 +843,27 @@ public class L2Attackable extends L2NpcInstance
         
         // Get the AggroInfo of the attacker L2Character from the _aggroList of the L2Attackable
         AggroInfo ai = getAggroListRP().get(attacker);
-        if (ai != null) 
+        if (ai == null) 
         {
-            // Add new damage and aggro (=damage) to the AggroInfo object
-            ai._damage += damage;
-            ai._hate += (aggro*100)/(getLevel()+7);
-        } 
-        else 
-        {
-            // Create a AggroInfo object and Init it
             ai = new AggroInfo(attacker);
-            ai._damage = damage;
-            ai._hate = (aggro*100)/(getLevel()+7);
-            
-            // Add the attaker L2Character and the AggroInfo object in the _aggroList of the L2Attackable
+            ai._damage = 0;
+            ai._hate = 0;
             getAggroListRP().put(attacker, ai);
         }
-        
+
+        // If aggro is negative, its comming from SEE_SPELL, buffs use constant 150
+        if (aggro < 0) {
+        	ai._hate -= (aggro*150)/(getLevel()+7);
+        	aggro = -aggro;
+        }
+        // if damage == 0 -> this is case of adding only to aggro list, dont apply formula on it
+        else if (damage == 0) ai._hate += aggro;
+        // else its damage that must be added using constant 100
+        else ai._hate += (aggro*100)/(getLevel()+7);
+
+        // Add new damage and aggro (=damage) to the AggroInfo object
+        ai._damage += damage;
+
         // Set the intention to the L2Attackable to AI_INTENTION_ACTIVE
         if (aggro > 0 && getAI().getIntention() == CtrlIntention.AI_INTENTION_IDLE) getAI().setIntention(CtrlIntention.AI_INTENTION_ACTIVE);
         
@@ -861,7 +875,7 @@ public class L2Attackable extends L2NpcInstance
             try {
                 if (attacker instanceof L2PcInstance || attacker instanceof L2Summon) 
                 {
-                    L2PcInstance player = attacker instanceof L2PcInstance?(L2PcInstance)attacker:((L2Summon)attacker).getOwner();
+                    L2PcInstance player = attacker instanceof L2PcInstance ? (L2PcInstance)attacker : ((L2Summon)attacker).getOwner();
                     
                     if (getTemplate().getEventQuests(Quest.QuestEventType.MOBGOTATTACKED) !=null)
                     	for (Quest quest: getTemplate().getEventQuests(Quest.QuestEventType.MOBGOTATTACKED))
@@ -870,6 +884,16 @@ public class L2Attackable extends L2NpcInstance
             } 
             catch (Exception e) { _log.log(Level.SEVERE, "", e); }
         }
+    }
+
+    /**
+     * Clears _aggroList hate of the L2Character without removing from the list.<BR><BR>
+     */
+    public void stopHating(L2Character target) {
+    	if (target == null) return;
+    	AggroInfo ai = getAggroListRP().get(target);
+    	if (ai == null) return;
+    	ai._hate = 0;
     }
     
     /**
@@ -1546,10 +1570,11 @@ public class L2Attackable extends L2NpcInstance
          for (int i = 0; i < item.getCount(); i++)
          {
              // Randomize drop position  
-             //int newX = this.getX() + Rnd.get(randDropLim * 2 + 1) - randDropLim;
-             //int newY = this.getY() + Rnd.get(randDropLim * 2 + 1) - randDropLim;
-             //int newZ = Math.max(this.getZ(), lastAttacker.getZ()) + 20;
-             //Math.max(this.getZ(), lastAttacker.getZ()) + 20; // TODO: temp hack, do somethign nicer when we have geodatas
+
+             //int newX = getX() + Rnd.get(randDropLim * 2 + 1) - randDropLim;
+             //int newY = getY() + Rnd.get(randDropLim * 2 + 1) - randDropLim;
+             //int newZ = Math.max(getZ(), lastAttacker.getZ()) + 20; // TODO: temp hack, do somethign nicer when we have geodatas
+
 
              // Init the dropped L2ItemInstance and add it in the world as a visible object at the position where mob was last
              ditem = ItemTable.getInstance().createItem("Loot", item.getItemId(), item.getCount(), lastAttacker, this);
@@ -1606,17 +1631,6 @@ public class L2Attackable extends L2NpcInstance
        public void clearAggroList()
     {
     	getAggroList().clear();
-    }
-    
-    /**
-     * Clears _aggroList hate of the L2Character without removing from the list.<BR><BR>
-     */
-    public void clearHating(L2Character target) 
-    {
-    	if (getAggroListRP().isEmpty()) return;
-    	AggroInfo ai = getAggroListRP().get(target);
-    	if (ai == null) return;
-    	ai._hate = 0;
     }
     
     /**
@@ -1787,7 +1801,7 @@ public class L2Attackable extends L2NpcInstance
     private void levelSoulCrystals(L2Character attacker)
     {
         // Only L2PcInstance can absorb a soul
-        if (!(attacker instanceof L2PcInstance))
+        if (!(attacker instanceof L2PcInstance) && !(attacker instanceof L2Summon))
         {
             resetAbsorbList(); return;
         }
@@ -1808,7 +1822,9 @@ public class L2Attackable extends L2NpcInstance
         boolean doLevelup = true;
         boolean isBossMob = maxAbsorbLevel > 10 ? true : false;         
         
-        L2PcInstance killer = (L2PcInstance)attacker;
+        L2NpcTemplate.AbsorbCrystalType absorbType = getTemplate().absorbType;         
+        
+        L2PcInstance killer = (attacker instanceof L2Summon)? ((L2Summon)attacker).getOwner() : (L2PcInstance)attacker;
         
         // If this mob is a boss, then skip some checkings 
         if (!isBossMob)
@@ -1854,8 +1870,15 @@ public class L2Attackable extends L2NpcInstance
         
         List<L2PcInstance> players = new FastList<L2PcInstance>();        
                 
-        if (isBossMob && killer.isInParty())
+        if (absorbType == L2NpcTemplate.AbsorbCrystalType.FULL_PARTY && killer.isInParty())
             players = killer.getParty().getPartyMembers();
+        else if (absorbType == L2NpcTemplate.AbsorbCrystalType.PARTY_ONE_RANDOM && killer.isInParty())
+        {
+        	// This is a naive method for selecting a random member.  It gets any random party member and  
+        	// then checks if the member has a valid crystal.  It does not select the random party member 
+        	// among those who have crystals, only.  However, this might actually be correct (same as retail).
+            players.add(killer.getParty().getPartyMembers().get(Rnd.get(killer.getParty().getMemberCount())));
+        }
         else
             players.add(killer); 
         
@@ -1976,20 +1999,24 @@ public class L2Attackable extends L2NpcInstance
                 continue;
             }
                         
-            // Ember and Anakazel(78) are not 100% success rate and each individual 
-            // member of the party has a failure rate on leveling.           
-            if(isBossMob && (getNpcId() == 25319 || getNpcId() == 25338))
-                doLevelup = false;
+            /* TODO: Confirm boss chance for crystal level up and for crystal breaking.
+             * It is known that bosses with FULL_PARTY crystal level ups have 100% success rate, but this is not 
+             * the case for the other bosses (one-random or last-hit).  
+             * While not confirmed, it is most reasonable that crystals leveled up at bosses will never break.
+             * Also, the chance to level up is guessed as around 70% if not higher.
+             */
+            int chanceLevelUp = isBossMob? 70:SoulCrystal.LEVEL_CHANCE;
             
-            // If succeeds or it is a boss mob, level up the crystal.
-            if ((isBossMob && doLevelup) || (dice <= SoulCrystal.LEVEL_CHANCE))
+            // If succeeds or it is a full party absorb, level up the crystal.
+            if (((absorbType == L2NpcTemplate.AbsorbCrystalType.FULL_PARTY) && doLevelup) || (dice <= chanceLevelUp))
             {
 
                 // Give staged crystal
                 exchangeCrystal(player, crystalOLD, crystalNEW, false);
             }
-            // If true and not a boss mob, break the crystal.
-            else if (!isBossMob && dice >= (100.0 - SoulCrystal.BREAK_CHANCE))
+            
+            // If true and not a last-hit mob, break the crystal.
+            else if ((!isBossMob) && dice >= (100.0 - SoulCrystal.BREAK_CHANCE))
             {
                 // Remove current crystal an give a broken open.
                 if      (crystalNME.startsWith("red"))
@@ -2124,12 +2151,14 @@ public class L2Attackable extends L2NpcInstance
     /**
      * Return True.<BR><BR>
      */
-    public boolean isAttackable()
+    @Override
+	public boolean isAttackable()
     {
         return true;
     }
     
-    public void onSpawn()
+    @Override
+	public void onSpawn()
     {
         // Clear mob spoil,seed
         setSpoil(false);
@@ -2183,9 +2212,24 @@ public class L2Attackable extends L2NpcInstance
         return (_seedType < 5650); // low-grade seeds has id's below 5650
     }
     
-    
     private int getAbsorbLevel()
     {
         return getTemplate().absorbLevel;
+    }
+
+    /**
+     * Check if the server allows Random Animation.<BR><BR>
+     */
+    // This is located here because L2Monster and L2FriendlyMob both extend this class. The other non-pc instances extend either L2NpcInstance or L2MonsterInstance.
+    @Override
+	public boolean hasRandomAnimation()
+    {
+        return ((Config.MAX_MONSTER_ANIMATION > 0) && !(this instanceof L2BossInstance));
+    }
+
+    @Override
+	public boolean isMob()
+    {
+        return true; // This means we use MAX_MONSTER_ANIMATION instead of MAX_NPC_ANIMATION
     }
 }

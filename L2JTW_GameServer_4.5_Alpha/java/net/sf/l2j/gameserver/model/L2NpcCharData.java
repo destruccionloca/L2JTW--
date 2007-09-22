@@ -57,6 +57,7 @@ public class L2NpcCharData
 	private int _dhair;
 	private int _face;
 	private int _enchlvl;
+	private int _augmentation;
 	
 	private FastList<L2NpcCharData> npcCharData;
 	
@@ -156,6 +157,10 @@ public class L2NpcCharData
 	{
 		_enchlvl = enchlvl ;
 	}
+    public void setAugmentation(int augmentation)
+	{
+    	_augmentation = augmentation ;
+	}
     
     
     //--------------------------------------------------------------------------------------------------------------
@@ -236,7 +241,10 @@ public class L2NpcCharData
 	{
 		return _enchlvl;
 	}
-    
+    public int getAugmentation()
+    {
+    	return _augmentation;
+    }
     
     
     

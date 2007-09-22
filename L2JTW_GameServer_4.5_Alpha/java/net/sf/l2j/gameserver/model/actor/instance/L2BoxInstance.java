@@ -1,3 +1,20 @@
+/* This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+ * 02111-1307, USA.
+ *
+ * http://www.gnu.org/copyleft/gpl.html
+ */
 package net.sf.l2j.gameserver.model.actor.instance;
 
 /*
@@ -83,6 +100,7 @@ public class L2BoxInstance extends L2NpcInstance {
 		super(objectId, _template);
 	}
 
+	@Override
 	public void onBypassFeedback(L2PcInstance player, String command)
 	{
 		String playerName = player.getName();
@@ -112,11 +130,13 @@ public class L2BoxInstance extends L2NpcInstance {
 		//else _log.info("onBypassFeedback unknown command "+command);
 	}
 
+	@Override
 	public boolean hasRandomAnimation()
 	{
 		return false;
 	}
 
+	@Override
 	public String getHtmlPath(int npcId, int val)
 	{
 		String pom = "";
@@ -283,10 +303,10 @@ public class L2BoxInstance extends L2NpcInstance {
 		}
 		if (startPos >= _items.size())
 			startPos = 0;
-		String button = "<button value=\"放置\" width=80 height=15 action=\"bypass -h npc_"+getObjectId()+"_InBox "+drawername;
-		String next = "<button value=\"下一頁\" width=50 height=15 action=\"bypass -h npc_"+getObjectId()+"_Deposit "+drawername+" "+(startPos+MAX_ITEMS_PER_PAGE)+"\">";
-		String back = "<button value=\"上一頁\" width=50 height=15 action=\"bypass -h npc_"+getObjectId()+"_Chat 0\">";
-		String content = "<html><body>放置者 "+drawername+":<br>"+next+" "+back+"<table width=\"100%\">";
+		String button = "<button value=\"Deposit\" width=80 height=15 action=\"bypass -h npc_"+getObjectId()+"_InBox "+drawername;
+		String next = "<button value=\"next\" width=50 height=15 action=\"bypass -h npc_"+getObjectId()+"_Deposit "+drawername+" "+(startPos+MAX_ITEMS_PER_PAGE)+"\">";
+		String back = "<button value=\"back\" width=50 height=15 action=\"bypass -h npc_"+getObjectId()+"_Chat 0\">";
+		String content = "<html><body>Drawer "+drawername+":<br>"+next+" "+back+"<table width=\"100%\">";
 		content += "<tr><td>Item</td><td>Count</td><td>Deposit</td></tr>";
 		for (L2BoxItem i : _items)
 		{

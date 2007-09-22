@@ -22,7 +22,8 @@ import java.util.List;
 
 import javolution.util.FastList;
 import net.sf.l2j.gameserver.model.L2Character;
-import net.sf.l2j.gameserver.model.L2Summon;
+import net.sf.l2j.gameserver.model.actor.instance.L2PetInstance;
+import net.sf.l2j.gameserver.model.actor.instance.L2SummonInstance;
 
 /**
  * This class ...
@@ -43,9 +44,9 @@ public class PartySpelled extends L2GameServerPacket
 
         public Effect(int pSkillId, int pDat, int pDuration)
         {
-            this._skillId = pSkillId;
-            this._dat = pDat;
-            this._duration = pDuration;
+            _skillId = pSkillId;
+            _dat = pDat;
+            _duration = pDuration;
         }
     }
 
@@ -55,11 +56,12 @@ public class PartySpelled extends L2GameServerPacket
         _activeChar = cha;
     }
 
-    protected final void writeImpl()
+    @Override
+	protected final void writeImpl()
     {
         if (_activeChar == null) return;
         writeC(0xee);
-        writeD(_activeChar instanceof L2Summon ? 2 : 0);
+        writeD(_activeChar instanceof L2SummonInstance ? 2 : _activeChar instanceof L2PetInstance ? 1 : 0);
         writeD(_activeChar.getObjectId());
         writeD(_effects.size());
         for (Effect temp : _effects)
@@ -79,7 +81,8 @@ public class PartySpelled extends L2GameServerPacket
     /* (non-Javadoc)
      * @see net.sf.l2j.gameserver.serverpackets.ServerBasePacket#getType()
      */
-    public String getType()
+    @Override
+	public String getType()
     {
         return _S__EE_PartySpelled;
     }

@@ -221,6 +221,7 @@ public class L2FolkInstance extends L2NpcInstance
         player.sendPacket(new ActionFailed());
     }
 	
+	@Override
 	public void onBypassFeedback(L2PcInstance player, String command)
 	{
 		if (command.startsWith("SkillList"))

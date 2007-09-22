@@ -51,11 +51,13 @@ public final class UseItem extends L2GameClientPacket
 
 	private int _objectId;
 	
+	@Override
 	protected void readImpl()
 	{
 		_objectId = readD();
 	}
 
+	@Override
 	protected void runImpl()
 	{
 
@@ -214,6 +216,38 @@ public final class UseItem extends L2GameClientPacket
                 	return;
                 }
                 
+                // Don't allow weapon/shield hero equipment during Olympiads
+                if (activeChar.isInOlympiadMode()
+                		&& (
+                				bodyPart == L2Item.SLOT_LR_HAND
+                				|| bodyPart == L2Item.SLOT_L_HAND
+                				|| bodyPart == L2Item.SLOT_R_HAND
+                			)
+                		&& (
+                				(item.getItemId() >= 6611 && item.getItemId() <= 6621) ||
+                				item.getItemId() == 6842 
+                			)
+                	)
+                {
+                	return;
+                }
+
+                // Don't allow weapon/shield hero equipment during Olympiads
+                if (activeChar.isInOlympiadMode()
+                		&& (
+                				bodyPart == L2Item.SLOT_LR_HAND
+                				|| bodyPart == L2Item.SLOT_L_HAND
+                				|| bodyPart == L2Item.SLOT_R_HAND
+                			)
+                		&& (
+                				(item.getItemId() >= 6611 && item.getItemId() <= 6621) ||
+                				item.getItemId() == 6842 
+                			)
+                	)
+                {
+                	return;
+                }
+
                 // Equip or unEquip
                 L2ItemInstance[] items = null;
                 boolean isEquiped = item.isEquipped();
@@ -358,6 +392,7 @@ public final class UseItem extends L2GameClientPacket
 //		}
 	}
 
+	@Override
 	public String getType()
 	{
 		return _C__14_USEITEM;

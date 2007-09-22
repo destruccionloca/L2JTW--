@@ -66,7 +66,12 @@ public class StatusUpdate extends L2GameServerPacket
     public static final int M_DEF = 0x19;
     public static final int PVP_FLAG = 0x1a;
     public static final int KARMA = 0x1b;
+    //Possible Value
+    public static final int RUN_SPD = 0x2a;
+    public static final int RUN_SPD_MP = 0x2b;
+    public static final int ATK_SPD_MP = 0x2c;
 
+    
     public static final int CUR_CP = 0x21;
     public static final int MAX_CP = 0x22;
 
@@ -87,8 +92,8 @@ public class StatusUpdate extends L2GameServerPacket
 
         Attribute(int pId, int pValue)
         {
-            this.id = pId;
-            this.value = pValue;
+            id = pId;
+            value = pValue;
         }
     }
 
@@ -103,7 +108,8 @@ public class StatusUpdate extends L2GameServerPacket
         _attributes.add(new Attribute(id, level));
     }
 
-    protected final void writeImpl()
+    @Override
+	protected final void writeImpl()
     {
         writeC(0x0e);
         writeD(_objectId);
@@ -121,7 +127,8 @@ public class StatusUpdate extends L2GameServerPacket
     /* (non-Javadoc)
      * @see net.sf.l2j.gameserver.serverpackets.ServerBasePacket#getType()
      */
-    public String getType()
+    @Override
+	public String getType()
     {
         return _S__1A_STATUSUPDATE;
     }

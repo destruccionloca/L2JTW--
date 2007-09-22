@@ -22,13 +22,14 @@ import java.util.List;
 
 import javolution.util.FastList;
 import net.sf.l2j.Config;
-import net.sf.l2j.gameserver.datatables.ItemTable;
 import net.sf.l2j.gameserver.SevenSignsFestival;
+import net.sf.l2j.gameserver.datatables.ItemTable;
 import net.sf.l2j.gameserver.instancemanager.DuelManager;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PetInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PlayableInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2SummonInstance;
+import net.sf.l2j.gameserver.model.entity.DimensionalRift;
 import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.L2GameServerPacket;
 import net.sf.l2j.gameserver.serverpackets.PartySmallWindowAdd;
@@ -58,11 +59,15 @@ public class L2Party {
 	private int _itemDistribution = 0;
 	private int _itemLastLoot = 0;
 	
+	private DimensionalRift _dr;
+	
 	public static final int ITEM_LOOTER = 0;
 	public static final int ITEM_RANDOM = 1;
 	public static final int ITEM_RANDOM_SPOIL = 2;
 	public static final int ITEM_ORDER = 3;
 	public static final int ITEM_ORDER_SPOIL = 4;
+	
+	private long _lastPositionUpdate=0;
 	
 	/**
 	 * constructor ensures party has always one member - leader
@@ -143,10 +148,17 @@ public class L2Party {
 		{
 			_itemLastLoot++;
 			if (_itemLastLoot >= getMemberCount()) _itemLastLoot = 0;
-			L2PcInstance member = getPartyMembers().get(_itemLastLoot);
-			
-			if (member.getInventory().validateCapacityByItemId(ItemId) &&
-                    Util.checkIfInRange(1400, target, member, true)) return member;
+			L2PcInstance member;
+			try 
+			{ 
+				member = getPartyMembers().get(_itemLastLoot); 
+				if (member.getInventory().validateCapacityByItemId(ItemId) &&
+	                    Util.checkIfInRange(1400, target, member, true)) return member;
+			} 
+			catch (Exception e)
+			{
+				// continue, take another member if this just logged off
+			}
 		}
 		
 		return null;
@@ -185,13 +197,13 @@ public class L2Party {
 	 * @param player
 	 * @return
 	 */
-	public boolean isLeader(L2PcInstance player) { return (getPartyMembers().get(0).equals(player)); }
+	public boolean isLeader(L2PcInstance player) { return (getLeader().equals(player)); }
 	
 	/**
 	 * Returns the Object ID for the party leader to be used as a unique identifier of this party
 	 * @return int 
 	 */
-	public int getPartyLeaderOID() { return getPartyMembers().get(0).getObjectId(); }
+	public int getPartyLeaderOID() { return getLeader().getObjectId(); }
 	
 	/**
 	 * Broadcasts packet to every party member 
@@ -230,7 +242,7 @@ public class L2Party {
 		player.sendPacket(window);
 		
 		SystemMessage msg = new SystemMessage(SystemMessageId.YOU_JOINED_S1_PARTY);
-		msg.addString(getPartyMembers().get(0).getName());
+		msg.addString(getLeader().getName());
 		player.sendPacket(msg);
 		
 		msg = new SystemMessage(SystemMessageId.S1_JOINED_PARTY);
@@ -248,6 +260,9 @@ public class L2Party {
 		// update partySpelled
 		for(L2PcInstance member : getPartyMembers())
 			member.updateEffectIcons(true); // update party icons only
+
+		if (isInDimensionalRift())
+			_dr.partyMemberInvited();
 	}
 	
 	/**
@@ -277,11 +292,14 @@ public class L2Party {
 			broadcastToPartyMembers(msg);
 			broadcastToPartyMembers(new PartySmallWindowDelete(player));
 			
+			if (isInDimensionalRift())
+				_dr.partyMemberExited(player);
+			
 			if (getPartyMembers().size() == 1) 
 			{
-				getPartyMembers().get(0).setParty(null);
-				if (getPartyMembers().get(0).isInDuel())
-					DuelManager.getInstance().onRemoveFromParty(getPartyMembers().get(0));
+				getLeader().setParty(null);
+				if (getLeader().isInDuel())
+					DuelManager.getInstance().onRemoveFromParty(getLeader());
 			}
 		}
 	}
@@ -308,14 +326,14 @@ public class L2Party {
 					//Swap party members
 					L2PcInstance temp;
 					int p1 = getPartyMembers().indexOf(player);
-					temp = getPartyMembers().get(0);
+					temp = getLeader();
 					getPartyMembers().set(0,getPartyMembers().get(p1));
 					getPartyMembers().set(p1,temp);
 					
 					SystemMessage msg = new SystemMessage(SystemMessageId.S1_HAS_BECOME_A_PARTY_LEADER);
-					msg.addString(getPartyMembers().get(0).getName());
+					msg.addString(getLeader().getName());
 					broadcastToPartyMembers(msg);
-					broadcastToPartyMembers(new PartySmallWindowUpdate(getPartyMembers().get(0)));
+					broadcastToPartyMembers(new PartySmallWindowUpdate(getLeader()));
 				}
 			}
 			else
@@ -354,9 +372,9 @@ public class L2Party {
 				if (getPartyMembers().size() > 1)
 				{
 					SystemMessage msg = new SystemMessage(SystemMessageId.S1_HAS_BECOME_A_PARTY_LEADER);
-					msg.addString(getPartyMembers().get(0).getName());
+					msg.addString(getLeader().getName());
 					broadcastToPartyMembers(msg);
-					broadcastToPartyMembers(new PartySmallWindowUpdate(getPartyMembers().get(0)));
+					broadcastToPartyMembers(new PartySmallWindowUpdate(getLeader()));
 				}
 			} 
 			else 
@@ -389,9 +407,9 @@ public class L2Party {
                 if (getPartyMembers().size() > 1)
                 {
     				SystemMessage msg = new SystemMessage(SystemMessageId.S1_HAS_BECOME_A_PARTY_LEADER);
-    				msg.addString(getPartyMembers().get(0).getName());
+    				msg.addString(getLeader().getName());
     				broadcastToPartyMembers(msg);
-    				broadcastToPartyMembers(new PartySmallWindowUpdate(getPartyMembers().get(0)));
+    				broadcastToPartyMembers(new PartySmallWindowUpdate(getLeader()));
                 }
 			} 
 			else 
@@ -723,4 +741,22 @@ public class L2Party {
 	public int getLevel() { return _partyLvl; }
 	
 	public int getLootDistribution() { return _itemDistribution; }
+	
+	public boolean allowPositionUpdate() {
+				long newtime=System.currentTimeMillis();
+				if (newtime>_lastPositionUpdate+5000) {
+					_lastPositionUpdate=newtime;
+					return true;
+				}
+				return false;
+			}
+	
+
+	public boolean isInDimensionalRift() { return _dr != null; }
+
+	public void setDimensionalRift(DimensionalRift dr) { _dr = dr; }
+
+	public DimensionalRift getDimensionalRift() { return _dr; }
+
+	public L2PcInstance getLeader() { return getPartyMembers().get(0); }
 }

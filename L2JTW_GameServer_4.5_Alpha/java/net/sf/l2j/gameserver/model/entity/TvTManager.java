@@ -3,12 +3,18 @@ package net.sf.l2j.gameserver.model.entity;
 import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.Announcements;
 import net.sf.l2j.gameserver.ThreadPoolManager;
-import net.sf.l2j.gameserver.model.entity.TvTEvent;
 
+/**
+ * @author FBIagent
+ */
 public class TvTManager implements Runnable
 {
+	/** The one and only instance of this class<br> */
 	private static TvTManager _instance = null;
 
+	/**
+	 * New instance only by getInstance()<br>
+	 */
 	private TvTManager()
 	{
 		if (Config.TVT_EVENT_ENABLED)
@@ -20,6 +26,11 @@ public class TvTManager implements Runnable
 			System.out.println("TvTEventEngine[TvTManager.TvTManager()]: Engine is disabled.");
 	}
 
+	/**
+	 * Initialize new/Returns the one and only instance<br><br> 
+	 * 
+	 * @return TvTManager<br>
+	 */
 	public static TvTManager getInstance()
 	{
 		if (_instance == null)
@@ -28,13 +39,18 @@ public class TvTManager implements Runnable
 		return _instance;
 	}
 
+	/**
+	 * The task method to handle cycles of the event<br><br>
+	 * 
+	 * @see java.lang.Runnable#run()<br>
+	 */
 	public void run()
 	{
 		TvTEvent.init();
 
 		for (;;)
 		{
-			waiter(Config.TVT_EVENT_INTERVAL * 60 * 1000); // in config given as minutes
+			waiter(Config.TVT_EVENT_INTERVAL * 60); // in config given as minutes
 			
 			if (!TvTEvent.startParticipation())
 			{
@@ -45,30 +61,32 @@ public class TvTManager implements Runnable
 			else
 				Announcements.getInstance().announceToAll("TvT Event: Registration opened for " + Config.TVT_EVENT_PARTICIPATION_TIME +  " minute(s).");
 
-			waiter(Config.TVT_EVENT_PARTICIPATION_TIME * 60 * 1000); // in config given as minutes
+			waiter(Config.TVT_EVENT_PARTICIPATION_TIME * 60); // in config given as minutes
 
 			if (!TvTEvent.startFight())
 			{
 				Announcements.getInstance().announceToAll("TvT Event: Event canceled cause of registration lack.");
-				System.out.println("TvTEventEngine[TvTManager.run()]: Lack of registration, abbort event.");
+				System.out.println("TvTEventEngine[TvTManager.run()]: Lack of registration, abort event.");
 				continue;
 			}
 			else
 				Announcements.getInstance().announceToAll("TvT Event: Teleport participants to team spot in " + Config.TVT_EVENT_START_LEAVE_TELEPORT_DELAY + " second(s).");
 
-			waiter(Config.TVT_EVENT_RUNNING_TIME * 60 * 1000); // in config given as minutes
-			Announcements.getInstance().announceToAll("TvT Event: Event finish. Team \"" + TvTEvent.calculateRewards() + "\" wins.");
-			Announcements.getInstance().announceToAll("TvT Event: Teleport back to registration npc in " + Config.TVT_EVENT_START_LEAVE_TELEPORT_DELAY + " second(s).");
+			waiter(Config.TVT_EVENT_RUNNING_TIME * 60); // in config given as minutes
+			Announcements.getInstance().announceToAll(TvTEvent.calculateRewards());
+			TvTEvent.sysMsgToAllParticipants("TvT Event: Teleport back to registration npc in " + Config.TVT_EVENT_START_LEAVE_TELEPORT_DELAY + " second(s).");
 			TvTEvent.stopFight();
 		}
 	}
 
-	void waiter(long interval)
+	/**
+	 * This method waits for a period time delay<br><br>
+	 * 
+	 * @param interval<br>
+	 */
+	void waiter(int seconds)
 	{
-		long startWaiterTime = System.currentTimeMillis();
-		int seconds = (int)(interval / 1000);
-
-		while (startWaiterTime + interval > System.currentTimeMillis())
+		while (seconds > 1)
 		{
 			seconds--; // here because we don't want to see two time announce at the same time
 			
@@ -80,7 +98,7 @@ public class TvTManager implements Runnable
 					if (TvTEvent.isParticipating())
 						Announcements.getInstance().announceToAll("TvT Event: " + seconds / 60 / 60 + " hour(s) till registration close!");
 					else if (TvTEvent.isStarted())
-						Announcements.getInstance().announceToAll("TvT Event: " + seconds / 60 / 60 + " hour(s) till event finish!");
+						TvTEvent.sysMsgToAllParticipants("TvT Event: " + seconds / 60 / 60 + " hour(s) till event finish!");
 
 					break;
 				case 1800: // 30 minutes left
@@ -94,7 +112,7 @@ public class TvTManager implements Runnable
 					if (TvTEvent.isParticipating())
 						Announcements.getInstance().announceToAll("TvT Event: " + seconds / 60 + " minute(s) till registration close!");
 					else if (TvTEvent.isStarted())
-						Announcements.getInstance().announceToAll("TvT Event: " + seconds / 60 + " minute(s) till event finish!");
+						TvTEvent.sysMsgToAllParticipants("TvT Event: " + seconds / 60 + " minute(s) till event finish!");
 
 					break;
 				case 30: // 30 seconds left
@@ -108,16 +126,16 @@ public class TvTManager implements Runnable
 					if (TvTEvent.isParticipating())
 						Announcements.getInstance().announceToAll("TvT Event: " + seconds + " second(s) till registration close!");
 					else if (TvTEvent.isStarted())
-						Announcements.getInstance().announceToAll("TvT Event: " + seconds + " second(s) till event finish!");
+						TvTEvent.sysMsgToAllParticipants("TvT Event: " + seconds + " second(s) till event finish!");
 
 					break;
 				}
 			}
 
-			long startOneSecondWaiterStartTime = System.currentTimeMillis();
+			long oneSecWaitStart = System.currentTimeMillis();
 
 			// only the try catch with Thread.sleep(1000) give bad countdown on high wait times
-			while (startOneSecondWaiterStartTime + 1000 > System.currentTimeMillis())
+			while (oneSecWaitStart + 1000L > System.currentTimeMillis())
 			{
 				try
 				{

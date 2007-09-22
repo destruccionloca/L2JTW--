@@ -66,4 +66,5 @@ public class ShowBoard extends L2GameServerPacket
         return _S__6E_SHOWBOARD;
     }
 
+
 }

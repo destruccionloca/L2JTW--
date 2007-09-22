@@ -139,7 +139,8 @@ public class EnergyStone implements IItemHandler
     {     
     L2Skill[] skills = activeChar.getAllSkills();
     for (L2Skill s : skills) {
-        if (s.getId() == 50 || s.getId() == 8) {
+        if (s.getId() == 50 || s.getId() == 8) 
+        {
             return (L2SkillCharge)s;
         }
     }

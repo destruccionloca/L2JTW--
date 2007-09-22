@@ -69,52 +69,51 @@ public class L2MonsterInstance extends L2Attackable
     public L2MonsterInstance(int objectId, L2NpcTemplate template)
     {
         super(objectId, template);
-		this.getKnownList();	// init knownlist
+		getKnownList();	// init knownlist
         _minionList  = new MinionList(this);
     }   
 
-    public final MonsterKnownList getKnownList()
+    @Override
+	public final MonsterKnownList getKnownList()
     {
     	if(super.getKnownList() == null || !(super.getKnownList() instanceof MonsterKnownList))
-    		this.setKnownList(new MonsterKnownList(this));
+    		setKnownList(new MonsterKnownList(this));
     	return (MonsterKnownList)super.getKnownList();
     }
-        
-    /**
-     * Return True if the attacker is not another L2MonsterInstance.<BR><BR>
-     */
-    public boolean isAutoAttackable(L2Character attacker) 
-    {
-        //if (attacker instanceof L2MonsterInstance)
-         //   return false;
-        
-        return !isEventMob;
-    }
-    
-    /**
-     * Return True if the L2MonsterInstance is Agressive (aggroRange > 0).<BR><BR>
-     */
-    public boolean isAggressive()
-    {
-        return (getTemplate().aggroRange > 0) && !this.isEventMob;
-    }
 
-    /**
-     * Return False.<BR><BR>
-     */
-    public boolean hasRandomAnimation()
-    {
-        return false;
-    }
-    
-
-	public void onSpawn()
+		
+	/**
+	 * Return True if the attacker is not another L2MonsterInstance.<BR><BR>
+	 */
+	@Override
+	public boolean isAutoAttackable(L2Character attacker) 
 	{
+
+		if (attacker instanceof L2MonsterInstance)
+			return false;
+		
+		return !isEventMob;
+	}
+	
+	/**
+	 * Return True if the L2MonsterInstance is Agressive (aggroRange > 0).<BR><BR>
+	 */
+	@Override
+	public boolean isAggressive()
+	{
+		return (getTemplate().aggroRange > 0) && !isEventMob;
+	}
+
+
+    @Override
+	public void onSpawn()
+    {
         super.onSpawn();
         
         if (getTemplate().getMinionData() != null)
-    		try
-    		{
+        {
+            try
+            {
                 for (L2MinionInstance minion : getSpawnedMinions())
                 {
                     if (minion == null) continue;
@@ -127,6 +126,7 @@ public class L2MonsterInstance extends L2Attackable
                 manageMinions();
 
             }
+
     		catch ( NullPointerException e )
     		{
     		}
@@ -139,9 +139,10 @@ public class L2MonsterInstance extends L2Attackable
                 
             }
 
-
+        }
 
     }
+
 
     
     protected int getMaintenanceInterval() { return MONSTER_MAINTENANCE_INTERVAL; }
@@ -218,12 +219,14 @@ public class L2MonsterInstance extends L2Attackable
         }
     }
     
-    public void doDie(L2Character killer) 
+    @Override
+	public void doDie(L2Character killer) 
     {
         if (_minionMaintainTask != null)
             _minionMaintainTask.cancel(true); // doesn't do it?
         
-        if (getTemplate().npcId == 29025) {
+        if (getTemplate().npcId == 29025) 
+        {
             try {
                 L2NpcTemplate BaiumSpawn = NpcTable.getInstance().getTemplate(29020);
                 L2Spawn Baium = new L2Spawn(BaiumSpawn);
@@ -241,7 +244,7 @@ public class L2MonsterInstance extends L2Attackable
             catch (Exception e) {
                 _log.warning("RaidBoss: Error while spawning Baium: " + e);
             }
-            this.deleteMe();
+            //deleteMe();
             return;
         }
 
@@ -282,7 +285,8 @@ public class L2MonsterInstance extends L2Attackable
         return _minionList.hasMinions();
     }
     
-    public void addDamageHate(L2Character attacker, int damage, int aggro)
+    @Override
+	public void addDamageHate(L2Character attacker, int damage, int aggro)
     {
         //if (!(attacker instanceof L2MonsterInstance))
         //{
@@ -290,7 +294,8 @@ public class L2MonsterInstance extends L2Attackable
         //}
     }
     
-    public void deleteMe()
+    @Override
+	public void deleteMe()
     {
         if (hasMinions())
         {

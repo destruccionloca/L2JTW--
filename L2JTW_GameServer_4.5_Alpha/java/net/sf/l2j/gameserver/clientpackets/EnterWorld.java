@@ -37,20 +37,21 @@ import net.sf.l2j.gameserver.cache.HtmCache;
 //import net.sf.l2j.gameserver.communitybbs.Manager.RegionBBSManager;
 import net.sf.l2j.gameserver.datatables.MapRegionTable;
 import net.sf.l2j.gameserver.handler.AdminCommandHandler;
-import net.sf.l2j.gameserver.instancemanager.PetitionManager;
 import net.sf.l2j.gameserver.instancemanager.CoupleManager;
+import net.sf.l2j.gameserver.instancemanager.DimensionalRiftManager;
+import net.sf.l2j.gameserver.instancemanager.PetitionManager;
 import net.sf.l2j.gameserver.instancemanager.SiegeManager;
 import net.sf.l2j.gameserver.model.L2Clan;
 import net.sf.l2j.gameserver.model.L2Effect;
 import net.sf.l2j.gameserver.model.L2ItemInstance;
 import net.sf.l2j.gameserver.model.L2World;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.model.entity.Couple;
 import net.sf.l2j.gameserver.model.entity.Hero;
 import net.sf.l2j.gameserver.model.entity.L2Event;
 import net.sf.l2j.gameserver.model.entity.CTF;
 import net.sf.l2j.gameserver.model.entity.Siege;
 import net.sf.l2j.gameserver.model.entity.TvTEvent;
-import net.sf.l2j.gameserver.model.entity.Couple;
 import net.sf.l2j.gameserver.model.quest.Quest;
 import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.Die;
@@ -86,11 +87,13 @@ public class EnterWorld extends L2GameClientPacket
 	 private static String Welcome_Path = "welcome" ;
 		public TaskPriority getPriority() { return TaskPriority.PR_URGENT; }
 	
+	@Override
 	protected void readImpl()
 	{
 		// this is just a trigger packet. it has no content
 	}
 
+	@Override
 	protected void runImpl()
 	{
 		byte check = 0;
@@ -100,7 +103,7 @@ public class EnterWorld extends L2GameClientPacket
 		if (activeChar == null)
 		{
 			_log.warning("EnterWorld failed! activeChar is null...");
-			this.getClient().closeNow();
+			getClient().closeNow();
 		    return;
 		}
 		
@@ -288,6 +291,11 @@ public class EnterWorld extends L2GameClientPacket
             activeChar.sendMessage("因在奧林匹亞競技場內所以將傳送至最近的村莊");
         }
 
+        if (DimensionalRiftManager.getInstance().checkIfInRiftZone(activeChar.getX(), activeChar.getY(), activeChar.getZ(), false))
+        {
+            DimensionalRiftManager.getInstance().teleportToWaitingRoom(activeChar);
+        }
+
 		if (activeChar.getClanJoinExpiryTime() > System.currentTimeMillis())
 		{
 			activeChar.sendPacket(new SystemMessage(SystemMessageId.CLAN_MEMBERSHIP_TERMINATED));
@@ -302,9 +310,9 @@ public class EnterWorld extends L2GameClientPacket
 		    {
 		    	if (!siege.getIsInProgress()) continue;
 				if (siege.checkIsAttacker(activeChar.getClan()))
-		    		activeChar.setSiegeStateFlag(0x180);
-		    	if (siege.checkIsDefender(activeChar.getClan()))
-		    		activeChar.setSiegeStateFlag(0x80);
+		    		activeChar.setSiegeState((byte)1);
+				else if (siege.checkIsDefender(activeChar.getClan()))
+		    		activeChar.setSiegeState((byte)2);
 		    }
 		}
 		
@@ -481,6 +489,7 @@ public class EnterWorld extends L2GameClientPacket
     /* (non-Javadoc)
 	 * @see net.sf.l2j.gameserver.clientpackets.ClientBasePacket#getType()
 	 */
+	@Override
 	public String getType()
 	{
 		return _C__03_ENTERWORLD;

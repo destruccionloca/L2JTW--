@@ -45,21 +45,24 @@ public class EffectCharge extends L2Effect
         getEffected().sendPacket(sm);
     }
 
-    public EffectType getEffectType()
-    {
-        return EffectType.CHARGE;
-    }
 
-    public boolean onActionTime()
+	@Override
+	public EffectType getEffectType()
+	{
+		return EffectType.CHARGE;
+	}
+
+
+	@Override
+	public boolean onActionTime()
     {
         // ignore
         return true;
     }
 
 
-    public int getLevel() { return num_charges; }
-
-
+	@Override
+	public int getLevel() { return num_charges; }
 	
 	public void addNumCharges(int i) { num_charges = num_charges + i; }
 }

@@ -50,11 +50,13 @@ public class RequestRecordInfo extends L2GameClientPacket
 	/** urgent messages, execute immediatly */
 	public TaskPriority getPriority() { return TaskPriority.PR_NORMAL; }
 
+	@Override
 	protected void readImpl()
 	{
 		// trigger
 	}
 
+	@Override
 	protected void runImpl()
 	{
 		L2PcInstance _activeChar = getClient().getActiveChar();
@@ -107,6 +109,9 @@ public class RequestRecordInfo extends L2GameClientPacket
 					}
 					else
 						_activeChar.sendPacket(new NpcInfo(summon, _activeChar));
+					
+					// The PetInfo packet wipes the PartySpelled (list of active spells' icons).  Re-add them
+					summon.updateEffectIcons(true);
 				}
 	           	else if (object instanceof L2PcInstance)
 				{
@@ -140,6 +145,7 @@ public class RequestRecordInfo extends L2GameClientPacket
 		}
 	}
 
+	@Override
 	public String getType()
 	{
 		return _0__CF_REQUEST_RECORD_INFO;

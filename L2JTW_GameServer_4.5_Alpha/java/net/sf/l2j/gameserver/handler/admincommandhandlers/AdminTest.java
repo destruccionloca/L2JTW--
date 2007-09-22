@@ -39,6 +39,7 @@ import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.serverpackets.MagicSkillUser;
+import net.sf.l2j.gameserver.serverpackets.StatusUpdate;
 
 
 /**
@@ -53,7 +54,7 @@ public class AdminTest implements IAdminCommandHandler
     private static final String[] ADMIN_COMMANDS =
     {
         "admin_test", "admin_stats", "admin_skill_test", 
-        "admin_st", "admin_mp", "admin_known"
+        "admin_st", "admin_mp", "admin_known", "admin_packettest"
     };
 
     /* (non-Javadoc)
@@ -88,8 +89,8 @@ public class AdminTest implements IAdminCommandHandler
             {
                 activeChar.sendMessage("Command format is //skill_test <ID>");
             }
-        }        
-        else if (command.startsWith("admin_test uni flush"))
+        }
+               else if (command.startsWith("admin_test uni flush"))
         {
             Universe.getInstance().flush();
             activeChar.sendMessage("Universe Map Saved.");
@@ -143,6 +144,7 @@ public class AdminTest implements IAdminCommandHandler
         player.broadcastPacket(new MagicSkillUser(activeChar, player, id, 1, 1, 1));
         
     }
+   
     /* (non-Javadoc)
      * @see net.sf.l2j.gameserver.handler.IAdminCommandHandler#getAdminCommandList()
      */

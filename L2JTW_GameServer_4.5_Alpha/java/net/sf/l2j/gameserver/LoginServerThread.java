@@ -57,8 +57,8 @@ import net.sf.l2j.gameserver.network.L2GameClient.GameClientState;
 import net.sf.l2j.gameserver.serverpackets.AuthLoginFail;
 import net.sf.l2j.gameserver.serverpackets.CharSelectInfo;
 import net.sf.l2j.loginserver.crypt.NewCrypt;
-import net.sf.l2j.util.Util;
 import net.sf.l2j.util.Rnd;
+import net.sf.l2j.util.Util;
 
 public class LoginServerThread extends Thread
 {
@@ -135,6 +135,7 @@ public class LoginServerThread extends Thread
 		return _instance;
 	}
 
+	@Override
 	public void run()
 	{
 		while(true)
@@ -587,6 +588,7 @@ public class LoginServerThread extends Thread
 			loginOkID2 = loginOK2;
 		}
 
+		@Override
 		public String toString()
 		{
 			return "PlayOk: "+playOkID1+" "+playOkID2+" LoginOk:"+loginOkID1+" "+loginOkID2;

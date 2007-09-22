@@ -29,6 +29,9 @@ import net.sf.l2j.gameserver.model.actor.instance.L2RaidBossInstance;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.skills.Formulas;
 import net.sf.l2j.gameserver.templates.L2WeaponType;
+import net.sf.l2j.gameserver.model.L2Object;
+
+
 /**
  * 
  * sample
@@ -47,17 +50,20 @@ public class MagicSkillLaunched extends L2GameServerPacket
 	private int _charObjId;
 	private int _skillId;
 	private int _skillLevel;
-	private int _dat2;
-	private int _targetId;
+	private int _numberOfTargets;
+	private L2Object[] _targets;
+	private int _singleTargetId;
    // private int _flags;
 	
-	public MagicSkillLaunched(L2Character cha, int skillId, int skillLevel, L2Character target)
+	
+	public MagicSkillLaunched(L2Character cha, int skillId, int skillLevel, L2Object[] targets)
 	{
 		_charObjId = cha.getObjectId();
 		_skillId = skillId;
 		_skillLevel = skillLevel;
-		_dat2 = 1;
-		_targetId = target.getObjectId();
+		_numberOfTargets = targets.length;
+		_targets = targets;
+		_singleTargetId = 0;
         // _flags |= 0x20;
 	}
 	
@@ -66,19 +72,32 @@ public class MagicSkillLaunched extends L2GameServerPacket
 		_charObjId = cha.getObjectId();
 		_skillId = skillId;
 		_skillLevel = skillLevel;
-		_dat2 = 1;
-		_targetId = cha.getTargetId();
+		_numberOfTargets = 1;
+		_singleTargetId = cha.getTargetId();
         //_flags |= 0x20;
 	}
 	
+	@Override
 	protected final void writeImpl()
 	{
 		writeC(0x76);
 		writeD(_charObjId);
 		writeD(_skillId);
 		writeD(_skillLevel);
-		writeD(_dat2);  // failed or not
-		writeD(_targetId);
+		writeD(_numberOfTargets); // also failed or not?
+		if (_singleTargetId != 0 || _numberOfTargets == 0) 
+			writeD(_singleTargetId);
+		else for(L2Object target : _targets)
+		{
+			try 
+			{ 
+				writeD(target.getObjectId());
+			} 
+			catch (NullPointerException e) 
+			{ 
+				writeD(0); // untested 
+			}
+		}
         //if (L2Skill.CRIT_ATTACK)
            // writeC(_flags);
 
@@ -87,6 +106,7 @@ public class MagicSkillLaunched extends L2GameServerPacket
 	/* (non-Javadoc)
 	 * @see net.sf.l2j.gameserver.serverpackets.ServerBasePacket#getType()
 	 */
+	@Override
 	public String getType()
 	{
 		return _S__8E_MAGICSKILLLAUNCHED;

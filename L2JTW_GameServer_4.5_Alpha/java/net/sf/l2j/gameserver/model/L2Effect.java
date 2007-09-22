@@ -110,8 +110,8 @@ public abstract class L2Effect
 
         EffectTask(int pDelay, int pRate)
         {
-            this._delay = pDelay;
-            this._rate = pRate;
+            _delay = pDelay;
+            _rate = pRate;
         }
 
         public void run()
@@ -357,11 +357,16 @@ public abstract class L2Effect
             _currentFuture = null;
             _currentTask = null;
 
+
+            
             _effected.removeEffect(this);
+            
+            
 
             if (!_preventExitUpdate)
             {
-            	_effected.updateStats();
+            	//_effected.updateStats();
+            	
             }
         }
     }
@@ -467,7 +472,10 @@ public abstract class L2Effect
 
     public void updateEffects(L2Character effectedChar)
     {
-        effectedChar.updateStats();
+    	_log.warning("Update Effects");
+    	//useless Packet
+        //effectedChar.updateStats();
+    	//_effected.updatetype(this);
     }
 
     public Func[] getStatFuncs()

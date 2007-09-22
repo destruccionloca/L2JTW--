@@ -95,9 +95,11 @@ public final class L2BossInstance extends L2MonsterInstance
 		super(objectId, template);
 	}
 
-    protected int getMaintenanceInterval() { return BOSS_MAINTENANCE_INTERVAL; }
+    @Override
+	protected int getMaintenanceInterval() { return BOSS_MAINTENANCE_INTERVAL; }
 	
-    public void doDie(L2Character killer)
+    @Override
+	public void doDie(L2Character killer)
     {
     	
     	if(getNpcId() == 25050)
@@ -126,7 +128,8 @@ public final class L2BossInstance extends L2MonsterInstance
         return _teleportedToNest;
     }
     
-    public void onSpawn()
+    @Override
+	public void onSpawn()
     {
     	
     	
@@ -159,7 +162,8 @@ public final class L2BossInstance extends L2MonsterInstance
      * Reduce the current HP of the L2Attackable, update its _aggroList and launch the doDie Task if necessary.<BR><BR> 
      * 
      */
-    public void reduceCurrentHp(double damage, L2Character attacker, boolean awake)
+    @Override
+	public void reduceCurrentHp(double damage, L2Character attacker, boolean awake)
     {
         switch (getTemplate().npcId)
         {
@@ -178,14 +182,12 @@ public final class L2BossInstance extends L2MonsterInstance
         super.reduceCurrentHp(damage, attacker, awake);
     }
     
-    public boolean isRaid()
+    @Override
+	public boolean isRaid()
     {
         return true;
     }
 
-    //------------------------------------------------------------------------------------------
-    //Baium Data
-    
     /**
      * Ends Baium's speech loop.<BR>
      */

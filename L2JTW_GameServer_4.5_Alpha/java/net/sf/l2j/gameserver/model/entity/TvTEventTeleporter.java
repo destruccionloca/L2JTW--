@@ -4,14 +4,22 @@ import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.ThreadPoolManager;
 import net.sf.l2j.gameserver.model.L2Effect;
 import net.sf.l2j.gameserver.model.L2Summon;
-import net.sf.l2j.gameserver.model.entity.TvTEvent;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 
 public class TvTEventTeleporter implements Runnable
 {
+	/** The instance of the player to teleport */
 	private L2PcInstance _playerInstance;
+	/** Coordinates of the spot to teleport to */
 	private int[] _coordinates = new int[3];
 
+	/**
+	 * Initialize the teleporter and start the delayed task
+	 * 
+	 * @param playerInstance
+	 * @param coordinates
+	 * @param reAdd
+	 */
 	public TvTEventTeleporter(L2PcInstance playerInstance, int[] coordinates, boolean reAdd)
 	{
 		_playerInstance = playerInstance;
@@ -26,6 +34,16 @@ public class TvTEventTeleporter implements Runnable
 		ThreadPoolManager.getInstance().scheduleGeneral(this, delay);
 	}
 
+	/**
+	 * The task method to teleport the player<br>
+	 * 1. Unsummon pet if there is one
+	 * 2. Remove all effects
+	 * 3. Revive and full heal the player
+	 * 4. Teleport the player
+	 * 5. Broadcast status and user info
+	 * 
+	 * @see java.lang.Runnable#run()
+	 */
 	public void run()
 	{
 		if (_playerInstance == null)

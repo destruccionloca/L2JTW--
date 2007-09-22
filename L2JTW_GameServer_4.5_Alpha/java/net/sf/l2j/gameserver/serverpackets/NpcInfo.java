@@ -50,7 +50,7 @@ public class NpcInfo extends L2GameServerPacket
 	private boolean _isAttackable, _isSummoned;
 	private int _mAtkSpd, _pAtkSpd;
 	private int _runSpd, _walkSpd, _swimRunSpd, _swimWalkSpd, _flRunSpd, _flWalkSpd, _flyRunSpd, _flyWalkSpd,_atkspdMul,_movespdMul;
-	private int _rhand, _lhand,_lrhand,enchlvl, armor, head, boot,pant, glove, charrace,charhair,charface,charcolor,charclass,charhero,charsex,dhair,hair,face;
+	private int _rhand, _lhand,_lrhand,enchlvl, armor, head, boot,pant, glove, charrace,charhair,charface,charcolor,charclass,charhero,charsex,dhair,hair,face,augmentation;
     private int _collisionHeight, _collisionRadius;
     private String _name = "";
     private String _title = "";
@@ -118,6 +118,7 @@ public class NpcInfo extends L2GameServerPacket
             charhair = chardata.getCharHair();
             charhero = chardata.getCharHero();
             charsex = chardata.getCharSex();
+            augmentation = chardata.getAugmentation();
             
             
             
@@ -216,6 +217,7 @@ public class NpcInfo extends L2GameServerPacket
 		_swimWalkSpd = _flWalkSpd = _flyWalkSpd = _walkSpd;
 	}
 	
+	@Override
 	protected final void writeImpl()
 	{
         
@@ -251,7 +253,7 @@ public class NpcInfo extends L2GameServerPacket
 			writeH(0x00);
 			writeH(0x00);
 			writeH(0x00);
-			writeD(0x00);
+			writeD(augmentation);
 			writeH(0x00);
 			writeH(0x00);
 			writeH(0x00);
@@ -264,6 +266,9 @@ public class NpcInfo extends L2GameServerPacket
 			writeH(0x00);
 			writeH(0x00);
 			writeH(0x00);
+			if(_lrhand>0)
+			writeD(augmentation);
+			else
 			writeD(0x00);
 			writeH(0x00);
 			writeH(0x00);
@@ -414,6 +419,7 @@ public class NpcInfo extends L2GameServerPacket
 	/* (non-Javadoc)
 	 * @see net.sf.l2j.gameserver.serverpackets.ServerBasePacket#getType()
 	 */
+	@Override
 	public String getType()
 	{
 		return _S__22_NPCINFO;
