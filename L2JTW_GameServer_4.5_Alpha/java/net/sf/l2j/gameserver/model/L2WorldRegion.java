@@ -30,6 +30,8 @@ import net.sf.l2j.gameserver.ai.L2AttackableAI;
 import net.sf.l2j.gameserver.datatables.SpawnTable;
 import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PlayableInstance;
+import net.sf.l2j.gameserver.model.zone.L2ZoneManager;
+import net.sf.l2j.gameserver.model.zone.L2ZoneType;
 import net.sf.l2j.util.L2ObjectSet;
 
 
@@ -52,6 +54,8 @@ public final class L2WorldRegion
     private int _tileX, _tileY;
     private Boolean _active = false;   
     private ScheduledFuture _neighborsTask = null;
+    
+    private L2ZoneManager _zoneManager;
 
     public L2WorldRegion(int pTileX, int pTileY)
     {
@@ -68,6 +72,35 @@ public final class L2WorldRegion
             _active = true;
         else
             _active = false;
+    }
+    
+    public void addZone(L2ZoneType zone)
+    {
+    	if (_zoneManager == null)
+    	{
+    		_zoneManager = new L2ZoneManager();
+    	}
+    	_zoneManager.registerNewZone(zone);
+    }
+    
+    public void revalidateZones(L2Character character)
+    {
+    	if (_zoneManager == null) return;
+
+    	if (_zoneManager != null)
+    	{
+    		_zoneManager.revalidateZones(character);
+    	}
+    }
+    
+    public void removeFromZones(L2Character character)
+    {
+    	if (_zoneManager == null) return;
+    	
+    	if (_zoneManager != null)
+    	{
+    		_zoneManager.removeCharacter(character);
+    	}
     }
     
     /** Task of AI notification */
@@ -107,6 +140,7 @@ public final class L2WorldRegion
         if (!isOn)
         {
             for(L2Object o: _visibleObjects)
+            {
                 if (o instanceof L2Attackable)
                 {
                     c++;
@@ -134,12 +168,14 @@ public final class L2WorldRegion
                     // it until the grid is made active.
                     //mob.getStatus().stopHpMpRegeneration();
                 }
+            }
             _log.fine(c+ " mobs were turned off");
         }
         else
         {
             for(L2Object o: _visibleObjects)
-                if (o instanceof L2Attackable)
+            {
+            	if (o instanceof L2Attackable)
                 {
                     c++;
                     // Start HP/MP/CP Regeneration task
@@ -148,6 +184,13 @@ public final class L2WorldRegion
                     // start the ai
                     //((L2AttackableAI) mob.getAI()).startAITask();
                 }
+            	else if (o instanceof L2NpcInstance)
+                {
+                    // Create a RandomAnimation Task that will be launched after the calculated delay if the server allow it 
+                    // L2Monsterinstance/L2Attackable socials are handled by AI (TODO: check the instances)
+            		((L2NpcInstance)o).startRandomAnimationTimer();
+                }
+            }
             _log.fine(c+ " mobs were turned on");
         }
         

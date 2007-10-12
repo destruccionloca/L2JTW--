@@ -46,7 +46,6 @@ import net.sf.l2j.gameserver.model.L2Spawn;
 import net.sf.l2j.gameserver.model.SpawnListener;
 import net.sf.l2j.gameserver.serverpackets.NpcHtmlMessage;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
-import net.sf.l2j.gameserver.util.IllegalPlayerAction;
 import net.sf.l2j.gameserver.util.Util;
 import net.sf.l2j.util.Rnd;
 
@@ -73,15 +72,15 @@ public class DimensionalRiftManager
         return _instance;
     }
 
-    public DimensionalRiftManager()
+    private DimensionalRiftManager()
     {
         loadRooms();
         loadSpawns();
     }
 
-    public DimensionalRiftRoom getRoom(byte _type, byte room)
+    public DimensionalRiftRoom getRoom(byte type, byte room)
     {
-        return _rooms.get(_type).get(room);
+        return _rooms.get(type) == null ? null : _rooms.get(type).get(room);
     }
 
     private void loadRooms()
@@ -215,7 +214,7 @@ public class DimensionalRiftManager
 	                                                spawnDat.setLocz(z);
 	                                                spawnDat.setHeading(-1);
 	                                                spawnDat.setRespawnDelay(delay);
-	                                                spawnDat.addSpawnListener(new RiftSpawnListener(type, roomId));
+	                                                L2Spawn.addSpawnListener(new RiftSpawnListener(type, roomId));
 	                                                
 	                                                SpawnTable.getInstance().addNewSpawn(spawnDat, false);
 	                                                _rooms.get(type).get(roomId).getSpawns().add(spawnDat);
@@ -445,7 +444,8 @@ public class DimensionalRiftManager
             for(L2Spawn spawn : _roomSpawns)
             {
                 spawn.stopRespawn();
-                spawn.getLastSpawn().deleteMe();
+                if(spawn.getLastSpawn() != null)
+                    spawn.getLastSpawn().deleteMe();
             }
         }
     }

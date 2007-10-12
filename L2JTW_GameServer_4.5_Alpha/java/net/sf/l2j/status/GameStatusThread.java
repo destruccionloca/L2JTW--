@@ -51,7 +51,6 @@ import net.sf.l2j.gameserver.datatables.ItemTable;
 import net.sf.l2j.gameserver.datatables.NpcTable;
 import net.sf.l2j.gameserver.datatables.SkillTable;
 import net.sf.l2j.gameserver.instancemanager.Manager;
-import net.sf.l2j.gameserver.instancemanager.ZoneManager;
 import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.L2ItemInstance;
 import net.sf.l2j.gameserver.model.L2Multisell;
@@ -381,9 +380,9 @@ public class GameStatusThread extends Thread
                     int igm = 0;
                     String gmList = "";
                     
-                    for (L2PcInstance player : GmListTable.getInstance().getAllGms())
+                    for (String player : GmListTable.getInstance().getAllGmNames(true))
                     {
-                            gmList = gmList + ", " + player.getName();
+                            gmList = gmList + ", " + player;
                             igm++;
                     }
                     _print.println("There are currently " + igm +" GM(s) online...");
@@ -676,7 +675,7 @@ public class GameStatusThread extends Thread
                 		else if(type.equals("zone"))
                 		{
                 			_print.print("Reloading zone tables... ");
-                			ZoneManager.getInstance().reload();
+                			//TODO: ZONETODO reload zones using telnet ZoneManager.getInstance().reload();
                 			_print.print("done\n");
                 		}
 
@@ -873,7 +872,7 @@ public class GameStatusThread extends Thread
     
     private int getOnlineGMS()
     {
-        return GmListTable.getInstance().getAllGms().length;
+        return GmListTable.getInstance().getAllGms(true).length;
     }
     
     private String getUptime(int time)

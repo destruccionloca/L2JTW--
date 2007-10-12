@@ -41,6 +41,7 @@ import net.sf.l2j.gameserver.idfactory.IdFactory;
 import net.sf.l2j.gameserver.instancemanager.CastleManager;
 import net.sf.l2j.gameserver.instancemanager.DimensionalRiftManager;
 import net.sf.l2j.gameserver.instancemanager.QuestManager;
+import net.sf.l2j.gameserver.instancemanager.TownManager;
 import net.sf.l2j.gameserver.instancemanager.games.Lottery;
 import net.sf.l2j.gameserver.model.L2Attackable;
 import net.sf.l2j.gameserver.model.L2Character;
@@ -66,6 +67,7 @@ import net.sf.l2j.gameserver.model.entity.L2Event;
 import net.sf.l2j.gameserver.model.entity.CTF;
 import net.sf.l2j.gameserver.model.quest.Quest;
 import net.sf.l2j.gameserver.model.quest.QuestState;
+import net.sf.l2j.gameserver.model.zone.type.L2TownZone;
 import net.sf.l2j.gameserver.network.L2GameClient;
 import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.ActionFailed;
@@ -132,7 +134,7 @@ public class L2NpcInstance extends L2Character
 
     private int _isSpoiledBy = 0;
 
-    private RandomAnimationTask _rAniTask = null;
+    protected RandomAnimationTask _rAniTask = null;
     
     
     
@@ -150,7 +152,7 @@ public class L2NpcInstance extends L2Character
     
     
     /** Task launching the function onRandomAnimation() */
-    private class RandomAnimationTask implements Runnable
+    protected class RandomAnimationTask implements Runnable
     {
         public void run()
         {
@@ -158,13 +160,19 @@ public class L2NpcInstance extends L2Character
             {
                 if(this != _rAniTask)
                     return; // Shouldn't happen, but who knows... just to make sure every active npc has only one timer.
-                if(isMob() && getAI().getIntention() != AI_INTENTION_ACTIVE)
-                    return; // Cancel further animation timers until intention is changed to ACTIVE again.
-
-                // Maybe settings are changed in meanwhile by server admin
-                // If this line is missing and MAX_ANIMATION is set to 0, there will be 0 seconds between the animations... :S
-                if(!hasRandomAnimation())
-                    return;
+                if(isMob())
+                {
+                	// Cancel further animation timers until intention is changed to ACTIVE again.
+                	if(getAI().getIntention() != AI_INTENTION_ACTIVE)
+                    	return; 
+                }
+                else
+                {
+                	if (!isInActiveRegion()) // NPCs in inactive region don't run this task 
+                		return;
+                	// update knownlist to remove playable which aren't in range any more
+                	getKnownList().updateKnownObjects(); 
+                }
 
                 if(!(isDead() || isStunned() || isSleeping() || isParalyzed()))
                     onRandomAnimation();
@@ -181,7 +189,7 @@ public class L2NpcInstance extends L2Character
     public void onRandomAnimation()
     {
         // Send a packet SocialAction to all L2PcInstance in the _KnownPlayers of the L2NpcInstance
-        SocialAction sa = new SocialAction(getObjectId(), Rnd.get(1, 3));
+        SocialAction sa = new SocialAction(getObjectId(), Rnd.get(2, 3));
         broadcastPacket(sa);
     }
 
@@ -190,7 +198,10 @@ public class L2NpcInstance extends L2Character
      */
     public void startRandomAnimationTimer()
     {
-        int minWait =  isMob() ? Config.MIN_MONSTER_ANIMATION : Config.MIN_NPC_ANIMATION;
+        if (!hasRandomAnimation())
+            return;
+        
+    	int minWait =  isMob() ? Config.MIN_MONSTER_ANIMATION : Config.MIN_NPC_ANIMATION;
         int maxWait = isMob() ? Config.MAX_MONSTER_ANIMATION : Config.MAX_NPC_ANIMATION;
 
         // Calculate the delay before the next animation
@@ -280,9 +291,6 @@ public class L2NpcInstance extends L2Character
         // Set the name of the L2Character
         setName(template.name);
         
-        // Create a RandomAnimation Task that will be launched after the calculated delay if the server allow it 
-        if (hasRandomAnimation() && !isMob()) // Mob socials are handled by AI
-            startRandomAnimationTimer();
     }
 
     @Override
@@ -599,6 +607,7 @@ public class L2NpcInstance extends L2Character
         return false;
     }
     
+    
     /**
      * Return the Identifier of the item in the left hand of this L2NpcInstance contained in the L2NpcTemplate.<BR><BR>
      */
@@ -846,7 +855,7 @@ public class L2NpcInstance extends L2Character
             TextBuilder html1 = new TextBuilder("<html><body><center><font color=\"LEVEL\">NPC 資訊</font></center><br>");
 
             String className = getClass().getName().substring(43);
-            html1.append("型態:" + className + "<br1>種類:" + getFactionId() + "<br1>位置編號:" + (getSpawn() != null ? getSpawn().getLocation() : 0) + "<br1>");
+            html1.append("<br>");
             
             if (this instanceof L2ControllableMobInstance)
                 html1.append("群組:" + MobGroupTable.getInstance().getGroupForMob((L2ControllableMobInstance)this).getGroupId() + "<br>");
@@ -971,7 +980,11 @@ public class L2NpcInstance extends L2Character
 		if (_castleIndex < 0)
 
 		{
-			_castleIndex = CastleManager.getInstance().getCastleIndexByTown(this);
+			L2TownZone town = TownManager.getInstance().getTown(getX(), getY(), getZ());
+			
+			if (town != null)
+				_castleIndex = CastleManager.getInstance().getCastleIndex(town.getTaxById());
+			
 			if (_castleIndex < 0)
 			{
 				_castleIndex = CastleManager.getInstance().findNearestCastleIndex(this);
@@ -2388,6 +2401,7 @@ public class L2NpcInstance extends L2Character
      */
     public void deleteMe()
     {
+    	if (getWorldRegion() != null) getWorldRegion().removeFromZones(this);
         //FIXME this is just a temp hack, we should find a better solution
         
         try { decayMe(); } catch (Throwable t) {_log.severe("deletedMe(): " + t); }
@@ -2432,7 +2446,7 @@ public class L2NpcInstance extends L2Character
         }
     }
 
-    public boolean isMob()
+    public boolean isMob() // rather delete this check
     {
         return false; // This means we use MAX_NPC_ANIMATION instead of MAX_MONSTER_ANIMATION
     }

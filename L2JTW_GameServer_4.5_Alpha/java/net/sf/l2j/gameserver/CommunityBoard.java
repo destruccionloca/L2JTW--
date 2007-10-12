@@ -1512,7 +1512,7 @@ public class CommunityBoard
             htmlCode.append(colSpacer);
            // htmlCode.append(tdOpen + "啟動時間: " + GameServer.DateTimeServerStarted.getTime() + tdClose);
             htmlCode.append(trClose);
-
+/*
             htmlCode.append(trOpen);
             htmlCode.append(tdOpen + "經驗倍率: " + Config.RATE_XP + tdClose);
             htmlCode.append(colSpacer);
@@ -1536,7 +1536,7 @@ public class CommunityBoard
             htmlCode.append(colSpacer);
             htmlCode.append(tdOpen + "金錢倍率: " + Config.RATE_DROP_ADENA + tdClose);
             htmlCode.append(trClose);
-
+*/
             htmlCode.append("</table>");
             htmlCode.append("<table>");
             htmlCode.append(trOpen);

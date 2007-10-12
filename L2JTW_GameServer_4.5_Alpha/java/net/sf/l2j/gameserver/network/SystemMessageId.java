@@ -3759,6 +3759,7 @@ public enum SystemMessageId
     
     /**
      * ID: 1673<br>
+     * TODO: Correct this message
      * Message: A manor cannot be set up between 6 a.m. and 8 p.m.
      */
     THE_PRESENT_RECORD_DURING_THE_CURRENT_OLYMPIAD_SESSION_IS_S1_WINS_S2_DEFEATS_YOU_HAVE_EARNED_S3_OLYMPIAD_POINTS(1673),
@@ -4695,9 +4696,27 @@ public enum SystemMessageId
      * ID: 2013<br>
      * Message: Your seed or remaining purchase amount is inadequate.
      */
-    YOUR_SEED_OR_REMAINING_PURCHASE_AMOUNT_IS_INADEQUATE(2013);
-   
+    YOUR_SEED_OR_REMAINING_PURCHASE_AMOUNT_IS_INADEQUATE(2013),
+
+    /**
+     * ID: 1916<br>
+     * Message: Your Death Penalty is now level $s1.
+     */
+    DEATH_PENALTY_LEVEL_S1_ADDED(1916),
+
+    /**
+     * ID: 1917<br>
+     * Message: Your Death Penalty has been lifted.
+     */
+    DEATH_PENALTY_LIFTED(1917),
     
+    /**
+	 * ID: 1607<br>
+	 * Message: $s1 adena has been withdrawn to pay for purchasing fees.
+	 */
+	S1_ADENA_HAS_BEEN_WITHDRAWN_TO_PAY_FOR_PURCHASING_FEES(1607);
+ 
+
     private int _id;
     
     private SystemMessageId(int id)

@@ -20,7 +20,9 @@ package net.sf.l2j.gameserver.skills.l2skills;
 import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2Skill;
+import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.network.SystemMessageId;
+import net.sf.l2j.gameserver.serverpackets.EtcStatusUpdate;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.templates.StatsSet;
 import net.sf.l2j.gameserver.skills.effects.EffectCharge;
@@ -29,28 +31,35 @@ public class L2SkillCharge extends L2Skill {
 
 	final int numCharges;
 	
+
 	public L2SkillCharge(StatsSet set) 
-    {
+	{
 		super(set);
 		numCharges = set.getInteger("num_charges", getLevel());
 	}
 
 	@Override
-	public void useSkill(L2Character caster, @SuppressWarnings("unused") L2Object[] targets) {
+	public void useSkill(L2Character caster, @SuppressWarnings("unused") L2Object[] targets) 
+	{
 		if (caster.isAlikeDead())
 			return;
 		
 		// get the effect
 		EffectCharge effect = (EffectCharge) caster.getEffect(4271);
 
-		if (effect != null) {
-			if (effect.num_charges < numCharges)
+		if (effect != null) 
+		{
+			if (effect.numCharges < numCharges)
 			{
-				effect.num_charges++;
-				caster.updateEffectIcons();
-                SystemMessage sm = new SystemMessage(SystemMessageId.FORCE_INCREASED_TO_S1);
-                sm.addNumber(effect.num_charges);
-                caster.sendPacket(sm);
+				effect.numCharges++;
+				if (caster instanceof L2PcInstance)
+				{
+					caster.sendPacket(new EtcStatusUpdate((L2PcInstance)caster));
+					SystemMessage sm = new SystemMessage(SystemMessageId.FORCE_INCREASED_TO_S1);
+					sm.addNumber(effect.numCharges);
+					caster.sendPacket(sm);
+				}
+
 			}
 			else
             {

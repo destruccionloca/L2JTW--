@@ -19,6 +19,7 @@
 package net.sf.l2j.gameserver.model;
 
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 
 import javolution.util.FastList;
@@ -245,7 +246,8 @@ public class L2Attackable extends L2NpcInstance
     /** crops */
     private RewardItem[] _harvestItems;
     private boolean _seeded;
-    private int _seedType;
+    private int _seedType = 0;
+    private L2PcInstance _seeder = null;
     
     /** True if an over-hit enabled skill has successfully landed on the L2Attackable */
     private boolean _overhit;
@@ -445,7 +447,7 @@ public class L2Attackable extends L2NpcInstance
 
             	if (getTemplate().getEventQuests(Quest.QuestEventType.MOBKILLED) != null)
             		for (Quest quest: getTemplate().getEventQuests(Quest.QuestEventType.MOBKILLED))
-            			quest.notifyKill(this, player);
+            			quest.notifyKill(this, player, killer instanceof L2Summon);
             }
         } 
         catch (Exception e) { _log.log(Level.SEVERE, "", e); }
@@ -736,11 +738,6 @@ public class L2Attackable extends L2NpcInstance
      */
     public void addDamage(L2Character attacker, int damage)
     {
-//      Change by Kassoon: Aggro is damage/2
-        int aggro = damage / 2;
-        if (aggro > 50)
-        addDamageHate(attacker, damage, aggro);
-        else
         addDamageHate(attacker, damage, damage);
     }
     /*
@@ -879,17 +876,64 @@ public class L2Attackable extends L2NpcInstance
                     
                     if (getTemplate().getEventQuests(Quest.QuestEventType.MOBGOTATTACKED) !=null)
                     	for (Quest quest: getTemplate().getEventQuests(Quest.QuestEventType.MOBGOTATTACKED))
-                    		quest.notifyAttack(this, player);
+                    		quest.notifyAttack(this, player, damage, attacker instanceof L2Summon);
                 }
             } 
             catch (Exception e) { _log.log(Level.SEVERE, "", e); }
         }
     }
 
+    public void reduceHate(L2Character target, int amount) 
+    {
+    	if (target == null) // whole aggrolist 
+    	{
+    		L2Character mostHated = getMostHated();
+        	if (mostHated == null) // makes target passive for a moment more
+        	{
+        		((L2AttackableAI)getAI()).setGlobalAggro(-25);
+        		return;
+        	}
+        	else
+        	{
+        		for(L2Character aggroed : getAggroListRP().keySet())
+        		{
+        			AggroInfo ai = getAggroListRP().get(aggroed);
+        	    	if (ai == null) return; 
+        	    	ai._hate -= amount;
+        		}
+        	}
+
+        	amount = getHating(mostHated);
+        	if (amount <= 0)
+            {
+        		((L2AttackableAI)getAI()).setGlobalAggro(-25);
+        		clearAggroList();
+        		getAI().setIntention(CtrlIntention.AI_INTENTION_ACTIVE);
+        		setWalking();
+            }
+        	return;
+    	}
+    	AggroInfo ai = getAggroListRP().get(target);
+    	if (ai == null) return; 
+    	ai._hate -= amount;
+    	
+        if (ai._hate <= 0)
+        {
+        	if (getMostHated() == null)
+        	{
+        		((L2AttackableAI)getAI()).setGlobalAggro(-25);
+        		clearAggroList();
+        		getAI().setIntention(CtrlIntention.AI_INTENTION_ACTIVE);
+        		setWalking();
+        	}
+        }
+    }
+
     /**
      * Clears _aggroList hate of the L2Character without removing from the list.<BR><BR>
      */
-    public void stopHating(L2Character target) {
+    public void stopHating(L2Character target) 
+    {
     	if (target == null) return;
     	AggroInfo ai = getAggroListRP().get(target);
     	if (ai == null) return;
@@ -2164,6 +2208,10 @@ public class L2Attackable extends L2NpcInstance
         setSpoil(false);
         // Clear all aggro char from list
         clearAggroList();
+        // Clear Harvester Rewrard List
+    	_harvestItems = null;
+    	// Clear mod Seeded stat
+    	setSeeded(false);
 
         _sweepItems = null;
         resetAbsorbList();
@@ -2178,38 +2226,102 @@ public class L2Attackable extends L2NpcInstance
                 ((L2AttackableAI) getAI()).stopAITask();
     }
     
+    /**
+     * Sets state of the mob to seeded. Paramets needed to be set before.
+     */
+    public void setSeeded()
+    {
+    	if (_seedType != 0 && _seeder != null)
+    		setSeeded(_seedType, _seeder.getLevel());
+    }
+    
+    /**
+     * Sets the seed parametrs, but not the seed state
+     * @param id  - id of the seed
+     * @param seeder - player who is sowind the seed
+     */
+    public void setSeeded(int id, L2PcInstance seeder) 
+    {
+    	if (!_seeded) {
+			_seedType = id;
+			_seeder = seeder;
+    	}
+    }
+    
     public void setSeeded(int id, int seederLvl)
     {
         _seeded = true;
         _seedType = id;
         int count = 1;
 
-        int diff = (getLevel() - seederLvl - 1);
-
-        // hi-lvl mobs bonus
-        if (diff > 0 && diff < 5)//Config.MANOR_HARVEST_DIFF_BONUS)
+        Map<Integer, L2Skill> skills = getTemplate().getSkills();
+        
+        if (skills != null) 
         {
-            count += Rnd.nextInt(diff);
+		    for (int skillId : skills.keySet())
+		    {
+		    	switch (skillId) {
+		    	case 4303: //Strong type x2
+		    		count *= 2;
+		    		break;
+		    	case 4304: //Strong type x3
+		    		count *= 3;
+		    		break;
+		    	case 4305: //Strong type x4
+		    		count *= 4;
+		    		break;
+		    	case 4306: //Strong type x5
+		    		count *= 5;
+		    		break;
+		    	case 4307: //Strong type x6
+		    		count *= 6;
+		    		break;
+		    	case 4308: //Strong type x7
+		    		count *= 7;
+		    		break;
+		    	case 4309: //Strong type x8
+		    		count *= 8;
+		    		break;
+		    	case 4310: //Strong type x9
+		    		count *= 9;
+		    		break;
+		    	}
+		    }
         }
 
-        List<RewardItem> harvested = new FastList<RewardItem>();
+        int diff = (getLevel() - (L2Manor.getInstance().getSeedLevel(_seedType) - 5));
+        
+        // hi-lvl mobs bonus
+        if (diff > 0)
+        {
+            count += diff;
+        }
 
-        for (int i = 0; i < count; i++)
-            harvested.add(new RewardItem(L2Manor.getInstance().getCropType(_seedType), 1));
+        FastList<RewardItem> harvested = new FastList<RewardItem>();
+
+        harvested.add(new RewardItem(L2Manor.getInstance().getCropType(_seedType), count));
 
         _harvestItems = harvested.toArray(new RewardItem[harvested.size()]);
     }
     
+    public void setSeeded(boolean seeded)
+    {
+    	_seeded = seeded;
+    }
+    
+    public L2PcInstance getSeeder() 
+    {
+    	return _seeder;
+    }
+    
+    public int getSeedType()
+    {
+    	return _seedType;
+    }
+        
     public boolean isSeeded()
     {
         return _seeded;
-    }
-
-    //TODO: should we remove this ?
-    @SuppressWarnings("unused")
-    private boolean isSeededHigh()
-    {
-        return (_seedType < 5650); // low-grade seeds has id's below 5650
     }
     
     private int getAbsorbLevel()

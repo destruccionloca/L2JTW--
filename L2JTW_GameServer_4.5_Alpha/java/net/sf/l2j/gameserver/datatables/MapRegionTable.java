@@ -30,16 +30,14 @@ import net.sf.l2j.gameserver.instancemanager.ArenaManager;
 import net.sf.l2j.gameserver.instancemanager.CastleManager;
 import net.sf.l2j.gameserver.instancemanager.ClanHallManager;
 import net.sf.l2j.gameserver.instancemanager.TownManager;
-import net.sf.l2j.gameserver.instancemanager.ZoneManager;
 import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.Location;
 import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
-import net.sf.l2j.gameserver.model.entity.Arena;
 import net.sf.l2j.gameserver.model.entity.Castle;
 import net.sf.l2j.gameserver.model.entity.ClanHall;
-import net.sf.l2j.gameserver.model.entity.Zone;
-import net.sf.l2j.gameserver.model.entity.ZoneType;
+import net.sf.l2j.gameserver.model.zone.type.L2ArenaZone;
+import net.sf.l2j.gameserver.model.zone.type.L2ClanHallZone;
 
 /**
  * This class ...
@@ -193,6 +191,36 @@ public class MapRegionTable
 	{
 		return ( posY >> 15 ) + 10;// + centerTileX;
 	}
+	
+	public int getAreaCastle(L2Character activeChar)
+	{
+		int area = getClosestTownNumber(activeChar);
+		int castle;
+		switch (area) 
+		{
+		case 0:  castle = 1; break;//Talking Island Village
+        case 1:  castle = 4; break; //Elven Village
+        case 2:  castle = 4; break; //Dark Elven Village
+        case 3:  castle = 9; break; //Orc Village
+        case 4:  castle = 9; break; //Dwarven Village
+        case 5:  castle = 1; break; //Town of Gludio
+        case 6:  castle = 1; break; //Gludin Village
+        case 7:  castle = 2; break; //Town of Dion
+        case 8:  castle = 3; break; //Town of Giran
+        case 9:  castle = 4; break; //Town of Oren
+        case 10: castle = 5; break; //Town of Aden
+        case 11: castle = 5; break; //Hunters Village
+        case 12: castle = 3; break; //Giran Harbor
+        case 13: castle = 6; break; //Heine
+        case 14: castle = 8; break; //Rune Township
+        case 15: castle = 7; break; //Town of Goddard
+        case 16: castle = 9; break; //Town of Shuttgart 
+        case 17: castle = 4; break; //Ivory Tower
+        case 18: castle = 8; break; //Primeval Isle Wharf
+        default: castle = 5; break; //Town of Aden
+		}
+		return castle;
+	}
 
 	public int getClosestTownNumber(L2Character activeChar)
     {
@@ -242,28 +270,25 @@ public class MapRegionTable
             L2PcInstance player = ((L2PcInstance)activeChar);
 
             // If in Monster Derby Track
-            if (ZoneManager.getInstance().checkIfInZone(ZoneType.getZoneTypeName(ZoneType.ZoneTypeEnum.MonsterDerbyTrack), player))
+            if (player.isInsideZone(L2Character.ZONE_MOSTERTRACK))
                 return new Location(12661, 181687, -3560);
             
             Castle castle = null;
             ClanHall clanhall = null;
-            Zone zone = null;
 
             if (player.getClan() != null)
             {
             	// If teleport to clan hall
             	if (teleportWhere == TeleportWhereType.ClanHall)
                 {
+            		
             	    clanhall = ClanHallManager.getInstance().getClanHallByOwner(player.getClan());
             	    if (clanhall != null)
             	    {
-            	        zone = clanhall.getZone();
-            	        if (zone != null && !zone.getCoords().isEmpty())
+            	    	L2ClanHallZone zone = clanhall.getZone();
+            	        if (zone != null)
             	        {
-            	            coord = zone.getCoords().get(0);
-            	            int x = coord[0] + (coord[2] - coord[0])/2;
-            			    int y = coord[1] + (coord[3] - coord[1])/2;
-            	            return new Location(x, y, coord[4]); 
+            	            return zone.getSpawn(); 
             	        }
             	    }
                 }
@@ -280,12 +305,8 @@ public class MapRegionTable
             		// If is on caslte with siege and player's clan is defender
             		if (teleportWhere == TeleportWhereType.Castle || (teleportWhere == TeleportWhereType.Castle && castle.getSiege().getIsInProgress() && castle.getSiege().getDefenderClan(player.getClan()) != null))
             		{
-            			zone = ZoneManager.getInstance().getZone(ZoneType.getZoneTypeName(ZoneType.ZoneTypeEnum.CastleDefenderSpawn), castle.getName());
-            			if (zone != null && !zone.getCoords().isEmpty())
-            			{
-            				coord = zone.getCoords().get(0);
-            				return new Location(coord[0], coord[1], coord[4]); 
-            			}
+           				coord = castle.getZone().getSpawn();
+            			return new Location(coord[0], coord[1], coord[2]); 
             		}
             		
             		if (teleportWhere == TeleportWhereType.SiegeFlag && castle.getSiege().getIsInProgress())
@@ -315,18 +336,18 @@ public class MapRegionTable
             }
             
             // Checking if in arena
-            Arena arena = ArenaManager.getInstance().getArena(player);
-            if (arena != null && !arena.getSpawn().isEmpty())
+            L2ArenaZone arena = ArenaManager.getInstance().getArena(player);
+            if (arena != null)
             {
-                coord = arena.getSpawn().get(0);
-                if (coord != null) return new Location(coord[0], coord[1], coord[4]); 
+                coord = arena.getSpawnLoc();
+                return new Location(coord[0], coord[1], coord[2]); 
             }
         }
 
         // Get the nearest town
         // TODO: Micht: Maybe we should add some checks to prevent exception here.
-        coord = TownManager.getInstance().getClosestTown(activeChar).getSpawn().get(0);
+        coord = TownManager.getInstance().getClosestTown(activeChar).getSpawnLoc();
         
-        return new Location(coord[0], coord[1], coord[4]);
+        return new Location(coord[0], coord[1], coord[2]);
     }
 }

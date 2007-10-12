@@ -85,7 +85,7 @@ public class L2MonsterInstance extends L2Attackable
 	/**
 	 * Return True if the attacker is not another L2MonsterInstance.<BR><BR>
 	 */
-	@Override
+	//@Override
 	public boolean isAutoAttackable(L2Character attacker) 
 	{
 
@@ -94,6 +94,7 @@ public class L2MonsterInstance extends L2Attackable
 		
 		return !isEventMob;
 	}
+	
 	
 	/**
 	 * Return True if the L2MonsterInstance is Agressive (aggroRange > 0).<BR><BR>

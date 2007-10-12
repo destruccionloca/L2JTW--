@@ -21,7 +21,7 @@ package net.sf.l2j.gameserver.clientpackets;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
-
+import java.nio.BufferUnderflowException;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -100,7 +100,14 @@ public final class Say2 extends L2GameClientPacket
 	protected void readImpl()
 	{
 		_text = readS();
-		_type = readD();
+		try
+		{
+			_type = readD();
+		}
+		catch (BufferUnderflowException e) 
+		{ 
+			_type = CHAT_NAMES.length;
+		}
 		_target = (_type == TELL) ? readS() : null;
 	}
 	
@@ -174,6 +181,17 @@ public final class Say2 extends L2GameClientPacket
 				if (receiver != null && 
 						!BlockList.isBlocked(receiver, activeChar))
 				{	
+					if (Config.JAIL_DISABLE_CHAT && receiver.isInJail())
+			        {
+			                activeChar.sendMessage("Player is in jail.");
+			                return;
+			        }
+					if (receiver.isChatBanned())
+			        {
+			                activeChar.sendMessage("Player is chat banned.");
+			                return;
+			        }
+
 					if (!receiver.getMessageRefusal())
 					{
 						receiver.sendPacket(cs);

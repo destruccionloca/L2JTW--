@@ -19,8 +19,18 @@
 package net.sf.l2j.gameserver.clientpackets;
 
 import java.nio.BufferUnderflowException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.LineNumberReader;
+import java.util.Date;
+import java.util.List;
+import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.l2j.Config;
+import net.sf.l2j.gameserver.Announcements;
 import net.sf.l2j.gameserver.TaskPriority;
 import net.sf.l2j.gameserver.ai.CtrlIntention;
 import net.sf.l2j.gameserver.model.L2CharPosition;
@@ -58,7 +68,7 @@ public class MoveBackwardToLocation extends L2GameClientPacket
 	public TaskPriority getPriority() { return TaskPriority.PR_HIGH; }
 
 	private static final String _C__01_MOVEBACKWARDTOLOC = "[C] 01 MoveBackwardToLoc";
-	
+	private static Logger _log = Logger.getLogger(MoveBackwardToLocation.class.getName());
 	
 	@Override
 	protected void readImpl()
@@ -110,6 +120,8 @@ public class MoveBackwardToLocation extends L2GameClientPacket
 		}
 		else if (activeChar.isAttackingNow() && activeChar.getActiveWeaponItem() != null && (activeChar.getActiveWeaponItem().getItemType() == L2WeaponType.BOW))
 		{
+			
+		     _log.warning("Actiion FAIL");
 			activeChar.sendPacket(new ActionFailed());
 		}
 		else 

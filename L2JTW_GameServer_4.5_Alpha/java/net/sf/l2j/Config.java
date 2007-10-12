@@ -257,6 +257,8 @@ public final class Config
 
     /** Spell Book needed to learn skill */
     public static boolean SP_BOOK_NEEDED;
+    /** Spell Book needet to enchant skill */
+    public static boolean ES_SP_BOOK_NEEDED;
     /** Logging Chat Window */
     public static boolean LOG_CHAT;
     /** Logging Item Window */
@@ -292,6 +294,27 @@ public final class Config
 
     /** Olympaid Validation Period */
     public static long ALT_OLY_VPERIOD;
+    
+    /** Manor Refresh Starting time */
+    public static int ALT_MANOR_REFRESH_TIME;
+    
+    /** Manor Refresh Min */
+    public static int ALT_MANOR_REFRESH_MIN; 
+    
+    /** Manor Next Period Approve Starting time */
+    public static int ALT_MANOR_APPROVE_TIME; 
+    
+    /** Manor Next Period Approve Min */
+    public static int ALT_MANOR_APPROVE_MIN;
+    
+    /** Manor Maintenance Time */
+    public static int ALT_MANOR_MAINTENANCE_PERIOD; 
+    
+    /** Manor Save All Actions */
+    public static boolean ALT_MANOR_SAVE_ALL_ACTIONS;
+    
+    /** Manor Save Period Rate */
+    public static int ALT_MANOR_SAVE_PERIOD_RATE;
 
     /** Initial Lottery prize */
     public static int ALT_LOTTERY_PRIZE;
@@ -546,6 +569,9 @@ public final class Config
 
     /** Allow fishing ? */
     public static boolean ALLOWFISHING;    
+    
+    /** Allow Manor system */
+    public static boolean ALLOW_MANOR;
 
     /** Jail config **/
     public static boolean JAIL_IS_PVP;
@@ -839,6 +865,7 @@ public final class Config
     public static int TVT_EVENT_PARTICIPATION_NPC_ID;
     public static int[] TVT_EVENT_PARTICIPATION_NPC_COORDINATES = new int[3];
     public static int TVT_EVENT_MIN_PLAYERS_IN_TEAMS;
+    public static int TVT_EVENT_MAX_PLAYERS_IN_TEAMS;
     public static int TVT_EVENT_RESPAWN_TELEPORT_DELAY;
     public static int TVT_EVENT_START_LEAVE_TELEPORT_DELAY;
     public static String TVT_EVENT_TEAM_1_NAME;
@@ -850,6 +877,8 @@ public final class Config
     public static boolean TVT_EVENT_POTIONS_ALLOWED;
     public static boolean TVT_EVENT_SUMMON_BY_ITEM_ALLOWED;
     public static List<Integer> TVT_EVENT_DOOR_IDS = new FastList<Integer>();
+    public static byte TVT_EVENT_MIN_LVL;
+    public static byte TVT_EVENT_MAX_LVL;
 
     /** L2JMOD Wedding system  */
     public static boolean L2JMOD_ALLOW_WEDDING;
@@ -954,6 +983,9 @@ public final class Config
 
     /** Is telnet enabled ? */
     public static boolean IS_TELNET_ENABLED;
+
+    /** Death Penalty chance */
+    public static int   DEATH_PENALTY_CHANCE;
 
     /** Player Protection control */
     public static int   PLAYER_SPAWN_PROTECTION;
@@ -1262,6 +1294,7 @@ public final class Config
                 FLOODPROTECTOR_INITIALSIZE        = Integer.parseInt(optionsSettings.getProperty("FloodProtectorInitialSize", "50"));
                 ALLOW_DISCARDITEM               = Boolean.valueOf(optionsSettings.getProperty("AllowDiscardItem", "True"));
                 ALLOWFISHING                    = Boolean.valueOf(optionsSettings.getProperty("AllowFishing", "False"));
+                ALLOW_MANOR                     = Boolean.parseBoolean(optionsSettings.getProperty("AllowManor", "False"));
                 ALLOW_BOAT                      = Boolean.valueOf(optionsSettings.getProperty("AllowBoat", "False"));
                 ALLOW_CURSED_WEAPONS            = Boolean.valueOf(optionsSettings.getProperty("AllowCursedWeapons", "False"));
                 ALLOW_L2WALKER_CLIENT           = L2WalkerAllowed.valueOf(optionsSettings.getProperty("AllowL2Walker", "False"));
@@ -1551,6 +1584,8 @@ public final class Config
 
                 JAIL_IS_PVP       = Boolean.valueOf(otherSettings.getProperty("JailIsPvp", "True"));
                 JAIL_DISABLE_CHAT = Boolean.valueOf(otherSettings.getProperty("JailDisableChat", "True"));
+                
+                DEATH_PENALTY_CHANCE = Integer.parseInt(otherSettings.getProperty("DeathPenaltyChance", "20"));
             }
             catch (Exception e)
             {
@@ -1639,6 +1674,7 @@ public final class Config
                 ALT_GAME_SKILL_HIT_RATE = Float.parseFloat(altSettings.getProperty("AltGameSkillHitRate", "1."));
                 IS_CRAFTING_ENABLED     = Boolean.parseBoolean(altSettings.getProperty("CraftingEnabled", "true"));
                 SP_BOOK_NEEDED          = Boolean.parseBoolean(altSettings.getProperty("SpBookNeeded", "true"));
+                ES_SP_BOOK_NEEDED       = Boolean.parseBoolean(altSettings.getProperty("EnchantSkillSpBookNeeded","true"));
                 AUTO_LOOT               = altSettings.getProperty("AutoLoot").equalsIgnoreCase("True");
                 AUTO_LOOT_HERBS         = altSettings.getProperty("AutoLootHerbs").equalsIgnoreCase("True");
 
@@ -1690,6 +1726,14 @@ public final class Config
                 ALT_OLY_IWAIT                                       = Long.parseLong(altSettings.getProperty("AltOlyIWait","300000"));
                 ALT_OLY_WPERIOD                                     = Long.parseLong(altSettings.getProperty("AltOlyWPeriod","604800000"));
                 ALT_OLY_VPERIOD                                     = Long.parseLong(altSettings.getProperty("AltOlyVPeriod","86400000"));
+                
+                ALT_MANOR_REFRESH_TIME                              = Integer.parseInt(altSettings.getProperty("AltManorRefreshTime","20"));
+    	        ALT_MANOR_REFRESH_MIN                               = Integer.parseInt(altSettings.getProperty("AltManorRefreshMin","00"));
+    	        ALT_MANOR_APPROVE_TIME                              = Integer.parseInt(altSettings.getProperty("AltManorApproveTime","6"));
+    	        ALT_MANOR_APPROVE_MIN                               = Integer.parseInt(altSettings.getProperty("AltManorApproveMin","00"));
+    	        ALT_MANOR_MAINTENANCE_PERIOD                        = Integer.parseInt(altSettings.getProperty("AltManorMaintenancePreiod","360000"));
+    	        ALT_MANOR_SAVE_ALL_ACTIONS                          = Boolean.parseBoolean(altSettings.getProperty("AltManorSaveAllActions","false"));
+    	        ALT_MANOR_SAVE_PERIOD_RATE                          = Integer.parseInt(altSettings.getProperty("AltManorSavePeriodRate","2"));
 
                 ALT_LOTTERY_PRIZE                = Integer.parseInt(altSettings.getProperty("AltLotteryPrize","50000"));
                 ALT_LOTTERY_TICKET_PRICE         = Integer.parseInt(altSettings.getProperty("AltLotteryTicketPrice","2000"));
@@ -1870,16 +1914,19 @@ public final class Config
                     }
                     else
                     {
-                        TVT_EVENT_PARTICIPATION_NPC_COORDINATES[0]    = Integer.parseInt(propertySplit[0]); 
-                        TVT_EVENT_PARTICIPATION_NPC_COORDINATES[1]    = Integer.parseInt(propertySplit[1]);
-                        TVT_EVENT_PARTICIPATION_NPC_COORDINATES[2]    = Integer.parseInt(propertySplit[2]);
+                        TVT_EVENT_PARTICIPATION_NPC_COORDINATES[0]  = Integer.parseInt(propertySplit[0]); 
+                        TVT_EVENT_PARTICIPATION_NPC_COORDINATES[1]  = Integer.parseInt(propertySplit[1]);
+                        TVT_EVENT_PARTICIPATION_NPC_COORDINATES[2]  = Integer.parseInt(propertySplit[2]);
 
-                        TVT_EVENT_MIN_PLAYERS_IN_TEAMS                = Integer.parseInt(L2JModSettings.getProperty("TvTEventMinPlayersInTeams", "1"));
+                        TVT_EVENT_MIN_PLAYERS_IN_TEAMS              = Integer.parseInt(L2JModSettings.getProperty("TvTEventMinPlayersInTeams", "1"));
+                        TVT_EVENT_MAX_PLAYERS_IN_TEAMS              = Integer.parseInt(L2JModSettings.getProperty("TvTEventMaxPlayersInTeams", "20"));
+                        TVT_EVENT_MIN_LVL							= (byte)Integer.parseInt(L2JModSettings.getProperty("TvTEventMinPlayerLevel", "1"));
+                        TVT_EVENT_MAX_LVL							= (byte)Integer.parseInt(L2JModSettings.getProperty("TvTEventMaxPlayerLevel", "80"));
                         TVT_EVENT_RESPAWN_TELEPORT_DELAY            = Integer.parseInt(L2JModSettings.getProperty("TvTEventRespawnTeleportDelay", "20"));
                         TVT_EVENT_START_LEAVE_TELEPORT_DELAY        = Integer.parseInt(L2JModSettings.getProperty("TvTEventStartLeaveTeleportDelay", "20"));
 
-                        TVT_EVENT_TEAM_1_NAME                        = L2JModSettings.getProperty("TvTEventTeam1Name", "Team1");
-                        propertySplit                                = L2JModSettings.getProperty("TvTEventTeam1Coordinates", "0,0,0").split(",");
+                        TVT_EVENT_TEAM_1_NAME                       = L2JModSettings.getProperty("TvTEventTeam1Name", "Team1");
+                        propertySplit                               = L2JModSettings.getProperty("TvTEventTeam1Coordinates", "0,0,0").split(",");
 
                         if (propertySplit.length < 3)
                         {

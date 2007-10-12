@@ -70,12 +70,12 @@ public class L2SkillChargeAtk extends L2Skill {
 		EffectCharge effect = (EffectCharge) caster.getEffect(4271);
 
 		if (effect != null) {
-			if (effect.num_charges < num_charges)
+			if (effect.numCharges < num_charges)
 			{
-				effect.num_charges++;
+				effect.numCharges++;
 				caster.updateEffectIcons();
                 SystemMessage sm = new SystemMessage(323);
-                sm.addNumber(effect.num_charges);
+                sm.addNumber(effect.numCharges);
                 caster.sendPacket(sm);
 			}
 			else

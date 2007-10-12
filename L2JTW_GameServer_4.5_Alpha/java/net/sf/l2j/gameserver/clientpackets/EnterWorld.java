@@ -137,7 +137,9 @@ public class EnterWorld extends L2GameClientPacket
             if (Config.GM_STARTUP_AUTO_LIST 
                     && (!Config.ALT_PRIVILEGES_ADMIN && activeChar.getAccessLevel() >= Config.GM_MENU
                       || Config.ALT_PRIVILEGES_ADMIN && AdminCommandHandler.getInstance().checkPrivileges(activeChar, "admin_gmliston")))
-            	GmListTable.getInstance().addGm(activeChar);
+            	GmListTable.getInstance().addGm(activeChar, false);
+            else
+            	GmListTable.getInstance().addGm(activeChar, true);
             
             if (Config.GM_NAME_COLOR_ENABLED)
             {
@@ -152,8 +154,7 @@ public class EnterWorld extends L2GameClientPacket
             activeChar.setProtection(true);
         
 		activeChar.spawnMe(activeChar.getX(), activeChar.getY(), activeChar.getZ());
-		activeChar.sendPacket(new EtcStatusUpdate());
-		
+
 		if (L2Event.active && L2Event.connectionLossData.containsKey(activeChar.getName()) && L2Event.isOnEvent(activeChar))
             L2Event.restoreChar(activeChar);
         else if (L2Event.connectionLossData.containsKey(activeChar.getName()))
@@ -162,8 +163,11 @@ public class EnterWorld extends L2GameClientPacket
 		if (SevenSigns.getInstance().isSealValidationPeriod())
 			sendPacket(new SignsSky());
 		
-        if (Config.STORE_SKILL_COOLTIME)
+        // buff and status icons
+		if (Config.STORE_SKILL_COOLTIME)
             activeChar.restoreEffects();
+        
+        activeChar.sendPacket(new EtcStatusUpdate(activeChar));
 
         // engage and notify Partner
         if(Config.L2JMOD_ALLOW_WEDDING)

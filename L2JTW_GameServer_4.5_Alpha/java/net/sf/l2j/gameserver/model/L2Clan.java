@@ -817,7 +817,7 @@ public class L2Clan
             clanData.close();
             statement.close();
             
-            if (getName() != null)
+            if (Config.DEBUG && getName() != null)
                 _log.config("Restored clan data for \"" + getName() + "\" from database.");
             restoreSubPledges();
             restoreRankPrivs();
@@ -1553,7 +1553,8 @@ public class L2Clan
         int id = 0;
         for (SubPledge sp : _subPledges.values())
         {
-            if (sp.getLeaderName().equals(name))
+        	if (sp.getLeaderName() == null) continue;
+        	if (sp.getLeaderName().equals(name))
                 id = sp.getId();
         }
         return id;
@@ -1808,7 +1809,7 @@ public class L2Clan
 				return false;
 			}
 		}
-        if (SiegeManager.getInstance().checkIfInZone(activeChar) && SiegeManager.getInstance().checkIfInZone(target))
+        if (activeChar.isInsideZone(L2PcInstance.ZONE_SIEGE) && target.isInsideZone(L2PcInstance.ZONE_SIEGE))
         {
         	activeChar.sendPacket(new SystemMessage(SystemMessageId.OPPOSING_CLAN_IS_PARTICIPATING_IN_SIEGE));
             return false;
@@ -1946,7 +1947,7 @@ public class L2Clan
 			player.sendPacket(new SystemMessage(SystemMessageId.FEATURE_ONLY_FOR_ALLIANCE_LEADER));
 			return;
 		}
-        if (SiegeManager.getInstance().checkIfInZone(player))
+        if (player.isInsideZone(L2PcInstance.ZONE_SIEGE))
         {
             player.sendPacket(new SystemMessage(SystemMessageId.CANNOT_DISSOLVE_ALLY_WHILE_IN_SIEGE));
             return;

@@ -24,6 +24,7 @@ import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.network.SystemMessageId;
+import net.sf.l2j.gameserver.serverpackets.EtcStatusUpdate;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.templates.L2WeaponType;
 import net.sf.l2j.gameserver.templates.StatsSet;
@@ -36,7 +37,7 @@ public class L2SkillChargeDmg extends L2Skill
 {
 
 
-    final int num_charges;
+    final int numCharges;
     final int charge_skill_id;
     
     public L2SkillChargeDmg(StatsSet set)
@@ -45,7 +46,7 @@ public class L2SkillChargeDmg extends L2Skill
 
         super(set);
         
-        num_charges = set.getInteger("num_charges", getLevel());
+        numCharges = set.getInteger("num_charges", getLevel());
         //charge_skill_id = set.getInteger("charge_skill_id");
         charge_skill_id = 4271;
     }
@@ -58,7 +59,7 @@ public class L2SkillChargeDmg extends L2Skill
         {
             L2PcInstance player = (L2PcInstance)activeChar;
             EffectCharge e = (EffectCharge)player.getEffect(charge_skill_id);
-            if(e == null || e.num_charges < this.num_charges)
+            if(e == null || e.numCharges < this.numCharges)
             {
             	//_log.warning("CHARGE 1");
                 SystemMessage sm = new SystemMessage(113);
@@ -81,7 +82,7 @@ public class L2SkillChargeDmg extends L2Skill
         
         // get the effect
         EffectCharge effect = (EffectCharge) caster.getEffect(charge_skill_id);
-        if (effect == null || effect.num_charges < this.num_charges)
+        if (effect == null || effect.numCharges < this.numCharges)
         {
         	//_log.warning("CHARGE 2");
             SystemMessage sm = new SystemMessage(113);
@@ -94,34 +95,20 @@ public class L2SkillChargeDmg extends L2Skill
 
         double modifier = 0;
 
-
-        modifier = effect.num_charges*0.333;
-        
-        effect.num_charges -= this.num_charges;
-        
-           //effect.num_charges = 0;
-           caster.updateEffectIcons();
-           if(effect.num_charges < 1)
-        	   effect.exit();
-       
-
-        boolean ss = false;
-        
-        L2ItemInstance weaponInst = caster.getActiveWeaponInstance();
-        
-
-
-
-
-
-        for(int index = 0;index < targets.length;index++)
+        modifier = (effect.numCharges-numCharges)*0.33;		
+		if (getTargetType() != SkillTargetType.TARGET_AREA && getTargetType() != SkillTargetType.TARGET_MULTIFACE)
+			effect.numCharges -= numCharges;
+		if (caster instanceof L2PcInstance)
+			caster.sendPacket(new EtcStatusUpdate((L2PcInstance)caster));
+        if (effect.numCharges == 0)
+        	{effect.exit();}
+        for (int index = 0;index < targets.length;index++)
         {
         	L2ItemInstance weapon = caster.getActiveWeaponInstance();
-					L2Character target = (L2Character)targets[index];
-					if (target.isAlikeDead())
-          {
-						continue;
-          }
+        	L2Character target = (L2Character)targets[index];
+        	if (target.isAlikeDead())
+        		continue;
+
 
 			// TODO: should we use dual or not?
 			// because if so, damage are lowered but we dont do anything special with dual then
@@ -132,17 +119,12 @@ public class L2SkillChargeDmg extends L2Skill
 			boolean shld = Formulas.getInstance().calcShldUse(caster, target);
             boolean dual = caster.isUsingDualWeapon();
 			boolean crit = Formulas.getInstance().calcCrit(caster.getCriticalHit(target, this));
-            boolean soul = (weapon != null && weapon.getChargedSoulshot() == L2ItemInstance.CHARGED_SOULSHOT);
-            /*if (caster instanceof L2PcInstance && weaponInst != null) 
-            {
-                if (weaponInst.getChargedSoulshot() == L2ItemInstance.CHARGED_SOULSHOT) 
-                {
-                    ss = true;
-                    weaponInst.setChargedSoulshot(L2ItemInstance.CHARGED_NONE);
-                }
-            }
-            */
-			int damage = (int) Formulas.getInstance().calcPhysDam(caster, target, this, shld, false, dual, soul);
+
+			boolean soul = (weapon != null 
+							&& weapon.getChargedSoulshot() == L2ItemInstance.CHARGED_SOULSHOT );
+			
+			int damage = (int)Formulas.getInstance().calcPhysDam(caster, target, this, shld, crit, false, soul);
+
 			if (damage > 0)
             {
                 double finalDamage = damage;

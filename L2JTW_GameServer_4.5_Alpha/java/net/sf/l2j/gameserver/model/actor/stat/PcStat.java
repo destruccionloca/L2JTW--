@@ -59,7 +59,7 @@ public class PcStat extends PlayableStat
     	L2PcInstance activeChar = getActiveChar();
     	
         // Set new karma
-        if (!activeChar.isCursedWeaponEquiped() && activeChar.getKarma() > 0 && (activeChar.isGM() || !activeChar.getInPvpZone()))
+        if (!activeChar.isCursedWeaponEquiped() && activeChar.getKarma() > 0 && (activeChar.isGM() || !activeChar.isInsideZone(L2PcInstance.ZONE_PVP)))
         {
             int karmaLost = activeChar.calculateKarmaLost(value);
             if (karmaLost > 0) activeChar.setKarma(activeChar.getKarma() - karmaLost);
@@ -138,12 +138,12 @@ public class PcStat extends PlayableStat
         if (!super.removeExpAndSp(addToExp, addToSp)) return false;
 
         // Send a Server->Client System Message to the L2PcInstance
-        //TODO: add right System msg
-        SystemMessage sm = new SystemMessage(SystemMessageId.YOU_EARNED_S1_EXP_AND_S2_SP);
+        SystemMessage sm = new SystemMessage(SystemMessageId.EXP_DECREASED_BY_S1);
         sm.addNumber((int)addToExp);
+        getActiveChar().sendPacket(sm);
+        sm = new SystemMessage(SystemMessageId.SP_DECREASED_S1);
         sm.addNumber(addToSp);
         getActiveChar().sendPacket(sm);
-
         return true;
     }
 

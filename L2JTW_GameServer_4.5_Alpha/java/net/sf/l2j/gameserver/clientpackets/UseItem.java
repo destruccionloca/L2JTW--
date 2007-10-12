@@ -29,7 +29,6 @@ import net.sf.l2j.gameserver.model.L2ItemInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.ActionFailed;
-import net.sf.l2j.gameserver.serverpackets.EtcStatusUpdate;
 import net.sf.l2j.gameserver.serverpackets.InventoryUpdate;
 import net.sf.l2j.gameserver.serverpackets.ItemList;
 import net.sf.l2j.gameserver.serverpackets.ShowCalculator;
@@ -356,7 +355,6 @@ public final class UseItem extends L2GameClientPacket
 				InventoryUpdate iu = new InventoryUpdate();
 				iu.addItems(Arrays.asList(items));
 				activeChar.sendPacket(iu);
-				activeChar.sendPacket(new EtcStatusUpdate());
 				activeChar.abortAttack();
 				activeChar.broadcastUserInfo();
 			}
