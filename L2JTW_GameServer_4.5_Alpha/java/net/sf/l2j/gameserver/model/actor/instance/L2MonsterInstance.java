@@ -240,6 +240,7 @@ public class L2MonsterInstance extends L2Attackable
                 Baium.setLocz(getZ());
                 Baium.setHeading(getHeading());
                 Baium.doSpawn();
+                Baium.stopRespawn();
 
             }
             catch (Exception e) {

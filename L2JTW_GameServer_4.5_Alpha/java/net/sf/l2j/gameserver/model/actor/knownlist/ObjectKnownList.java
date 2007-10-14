@@ -61,7 +61,7 @@ public class ObjectKnownList
 
         // Check if object is not inside distance to watch object
         if (!Util.checkIfInRange(getDistanceToWatchObject(object), getActiveObject(), object, true)) return false;
-        if(Math.abs(object.getZ()-getActiveObject().getZ()) > 1500) return false;
+        if(Math.abs(object.getZ()-getActiveObject().getZ()) > 600) return false;
 
         return (getKnownObjects().put(object.getObjectId(), object) == null);
     }
