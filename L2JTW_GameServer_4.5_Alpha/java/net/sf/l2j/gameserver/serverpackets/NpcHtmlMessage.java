@@ -191,7 +191,7 @@ public class NpcHtmlMessage extends L2GameServerPacket
 	
 	public final void buildBypassCache(L2PcInstance activeChar)
 	{
-        if (activeChar == null)
+        if (activeChar == null && _html == null)
             return;
         
         activeChar.clearBypass();

@@ -199,17 +199,15 @@ public final class L2VillageMasterInstance extends L2FolkInstance
                     // Avoid giving player an option to add a new sub class, if they have three already.
                     if (player.getTotalSubClasses() == 3)
                     {
-                        player.sendMessage("現在可以轉換為其中一個副執業");
+                        player.sendMessage("現在只能變更一個副職業。");
                         return;
                     }
 
                     subsAvailable = getAvailableSubClasses(player);
 
-
                     if (subsAvailable != null && !subsAvailable.isEmpty())
                     {
-                        content.append("增加副職業:<br>選擇副職業<br><br>");
-
+                        content.append("追加副職業：<br>下列副職業中，要將哪個副職業刪除並進行更換呢？<br>");
 
                         for (PlayerClass subClass : subsAvailable)
                             content.append("<a action=\"bypass -h npc_" + getObjectId() + "_Subclass 4 "
@@ -217,42 +215,35 @@ public final class L2VillageMasterInstance extends L2FolkInstance
                                 + formatClassForDisplay(subClass) + "\">"
                                 + formatClassForDisplay(subClass) + "</a><br>");
                     }
-
                     else
                     {
-                        player.sendMessage("目前沒有任何副職業可以挑選.");
-
+                        player.sendMessage("未有副職業可以轉換。");
                         return;
                     }
                     break;
                 case 2: // Change Class - Initial
-                    content.append("轉換副職業:<br>");
+                    content.append("副職業間進行變更：<br>");
 
                     final int baseClassId = player.getBaseClass();
 
-
                     if (player.getSubClasses().isEmpty())
-
                     {
-
-                        content.append("你無法轉換為副職業當你沒有任何副職業.<br>"
+                        content.append("當你沒有任何副職業時，無法進行變更副職業。<br>"
                             + "<a action=\"bypass -h npc_"
                             + getObjectId()
-                            + "_Subclass 1\">增加副職業.</a>");
+                            + "_Subclass 1\">追加副職業</a>");
                     }
                     else
                     {
-                        content.append("請挑選副職業轉換<br>");
-
+                        content.append("請選擇副職業進行變更<br>");
 
                         if (baseClassId == player.getActiveClass()) content.append(CharTemplateTable.getClassNameById(baseClassId)
-                            + "&nbsp;<font color=\"LEVEL\">(基本職業)</font><br><br>");
+                            + "&nbsp;<font color=\"LEVEL\">（基本職業）</font><br><br>");
                         else content.append("<a action=\"bypass -h npc_" + getObjectId()
                             + "_Subclass 5 0\">" + CharTemplateTable.getClassNameById(baseClassId)
-                            + "</a>&nbsp;" + "<font color=\"LEVEL\">(基本職業)</font><br><br>");
+                            + "</a>&nbsp;" + "<font color=\"LEVEL\">(（基本職業）</font><br><br>");
 
                         for (Iterator<SubClass> subList = iterSubClasses(player); subList.hasNext();)
-
                         {
                             SubClass subClass = subList.next();
                             int subClassId = subClass.getClassId();
@@ -266,13 +257,11 @@ public final class L2VillageMasterInstance extends L2FolkInstance
                     }
                     break;
                 case 3: // Change/Cancel Subclass - Initial
-                    content.append("副職業轉換:<br>選擇副職業想要轉換的<br>");
+                    content.append("副職業間進行變更：<br>下列副職業中，要將哪個副職業刪除並進行更換呢？<br>");
                     int classIndex = 1;
 
                     for (Iterator<SubClass> subList = iterSubClasses(player); subList.hasNext();)
-
                     {
-
                         SubClass subClass = subList.next();
 
                         content.append("副職業 " + classIndex + "<br1>");
@@ -283,9 +272,7 @@ public final class L2VillageMasterInstance extends L2FolkInstance
                         classIndex++;
                     }
 
-                    
-                    content.append("<br>當你想轉換副職業時將把等級設置為40等.");
-
+                    content.append("<br>刪除並變更副職業的話，會從2次轉職40級重新開始。");
                     break;
                 case 4: // Add Subclass - Action (Subclass 4 x[x])
                     boolean allowAddition = true;
@@ -295,7 +282,7 @@ public final class L2VillageMasterInstance extends L2FolkInstance
                      */
                     if (player.getLevel() < 75)
                     {
-                        player.sendMessage("在等級達到75之前無法新增副職業.");
+                        player.sendMessage("等級未達到75之前無法追加副職業。");
                         allowAddition = false;
                     }
 
@@ -307,7 +294,6 @@ public final class L2VillageMasterInstance extends L2FolkInstance
                         return;
                     }
 
-
                     if (allowAddition)
                     {
                         if (!player.getSubClasses().isEmpty())
@@ -318,11 +304,10 @@ public final class L2VillageMasterInstance extends L2FolkInstance
 
                                 if (subClass.getLevel() < 75)
                                 {
-                                    player.sendMessage("在等級達到75之前無法新增副職業.");
+                                    player.sendMessage("等級未達到75之前無法追加副職業。");
                                     allowAddition = false;
                                     break;
                                 }
-
                             }
                         }
                     }
@@ -339,13 +324,13 @@ public final class L2VillageMasterInstance extends L2FolkInstance
                     	QuestState qs = player.getQuestState("235_MimirsElixir");
                     	if(qs == null || !qs.isCompleted())
                         {
-                            player.sendMessage("你必須完成[米密爾的泉水]才能進行副職業增加.");
+                            player.sendMessage("必須完成「米密爾的泉水」的任務，才可追加副職業。");
                             return;
                         }
                     	qs = player.getQuestState("234_FatesWhisper");
                     	if(qs == null || !qs.isCompleted())
                         {
-                            player.sendMessage("你必須完成[命運的私語]才能進行副職業增加.");
+                            player.sendMessage("必須完成「命運的私語」的任務，才可追加副職業。");
                             return;
                         }
                     }
@@ -357,16 +342,13 @@ public final class L2VillageMasterInstance extends L2FolkInstance
 
                         if (!player.addSubClass(paramOne, player.getTotalSubClasses() + 1))
                         {
-                            player.sendMessage("副職業無法增加");
+                            player.sendMessage("副職業無法追加。");
                             return;
                         }
 
                         player.setActiveClass(player.getTotalSubClasses());
-                        
 
-                        content.append("增加副職業:<br>副職業 <font color=\"LEVEL\">" + className + "</font> 已經增加.");
-
-
+                        content.append("追加副職業：<br>副職業<font color=\"LEVEL\">" + className + "</font>已經追加。");
                         player.sendPacket(new SystemMessage(SystemMessageId.CLASS_TRANSFER)); // Transfer to new class.
                     }
                     else
@@ -390,21 +372,17 @@ public final class L2VillageMasterInstance extends L2FolkInstance
                         return;
                     }
 
-
                     player.setActiveClass(paramOne);
 
-
+                    content.append("副職業間進行變更:<br>目前正在使用的副職業為 <font color=\"LEVEL\">"
+                        + CharTemplateTable.getClassNameById(player.getActiveClass()) + "</font>.");
 
                     player.sendPacket(new SystemMessage(SystemMessageId.SUBCLASS_TRANSFER_COMPLETED)); // Transfer completed.
-
                     break;
                 case 6: // Change/Cancel Subclass - Choice
-
-                    content.append("請選擇副職業轉換. 如果你在尋找的職業不在這, " +
-                                   "請你找尋其他大師或宗師.<br>" +
-                    "<font color=\"LEVEL\">警告!</font> 職業技能將全部移除.<br><br>");
-
-                    
+                	 content.append("請選擇副職業變更。如果你在尋找的職業不在這，" +
+                			 		"請你找尋其他大師或宗師。<br>" +
+                	 				"<font color=\"LEVEL\">注意！</font>職業技能將會全部移除。<br><br>");
 
                     subsAvailable = getAvailableSubClasses(player);
 
@@ -415,12 +393,9 @@ public final class L2VillageMasterInstance extends L2FolkInstance
                                 + paramOne + " " + subClass.ordinal() + "\">"
                                 + formatClassForDisplay(subClass) + "</a><br>");
                     }
-
-
-                    else {
-                        player.sendMessage("目前無法轉副職業.");
-
-
+                    else
+                    {
+                        player.sendMessage("目前無法進行變更副職業。");
                         return;
                     }
                     break;
@@ -433,14 +408,12 @@ public final class L2VillageMasterInstance extends L2FolkInstance
                     {
                         player.setActiveClass(paramOne);
 
-                        
-
+                        content.append("副職業間進行變更:<br>副職業變更為 <font color=\"LEVEL\">"
+                            + CharTemplateTable.getClassNameById(paramTwo) + "</font>.");
 
                         player.sendPacket(new SystemMessage(SystemMessageId.ADD_NEW_SUBCLASS)); // Subclass added.
-
                     }
-                    else 
-
+                    else
                     {
                         /*
                          * This isn't good! modifySubClass() removed subclass from memory
@@ -450,10 +423,7 @@ public final class L2VillageMasterInstance extends L2FolkInstance
                          */
                         player.setActiveClass(0); // Also updates _classIndex plus switching _classid to baseclass.
 
-
-                    	player.sendMessage("副職業無法加入");
-
-
+                        player.sendMessage("副職業無法增加,將還原到原始職業.");
                         return;
                     }
                     break;
@@ -537,10 +507,7 @@ public final class L2VillageMasterInstance extends L2FolkInstance
         }
         if (clan.getDissolvingExpiryTime() > System.currentTimeMillis())
         {
-
             player.sendPacket(new SystemMessage(SystemMessageId.DISSOLUTION_IN_PROGRESS));
-
-
             return;
         }
 

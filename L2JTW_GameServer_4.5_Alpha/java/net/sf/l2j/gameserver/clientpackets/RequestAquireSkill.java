@@ -260,7 +260,7 @@ public class RequestAquireSkill extends L2GameClientPacket
             
             if (player.getClan().getReputationScore() >= repCost)
             {
-            	if (Config.SP_BOOK_NEEDED) 
+            	if (Config.LIFE_CRYSTAL_NEEDED) 
             	{
             		if (!player.destroyItemByItemId("Consume", itemId, 1, trainer, false))
             		{

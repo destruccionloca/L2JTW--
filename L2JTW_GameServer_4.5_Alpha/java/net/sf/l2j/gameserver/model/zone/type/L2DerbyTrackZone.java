@@ -20,16 +20,15 @@ package net.sf.l2j.gameserver.model.zone.type;
 import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.zone.L2ZoneType;
-import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
 /**
- * A peaceful zone
+ * The Monster Derby Track Zone
  *
  * @author  durgus
  */
-public class L2PeaceZone extends L2ZoneType
+public class L2DerbyTrackZone extends L2ZoneType
 {
-	public L2PeaceZone()
+	public L2DerbyTrackZone()
 	{
 		super();
 	}
@@ -37,24 +36,18 @@ public class L2PeaceZone extends L2ZoneType
 	@Override
 	protected void onEnter(L2Character character)
 	{
-		character.setInsideZone(L2Character.ZONE_PEACE, true);
-		
 		if (character instanceof L2PcInstance)
 		{
-            SystemMessage sm = new SystemMessage(116);
-            ((L2PcInstance)character).sendPacket(sm);
+			character.setInsideZone(L2Character.ZONE_MONSTERTRACK, true);
 		}
 	}
 	
 	@Override
 	protected void onExit(L2Character character)
 	{
-		character.setInsideZone(L2Character.ZONE_PEACE, false);
-		
 		if (character instanceof L2PcInstance)
 		{
-            SystemMessage sm = new SystemMessage(117);
-            ((L2PcInstance)character).sendPacket(sm);
+			character.setInsideZone(L2Character.ZONE_MONSTERTRACK, false);
 		}
 	}
 }

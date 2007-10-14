@@ -1094,7 +1094,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 
                     if (hated.isMoving()) range -= 100; if (range < 5) range = 5; 
         			//_accessor.moveTo(hated.getX(), hated.getY(), hated.getZ());	
-                    moveToPawn(getAttackTarget(), range);
+                    moveToPawn(getAttackTarget(), range+((L2Attackable) _actor).getTemplate().collisionRadius);
                     return;
             		
             		
@@ -1327,7 +1327,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
             	                    }
             	                if(!GeoData.getInstance().canSeeTarget(_actor, hated))
             	                {
-            	                	moveToPawn(hated, range);
+            	                	moveToPawn(hated, range+((L2Attackable) _actor).getTemplate().collisionRadius);
             	                	return;
             	                }
                          clientStopMoving(null);
@@ -1367,7 +1367,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         	//Geo Los Check
             if(!GeoData.getInstance().canSeeTarget(_actor, hated))
             {
-            	moveToPawn(hated, range);
+            	moveToPawn(hated, range+((L2Attackable) _actor).getTemplate().collisionRadius);
             	return;
             }
             //-------------------------------------------------------
@@ -1385,7 +1385,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
             	//Geo Los Check
                 if(!GeoData.getInstance().canSeeTarget(_actor, hated))
                 {
-                	moveToPawn(hated, range);
+                	moveToPawn(hated, range+((L2Attackable) _actor).getTemplate().collisionRadius);
                 	return;
                 }
                 //-------------------------------------------------------
@@ -1404,7 +1404,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         		}
                 if (hated.isMoving()) range -= 100; if (range < 5) range = 5; 
     			//_accessor.moveTo(hated.getX(), hated.getY(), hated.getZ());	
-                moveToPawn(getAttackTarget(), range);
+                moveToPawn(getAttackTarget(), range+((L2Attackable) _actor).getTemplate().collisionRadius);
                 return;
         		
         		
@@ -1874,7 +1874,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         {
         if (MostHate.isMoving()) attackrange -= 100; if (attackrange < 5) attackrange = 5; 
 		//_accessor.moveTo(MostHate.getX(), MostHate.getY(), MostHate.getZ());	
-        moveToPawn(getAttackTarget(), attackrange);
+        moveToPawn(getAttackTarget(), attackrange+((L2Attackable) _actor).getTemplate().collisionRadius);
         return;
         }
     	return;

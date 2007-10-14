@@ -551,8 +551,8 @@ public class AutoSpawnHandler
 				// Announce to all players that the spawn has taken place, with
 				// the nearest town location.
 				if (spawnInst.isBroadcasting())
-					Announcements.getInstance().announceToAll("The " + npcInst.getName() + " has spawned near "
-							+ nearestTown + "!");
+					Announcements.getInstance().announceToAll("" + npcInst.getName() + " 出現在 "
+							+ nearestTown + " 附近!");
 
 				if (Config.DEBUG)
 					_log.info("AutoSpawnHandler: Spawned NPC ID "

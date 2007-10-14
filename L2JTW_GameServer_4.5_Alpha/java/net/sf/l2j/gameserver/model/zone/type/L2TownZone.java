@@ -95,8 +95,8 @@ public class L2TownZone extends L2ZoneType
 		
 		if (character instanceof L2PcInstance)
 		{
-			((L2PcInstance)character).sendMessage("You entered "+_townName);
-			
+			//((L2PcInstance)character).sendMessage("¶i¤J "+_townName);
+			// This is useless
 			//TODO: check for town pvp zone during siege (Config.ZONE_TOWN != 0 && getCastle().checkIfInZoneTowns(x, y)
 		}
 	}
@@ -108,8 +108,8 @@ public class L2TownZone extends L2ZoneType
 		
 		if (character instanceof L2PcInstance)
 		{
-			((L2PcInstance)character).sendMessage("You left "+_townName);
-			
+			//((L2PcInstance)character).sendMessage("Â÷¶} "+_townName);
+			// This is useless
 			// TODO: check for town pvp zone during siege
 		}
 	}
