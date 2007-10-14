@@ -155,7 +155,7 @@ public abstract class L2Skill
 		BLOW,
         CHARGEATK   (L2SkillChargeAtk.class),  
 	    DEATHLINK_PDAM,
-	    CHARGEDAM,
+	    CHARGEDAM (L2SkillChargeDmg.class),
 	    SPOILATK,
 		
     	// Disablers
