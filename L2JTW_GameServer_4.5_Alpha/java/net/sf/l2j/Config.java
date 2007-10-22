@@ -131,6 +131,8 @@ public final class Config
     /** Alternative setting to blacksmith use of recipes to craft - default true*/
     public static boolean ALT_BLACKSMITH_USE_RECIPES;
 
+    /** Alternative game weight limit multiplier - default 1*/
+    public static double ALT_WEIGHT_LIMIT;
 
     /** Alternative game skill learning */
     public static boolean ALT_GAME_SKILL_LEARN;
@@ -145,7 +147,8 @@ public final class Config
 
     /** Alternative game - use tiredness, instead of CP */
     public static boolean ALT_GAME_TIREDNESS;
-
+    public static int ALT_PARTY_RANGE;
+    public static int ALT_PARTY_RANGE2;
     /** Alternative shield defence */
     public static boolean ALT_GAME_SHIELD_BLOCKS;
 
@@ -461,6 +464,8 @@ public final class Config
     public static float   RATE_DROP_ITEMS;
     /** Rate for spoiled items */
     public static float   RATE_DROP_SPOIL;
+    /** Rate for manored items */
+    public static int   RATE_DROP_MANOR;
     /** Rate for quest items */
     public static float   RATE_DROP_QUEST;
     /** Rate for karma and experience lose */
@@ -1180,6 +1185,7 @@ public final class Config
     /** Alt Settings for devs */
     public static boolean ALT_DEV_NO_QUESTS;
     public static boolean ALT_DEV_NO_SPAWNS;
+	
 
     /** Decay Time */
 
@@ -1611,6 +1617,7 @@ public final class Config
                 RATE_CONSUMABLE_COST            = Float.parseFloat(ratesSettings.getProperty("RateConsumableCost", "1."));
                 RATE_DROP_ITEMS                 = Float.parseFloat(ratesSettings.getProperty("RateDropItems", "1."));
                 RATE_DROP_SPOIL                 = Float.parseFloat(ratesSettings.getProperty("RateDropSpoil", "1."));
+                RATE_DROP_MANOR                 = Integer.parseInt(ratesSettings.getProperty("RateDropManor", "1"));
                 RATE_DROP_QUEST                 = Float.parseFloat(ratesSettings.getProperty("RateDropQuest", "1."));
                 RATE_KARMA_EXP_LOST             = Float.parseFloat(ratesSettings.getProperty("RateKarmaExpLost", "1."));    
                 RATE_SIEGE_GUARDS_PRICE         = Float.parseFloat(ratesSettings.getProperty("RateSiegeGuardsPrice", "1."));
@@ -1655,6 +1662,7 @@ public final class Config
                 ALT_GAME_CREATION_SPEED = Double.parseDouble(altSettings.getProperty("AltGameCreationSpeed", "1"));
                 ALT_GAME_CREATION_XP_RATE=Double.parseDouble(altSettings.getProperty("AltGameCreationRateXp", "1"));
                 ALT_GAME_CREATION_SP_RATE=Double.parseDouble(altSettings.getProperty("AltGameCreationRateSp", "1"));
+                ALT_WEIGHT_LIMIT        =Double.parseDouble(altSettings.getProperty("AltWeightLimit", "1"));
                 ALT_BLACKSMITH_USE_RECIPES=Boolean.parseBoolean(altSettings.getProperty("AltBlacksmithUseRecipes", "true"));
                 ALT_GAME_SKILL_LEARN    = Boolean.parseBoolean(altSettings.getProperty("AltGameSkillLearn", "false"));
 
@@ -1672,6 +1680,8 @@ public final class Config
                 ALLOW_CLASS_MASTERS     = Boolean.valueOf(altSettings.getProperty("AllowClassMasters", "False"));
                 ALT_GAME_FREIGHTS       = Boolean.parseBoolean(altSettings.getProperty("AltGameFreights", "false"));
                 ALT_GAME_FREIGHT_PRICE  = Integer.parseInt(altSettings.getProperty("AltGameFreightPrice", "1000"));
+                ALT_PARTY_RANGE 		= Integer.parseInt(altSettings.getProperty("AltPartyRange", "1600"));
+                ALT_PARTY_RANGE2  		= Integer.parseInt(altSettings.getProperty("AltPartyRange2", "1400"));
                 ALT_GAME_SKILL_HIT_RATE = Float.parseFloat(altSettings.getProperty("AltGameSkillHitRate", "1."));
                 IS_CRAFTING_ENABLED     = Boolean.parseBoolean(altSettings.getProperty("CraftingEnabled", "true"));
                 LIFE_CRYSTAL_NEEDED     = Boolean.parseBoolean(altSettings.getProperty("LifeCrystalNeeded", "true"));                
@@ -1720,10 +1730,10 @@ public final class Config
                 ALT_ACCEPT_CLAN_DAYS_WHEN_DISMISSED  = Integer.parseInt(altSettings.getProperty("DaysBeforeAcceptNewClanWhenDismissed", "1"));
                 ALT_CREATE_ALLY_DAYS_WHEN_DISSOLVED  = Integer.parseInt(altSettings.getProperty("DaysBeforeCreateNewAllyWhenDissolved", "10"));
 
-                ALT_OLY_START_TIME                                  = Integer.parseInt(altSettings.getProperty("AltOlyStartTime", "20"));
+                ALT_OLY_START_TIME                                  = Integer.parseInt(altSettings.getProperty("AltOlyStartTime", "18"));
                 ALT_OLY_MIN                                         = Integer.parseInt(altSettings.getProperty("AltOlyMin","00"));
-                ALT_OLY_CPERIOD                                     = Long.parseLong(altSettings.getProperty("AltOlyCPeriod","14100000"));
-                ALT_OLY_BATTLE                                      = Long.parseLong(altSettings.getProperty("AltOlyBattle","180000"));
+                ALT_OLY_CPERIOD                                     = Long.parseLong(altSettings.getProperty("AltOlyCPeriod","21600000"));
+                ALT_OLY_BATTLE                                      = Long.parseLong(altSettings.getProperty("AltOlyBattle","360000"));
                 ALT_OLY_BWAIT                                       = Long.parseLong(altSettings.getProperty("AltOlyBWait","600000"));
                 ALT_OLY_IWAIT                                       = Long.parseLong(altSettings.getProperty("AltOlyIWait","300000"));
                 ALT_OLY_WPERIOD                                     = Long.parseLong(altSettings.getProperty("AltOlyWPeriod","604800000"));
@@ -2249,6 +2259,7 @@ public final class Config
         else if (pName.equalsIgnoreCase("RateConsumableCost")) RATE_CONSUMABLE_COST = Float.parseFloat(pValue);
         else if (pName.equalsIgnoreCase("RateDropItems")) RATE_DROP_ITEMS = Float.parseFloat(pValue);
         else if (pName.equalsIgnoreCase("RateDropSpoil")) RATE_DROP_SPOIL = Float.parseFloat(pValue);
+        else if (pName.equalsIgnoreCase("RateDropManor")) RATE_DROP_MANOR = Integer.parseInt(pValue);
         else if (pName.equalsIgnoreCase("RateDropQuest")) RATE_DROP_QUEST = Float.parseFloat(pValue);
         else if (pName.equalsIgnoreCase("RateKarmaExpLost")) RATE_KARMA_EXP_LOST = Float.parseFloat(pValue);
         else if (pName.equalsIgnoreCase("RateSiegeGuardsPrice")) RATE_SIEGE_GUARDS_PRICE = Float.parseFloat(pValue);
@@ -2372,6 +2383,7 @@ public final class Config
         else if (pName.equalsIgnoreCase("AltGameCreationSpeed")) ALT_GAME_CREATION_SPEED = Double.parseDouble(pValue);
         else if (pName.equalsIgnoreCase("AltGameCreationXpRate")) ALT_GAME_CREATION_XP_RATE = Double.parseDouble(pValue);
         else if (pName.equalsIgnoreCase("AltGameCreationSpRate")) ALT_GAME_CREATION_SP_RATE = Double.parseDouble(pValue);
+        else if (pName.equalsIgnoreCase("AltWeightLimit")) ALT_WEIGHT_LIMIT = Double.parseDouble(pValue);
         else if (pName.equalsIgnoreCase("AltBlacksmithUseRecipes")) ALT_BLACKSMITH_USE_RECIPES = Boolean.valueOf(pValue);
         else if (pName.equalsIgnoreCase("AltGameSkillLearn")) ALT_GAME_SKILL_LEARN = Boolean.valueOf(pValue);
 
@@ -2393,7 +2405,8 @@ public final class Config
         else if (pName.equalsIgnoreCase("AllowClassMasters")) ALLOW_CLASS_MASTERS = Boolean.valueOf(pValue);
         else if (pName.equalsIgnoreCase("AltGameFreights")) ALT_GAME_FREIGHTS = Boolean.valueOf(pValue);
         else if (pName.equalsIgnoreCase("AltGameFreightPrice")) ALT_GAME_FREIGHT_PRICE = Integer.parseInt(pValue);
-
+        else if (pName.equalsIgnoreCase("AltPartyRange")) ALT_PARTY_RANGE = Integer.parseInt(pValue);
+        else if (pName.equalsIgnoreCase("AltPartyRange2")) ALT_PARTY_RANGE2 = Integer.parseInt(pValue);
         else if (pName.equalsIgnoreCase("AltGameSkillHitRate")) ALT_GAME_SKILL_HIT_RATE = Float.parseFloat(pValue);
 
         else if (pName.equalsIgnoreCase("CraftingEnabled")) IS_CRAFTING_ENABLED = Boolean.valueOf(pValue);

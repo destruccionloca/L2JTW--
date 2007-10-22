@@ -279,6 +279,7 @@ public class Siege
             _siegeGuardManager.unspawnSiegeGuard(); // Remove all spawned siege guard from this castle
             if (getCastle().getOwnerId() > 0) _siegeGuardManager.removeMercs();
             getCastle().spawnDoor(); // Respawn door to castle
+            getCastle().getZone().updateZoneStatusForCharactersInside();
         }
     }
 
@@ -427,6 +428,8 @@ public class Siege
             spawnSiegeGuard(); // Spawn siege guard
             MercTicketManager.getInstance().deleteTickets(getCastle().getCastleId()); // remove the tickets from the ground
             _defenderRespawnDelayPenalty = 0; // Reset respawn delay
+            
+            getCastle().getZone().updateZoneStatusForCharactersInside();
 
             // Schedule a task to prepare auto siege end
             _siegeEndDate = Calendar.getInstance();
@@ -1224,10 +1227,10 @@ public class Siege
         	L2NpcTemplate template = NpcTable.getInstance().getTemplate(_sp.getNpcId());
         	 
             template.getStatsSet().set("baseHpMax", _sp.getHp());
-            template.addResist(Stats.POWER_DEFENCE,100);
-            template.addResist(Stats.BOW_WPN_RES,100);
-            template.addResist(Stats.BLUNT_WPN_RES,100);
-            template.addResist(Stats.DAGGER_WPN_RES,100);
+            // TODO: Check/confirm if control towers have any special weapon resistances/vulnerabilities 
+            // template.addVulnerability(Stats.BOW_WPN_VULN,0);
+            // template.addVulnerability(Stats.BLUNT_WPN_VULN,0);
+            // template.addVulnerability(Stats.DAGGER_WPN_VULN,0);
             
             ct = new L2ControlTowerInstance(IdFactory.getInstance().getNextId(), template);
 

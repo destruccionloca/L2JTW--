@@ -251,7 +251,7 @@ public class AdminAdmin implements IAdminCommandHandler {
 			String[] cmd=st.nextToken().split("_");
 			try
 			{
-				String[] parameter = st.nextToken().split("=");
+				String[] parameter = st.nextToken().split(" ");
 				String pName = parameter[0].trim();
 				String pValue = parameter[1].trim();
 				if (Config.setParameterValue(pName, pValue))
@@ -263,7 +263,7 @@ public class AdminAdmin implements IAdminCommandHandler {
 			{
 
 				if (cmd.length==2)
-					activeChar.sendMessage("使用方法:  //set parameter=數值");
+					activeChar.sendMessage("使用方法:  //set 函數 數值");
 			}
 			finally
 			{

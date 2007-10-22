@@ -31,7 +31,11 @@ import net.sf.l2j.gameserver.SevenSigns;
 import net.sf.l2j.gameserver.SevenSignsFestival;
 import net.sf.l2j.gameserver.ThreadPoolManager;
 import net.sf.l2j.gameserver.ai.CtrlIntention;
+import net.sf.l2j.gameserver.ai.L2AttackableAI;
+//import net.sf.l2j.gameserver.ai.L2NpcAI;
+import net.sf.l2j.gameserver.ai.L2CharacterAI;
 import net.sf.l2j.gameserver.cache.HtmCache;
+import net.sf.l2j.gameserver.clientpackets.Say2;
 import net.sf.l2j.gameserver.datatables.ClanTable;
 import net.sf.l2j.gameserver.datatables.HelperBuffTable;
 import net.sf.l2j.gameserver.datatables.ItemTable;
@@ -58,6 +62,7 @@ import net.sf.l2j.gameserver.model.L2Spawn;
 import net.sf.l2j.gameserver.model.L2Summon;
 import net.sf.l2j.gameserver.model.L2World;
 import net.sf.l2j.gameserver.model.MobGroupTable;
+import net.sf.l2j.gameserver.model.L2Character.AIAccessor;
 import net.sf.l2j.gameserver.model.L2Skill.SkillType;
 import net.sf.l2j.gameserver.model.actor.knownlist.NpcKnownList;
 import net.sf.l2j.gameserver.model.actor.stat.NpcStat;
@@ -71,6 +76,7 @@ import net.sf.l2j.gameserver.model.zone.type.L2TownZone;
 import net.sf.l2j.gameserver.network.L2GameClient;
 import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.ActionFailed;
+import net.sf.l2j.gameserver.serverpackets.CreatureSay;
 import net.sf.l2j.gameserver.serverpackets.ExShowVariationCancelWindow;
 import net.sf.l2j.gameserver.serverpackets.ExShowVariationMakeWindow;
 import net.sf.l2j.gameserver.serverpackets.InventoryUpdate;
@@ -136,7 +142,7 @@ public class L2NpcInstance extends L2Character
 
     protected RandomAnimationTask _rAniTask = null;
     
-    
+    protected RandomPathTask _rPathTask = null;
     
     
     
@@ -145,9 +151,32 @@ public class L2NpcInstance extends L2Character
     
     //-----------------------------------------------------
     // L2NpcInstance act like L2Attackable
-    public void startAttackableAI()
+
+    // This is part of L2JTW 5.0 Implement Function, will not complete in 4.5
+    protected class RandomPathTask implements Runnable 
     {
-    	
+    	public void run()
+        {
+            try
+            {
+            	if(this != _rPathTask)
+                    return; 
+                if(isMob())
+                {
+                    	return; 
+                }
+                else
+                {
+                	if (!isInActiveRegion()) 
+                		return;
+                	
+                	getKnownList().updateKnownObjects(); 
+                }
+
+
+            }
+            catch (Throwable a) {}
+        }
     }
     
     
@@ -1196,7 +1225,7 @@ public class L2NpcInstance extends L2Character
                     L2Spawn spawn = SpawnTable.getInstance().getTemplate(Integer.parseInt(command.substring(12).trim()));
                     
                     if(spawn!=null) 
-                        player.sendPacket(new RadarControl(1,1,spawn.getLocx(),spawn.getLocy(),spawn.getLocz()));
+                        player.sendPacket(new RadarControl(0,1,spawn.getLocx(),spawn.getLocy(),spawn.getLocz()));
                 } catch (NumberFormatException nfe)
                 { 
                 	player.sendMessage("指令錯誤");
@@ -2331,15 +2360,24 @@ public class L2NpcInstance extends L2Character
      * 
      */
     @Override
-	public void doDie(L2Character killer) 
+	public boolean doDie(L2Character killer) 
     {
-        if (getTemplate().npcId == 29025) {
-            deleteMe();
-        }
-        else
-            DecayTaskManager.getInstance().addDecayTask(this);
+
+    	if(getNpcId() == 25050)
+    	{
+            CreatureSay cs2 = new CreatureSay(getObjectId(), Say2.ALL, "巴溫", "我..我的...力量....");
+            
+            for (L2PcInstance player : L2World.getInstance().getAllPlayers())
+            {
+                player.sendPacket(cs2);
+            }
+    	
+    	}
+        if (!super.doDie(killer))
+        	return false;
         
-        super.doDie(killer);
+    	DecayTaskManager.getInstance().addDecayTask(this);
+    	return true;
     }
     
     /**
@@ -2356,6 +2394,11 @@ public class L2NpcInstance extends L2Character
     @Override
 	public void onSpawn()
     {
+    	
+       // L2WorldRegion region = L2World.getInstance().getRegion(getX(),getY());
+       // if ((region !=null) && (!region.isActive()))
+       //    ((L2NpcAI) getAI()).stopAITask();      
+    	
     }
     
     /**

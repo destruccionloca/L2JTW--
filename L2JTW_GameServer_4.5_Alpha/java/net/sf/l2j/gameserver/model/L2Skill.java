@@ -99,7 +99,7 @@ public abstract class L2Skill
     public static final int SKILL_FAKE_DEX = 9005;
     public static final int SKILL_FAKE_STR = 9006;
 
-    public static boolean CRIT_ATTACK;
+    public static int CRIT_ATTACK;
     public static enum SkillOpType {
         OP_PASSIVE, OP_ACTIVE, OP_TOGGLE
     }
@@ -1434,13 +1434,16 @@ public abstract class L2Skill
                     
                     //------------------------------------------------------
                     //Blow Skill
+                    /*
                     if (skillType == SkillType.BLOW)
                     {
                     	CRIT_ATTACK = Formulas.getInstance().calcBlowFirst(activeChar, target);
                     	
                     }
-                    //CRIT_ATTACK = 0;
-                    /*
+                   
+                    */
+                    CRIT_ATTACK = 0;
+                    
                     if (this.getCondition() == 16 || this.getCondition() == 17)
                     {
                         int critBonus = 0;
@@ -1460,15 +1463,18 @@ public abstract class L2Skill
                          //boolean crit = Formulas.getInstance().calcCrit(activeChar.getCriticalHit(target, this));
                         double critrate = (activeChar.getDEX()*2) - critpenalty + critBonus - (int)activeChar.calcStat(Stats.CRIT_PENALTY, 0, null, null) + (int)activeChar.calcStat(Stats.CRIT_BONUS, 0, null, null);
                         int hitrate = Rnd.get(100);
+                        
                         if (hitrate <= critrate)
-                         {
-                          CRIT_ATTACK = true;
-                          //_log.warning("critical True");
+                        {
+                          CRIT_ATTACK = 1;
+                          _log.warning("critical True:Hitrate = "+hitrate+" CritRate:"+critrate);
                           
-                         }
+                        }
+                        else
+                        	_log.warning("critical False:Hitrate = "+hitrate+" CritRate:"+critrate);
                          
                     }
-                    */
+                    
                     // If a target is found, return it in a table else send a system message TARGET_IS_INCORRECT
    				
                     return new L2Character[]{target};
@@ -2002,8 +2008,17 @@ public abstract class L2Skill
                             		(player.getParty() != null && !player.getParty().getPartyMembers().contains(newTarget))
                             	  )
                             	) continue;
-                            if (targetType == SkillTargetType.TARGET_CORPSE_ALLY
-                                && !((L2PcInstance) newTarget).isDead()) continue;
+                            if (targetType == SkillTargetType.TARGET_CORPSE_ALLY)
+                            {
+                                if (!((L2PcInstance) newTarget).isDead()) 
+                                	continue;
+                            	if (getSkillType() == SkillType.RESURRECT)
+                            	{
+                            		// check target is not in a active siege zone
+                                 	if (((L2PcInstance) newTarget).isInsideZone(L2Character.ZONE_SIEGE))
+                                 		continue;
+                            	}
+                            }
 
                             if (!Util.checkIfInRange(radius, activeChar, newTarget, true)) continue;
                             
@@ -2054,8 +2069,17 @@ public abstract class L2Skill
                             if (newTarget == null)
                                 continue;
                             
-                            if (targetType == SkillTargetType.TARGET_CORPSE_CLAN && !newTarget.isDead())
-                                continue;
+                            if (targetType == SkillTargetType.TARGET_CORPSE_CLAN)
+                            {
+                            	if (!newTarget.isDead())
+                            		continue;
+                            	if (getSkillType() == SkillType.RESURRECT)
+                            	{
+                            		// check target is not in a active siege zone
+                                 	if (newTarget.isInsideZone(L2Character.ZONE_SIEGE))
+                                 		continue;
+                            	}
+                            }
 
                             if (player.isInDuel() && 
                               	  (
@@ -2084,79 +2108,68 @@ public abstract class L2Skill
             }
 //          ======================================================================================================================================================          
             case TARGET_CORPSE_PLAYER:
+            {
+                if (target != null && target.isDead())
                 {
-                    if (target != null && target.isDead())
+                    L2PcInstance player = null;
+
+                    if (activeChar instanceof L2PcInstance) player = (L2PcInstance) activeChar;
+                    L2PcInstance targetPlayer = null;
+
+                    if (target instanceof L2PcInstance) targetPlayer = (L2PcInstance) target;
+                    L2PetInstance targetPet = null;
+
+                    if (target instanceof L2PetInstance) targetPet = (L2PetInstance) target;
+
+                    if (player != null && (targetPlayer != null || targetPet != null))
                     {
-                        L2PcInstance player = null;
+                        boolean condGood = true;
 
-                        if (activeChar instanceof L2PcInstance) player = (L2PcInstance) activeChar;
-                        L2PcInstance targetPlayer = null;
-
-                        if (target instanceof L2PcInstance) targetPlayer = (L2PcInstance) target;
-                        L2PetInstance targetPet = null;
-
-                        if (target instanceof L2PetInstance) targetPet = (L2PetInstance) target;
-
-                        if (player != null && (targetPlayer != null || targetPet != null))
+                        if (getSkillType() == SkillType.RESURRECT)
                         {
-                            boolean condGood = true;
-
-                            if (getId() == 1016) // Greater Resurrection
+                            // check target is not in a active siege zone
+                        	if (target.isInsideZone(L2Character.ZONE_SIEGE))
                             {
-                                // check target is not in a active siege zone
-                                Castle castle = null;
+                                condGood = false;
+                                player.sendPacket(new SystemMessage(SystemMessageId.CANNOT_BE_RESURRECTED_DURING_SIEGE));
+                            }
 
-                                if (targetPlayer != null) castle = CastleManager.getInstance().getCastle(targetPlayer.getX(),
-                                                                                                         targetPlayer.getY(),
-                                                                                                         targetPlayer.getZ());
-                                else if (targetPet != null)
-                                    castle = CastleManager.getInstance().getCastle(targetPet.getX(),
-                                                                                   targetPet.getY(),
-                                                                                   targetPet.getZ());
-
-                                if (castle != null) if (castle.getSiege().getIsInProgress())
+                            if (targetPlayer != null)
+                            {
+                            	if (targetPlayer.isReviveRequested())
+                            	{
+                            		if (targetPlayer.isRevivingPet())
+                            			player.sendPacket(new SystemMessage(SystemMessageId.MASTER_CANNOT_RES)); // While a pet is attempting to resurrect, it cannot help in resurrecting its master.
+                            		else
+                            			player.sendPacket(new SystemMessage(SystemMessageId.RES_HAS_ALREADY_BEEN_PROPOSED)); // Resurrection is already been proposed.
+                                    condGood = false;
+                            	}
+                            }
+                            else if (targetPet != null)
+                            {
+                                if (targetPet.getOwner() != player)
                                 {
                                     condGood = false;
-                                    player.sendPacket(new SystemMessage(SystemMessageId.CANNOT_BE_RESURRECTED_DURING_SIEGE));
+                                    player.sendMessage("You are not the owner of this pet");
                                 }
-
-                                // Can only res party memeber or own pet
-                                if (targetPlayer != null)
-                                {
-                                	if (targetPlayer.isReviveRequested())
-                                	{
-                                		if (targetPlayer.isRevivingPet())
-                                			player.sendPacket(new SystemMessage(SystemMessageId.MASTER_CANNOT_RES)); // While a pet is attempting to resurrect, it cannot help in resurrecting its master.
-                                		else
-                                			player.sendPacket(new SystemMessage(SystemMessageId.RES_HAS_ALREADY_BEEN_PROPOSED)); // Resurrection is already been proposed.
-                                        condGood = false;
-                                	}
-                                }
-                                else if (targetPet != null)
-                                {
-                                    if (targetPet.getOwner() != player)
-                                    {
-                                        condGood = false;
-                                        player.sendMessage("You are not the owner of this pet");
-                                    }
-                                }
-                            }
-
-                            if (condGood)
-                            {
-                                if (onlyFirst == false)
-                                {
-                                    targetList.add(target);
-                                    return targetList.toArray(new L2Object[targetList.size()]);
-                                }
-                                else return new L2Character[] {target};
-
                             }
                         }
+
+                        if (condGood)
+                        {
+                            if (onlyFirst == false)
+                            {
+                                targetList.add(target);
+                                return targetList.toArray(new L2Object[targetList.size()]);
+                            }
+                            else return new L2Character[] {target};
+
+                        }
                     }
-                    activeChar.sendPacket(new SystemMessage(SystemMessageId.TARGET_IS_INCORRECT));
-                    return null;
                 }
+                activeChar.sendPacket(new SystemMessage(SystemMessageId.TARGET_IS_INCORRECT));
+                return null;
+            }
 //          ======================================================================================================================================================          
             case TARGET_CORPSE_MOB:
             {

@@ -673,7 +673,7 @@ public abstract class L2Character extends L2Object
 		if (this instanceof L2PcInstance) {
 	        if (((L2PcInstance)this).inObserverMode())
 	        {
-	            ((L2PcInstance)this).sendMessage("無法進行攻擊");
+	            sendPacket(new SystemMessage(SystemMessageId.OBSERVERS_CANNOT_PARTICIPATE));
 	            sendPacket(new ActionFailed());
 	            return;
 	        }
@@ -1615,8 +1615,14 @@ public abstract class L2Character extends L2Object
 	 * @param killer The L2Character who killed it
 	 *
 	 */
-	public void doDie(L2Character killer)
+	public boolean doDie(L2Character killer)
 	{
+		// killing is only possible one time
+        synchronized (this)
+        {
+            if (isKilledAlready()) return false;
+            setIsKilledAlready(true);
+        }
 		// Set target to null and cancel Attack or Cast
 		setTarget(null);
 
@@ -1649,6 +1655,7 @@ public abstract class L2Character extends L2Object
 		getNotifyQuestOfDeath().clear();
 
 		getAttackByList().clear();
+		return true;
 	}
 
 	/** Sets HP, MP and CP and revives the L2Character. */

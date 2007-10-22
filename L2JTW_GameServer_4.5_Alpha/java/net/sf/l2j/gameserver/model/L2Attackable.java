@@ -305,6 +305,7 @@ public class L2Attackable extends L2NpcInstance
     /**
      * Return the L2Character AI of the L2Attackable and if its null create a new one.<BR><BR>
      */
+    
     @Override
 	public L2CharacterAI getAI() 
     {
@@ -426,9 +427,13 @@ public class L2Attackable extends L2NpcInstance
      */
 
     @Override
-	public void doDie(L2Character killer) 
+	public boolean doDie(L2Character killer) 
     {
-        // Enhance soul crystals of the attacker if this L2Attackable had its soul absorbed
+    	// Kill the L2NpcInstance (the corpse disappeared after 7 seconds)
+        if (!super.doDie(killer))
+        	return false;
+    	
+    	// Enhance soul crystals of the attacker if this L2Attackable had its soul absorbed
         try {
             if (killer instanceof L2PcInstance)
             {
@@ -468,9 +473,7 @@ public class L2Attackable extends L2NpcInstance
         			setChampion(true);
         	}
         }
-
-        // Kill the L2NpcInstance (the corpse disappeared after 7 seconds)
-        super.doDie(killer);
+        return true;
         
     }
     
@@ -525,7 +528,7 @@ public class L2Attackable extends L2NpcInstance
                 		ddealer = info._attacker;
                 	
                 	// Check if ddealer isn't too far from this (killed monster)
-                	if (!Util.checkIfInRange(1600, this, ddealer, true)) continue;
+                	if (!Util.checkIfInRange(Config.ALT_PARTY_RANGE, this, ddealer, true)) continue;
                 	
                 	// Calculate real damages (Summoners should get own damage plus summon's damage)                    
                 	reward = rewards.get(ddealer);
@@ -650,7 +653,7 @@ public class L2Attackable extends L2NpcInstance
                         // If the L2PcInstance is in the L2Attackable rewards add its damages to party damages
                         if (reward2 != null)
                         {
-                        	if (Util.checkIfInRange(1600, this, pl, true))
+                        	if (Util.checkIfInRange(Config.ALT_PARTY_RANGE, this, pl, true))
                         	{
                         		partyDmg += reward2._dmg; // Add L2PcInstance damages to party damages
                         		rewardedMembers.add(pl);
@@ -662,7 +665,7 @@ public class L2Attackable extends L2NpcInstance
                         {
                         	// Add L2PcInstance of the party (that have attacked or not) to members that can be rewarded
                         	// and in range of the monster.
-                        	if (Util.checkIfInRange(1600, this, pl, true))
+                        	if (Util.checkIfInRange(Config.ALT_PARTY_RANGE, this, pl, true))
                         	{
                         		rewardedMembers.add(pl);
                         		if (pl.getLevel() > partyLvl) partyLvl = pl.getLevel();
@@ -674,7 +677,7 @@ public class L2Attackable extends L2NpcInstance
                         	reward2 = rewards.get(summon);
                         	if (reward2 != null) // Pets are only added if they have done damage
                             {
-                            	if (Util.checkIfInRange(1600, this, summon, true))
+                            	if (Util.checkIfInRange(Config.ALT_PARTY_RANGE, this, summon, true))
                             	{
                             		partyDmg += reward2._dmg; // Add summon damages to party damages
                             		rewardedMembers.add(summon);
@@ -2305,7 +2308,7 @@ public class L2Attackable extends L2NpcInstance
 
         FastList<RewardItem> harvested = new FastList<RewardItem>();
 
-        harvested.add(new RewardItem(L2Manor.getInstance().getCropType(_seedType), count));
+        harvested.add(new RewardItem(L2Manor.getInstance().getCropType(_seedType), count* Config.RATE_DROP_MANOR));
 
         _harvestItems = harvested.toArray(new RewardItem[harvested.size()]);
     }

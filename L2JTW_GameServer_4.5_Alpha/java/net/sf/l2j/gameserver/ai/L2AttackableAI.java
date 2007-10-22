@@ -155,10 +155,14 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
      */
     private boolean autoAttackCondition(L2Character target)
     {
-    	
 
-    	
+    	if (target == null || !(_actor instanceof L2Attackable)) return false;
+
         L2Attackable me = (L2Attackable) _actor;
+        
+        // Check if the target isn't invulnerable
+        if (target.isInvul())
+            return false;
 
         L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(((L2NpcInstance)_actor).getTemplate().npcId);
         //_log.warning("Chatdata Get:"+((L2NpcInstance)_actor).getTemplate().npcId);
@@ -635,6 +639,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
                 z1 = npc.getZ();
             }
 
+
             //_log.config("Curent pos ("+getX()+", "+getY()+"), moving to ("+x1+", "+y1+").");
             // Move the actor to Location (x,y,z) server side AND client side by sending Server->Client packet CharMoveToLocation (broadcast)
             moveTo(x1, y1, z1);
@@ -942,6 +947,8 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
                     }
                 }
             }
+
+            if(_actor.isAttackingDisabled()) return;
 
             // Get all information needed to chose between physical or magical attack
             L2Skill[] skills = null;

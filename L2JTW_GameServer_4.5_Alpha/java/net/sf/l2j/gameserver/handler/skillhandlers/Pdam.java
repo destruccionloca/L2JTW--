@@ -89,8 +89,6 @@ public class Pdam implements ISkillHandler
         {
             L2Character target = (L2Character) targets[index];
             Formulas f = Formulas.getInstance();
-            if(target.reflectSkill(skill))
-            	target = activeChar;
             L2ItemInstance weapon = activeChar.getActiveWeaponInstance();
             if (activeChar instanceof L2PcInstance && target instanceof L2PcInstance
                 && target.isAlikeDead() && target.isFakeDeath())
@@ -113,7 +111,7 @@ public class Pdam implements ISkillHandler
 
 
 
-			if (L2Skill.CRIT_ATTACK)
+			if (L2Skill.CRIT_ATTACK==1)
 				{
 	
 					damage = (int) f.calcPhysDam(activeChar, target, skill, shld, true, dual, soul);
@@ -200,7 +198,7 @@ public class Pdam implements ISkillHandler
                        }               
                 if (activeChar instanceof L2PcInstance)
                 {
-                    if (L2Skill.CRIT_ATTACK) activeChar.sendPacket(new SystemMessage(SystemMessage.CRITICAL_HIT));
+                    if (L2Skill.CRIT_ATTACK == 1) activeChar.sendPacket(new SystemMessage(SystemMessage.CRITICAL_HIT));
                     
                     SystemMessage sm = new SystemMessage(SystemMessage.YOU_DID_S1_DMG);
                     sm.addNumber(damage);
@@ -211,59 +209,63 @@ public class Pdam implements ISkillHandler
 
                 if (skill.hasEffects())
                 {
-                    // activate attacked effects, if any
-                    target.stopEffect(skill.getId());
-                    if (target.getEffect(skill.getId()) != null)
-                        target.removeEffect(target.getEffect(skill.getId()));
 
-                    if ((f.calcSkillSuccess(activeChar, target, skill, false, false, false)) || skill.willHit())
-
-                    {
-                        
-                        if (skill.getChargeNum()>0)
+                	if (target.reflectSkill(skill))
+					{
+						activeChar.stopEffect(skill.getId());
+						if (activeChar.getEffect(skill.getId()) != null)
+							activeChar.removeEffect(target.getEffect(skill.getId()));
+						skill.getEffects(null, activeChar);
+						SystemMessage sm = new SystemMessage(SystemMessageId.YOU_FEEL_S1_EFFECT);
+						sm.addSkillName(skill.getId());
+						activeChar.sendPacket(sm);
+					}
+                	else
+                	{
+                		// activate attacked effects, if any
+                        target.stopEffect(skill.getId());
+                        if (target.getEffect(skill.getId()) != null)
+                            target.removeEffect(target.getEffect(skill.getId()));
+                        if (f.calcSkillSuccess(activeChar, target, skill, false, false, false))
                         {
-                            L2Skill charge = SkillTable.getInstance().getInfo(4271, skill.getChargeNum());
-                            charge.getEffects(activeChar, activeChar);
+                            skill.getEffects(activeChar, target);
+                            
+                            SystemMessage sm = new SystemMessage(SystemMessageId.YOU_FEEL_S1_EFFECT);
+                            sm.addSkillName(skill.getId());
+                            target.sendPacket(sm);
                         }
                         else
                         {
-                        skill.getEffects(activeChar, target);
-                        
-                        SystemMessage sm = new SystemMessage(SystemMessageId.YOU_FEEL_S1_EFFECT);
-                        sm.addSkillName(skill.getId());
-                        target.sendPacket(sm);
+                            SystemMessage sm = new SystemMessage(SystemMessageId.S1_WAS_UNAFFECTED_BY_S2);
+        					if(target instanceof L2NpcInstance || target instanceof L2Summon)
+        					{
+        						if(target instanceof L2NpcInstance)
+        						{
+        						if (((L2NpcInstance)target).getTemplate().serverSideName)
+        						{
+        							sm.addString(target.getName());
+        						}
+        						else
+        							sm.addNpcName(((L2NpcInstance)target).getTemplate().idTemplate);
+        						}
+        						if(target instanceof L2Summon)
+        						{
+        						if (((L2Summon)target).getTemplate().serverSideName)
+        						{
+        							sm.addString(target.getName());
+        						}
+        						else
+        							sm.addNpcName(((L2Summon)target).getTemplate().idTemplate);
+        						}
+        							
+        					}
+        					else
+                            sm.addString(target.getName());
+                            sm.addSkillName(skill.getDisplayId());
+                            activeChar.sendPacket(sm);
                         }
-                    }
-                    else
-                    {
-                        SystemMessage sm = new SystemMessage(SystemMessageId.S1_WAS_UNAFFECTED_BY_S2);
-    					if(target instanceof L2NpcInstance || target instanceof L2Summon)
-    					{
-    						if(target instanceof L2NpcInstance)
-    						{
-    						if (((L2NpcInstance)target).getTemplate().serverSideName)
-    						{
-    							sm.addString(target.getName());
-    						}
-    						else
-    							sm.addNpcName(((L2NpcInstance)target).getTemplate().idTemplate);
-    						}
-    						if(target instanceof L2Summon)
-    						{
-    						if (((L2Summon)target).getTemplate().serverSideName)
-    						{
-    							sm.addString(target.getName());
-    						}
-    						else
-    							sm.addNpcName(((L2Summon)target).getTemplate().idTemplate);
-    						}
-    							
-    					}
-    					else
-                        sm.addString(target.getName());
-                        sm.addSkillName(skill.getDisplayId());
-                        activeChar.sendPacket(sm);
-                    }
+                	}
+
                 }
 
                  // Success of lethal effect
@@ -326,7 +328,14 @@ public class Pdam implements ISkillHandler
 	    	        	    	   else
 	    	        	    	   {
 	    	        	    		   player.setCurrentHp(0);
-	    	        	    		   player.doDie(activeChar);
+	    	        	    		   if (player.isInOlympiadMode())
+	    	        	    		   {
+	    	        	    			   player.abortAttack();
+	    	        	    			   player.abortCast();
+	    	        	    			   player.getStatus().stopHpMpRegeneration();
+	    	        	    		   }
+	    	        	    		   else
+	    	        	    			   player.doDie(activeChar);
 	    	        	    	   }
 	                	       }
 	                	       else 
@@ -430,7 +439,7 @@ public class Pdam implements ISkillHandler
         	activeChar.doDie(null);
         	activeChar.setCurrentHp(0);
         }
-        L2Skill.CRIT_ATTACK =false;
+        L2Skill.CRIT_ATTACK =0;
     }
 
     public SkillType[] getSkillIds()

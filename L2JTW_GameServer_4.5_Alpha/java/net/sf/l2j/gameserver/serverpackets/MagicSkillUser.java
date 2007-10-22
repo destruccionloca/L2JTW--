@@ -96,10 +96,11 @@ public class MagicSkillUser extends L2GameServerPacket
 		writeD(_x);
 		writeD(_y);
 		writeD(_z);
-
-		writeH(0x00); // unknown loop but not AoE
-        if (L2Skill.CRIT_ATTACK)
+		
+        if (L2Skill.CRIT_ATTACK ==1)
             writeC(_flags);
+		writeH(0x00); // unknown loop but not AoE
+
 		//for()
 		//{
 

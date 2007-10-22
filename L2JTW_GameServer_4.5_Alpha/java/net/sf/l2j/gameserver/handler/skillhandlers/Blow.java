@@ -65,10 +65,21 @@ public class Blow implements ISkillHandler
 				_successChance = SIDE;
 			//If skill requires Crit or skill requires behind, 
 			//calculate chance based on DEX, Position and on self BUFF
-			if(((skill.getCondition() & L2Skill.COND_BEHIND) != 0) && _successChance == BEHIND || ((skill.getCondition() & L2Skill.COND_CRIT) != 0) && L2Skill.CRIT_ATTACK)
+			if(((skill.getCondition() & L2Skill.COND_CRIT) != 0) && L2Skill.CRIT_ATTACK==1)
 			{
-				if(target.reflectSkill(skill))
-					target = activeChar;
+				if (skill.hasEffects())
+				{
+					if (target.reflectSkill(skill))
+					{
+						activeChar.stopEffect(skill.getId());
+						if (activeChar.getEffect(skill.getId()) != null)
+							activeChar.removeEffect(target.getEffect(skill.getId()));
+						skill.getEffects(null, activeChar);
+						SystemMessage sm = new SystemMessage(SystemMessageId.YOU_FEEL_S1_EFFECT);
+						sm.addSkillName(skill.getId());
+						activeChar.sendPacket(sm);
+					}
+				}
 	            L2ItemInstance weapon = activeChar.getActiveWeaponInstance();
 	            boolean soul = (weapon != null && weapon.getChargedSoulshot() == L2ItemInstance.CHARGED_SOULSHOT && weapon.getItemType() == L2WeaponType.DAGGER);
 	            boolean shld = Formulas.getInstance().calcShldUse(activeChar, target);
@@ -113,7 +124,14 @@ public class Blow implements ISkillHandler
 	        	    	   else
 	        	    	   {
 	        	    		   player.setCurrentHp(0);
-	        	    		   player.doDie(activeChar);
+	        	    		   if (player.isInOlympiadMode())
+	        	    		   {
+	        	    			   player.abortAttack();
+	        	    			   player.abortCast();
+	        	    			   player.getStatus().stopHpMpRegeneration();
+	        	    		   }
+	        	    		   else
+	        	    			   player.doDie(activeChar);
 	        	    	   }
 	        	       }
 	        	       else 
@@ -165,7 +183,7 @@ public class Blow implements ISkillHandler
 	            	activeChar.sendPacket(new SystemMessage(SystemMessageId.LETHAL_STRIKE));   
 				}
 			}
-			if(L2Skill.CRIT_ATTACK)
+			if(L2Skill.CRIT_ATTACK==1)
 			{
             L2Effect effect = activeChar.getEffect(skill.getId());    
             //Self Effect
@@ -178,7 +196,7 @@ public class Blow implements ISkillHandler
 			//activeChar.getAI().setIntention(CtrlIntention.AI_INTENTION_ATTACK, target, null);
             
             
-            L2Skill.CRIT_ATTACK = false;
+            L2Skill.CRIT_ATTACK = 0;
         }
 	}
 	

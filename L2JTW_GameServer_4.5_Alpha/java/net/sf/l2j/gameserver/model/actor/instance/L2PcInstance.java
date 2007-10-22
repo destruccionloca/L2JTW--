@@ -1741,7 +1741,7 @@ public final class L2PcInstance extends L2PlayableInstance
 		if (con < 1) return 31000;
 		if (con > 59) return 176000;
 		double baseLoad = Math.pow(1.029993928, con)*30495.627366;
-		return (int)calcStat(Stats.MAX_LOAD, baseLoad, this, null);
+		return (int)calcStat(Stats.MAX_LOAD, baseLoad*Config.ALT_WEIGHT_LIMIT, this, null);
 	}
 
 	public int getExpertisePenalty()
@@ -4136,10 +4136,11 @@ public final class L2PcInstance extends L2PlayableInstance
 	 *
 	 */
 	@Override
-	public void doDie(L2Character killer)
+	public boolean doDie(L2Character killer)
 	{
 		// Kill the L2PcInstance
-		super.doDie(killer);
+		if (!super.doDie(killer))
+			return false;
 
 		if (killer != null)
 		{
@@ -4251,6 +4252,7 @@ public final class L2PcInstance extends L2PlayableInstance
 
 		stopRentPet();
 		stopWaterTask();
+		return true;
 	}
 
 	private void onDieDropItem(L2Character killer)
@@ -5130,7 +5132,6 @@ public final class L2PcInstance extends L2PlayableInstance
             sendPacket(iu);
 
             abortAttack();
-            refreshExpertisePenalty();
             broadcastUserInfo();
 
             // this can be 0 if the user pressed the right mousebutton twice very fast
@@ -5166,7 +5167,6 @@ public final class L2PcInstance extends L2PlayableInstance
             sendPacket(iu);
 
             abortAttack();
-            refreshExpertisePenalty();
             broadcastUserInfo();
 
             // this can be 0 if the user pressed the right mousebutton twice very fast
@@ -6969,7 +6969,7 @@ public final class L2PcInstance extends L2PlayableInstance
         */
         if (inObserverMode())
         {
-            sendMessage("無法在觀看模式下進行技能施展");
+        	sendPacket(new SystemMessage(SystemMessageId.OBSERVERS_CANNOT_PARTICIPATE));
             abortCast();
             sendPacket(new ActionFailed());
             return;

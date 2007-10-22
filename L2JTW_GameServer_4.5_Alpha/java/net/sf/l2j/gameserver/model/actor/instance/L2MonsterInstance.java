@@ -221,9 +221,12 @@ public class L2MonsterInstance extends L2Attackable
     }
     
     @Override
-	public void doDie(L2Character killer) 
+	public boolean doDie(L2Character killer) 
     {
-        if (_minionMaintainTask != null)
+    	if (!super.doDie(killer))
+    		return false;
+    	
+    	if (_minionMaintainTask != null)
             _minionMaintainTask.cancel(true); // doesn't do it?
         
         if (getTemplate().npcId == 29025) 
@@ -243,17 +246,17 @@ public class L2MonsterInstance extends L2Attackable
                 Baium.stopRespawn();
 
             }
-            catch (Exception e) {
+            catch (Exception e) 
+            {
                 _log.warning("RaidBoss: Error while spawning Baium: " + e);
             }
-            //deleteMe();
-            return;
+            deleteMe();
+            return true;
         }
 
         if (this instanceof L2RaidBossInstance)
         	deleteSpawnedMinions();
-        
-        super.doDie(killer);
+        return true;
 
     }
     

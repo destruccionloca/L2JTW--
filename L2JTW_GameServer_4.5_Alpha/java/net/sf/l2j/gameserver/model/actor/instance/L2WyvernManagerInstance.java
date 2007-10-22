@@ -46,14 +46,17 @@ public class L2WyvernManagerInstance extends L2CastleChamberlainInstance
         			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
                     sm.addString("SYS");
                     sm.addString("已經有使魔召喚.");
+
         			player.sendPacket(sm);
         			return;
         		}
         		else
         		{
         			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
+
                     sm.addString("SYS");
-                    sm.addString("使魔召喚.");
+                    sm.addString("請招喚座龍.");
+
         			player.sendPacket(sm);
         			return;
         		}
@@ -67,6 +70,7 @@ public class L2WyvernManagerInstance extends L2CastleChamberlainInstance
         				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
                         sm.addString("SYS");
                         sm.addString("座龍尚未達到需求的等級");
+
                 		player.sendPacket(sm);
                 		return;                
         			}
