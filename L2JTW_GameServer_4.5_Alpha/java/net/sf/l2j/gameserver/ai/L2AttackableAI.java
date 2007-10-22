@@ -960,7 +960,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
                 _actor.setTarget(getAttackTarget());
                 skills = _actor.getAllSkills();
                 dist2 = Math.sqrt(_actor.getPlanDistanceSq(getAttackTarget().getX(), getAttackTarget().getY()));
-                range = _actor.getPhysicalAttackRange();
+                range = _actor.getPhysicalAttackRange()+((L2Attackable) _actor).getTemplate().collisionRadius;
             }
             catch (NullPointerException e)
             {
@@ -1101,7 +1101,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 
                     if (hated.isMoving()) range -= 100; if (range < 5) range = 5; 
         			//_accessor.moveTo(hated.getX(), hated.getY(), hated.getZ());	
-                    moveToPawn(getAttackTarget(), range+((L2Attackable) _actor).getTemplate().collisionRadius);
+                    moveToPawn(getAttackTarget(), range);
                     return;
             		
             		
@@ -1334,7 +1334,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
             	                    }
             	                if(!GeoData.getInstance().canSeeTarget(_actor, hated))
             	                {
-            	                	moveToPawn(hated, range+((L2Attackable) _actor).getTemplate().collisionRadius);
+            	                	moveToPawn(hated, range);
             	                	return;
             	                }
                          clientStopMoving(null);
@@ -1369,12 +1369,13 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         	}
         	else if (hated.isMoving() && range+40 >= dist2)
         	{
-        		
+        		//_log.warning("AttackableAI: Chasing Attack");      
             //-------------------------------------------------------
         	//Geo Los Check
             if(!GeoData.getInstance().canSeeTarget(_actor, hated))
             {
-            	moveToPawn(hated, range+((L2Attackable) _actor).getTemplate().collisionRadius);
+            	//_log.warning("AttackableAI: Chasing Attack - Move to Pawn");      
+            	moveToPawn(hated, range);
             	return;
             }
             //-------------------------------------------------------
@@ -1392,11 +1393,13 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
             	//Geo Los Check
                 if(!GeoData.getInstance().canSeeTarget(_actor, hated))
                 {
-                	moveToPawn(hated, range+((L2Attackable) _actor).getTemplate().collisionRadius);
+                	//_log.warning("AttackableAI: Attack - Move to Pawn");      
+                	moveToPawn(hated, range);
                 	return;
                 }
                 //-------------------------------------------------------
         		//_log.warning("AttackableAI: Normal Attack");      		
+               // _log.warning("AttackableAI: Normal Attack");   
         		setAttackTarget(hated);
         		_accessor.doAttack(hated);     	 		
         		
@@ -1404,6 +1407,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         	}
         	else if(dist2 >= range)
         	{
+        		//_log.warning("AttackableAI: Move to Pawn");      
         		if (_actor.isMovementDisabled())
         		{
         			TargetReconsider(_actor);
@@ -1411,9 +1415,9 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         		}
                 if (hated.isMoving()) range -= 100; if (range < 5) range = 5; 
     			//_accessor.moveTo(hated.getX(), hated.getY(), hated.getZ());	
-                moveToPawn(getAttackTarget(), range+((L2Attackable) _actor).getTemplate().collisionRadius);
+                moveToPawn(getAttackTarget(), range);
                 return;
-        		
+                
         		
         	}
             
@@ -1441,7 +1445,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         {
             skills = caster.getAllSkills();
             distTarget = Math.sqrt(caster.getPlanDistanceSq(MostHate.getX(), MostHate.getY()));
-            attackrange = _actor.getPhysicalAttackRange();
+            attackrange = _actor.getPhysicalAttackRange()+((L2Attackable) _actor).getTemplate().collisionRadius;
         }
         catch (NullPointerException e)
         {

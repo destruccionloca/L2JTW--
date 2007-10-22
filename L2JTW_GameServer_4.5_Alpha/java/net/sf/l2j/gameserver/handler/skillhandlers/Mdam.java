@@ -33,9 +33,8 @@ import net.sf.l2j.gameserver.model.actor.instance.L2RaidBossInstance;
 import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.skills.Formulas;
-import net.sf.l2j.gameserver.skills.Stats;
 
- /**
+/**
  * This class ...
  * 
  * @version $Revision: 1.1.2.8.2.9 $ $Date: 2005/04/05 19:41:23 $
@@ -44,7 +43,6 @@ import net.sf.l2j.gameserver.skills.Stats;
 public class Mdam implements ISkillHandler
 {
     //private static Logger _log = Logger.getLogger(Mdam.class.getName());
-
 
     /* (non-Javadoc)
      * @see net.sf.l2j.gameserver.handler.IItemHandler#useItem(net.sf.l2j.gameserver.model.L2PcInstance, net.sf.l2j.gameserver.model.L2ItemInstance)
@@ -63,11 +61,18 @@ public class Mdam implements ISkillHandler
 
         L2ItemInstance weaponInst = activeChar.getActiveWeaponInstance();
 
+        /* if (activeChar instanceof L2PcInstance)
+        {
+            if (weaponInst == null)
+            {
+                SystemMessage sm2 = new SystemMessage(SystemMessage.S1_S2);
+                sm2.addString("You must equip a weapon before casting a spell.");
+                activeChar.sendPacket(sm2);
+                return;
+            }
+        } */
 
-
-
-		if (weaponInst != null) 
-
+        if (weaponInst != null)
         {
             if (weaponInst.getChargedSpiritshot() == L2ItemInstance.CHARGED_BLESSED_SPIRITSHOT)
             {
@@ -80,7 +85,6 @@ public class Mdam implements ISkillHandler
                 weaponInst.setChargedSpiritshot(L2ItemInstance.CHARGED_NONE);
             }
         }
-        
         // If there is no weapon equipped, check for an active summon.
         else if (activeChar instanceof L2Summon)
         {
@@ -97,9 +101,7 @@ public class Mdam implements ISkillHandler
                 activeSummon.setChargedSpiritShot(L2ItemInstance.CHARGED_NONE);
             }
         }
-      
 
-      
         for (int index = 0; index < targets.length; index++)
         {
             L2Character target = (L2Character) targets[index];
@@ -132,27 +134,19 @@ public class Mdam implements ISkillHandler
             //			}
 
             boolean mcrit = Formulas.getInstance().calcMCrit(activeChar.getMCriticalHit(target, skill));
-            /*
-            if (weaponInst == null)
-            {
-                bss = false;
-                ss = false;
-            }
-              
-            */
-            
-           int damage = (int) Formulas.getInstance().calcMagicDam(activeChar, target, skill, ss, bss, mcrit);
-            
-           if (skill.getSkillType() == SkillType.DEATHLINK)   
-           {   
-                double cur = 2*activeChar.getCurrentHp();   
-                double max = activeChar.getMaxHp();   
-                if (cur<max)   
-                     damage *= Math.sqrt(max/cur);   
-                else damage *= Math.pow(max/cur, 4);   
-           }
 
+            int damage = (int) Formulas.getInstance().calcMagicDam(activeChar, target, skill, ss, bss,
+                                                                   mcrit);
             
+            if (skill.getSkillType() == SkillType.DEATHLINK)   
+            {   
+                 double cur = 2*activeChar.getCurrentHp();   
+                 double max = activeChar.getMaxHp();   
+                 if (cur<max)   
+                      damage *= Math.sqrt(max/cur);   
+                 else damage *= Math.pow(max/cur, 4);   
+            }
+
             if (damage > 5000 && activeChar instanceof L2PcInstance)
             {
                 String name = "";
@@ -167,24 +161,11 @@ public class Mdam implements ISkillHandler
                     + skill.getName() + "(" + skill.getId() + ") to " + name, "damage_mdam");
             }
 
-
-            /*
-            double reflectedStancePercent = target.getStat().calcStat(Stats.REFLECT_STANCE,0,null,null);
-            if (reflectedStancePercent > 0)
-            {
-                int reflectedStanceDamage = (int)(reflectedStancePercent / 100. * damage);
-                damage -= reflectedStanceDamage;
-                activeChar.reduceCurrentHp(reflectedStanceDamage, activeChar);
-                if(target instanceof L2PcInstance) ((L2PcInstance)target).sendMessage("魔法反擊造成" + reflectedStanceDamage + "的傷害");
-            }
-            */
-
             // Why are we trying to reduce the current target HP here?
             // Why not inside the below "if" condition, after the effects processing as it should be?
             // It doesn't seem to make sense for me. I'm moving this line inside the "if" condition, right after the effects processing...
             // [changed by nexus - 2006-08-15]
             //target.reduceCurrentHp(damage, activeChar);
-
     
             if (damage > 0)
             {
@@ -199,7 +180,6 @@ public class Mdam implements ISkillHandler
     
                 if (skill.hasEffects())
                 {
-
                 	if (target.reflectSkill(skill))
                 	{
                 		activeChar.stopEffect(skill.getId());
@@ -220,40 +200,42 @@ public class Mdam implements ISkillHandler
                             skill.getEffects(activeChar, target);
                         else
                         {
-                        	 SystemMessage sm = new SystemMessage(SystemMessageId.S1_WAS_UNAFFECTED_BY_S2);
-         					if(target instanceof L2NpcInstance || target instanceof L2Summon)
-         					{
-         						if(target instanceof L2NpcInstance)
-         						{
-         						if (((L2NpcInstance)target).getTemplate().serverSideName)
-         						{
-         							sm.addString(target.getName());
-         						}
-         						else
-         							sm.addNpcName(((L2NpcInstance)target).getTemplate().idTemplate);
-         						}
-         						
-         						if(target instanceof L2Summon)
-         						{
-         						if (((L2Summon)target).getTemplate().serverSideName)
-         						{
-         							sm.addString(target.getName());
-         						}
-         						else
-         							sm.addNpcName(((L2Summon)target).getTemplate().idTemplate);
-         						}
+                       	 SystemMessage sm = new SystemMessage(SystemMessageId.S1_WAS_UNAFFECTED_BY_S2);
+      					if(target instanceof L2NpcInstance || target instanceof L2Summon)
+      					{
+      						if(target instanceof L2NpcInstance)
+      						{
+      						if (((L2NpcInstance)target).getTemplate().serverSideName)
+      						{
+      							sm.addString(target.getName());
+      						}
+      						else
+      							sm.addNpcName(((L2NpcInstance)target).getTemplate().idTemplate);
+      						}
+      						
+      						if(target instanceof L2Summon)
+      						{
+      						if (((L2Summon)target).getTemplate().serverSideName)
+      						{
+      							sm.addString(target.getName());
+      						}
+      						else
+      							sm.addNpcName(((L2Summon)target).getTemplate().idTemplate);
+      						}
+      						activeChar.sendPacket(sm);
+      					}
+      					else
+      					{
+                         SystemMessage sms = new SystemMessage(SystemMessageId.S1_WAS_UNAFFECTED_BY_S2);
+                         sms.addString(target.getName());
+                         sms.addSkillName(skill.getDisplayId());
+                         activeChar.sendPacket(sms);
+      					}
                         }
                 	}
-
-                }
-                if (skill.isSuicideAttack())
-                {
-                    activeChar.doDie(null);
-                    activeChar.setCurrentHp(0);
                 }
                 
                 target.reduceCurrentHp(damage, activeChar);
-
             }
         }
         // self Effect :]
@@ -270,11 +252,10 @@ public class Mdam implements ISkillHandler
         	activeChar.doDie(null);
         	activeChar.setCurrentHp(0);
         }
-    }}
+    }
 
     public SkillType[] getSkillIds()
     {
         return SKILL_IDS;
     }
-
 }

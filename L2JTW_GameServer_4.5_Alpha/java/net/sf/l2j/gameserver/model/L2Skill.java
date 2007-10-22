@@ -2108,68 +2108,68 @@ public abstract class L2Skill
             }
 //          ======================================================================================================================================================          
             case TARGET_CORPSE_PLAYER:
-            {
-                if (target != null && target.isDead())
                 {
-                    L2PcInstance player = null;
-
-                    if (activeChar instanceof L2PcInstance) player = (L2PcInstance) activeChar;
-                    L2PcInstance targetPlayer = null;
-
-                    if (target instanceof L2PcInstance) targetPlayer = (L2PcInstance) target;
-                    L2PetInstance targetPet = null;
-
-                    if (target instanceof L2PetInstance) targetPet = (L2PetInstance) target;
-
-                    if (player != null && (targetPlayer != null || targetPet != null))
+                    if (target != null && target.isDead())
                     {
-                        boolean condGood = true;
+                        L2PcInstance player = null;
 
-                        if (getSkillType() == SkillType.RESURRECT)
+                        if (activeChar instanceof L2PcInstance) player = (L2PcInstance) activeChar;
+                        L2PcInstance targetPlayer = null;
+
+                        if (target instanceof L2PcInstance) targetPlayer = (L2PcInstance) target;
+                        L2PetInstance targetPet = null;
+
+                        if (target instanceof L2PetInstance) targetPet = (L2PetInstance) target;
+
+                        if (player != null && (targetPlayer != null || targetPet != null))
                         {
-                            // check target is not in a active siege zone
-                        	if (target.isInsideZone(L2Character.ZONE_SIEGE))
-                            {
-                                condGood = false;
-                                player.sendPacket(new SystemMessage(SystemMessageId.CANNOT_BE_RESURRECTED_DURING_SIEGE));
-                            }
+                            boolean condGood = true;
 
-                            if (targetPlayer != null)
+                            if (getSkillType() == SkillType.RESURRECT)
                             {
-                            	if (targetPlayer.isReviveRequested())
-                            	{
-                            		if (targetPlayer.isRevivingPet())
-                            			player.sendPacket(new SystemMessage(SystemMessageId.MASTER_CANNOT_RES)); // While a pet is attempting to resurrect, it cannot help in resurrecting its master.
-                            		else
-                            			player.sendPacket(new SystemMessage(SystemMessageId.RES_HAS_ALREADY_BEEN_PROPOSED)); // Resurrection is already been proposed.
-                                    condGood = false;
-                            	}
-                            }
-                            else if (targetPet != null)
-                            {
-                                if (targetPet.getOwner() != player)
+                                // check target is not in a active siege zone
+                            	if (target.isInsideZone(L2Character.ZONE_SIEGE))
                                 {
                                     condGood = false;
-                                    player.sendMessage("You are not the owner of this pet");
+                                    player.sendPacket(new SystemMessage(SystemMessageId.CANNOT_BE_RESURRECTED_DURING_SIEGE));
+                                }
+
+                                if (targetPlayer != null)
+                                {
+                                	if (targetPlayer.isReviveRequested())
+                                	{
+                                		if (targetPlayer.isRevivingPet())
+                                			player.sendPacket(new SystemMessage(SystemMessageId.MASTER_CANNOT_RES)); // While a pet is attempting to resurrect, it cannot help in resurrecting its master.
+                                		else
+                                			player.sendPacket(new SystemMessage(SystemMessageId.RES_HAS_ALREADY_BEEN_PROPOSED)); // Resurrection is already been proposed.
+                                        condGood = false;
+                                	}
+                                }
+                                else if (targetPet != null)
+                                {
+                                    if (targetPet.getOwner() != player)
+                                    {
+                                        condGood = false;
+                                        player.sendMessage("並非此寵物的主人");
+                                    }
                                 }
                             }
-                        }
 
-                        if (condGood)
-                        {
-                            if (onlyFirst == false)
+                            if (condGood)
                             {
-                                targetList.add(target);
-                                return targetList.toArray(new L2Object[targetList.size()]);
-                            }
-                            else return new L2Character[] {target};
+                                if (onlyFirst == false)
+                                {
+                                    targetList.add(target);
+                                    return targetList.toArray(new L2Object[targetList.size()]);
+                                }
+                                else return new L2Character[] {target};
 
+                            }
                         }
                     }
+                    activeChar.sendPacket(new SystemMessage(SystemMessageId.TARGET_IS_INCORRECT));
+                    return null;
                 }
-                activeChar.sendPacket(new SystemMessage(SystemMessageId.TARGET_IS_INCORRECT));
-                return null;
-            }
 //          ======================================================================================================================================================          
             case TARGET_CORPSE_MOB:
             {
