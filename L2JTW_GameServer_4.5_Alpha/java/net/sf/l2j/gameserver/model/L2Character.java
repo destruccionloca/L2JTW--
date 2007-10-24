@@ -40,6 +40,7 @@ import net.sf.l2j.gameserver.ai.CtrlEvent;
 import net.sf.l2j.gameserver.ai.CtrlIntention;
 import net.sf.l2j.gameserver.ai.L2AttackableAI;
 import net.sf.l2j.gameserver.ai.L2CharacterAI;
+import net.sf.l2j.gameserver.datatables.DoorTable;
 import net.sf.l2j.gameserver.datatables.MapRegionTable;
 import net.sf.l2j.gameserver.datatables.SkillTable;
 import net.sf.l2j.gameserver.datatables.MapRegionTable.TeleportWhereType;
@@ -4337,6 +4338,17 @@ public abstract class L2Character extends L2Object
                 		// _log.warning("break, no path");
                 		return;
                 	}
+                	// check for doors in the route
+                	for (int i = 0; i < m.geoPath.size()-1; i++)
+                	{
+                		if (DoorTable.getInstance().checkIfDoorsBetween(m.geoPath.get(i),m.geoPath.get(i+1)))
+                		{
+                			m.geoPath = null;
+                			getAI().stopFollow();
+                			getAI().setIntention(CtrlIntention.AI_INTENTION_IDLE);
+                			return;
+                		}
+                	}
                 	m.geoPath.get(m.geoPath.size()-1).getX();
                 	m.onGeodataPathIndex = 0; // on first segment
                 	m.geoPathGtx = gtx;
@@ -4347,6 +4359,19 @@ public abstract class L2Character extends L2Object
                 	x = m.geoPath.get(m.onGeodataPathIndex).getX();
                 	y = m.geoPath.get(m.onGeodataPathIndex).getY();
                 	z = m.geoPath.get(m.onGeodataPathIndex).getZ();
+
+                	// untested: final check if we can indeed reach first path node (path nodes sometimes aren't accurate enough)
+                	/*
+                	Location destiny = GeoData.getInstance().moveCheck(curX, curY, curZ, x, y, z);
+                	if (destiny.getX() != x || destiny.getY() != y)
+                	{
+                		m.geoPath = null;
+            			getAI().stopFollow();
+            			getAI().setIntention(CtrlIntention.AI_INTENTION_IDLE);
+            			return;
+                	}
+                	*/
+
                 	dx = (x - curX);
                 	dy = (y - curY);
                 	distance = Math.sqrt(dx*dx + dy*dy);

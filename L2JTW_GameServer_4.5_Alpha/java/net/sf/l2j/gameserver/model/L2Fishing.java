@@ -128,7 +128,7 @@ public class L2Fishing implements Runnable
 	{
 		_fishAiTask = null;
         
-        if (_fisher == null) return;
+        if (_fisher == null || this == null) return;
         
 		if (win)
 		{

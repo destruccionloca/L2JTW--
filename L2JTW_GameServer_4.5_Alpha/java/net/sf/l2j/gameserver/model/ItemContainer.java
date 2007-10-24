@@ -465,6 +465,7 @@ public abstract class ItemContainer
      */
     protected void removeItem(L2ItemInstance item)
     {
+    	if(item != null)
         _items.remove(item);
     }
 

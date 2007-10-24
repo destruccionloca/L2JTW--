@@ -56,7 +56,10 @@ public abstract class PathFinding
 	
 	public List<AbstractNodeLoc> search(Node start, Node end)
 	{
-		//List of Visited Nodes
+		// Grid-based pathfinding. Drawback is not having higher cost for diagonal movement
+		// Could be optimized not to calculate backwards as far as forwards. 
+
+		// List of Visited Nodes
 		LinkedList<Node> visited = new LinkedList<Node>();		
 
 		// List of Nodes to Visit
@@ -66,7 +69,16 @@ public abstract class PathFinding
 		int i = 0;
 		while (i < 800)//TODO! Add limit to cfg
 		{
-			Node node = to_visit.removeFirst();
+			Node node;
+			try 
+			{
+				 node = to_visit.removeFirst();
+			}
+			catch (Exception e) 
+			{ 
+				// No Path found
+				return null;
+			}
 			if (node.equals(end)) //path found!
 				return constructPath(node);
 			else
