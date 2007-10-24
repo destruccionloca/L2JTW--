@@ -2394,11 +2394,8 @@ public class L2NpcInstance extends L2Character
     @Override
 	public void onSpawn()
     {
-    	
-       // L2WorldRegion region = L2World.getInstance().getRegion(getX(),getY());
-       // if ((region !=null) && (!region.isActive()))
-       //    ((L2NpcAI) getAI()).stopAITask();      
-    	
+    	super.onSpawn();
+
     }
     
     /**

@@ -116,7 +116,7 @@ public final class L2BossInstance extends L2MonsterInstance
     @Override
 	public void onSpawn()
     {
-    	
+
     	
     	switch (getTemplate().npcId) {
         case 29020: // Baium does his animation
@@ -137,6 +137,7 @@ public final class L2BossInstance extends L2MonsterInstance
             break;
     }
     	super.onSpawn(); // ????? 
+
     }
     
     

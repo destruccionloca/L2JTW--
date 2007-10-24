@@ -246,6 +246,10 @@ public abstract class L2ZoneType
 	
 	public void revalidateInZone(L2Character character)
 	{
+	
+		if(character == null)
+		return;
+		
 		// If the character cant be affected by this zone return
 		if (_checkAffected)
 		{
