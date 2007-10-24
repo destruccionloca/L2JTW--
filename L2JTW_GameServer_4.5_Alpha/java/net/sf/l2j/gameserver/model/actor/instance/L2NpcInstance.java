@@ -1098,7 +1098,7 @@ public class L2NpcInstance extends L2Character
                 		NpcHtmlMessage html = new NpcHtmlMessage(5);		
                 		StringBuffer replyMSG = new StringBuffer("<html><body>");
                 		replyMSG.append("<br><font color=\"LEVEL\">[領地現況公告]</font><br><br>");
-                		replyMSG.append("名稱:&nbsp;亞丁王國的"+getCastle().getName()+"領地<br>目前沒有統治此地區的血盟。");
+                		replyMSG.append("名稱:亞丁王國的"+getCastle().getName()+"領地<br>目前沒有統治此地區的血盟。");
                 		replyMSG.append("<br><br>");
                 		replyMSG.append("<button value=\"初始畫面\" action=\"bypass -h npc_"+String.valueOf(getObjectId())+"_Chat 0\" back=\"l2ui_ch3.smallbutton2_down\" width=65 height=20 fore=\"l2ui_ch3.smallbutton2\">");  
                 		replyMSG.append("</body></html>");
@@ -1111,7 +1111,7 @@ public class L2NpcInstance extends L2Character
             		NpcHtmlMessage html = new NpcHtmlMessage(5);		
             		StringBuffer replyMSG = new StringBuffer("<html><body>");
             		replyMSG.append("<br><font color=\"LEVEL\">[領地現況公告]</font><br><br>");
-            		replyMSG.append("名稱:&nbsp;亞丁王國的"+getCastle().getName()+"領地<br>目前沒有統治此地區的血盟。");
+            		replyMSG.append("名稱:亞丁王國的"+getCastle().getName()+"領地<br>目前沒有統治此地區的血盟。");
             		replyMSG.append("<br><br>");
             		replyMSG.append("<button value=\"初始畫面\" action=\"bypass -h npc_"+String.valueOf(getObjectId())+"_Chat 0\" back=\"l2ui_ch3.smallbutton2_down\" width=65 height=20 fore=\"l2ui_ch3.smallbutton2\">");  
             		replyMSG.append("</body></html>");
@@ -2295,6 +2295,9 @@ public class L2NpcInstance extends L2Character
             if (Config.LIST_PET_RENT_NPC.contains(npcId))
                 html.replace("_Quest", "_RentPet\">出租寵物</a><br><a action=\"bypass -h npc_%objectId%_Quest");
         
+        
+        html.replace("%npcname%", getName());
+        html.replace("%playername%", player.getName());
         html.replace("%objectId%", String.valueOf(getObjectId()));
         html.replace("%festivalMins%", SevenSignsFestival.getInstance().getTimeToNextFestivalStr());        
         player.sendPacket(html);
