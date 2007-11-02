@@ -51,27 +51,23 @@ public class L2SkillChargeDmg extends L2Skill
         charge_skill_id = 4271;
     }
 
-
-
-    public boolean checkCondition(L2Character activeChar)
-    {
-        if (activeChar instanceof L2PcInstance)
-        {
-            L2PcInstance player = (L2PcInstance)activeChar;
-            EffectCharge e = (EffectCharge)player.getEffect(charge_skill_id);
-            if(e == null || e.numCharges < this.numCharges)
-            {
-            	//_log.warning("CHARGE 1");
-                SystemMessage sm = new SystemMessage(113);
-                sm.addSkillName(this.getId());
-                activeChar.sendPacket(sm);
-                return false;
-            }
-            
-        }
-
-        return super.checkCondition(activeChar, false);
-    }
+    @Override
+    public boolean checkCondition(L2Character activeChar, L2Object target, boolean itemOrWeapon)
+	{
+		if (activeChar instanceof L2PcInstance)
+		{
+			L2PcInstance player = (L2PcInstance)activeChar;
+			EffectCharge e = (EffectCharge)player.getEffect(charge_skill_id);
+			if(e == null || e.numCharges < numCharges)
+			{
+				SystemMessage sm = new SystemMessage(SystemMessageId.S1_CANNOT_BE_USED);
+				sm.addSkillName(getId());
+				activeChar.sendPacket(sm);
+				return false;
+			}
+		}
+		return super.checkCondition(activeChar, target, itemOrWeapon);
+	}
     
     public void useSkill(L2Character caster, L2Object[] targets)
     {

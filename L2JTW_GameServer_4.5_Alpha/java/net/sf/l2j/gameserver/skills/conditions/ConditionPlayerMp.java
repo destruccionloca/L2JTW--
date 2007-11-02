@@ -16,41 +16,21 @@
  *
  * http://www.gnu.org/copyleft/gpl.html
  */
-package net.sf.l2j.gameserver.skills.effects;
+package net.sf.l2j.gameserver.skills.conditions;
 
-import net.sf.l2j.gameserver.model.L2Effect;
 import net.sf.l2j.gameserver.skills.Env;
 
-public class EffectMute extends L2Effect
-{
-	public EffectMute(Env env, EffectTemplate template)
-	{
-		super(env, template);
-	}
+public class ConditionPlayerMp extends Condition {
 
-	@Override
-	public EffectType getEffectType()
+	private final int _mp;
+	
+	public ConditionPlayerMp(int mp)
 	{
-		return L2Effect.EffectType.MUTE;
-	}
-
-	@Override
-	public void onStart() {
-		getEffected().startMuted();
+		_mp = mp;
 	}
 	
 	@Override
-	public boolean onActionTime()
-	{
-		// Simply stop the effect
-		getEffected().stopMuted(this);
-		return false;
-	}
-
-
-	@Override
-	public void onExit()
-	{
-		getEffected().stopMuted(this);
+	public boolean testImpl(Env env) {
+		return env.player.getCurrentMp()*100/env.player.getMaxMp() <= _mp;
 	}
 }

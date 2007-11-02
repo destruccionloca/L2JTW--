@@ -105,9 +105,7 @@ public final class RequestActionUse extends L2GameClientPacket
 					&& !activeChar.isSitting()
 					&& target instanceof L2StaticObjectInstance
 					&& ((L2StaticObjectInstance)target).getType() == 1
-					&& activeChar.getClan() != null
 					&& CastleManager.getInstance().getCastle(target) != null
-					&& activeChar.isCastleLord(CastleManager.getInstance().getCastle(target).getCastleId())
 					&& activeChar.isInsideRadius(target, L2StaticObjectInstance.INTERACTION_DISTANCE, false, false)
 			)
 			{
@@ -124,7 +122,7 @@ public final class RequestActionUse extends L2GameClientPacket
 				activeChar.sitDown();
 
 			if (Config.DEBUG) 
-				_log.fine("new wait type: "+(activeChar.isSitting() ? "STANDING" : "SITTING"));
+				_log.fine("new wait type: "+(activeChar.isSitting() ? "SITTING" : "STANDING"));
 
 			break;
 		case 1:

@@ -245,6 +245,10 @@ public class L2Attackable extends L2NpcInstance
     {    	
     	return _aggroList;
     }
+
+	private boolean _isReturningToSpawnPoint              = false;
+    public final boolean isReturningToSpawnPoint() { return _isReturningToSpawnPoint; }
+	public final void setisReturningToSpawnPoint(boolean value) { _isReturningToSpawnPoint = value; }
     
     /** Table containing all Items that a Dwarf can Sweep on this L2Attackable */ 
     private RewardItem[] _sweepItems;
@@ -466,7 +470,7 @@ public class L2Attackable extends L2NpcInstance
         if (Config.L2JMOD_CHAMPION_ENABLE)
         {
         	//Set champion on next spawn
-        	if (this instanceof L2MonsterInstance && Config.L2JMOD_CHAMPION_FREQUENCY > 0 && getLevel()>=Config.L2JMOD_CHAMP_MIN_LVL && getLevel()<=Config.L2JMOD_CHAMP_MAX_LVL) 
+        	if (!(this instanceof L2BossInstance) && this instanceof L2MonsterInstance && Config.L2JMOD_CHAMPION_FREQUENCY > 0 && getLevel()>=Config.L2JMOD_CHAMP_MIN_LVL && getLevel()<=Config.L2JMOD_CHAMP_MAX_LVL) 
         	{        
         		int random = Rnd.get(100);
         		if (random < Config.L2JMOD_CHAMPION_FREQUENCY) 
@@ -894,6 +898,14 @@ public class L2Attackable extends L2NpcInstance
 
     public void reduceHate(L2Character target, int amount) 
     {
+    	if (getAI() instanceof L2SiegeGuardAI)
+    	{
+    		// TODO: this just prevents error until siege guards are handled properly
+    		stopHating(target);
+        	setTarget(null);
+        	getAI().setIntention(CtrlIntention.AI_INTENTION_IDLE, null, null);
+    		return;
+    	}
     	if (target == null) // whole aggrolist 
     	{
     		L2Character mostHated = getMostHated();

@@ -56,8 +56,9 @@ public abstract class PathFinding
 	
 	public List<AbstractNodeLoc> search(Node start, Node end)
 	{
-		// Grid-based pathfinding. Drawback is not having higher cost for diagonal movement
-		// Could be optimized not to calculate backwards as far as forwards. 
+		// The simplest grid-based pathfinding. 
+		// Drawback is not having higher cost for diagonal movement (means funny routes)
+		// Could be optimized e.g. not to calculate backwards as far as forwards. 
 
 		// List of Visited Nodes
 		LinkedList<Node> visited = new LinkedList<Node>();		
@@ -67,7 +68,7 @@ public abstract class PathFinding
 		to_visit.add(start);
 		
 		int i = 0;
-		while (i < 800)//TODO! Add limit to cfg
+		while (i < 800)//TODO! Add limit to cfg. Worst case max distance is 1810..
 		{
 			Node node;
 			try 
@@ -101,15 +102,89 @@ public abstract class PathFinding
 		//No Path found
 		return null;
 	}
+
+	public List<AbstractNodeLoc> searchByClosest(Node start, Node end)
+	{
+		// Always continues checking from the closest to target non-blocked 
+		// node from to_visit list. There's extra length in path if needed
+		// to go backwards/sideways but when moving generally forwards, this is extra fast 
+		// and accurate. And can reach insane distances. If this has 
+		// to run for full 800 (maybe limit it much lower) is slower than the 
+		// basic search though.
+		// Generally returns a bit (only a bit) more intelligent looking routes than
+		// the basic version. Not a true distance image (which would increase CPU
+		// load) level of intelligence though. 
+		
+		// List of Visited Nodes
+		FastNodeList visited = new FastNodeList(700);//TODO! Add limit to cfg		
+
+		// List of Nodes to Visit
+		LinkedList<Node> to_visit = new LinkedList<Node>();
+		to_visit.add(start);
+		short targetx = end.getLoc().getNodeX();
+		short targety = end.getLoc().getNodeY();
+		int dx, dy;
+		boolean added;
+		int i = 0;
+		while (i < 700)//TODO! Add limit to cfg.
+		{
+			Node node;
+			try 
+			{
+				 node = to_visit.removeFirst();
+			}
+			catch (Exception e) 
+			{ 
+				// No Path found
+				return null;
+			}
+			if (node.equals(end)) //path found!
+				return constructPath(node);
+			else
+			{
+				i++;
+				visited.add(node);
+				node.attacheNeighbors();
+				Node[] neighbors = node.getNeighbors();
+				if (neighbors == null) continue;
+				for (Node n : neighbors)
+				{
+					if (!visited.contains(n) && !to_visit.contains(n))
+					{
+						added = false;
+						n.setParent(node);
+						dx = targetx - n.getLoc().getNodeX();
+						dy = targety - n.getLoc().getNodeY();
+						n.setCost(dx*dx+dy*dy);
+						for (int index = 0; index < to_visit.size(); index++)
+						{
+							// supposed to find it quite early..
+							if (to_visit.get(index).getCost() > n.getCost())
+							{
+								to_visit.add(index, n);
+								added = true;
+								break;
+							}
+						}
+						if (!added) to_visit.addLast(n);
+					}
+				}
+			}
+		}
+		//No Path found
+		return null;
+	}
+
 	
 	public List<AbstractNodeLoc> searchAStar(Node start, Node end)
 	{
+		// Not operational yet?
 		int start_x = start.getLoc().getX();
 		int start_y = start.getLoc().getY();
 		int end_x = end.getLoc().getX();
 		int end_y = end.getLoc().getY();
 		//List of Visited Nodes
-		FastNodeList visited = new FastNodeList(800/2);//TODO! Add limit to cfg
+		FastNodeList visited = new FastNodeList(800);//TODO! Add limit to cfg
 
 		// List of Nodes to Visit
 		BinaryNodeHeap to_visit = new BinaryNodeHeap(800);
@@ -118,7 +193,16 @@ public abstract class PathFinding
 		int i = 0;
 		while (i < 800)//TODO! Add limit to cfg
 		{
-			Node node = to_visit.removeFirst();
+			Node node;
+			try 
+			{
+				 node = to_visit.removeFirst();
+			}
+			catch (Exception e) 
+			{ 
+				// No Path found
+				return null;
+			}
 			if (node.equals(end)) //path found!
 				return constructPath(node);
 			else

@@ -565,7 +565,7 @@ public class L2SignsPriestInstance extends L2FolkInstance
                     break;
                 case 19: // Seal Information (for when joining a cabal)
                     int chosenSeal = Integer.parseInt(command.substring(16));
-                    String fileSuffix = SevenSigns.getSealName(chosenSeal, true) + "_"
+                    String fileSuffix = SevenSigns.getSealFileName(chosenSeal, true) + "_"
                         + SevenSigns.getCabalShortName(cabal);
 
                     showChatWindow(player, val, fileSuffix, false);

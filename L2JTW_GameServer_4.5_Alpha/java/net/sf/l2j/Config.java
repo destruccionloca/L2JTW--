@@ -187,6 +187,9 @@ public final class Config
 
     /** View npc stats/drop by shift-cliking it for nongm-players */
     public static boolean ALT_GAME_VIEWNPC;
+    
+    /** Allow player to attack lower level RaidBoss */
+    public static boolean ALT_RAIDBOSS_FOSSILIZATION;
 
     /** Alternative EXP, so player can get exp without lvl problem**/
     public static boolean ALT_GAME_EXP;
@@ -275,13 +278,12 @@ public final class Config
     /** Alternative default level for privileges */
     public static int ALT_PRIVILEGES_DEFAULT_LEVEL;
 
-    /** Olympiad Compitition Starting time */
+    /** Olympiad Competition Starting time */
     public static int ALT_OLY_START_TIME;
-
-    /** Olympiad Compition Min */
+    /** Olympiad Minutes */
     public static int ALT_OLY_MIN;
 
-    /** Olympaid Comptetition Period */
+    /** Olympiad Competition Period */
     public static long ALT_OLY_CPERIOD;
 
     /** Olympiad Battle Period */
@@ -1743,7 +1745,7 @@ public final class Config
     	        ALT_MANOR_REFRESH_MIN                               = Integer.parseInt(altSettings.getProperty("AltManorRefreshMin","00"));
     	        ALT_MANOR_APPROVE_TIME                              = Integer.parseInt(altSettings.getProperty("AltManorApproveTime","6"));
     	        ALT_MANOR_APPROVE_MIN                               = Integer.parseInt(altSettings.getProperty("AltManorApproveMin","00"));
-    	        ALT_MANOR_MAINTENANCE_PERIOD                        = Integer.parseInt(altSettings.getProperty("AltManorMaintenancePreiod","360000"));
+    	        ALT_MANOR_MAINTENANCE_PERIOD                        = Integer.parseInt(altSettings.getProperty("AltManorMaintenancePeriod","360000"));
     	        ALT_MANOR_SAVE_ALL_ACTIONS                          = Boolean.parseBoolean(altSettings.getProperty("AltManorSaveAllActions","false"));
     	        ALT_MANOR_SAVE_PERIOD_RATE                          = Integer.parseInt(altSettings.getProperty("AltManorSavePeriodRate","2"));
 
@@ -1760,6 +1762,9 @@ public final class Config
                 ALT_DEV_NO_SPAWNS                = Boolean.parseBoolean(altSettings.getProperty("AltDevNoSpawns", "False"));
 
 
+                // Alt Raidboss for allow higher level player attack low level raidboss
+                ALT_RAIDBOSS_FOSSILIZATION       = Boolean.parseBoolean(altSettings.getProperty("AltRaidBossFossilization", "False"));
+              
                 // Dimensional Rift Config
                 RIFT_MIN_PARTY_SIZE              = Integer.parseInt(altSettings.getProperty("RiftMinPartySize", "5")); 
                 RIFT_MAX_JUMPS                   = Integer.parseInt(altSettings.getProperty("MaxRiftJumps", "4")); 

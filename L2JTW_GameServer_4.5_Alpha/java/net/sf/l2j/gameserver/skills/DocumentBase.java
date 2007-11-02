@@ -36,6 +36,7 @@ import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.model.base.Race;
 import net.sf.l2j.gameserver.skills.conditions.Condition;
 import net.sf.l2j.gameserver.skills.conditions.ConditionElementSeed;
+import net.sf.l2j.gameserver.skills.conditions.ConditionForceBuff;
 import net.sf.l2j.gameserver.skills.conditions.ConditionGameChance;
 import net.sf.l2j.gameserver.skills.conditions.ConditionGameTime;
 import net.sf.l2j.gameserver.skills.conditions.ConditionLogicAnd;
@@ -44,11 +45,13 @@ import net.sf.l2j.gameserver.skills.conditions.ConditionLogicOr;
 import net.sf.l2j.gameserver.skills.conditions.ConditionPlayerHp;
 import net.sf.l2j.gameserver.skills.conditions.ConditionPlayerHpPercentage;
 import net.sf.l2j.gameserver.skills.conditions.ConditionPlayerLevel;
+import net.sf.l2j.gameserver.skills.conditions.ConditionPlayerMp;
 import net.sf.l2j.gameserver.skills.conditions.ConditionPlayerRace;
 import net.sf.l2j.gameserver.skills.conditions.ConditionPlayerState;
 import net.sf.l2j.gameserver.skills.conditions.ConditionSkillStats;
 import net.sf.l2j.gameserver.skills.conditions.ConditionSlotItemId;
 import net.sf.l2j.gameserver.skills.conditions.ConditionTargetAggro;
+import net.sf.l2j.gameserver.skills.conditions.ConditionTargetClassIdRestriction;
 import net.sf.l2j.gameserver.skills.conditions.ConditionTargetLevel;
 import net.sf.l2j.gameserver.skills.conditions.ConditionTargetUsesWeaponKind;
 import net.sf.l2j.gameserver.skills.conditions.ConditionUsingItemType;
@@ -335,6 +338,7 @@ abstract class DocumentBase
     {
         Condition cond = null;
         int[] ElementSeeds = new int[5];
+        int[] forces = new int[2];
         NamedNodeMap attrs = n.getAttributes();
         for (int i = 0; i < attrs.getLength(); i++)
         {
@@ -376,8 +380,8 @@ abstract class DocumentBase
             }
             else if ("front".equalsIgnoreCase(a.getNodeName()))
             {
-            	 boolean val = Boolean.valueOf(a.getNodeValue());
-            	 cond = joinAnd(cond, new ConditionPlayerState(CheckPlayerState.FRONT, val));
+                boolean val = Boolean.valueOf(a.getNodeValue());
+                cond = joinAnd(cond, new ConditionPlayerState(CheckPlayerState.FRONT, val));
             }
             else if ("hp".equalsIgnoreCase(a.getNodeName()))
             {
@@ -388,6 +392,11 @@ abstract class DocumentBase
             {
                 double rate = Double.parseDouble(getValue(a.getNodeValue(), null));
                 cond = joinAnd(cond, new ConditionPlayerHpPercentage(rate));
+            }
+            else if ("mp".equalsIgnoreCase(a.getNodeName()))
+            {
+                int hp = Integer.decode(getValue(a.getNodeValue(), null));
+                cond = joinAnd(cond, new ConditionPlayerMp(hp));
             }
             else if ("seed_fire".equalsIgnoreCase(a.getNodeName()))
             {
@@ -409,15 +418,30 @@ abstract class DocumentBase
             {
                 ElementSeeds[4] = Integer.decode(getValue(a.getNodeValue(), null));
             }
+            else if ("battle_force".equalsIgnoreCase(a.getNodeName()))
+            {
+                forces[0] = Integer.decode(getValue(a.getNodeValue(), null));
+            }
+            else if ("spell_force".equalsIgnoreCase(a.getNodeName()))
+            {
+                forces[1] = Integer.decode(getValue(a.getNodeValue(), null));
+            }
         }
 
         // Elemental seed condition processing
         for (int i = 0; i < ElementSeeds.length; i++)
+        {
             if (ElementSeeds[i] > 0)
             {
                 cond = joinAnd(cond, new ConditionElementSeed(ElementSeeds));
                 break;
             }
+        }
+
+        if(forces[0] + forces[1] > 0)
+        {
+            cond = joinAnd(cond, new ConditionForceBuff(forces));
+        }
 
         if (cond == null) _log.severe("Unrecognized <player> condition in " + _file);
         return cond;
@@ -439,6 +463,17 @@ abstract class DocumentBase
             {
                 int lvl = Integer.decode(getValue(a.getNodeValue(), template));
                 cond = joinAnd(cond, new ConditionTargetLevel(lvl));
+            }
+            else if ("class_id_restriction".equalsIgnoreCase(a.getNodeName()))
+            {
+            	FastList<Integer> array = new FastList<Integer>();
+            	StringTokenizer st = new StringTokenizer(a.getNodeValue(), ",");
+            	while (st.hasMoreTokens())
+                {
+                    String item = st.nextToken().trim();
+                    array.add(Integer.decode(getValue(item, null)));
+                }
+            	cond = joinAnd(cond, new ConditionTargetClassIdRestriction(array));
             }
             else if ("using".equalsIgnoreCase(a.getNodeName()))
             {

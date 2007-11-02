@@ -15,39 +15,25 @@
  *
  * http://www.gnu.org/copyleft/gpl.html
  */
-package net.sf.l2j.gameserver.model.zone.type;
+package net.sf.l2j.gameserver.skills.effects;
 
-import net.sf.l2j.gameserver.model.L2Character;
-import net.sf.l2j.gameserver.model.zone.L2ZoneType;
+import net.sf.l2j.gameserver.model.L2Effect;
+import net.sf.l2j.gameserver.skills.Env;
 
 /**
- * A fishing zone
+ * @author kombat
  *
- * @author  durgus
  */
-public class L2FishingZone extends L2ZoneType
+public final class EffectBattleForce extends EffectForce
 {
-	public L2FishingZone()
+	public EffectBattleForce(Env env, EffectTemplate template) 
 	{
-		super();
+		super(env, template);
 	}
 
 	@Override
-	protected void onEnter(L2Character character)
+	public EffectType getEffectType()
 	{
-	}
-	
-	@Override
-	protected void onExit(L2Character character)
-	{
-	}
-	
-	/* getWaterZ() this added function returns the Z value for the water surface.
-	 * In effect this simply returns the upper Z value of the zone. This required
-	 * some modification of L2ZoneForm, and zone form extentions. 
-	 */
-	public int getWaterZ()
-	{
-		return getZone().getHighZ();
+		return EffectType.BATTLE_FORCE;
 	}
 }

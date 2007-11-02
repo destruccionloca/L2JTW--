@@ -80,10 +80,28 @@ public class RequestSocialAction extends L2GameClientPacket
 			if (Config.DEBUG) _log.fine("Social Action:" + _actionId);
 			
 			SocialAction atk = new SocialAction(activeChar.getObjectId(), _actionId);
-			
 			activeChar.broadcastPacket(atk);
+			/*
+			// Schedule a social task to wait for the animation to finish
+			ThreadPoolManager.getInstance().scheduleGeneral(new SocialTask(this), 2600);
+			activeChar.setIsParalyzed(true);
+			*/
 		}
 	}
+	/*
+	class SocialTask implements Runnable
+	{
+		L2PcInstance _player;
+		SocialTask(RequestSocialAction action)
+		{
+			_player = getClient().getActiveChar();
+		}
+		public void run()
+		{
+			_player.setIsParalyzed(false);
+		}
+	}
+	*/
 	
 	/* (non-Javadoc)
 	 * @see net.sf.l2j.gameserver.clientpackets.ClientBasePacket#getType()

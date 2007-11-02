@@ -602,6 +602,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
             }
         }
         // Order to the L2MonsterInstance to random walk (1/100)
+     // Order to the L2MonsterInstance to random walk (1/100)
         else if (npc.getSpawn() != null && Rnd.nextInt(RANDOM_WALK_RATE) == 0)
         {
             int x1, y1, z1;
@@ -623,10 +624,13 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 
                 if (distance2 > Config.MAX_DRIFT_RANGE * Config.MAX_DRIFT_RANGE)
                 {
-                    float delay = (float) Math.sqrt(distance2) / Config.MAX_DRIFT_RANGE;
+                    npc.setisReturningToSpawnPoint(true);
+                	float delay = (float) Math.sqrt(distance2) / Config.MAX_DRIFT_RANGE;
                     x1 = _actor.getX() + (int) ((x1 - _actor.getX()) / delay);
                     y1 = _actor.getY() + (int) ((y1 - _actor.getY()) / delay);
                 }
+                else 
+                	npc.setisReturningToSpawnPoint(false);
 
             }
             else
@@ -638,7 +642,6 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
                     - Config.MAX_DRIFT_RANGE;
                 z1 = npc.getZ();
             }
-
 
             //_log.config("Curent pos ("+getX()+", "+getY()+"), moving to ("+x1+", "+y1+").");
             // Move the actor to Location (x,y,z) server side AND client side by sending Server->Client packet CharMoveToLocation (broadcast)
@@ -913,6 +916,8 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
                 // Go through all L2Object that belong to its faction
                 for (L2Object obj : _actor.getKnownList().getKnownObjects().values())
                 {
+                	if (obj==null)
+                		continue;
                     if (obj instanceof L2NpcInstance)
                     {
                         L2NpcInstance npc = (L2NpcInstance) obj;

@@ -76,12 +76,12 @@ import net.sf.l2j.gameserver.instancemanager.CoupleManager;
 import net.sf.l2j.gameserver.instancemanager.CursedWeaponsManager;
 import net.sf.l2j.gameserver.instancemanager.DimensionalRiftManager;
 import net.sf.l2j.gameserver.instancemanager.DuelManager;
-import net.sf.l2j.gameserver.instancemanager.FishingZoneManager;
 import net.sf.l2j.gameserver.instancemanager.ItemsOnGroundManager;
 import net.sf.l2j.gameserver.instancemanager.QuestManager;
 import net.sf.l2j.gameserver.instancemanager.SiegeManager;
 import net.sf.l2j.gameserver.model.BlockList;
 import net.sf.l2j.gameserver.model.FishData;
+import net.sf.l2j.gameserver.model.ForceBuff;
 import net.sf.l2j.gameserver.model.Inventory;
 import net.sf.l2j.gameserver.model.ItemContainer;
 import net.sf.l2j.gameserver.model.L2Attackable;
@@ -302,6 +302,24 @@ public final class L2PcInstance extends L2PlayableInstance
 				if (cubic.getId() != L2CubicInstance.LIFE_CUBIC)
 					cubic.doAction((L2Character)mainTarget);
 		}
+	}
+
+	/**
+	* Starts battle force / spell force on target.<br><br>
+	* 
+	* @param caster
+	* @param force type
+	*/
+	@Override
+	public void startForceBuff(L2Character target, L2Skill skill)
+	{
+		if(!(target instanceof L2PcInstance))return;
+
+		if(skill.getSkillType() != SkillType.FORCE_BUFF)
+			return;
+
+		if(_forceBuff == null)
+			_forceBuff = new ForceBuff(this, (L2PcInstance)target, skill);
 	}
 
 	private L2GameClient _client;
@@ -685,14 +703,17 @@ public final class L2PcInstance extends L2PlayableInstance
 
 	// L2JMOD Wedding
 	private boolean _married = false;
-    private int _partnerId = 0;
-    private int _coupleId = 0;
-    private boolean _engagerequest = false;
-    private int _engageid = 0;
-    private boolean _marryrequest = false;
-    private boolean _marryaccepted = false;
+	private int _partnerId = 0;
+	private int _coupleId = 0;
+	private boolean _engagerequest = false;
+	private int _engageid = 0;
+	private boolean _marryrequest = false;
+	private boolean _marryaccepted = false;
 
-	/** Skill casting information (used to queue when several skills are cast in a short time) **/
+	// Current force buff this caster is casting to a target
+	protected ForceBuff _forceBuff;
+
+    /** Skill casting information (used to queue when several skills are cast in a short time) **/
     //private L2Skill SkillDat = null;
     //private boolean _fu;
     //private boolean _dm;
@@ -2324,6 +2345,13 @@ public final class L2PcInstance extends L2PlayableInstance
 	}
 
 	/**
+	 * Set _waitTypeSitting to given value
+	 */
+	public void setIsSitting(boolean state)
+	{
+		_waitTypeSitting = state;
+	}
+	/**
 	 * Sit down the L2PcInstance, set the AI Intention to AI_INTENTION_REST and send a Server->Client ChangeWaitType packet (broadcast)<BR><BR>
 	 */
 	public void sitDown()
@@ -2338,12 +2366,45 @@ public final class L2PcInstance extends L2PlayableInstance
 		{
 			breakAttack();
 
-			_waitTypeSitting = true;
-			getAI().setIntention(CtrlIntention.AI_INTENTION_REST);
 			broadcastPacket(new ChangeWaitType (this, ChangeWaitType.WT_SITTING));
+			// Schedule a sit down task to wait for the animation to finish
+			ThreadPoolManager.getInstance().scheduleGeneral(new SitDownTask(this), 2500);
+			setIsParalyzed(true);
 		}
 	}
-
+	/**
+	 * Sit down Task
+	 */
+	class SitDownTask implements Runnable
+	{
+		L2PcInstance _player;
+		SitDownTask(L2PcInstance player)
+		{
+			_player = player;
+		}
+		public void run()
+		{	
+			setIsSitting(true);
+			_player.setIsParalyzed(false);
+			_player.getAI().setIntention(CtrlIntention.AI_INTENTION_REST);
+		}
+	}
+	/**
+	 * Stand up Task
+	 */
+	class StandUpTask implements Runnable
+	{
+		L2PcInstance _player;
+		StandUpTask(L2PcInstance player)
+		{
+			_player = player;
+		}
+		public void run()
+		{
+			_player.setIsSitting(false);
+			_player.getAI().setIntention(CtrlIntention.AI_INTENTION_IDLE);
+		}
+	}
 	/**
 	 * Stand up the L2PcInstance, set the AI Intention to AI_INTENTION_IDLE and send a Server->Client ChangeWaitType packet (broadcast)<BR><BR>
 	 */
@@ -2361,9 +2422,9 @@ public final class L2PcInstance extends L2PlayableInstance
 				stopEffects(L2Effect.EffectType.RELAXING);
 			}
 
-			_waitTypeSitting = false;
-			getAI().setIntention(CtrlIntention.AI_INTENTION_IDLE);
 			broadcastPacket(new ChangeWaitType (this, ChangeWaitType.WT_STANDING));
+			// Schedule a stand up task to wait for the animation to finish
+			ThreadPoolManager.getInstance().scheduleGeneral(new StandUpTask(this), 2500);
 		}
 	}
 
@@ -3353,7 +3414,7 @@ public final class L2PcInstance extends L2PlayableInstance
 		}
 
 		// Check if the L2PcInstance is confused
-		if (player.isConfused())
+		if (player.isOutOfControl())
 		{
 			// Send a Server->Client packet ActionFailed to the player
 			player.sendPacket(new ActionFailed());
@@ -4192,14 +4253,15 @@ public final class L2PcInstance extends L2PlayableInstance
 			if (isCursedWeaponEquiped())
 			{
 				CursedWeaponsManager.getInstance().drop(_cursedWeaponEquipedId, killer);
-			} else
+			}
+			else
 			{
 				if (pk == null || !pk.isCursedWeaponEquiped())
 				{
 					//if (getKarma() > 0)
 						onDieDropItem(killer);  // Check if any item should be dropped
 
-					if (!isInsideZone(ZONE_PVP))
+					if (!(isInsideZone(ZONE_PVP) && !isInsideZone(ZONE_SIEGE)))
 					{
 						boolean isKillerPc = (killer instanceof L2PcInstance);
 		                if (isKillerPc && ((L2PcInstance)killer).getClan() != null
@@ -4243,6 +4305,13 @@ public final class L2PcInstance extends L2PlayableInstance
 
 			_cubics.clear();
 		}
+
+		if(_forceBuff != null)
+			_forceBuff.delete();
+
+		for(L2Character character : getKnownList().getKnownCharacters())
+			if(character.getForceBuff() != null && character.getForceBuff().getTarget() == this)
+				character.abortCast();
 
 		if (isInParty() && getParty().isInDimensionalRift())
 			getParty().getDimensionalRift().getDeadMemberList().add(this);
@@ -6957,6 +7026,7 @@ public final class L2PcInstance extends L2PlayableInstance
             sendPacket(new ActionFailed());
             return;
         }
+
         /*
         if (isWearingFormalWear() && !skill.isPotion())
         {
@@ -7011,7 +7081,8 @@ public final class L2PcInstance extends L2PlayableInstance
 
 		// Check if it's ok to summon
         // siege golem (13), Wild Hog Cannon (299), Swoop Cannon (448)
-        if ((skill.getId() == 13 || skill.getId() == 299 || skill.getId() == 448) && !SiegeManager.getInstance().checkIfOkToSummon(this, false))
+        if ((skill.getId() == 13 || skill.getId() == 299 || skill.getId() == 448) 
+        		&& !SiegeManager.getInstance().checkIfOkToSummon(this, false))
 			return;
 
 
@@ -7084,14 +7155,6 @@ public final class L2PcInstance extends L2PlayableInstance
         		return;
         	}
         }
-        // GeoData Los Check here
-        if (skill.getCastRange() > 0 && !GeoData.getInstance().canSeeTarget(this, target))
-        {
-            sendPacket(new SystemMessage(SystemMessageId.CANT_SEE_TARGET));
-            sendPacket(new ActionFailed());
-            return;
-        }
-
 
         //************************************* Check skill availability *******************************************
 
@@ -7192,7 +7255,7 @@ public final class L2PcInstance extends L2PlayableInstance
         }
 
         // Check if all casting conditions are completed
-        if (!skill.checkCondition(this, false))
+        if (!skill.checkCondition(this, target, false))
         {
             // Send a Server->Client packet ActionFailed to the L2PcInstance
             sendPacket(new ActionFailed());
@@ -7409,6 +7472,14 @@ public final class L2PcInstance extends L2PlayableInstance
         	sendPacket(new ActionFailed());
         	abortCast();
         	return;
+        }
+        
+        // GeoData Los Check here
+        if (skill.getCastRange() > 0 && !GeoData.getInstance().canSeeTarget(this, target))
+        {
+            sendPacket(new SystemMessage(SystemMessageId.CANT_SEE_TARGET));
+            sendPacket(new ActionFailed());
+            return;
         }
 
         // If all conditions are checked, create a new SkillDat object and set the player _currentSkill
@@ -9380,123 +9451,120 @@ public final class L2PcInstance extends L2PlayableInstance
 			setXYZ(_obsX, _obsY, _obsZ);
 
 		// Set the online Flag to True or False and update the characters table of the database with online status and lastAccess (called when login and logout)
-		try { setOnlineStatus(false); } catch (Throwable t) {_log.log(Level.SEVERE, "deletedMe()", t); }
+		try { setOnlineStatus(false); } catch (Throwable t) {_log.log(Level.SEVERE, "deleteMe()", t); }
 
 		// Stop the HP/MP/CP Regeneration task (scheduled tasks)
-		try { stopAllTimers(); } catch (Throwable t) {_log.log(Level.SEVERE, "deletedMe()", t); }
+		try { stopAllTimers(); } catch (Throwable t) {_log.log(Level.SEVERE, "deleteMe()", t); }
 
 		// Stop crafting, if in progress
-		try { RecipeController.getInstance().requestMakeItemAbort(this); } catch (Throwable t) {_log.log(Level.SEVERE, "deletedMe()", t); }
+		try { RecipeController.getInstance().requestMakeItemAbort(this); } catch (Throwable t) {_log.log(Level.SEVERE, "deleteMe()", t); }
 
 		// Cancel Attak or Cast
-		try { setTarget(null); } catch (Throwable t) {_log.log(Level.SEVERE, "deletedMe()", t); }
+		try { setTarget(null); } catch (Throwable t) {_log.log(Level.SEVERE, "deleteMe()", t); }
 		
 		// Remove from world regions zones
 		if (getWorldRegion() != null) getWorldRegion().removeFromZones(this);
 
+		try
+		{
+			if(_forceBuff != null)
+			{
+				_forceBuff.delete();
+			}
+			for(L2Character character : getKnownList().getKnownCharacters())
+				if(character.getForceBuff() != null && character.getForceBuff().getTarget() == this)
+					character.abortCast();
+		}
+		catch(Throwable t) {_log.log(Level.SEVERE, "deleteMe()", t); }
+
 		// Remove the L2PcInstance from the world
 		if (isVisible())
-			try { decayMe(); } catch (Throwable t) {_log.log(Level.SEVERE, "deletedMe()", t); }
+			try { decayMe(); } catch (Throwable t) {_log.log(Level.SEVERE, "deleteMe()", t); }
 
-			// If a Party is in progress, leave it
-			if (isInParty()) try { leaveParty(); } catch (Throwable t) {_log.log(Level.SEVERE, "deletedMe()", t); }
+		// If a Party is in progress, leave it
+		if (isInParty()) try { leaveParty(); } catch (Throwable t) {_log.log(Level.SEVERE, "deleteMe()", t); }
 
-			// If the L2PcInstance has Pet, unsummon it
-			if (getPet() != null)
+		// If the L2PcInstance has Pet, unsummon it
+		if (getPet() != null)
+		{
+			try { getPet().unSummon(this); } catch (Throwable t) {_log.log(Level.SEVERE, "deleteMe()", t); }// returns pet to control item
+		}
+
+		if (getClanId() != 0 && getClan() != null)
+		{
+			// set the status for pledge member list to OFFLINE
+			try
 			{
-				try { getPet().unSummon(this); } catch (Throwable t) {_log.log(Level.SEVERE, "deletedMe()", t); }// returns pet to control item
-			}
+				L2ClanMember clanMember = getClan().getClanMember(getName());
+				if (clanMember != null) clanMember.setPlayerInstance(null);
+			} catch (Throwable t) {_log.log(Level.SEVERE, "deleteMe()", t); }
+		}
 
-			if (getClanId() != 0 && getClan() != null)
-			{
-				// set the status for pledge member list to OFFLINE
-				try
-				{
-					L2ClanMember clanMember = getClan().getClanMember(getName());
-					if (clanMember != null) clanMember.setPlayerInstance(null);
-				} catch (Throwable t) {_log.log(Level.SEVERE, "deletedMe()", t); }
-			}
+		if (getActiveRequester() != null)
+		{
+			// deals with sudden exit in the middle of transaction
+			setActiveRequester(null);
+		}
 
-			if (getActiveRequester() != null)
-			{
-				// deals with sudden exit in the middle of transaction
-				setActiveRequester(null);
-			}
+		// If the L2PcInstance is a GM, remove it from the GM List
+		if (isGM())
+		{
+			try { GmListTable.getInstance().deleteGm(this); } catch (Throwable t) {_log.log(Level.SEVERE, "deleteMe()", t); }
+		}
 
-			// If the L2PcInstance is a GM, remove it from the GM List
-			if (isGM())
-			{
-				try { GmListTable.getInstance().deleteGm(this); } catch (Throwable t) {_log.log(Level.SEVERE, "deletedMe()", t); }
-			}
+		// Update database with items in its inventory and remove them from the world
+		try { getInventory().deleteMe(); } catch (Throwable t) {_log.log(Level.SEVERE, "deleteMe()", t); }
 
-			// Update database with items in its inventory and remove them from the world
-			try { getInventory().deleteMe(); } catch (Throwable t) {_log.log(Level.SEVERE, "deletedMe()", t); }
+		// Update database with items in its warehouse and remove them from the world
+		try { clearWarehouse(); } catch (Throwable t) {_log.log(Level.SEVERE, "deleteMe()", t); }
+		if(Config.WAREHOUSE_CACHE)
+			WarehouseCacheManager.getInstance().remCacheTask(this);
 
-			// Update database with items in its warehouse and remove them from the world
-			try { clearWarehouse(); } catch (Throwable t) {_log.log(Level.SEVERE, "deletedMe()", t); }
-			if(Config.WAREHOUSE_CACHE)
-				WarehouseCacheManager.getInstance().remCacheTask(this);
+		// Update database with items in its freight and remove them from the world
+		try { getFreight().deleteMe(); } catch (Throwable t) {_log.log(Level.SEVERE, "deleteMe()", t); }
 
-			// Update database with items in its freight and remove them from the world
-			try { getFreight().deleteMe(); } catch (Throwable t) {_log.log(Level.SEVERE, "deletedMe()", t); }
+		// Remove all L2Object from _knownObjects and _knownPlayer of the L2Character then cancel Attak or Cast and notify AI
+		try { getKnownList().removeAllKnownObjects(); } catch (Throwable t) {_log.log(Level.SEVERE, "deleteMe()", t); }
 
-			// Remove all L2Object from _knownObjects and _knownPlayer of the L2Character then cancel Attak or Cast and notify AI
-			try { getKnownList().removeAllKnownObjects(); } catch (Throwable t) {_log.log(Level.SEVERE, "deletedMe()", t); }
+		// Close the connection with the client
+		closeNetConnection();
 
-			// Close the connection with the client
-			closeNetConnection();
+		// remove from flood protector
+		FloodProtector.getInstance().removePlayer(getObjectId());
 
-			// remove from flood protector
-			FloodProtector.getInstance().removePlayer(getObjectId());
+		if (getClanId() > 0)
+			getClan().broadcastToOtherOnlineMembers(new PledgeShowMemberListUpdate(this), this);
+			//ClanTable.getInstance().getClan(getClanId()).broadcastToOnlineMembers(new PledgeShowMemberListAdd(this));
 
-			if (getClanId() > 0)
-				getClan().broadcastToOtherOnlineMembers(new PledgeShowMemberListUpdate(this), this);
-				//ClanTable.getInstance().getClan(getClanId()).broadcastToOnlineMembers(new PledgeShowMemberListAdd(this));
+		for(L2PcInstance player : _snoopedPlayer)
+			player.removeSnooper(this);
 
-			for(L2PcInstance player : _snoopedPlayer)
-				player.removeSnooper(this);
+		for(L2PcInstance player : _snoopListener)
+			player.removeSnooped(this);
 
-			for(L2PcInstance player : _snoopListener)
-				player.removeSnooped(this);
-
-			// Remove L2Object object from _allObjects of L2World
-			L2World.getInstance().removeObject(this);
+		// Remove L2Object object from _allObjects of L2World
+		L2World.getInstance().removeObject(this);
 	}
 
 	private FishData _fish;
 
-    public void startFishing()
+   /*  startFishing() was stripped of any pre-fishing related checks, namely the fishing zone check.
+    * Also worthy of note is the fact the code to find the hook landing position was also striped. The
+    * stripped code was moved into fishing.java. In my opinion it makes more sense for it to be there
+    * since all other skill related checks were also there. Last but not least, moving the zone check
+    * there, fixed a bug where baits would always be consumed no matter if fishing actualy took place.
+    * startFishing() now takes up 3 arguments, wich are acurately described as being the hook landing 
+    * coordinates.
+    */
+	public void startFishing(int _x, int _y, int _z)
     {
         stopMove(null);
-        int rnd = Rnd.get(50) + 150;
-        double angle = Util.convertHeadingToDegree(getHeading());
-        //this.sendMessage("Angel: "+angle+" Heading: "+getHeading());
-        double radian = Math.toRadians(angle - 90);
-        double sin = Math.sin(radian);
-        double cos = Math.cos(radian);
-        int x1 = -(int)(sin * rnd); //Somthing wrong with L2j Heding calculation o_0?
-        int y1 = (int)(cos * rnd); //Somthing wrong with L2j Heding calculation o_0?
-        int x = getX()+x1;
-        int y = getY()+y1;
-        int z = getZ()-30;
-        _fishx = x;
-        _fishy = y;
-        _fishz = z;
-        
-		if (!FishingZoneManager.getInstance().isInsideFishingZone(_fishx, _fishy, _fishz))
-		{
-            //You can't fish here
-			sendPacket(new SystemMessage(SystemMessageId.CANNOT_FISH_HERE));
-			if (!isGM())
-			{
-				EndFishing(false);
-				return;
-			}
-		}
-
 
         setIsImobilised(true);
         _fishing = true;
+        _fishx = _x;
+        _fishy = _y;
+        _fishz = _z;
         broadcastUserInfo();
         //Starts fishing
     	int lvl = GetRandomFishLvl();
@@ -9518,7 +9586,8 @@ public final class L2PcInstance extends L2PlayableInstance
         ExFishingStart efs = null;
         if (!GameTimeController.getInstance().isNowNight() && _lure.isNightLure())
         	_fish.setType(-1);
-    	efs = new ExFishingStart(this,_fish.getType(),x,y,z,_lure.isNightLure());
+		//sendMessage("Hook x,y: " + _x + "," + _y + " - Water Z, Player Z:" + _z + ", " + getZ()); //debug line, uncoment to show coordinates used in fishing.
+    	efs = new ExFishingStart(this,_fish.getType(),_x,_y,_z,_lure.isNightLure());
         broadcastPacket(efs);
         StartLookingForFishTask();
     }
@@ -10291,6 +10360,17 @@ public final class L2PcInstance extends L2PlayableInstance
 		SystemMessage sm = new SystemMessage(SystemMessageId.YOU_DID_S1_DMG);
 		sm.addNumber(damage);
 		sendPacket(sm);
+	}
 
-    }
+	@Override
+	public ForceBuff getForceBuff()
+	{
+		return _forceBuff;
+	}
+
+	@Override
+	public void setForceBuff(ForceBuff fb)
+	{
+		_forceBuff = fb;
+	}
 }

@@ -375,7 +375,27 @@ public class SevenSigns
 	
 	public static final String getSealName(int seal, boolean shortName) 
 	{
-		String sealName = (!shortName) ? "" : "«Ê¦L";
+		String sealName = (!shortName) ? "" : "ªº«Ê¦L";
+		
+		switch (seal) 
+		{
+			case SEAL_AVARICE:
+            	sealName += "³g¼¤"; 
+                break;
+            case SEAL_GNOSIS:
+				sealName += "±Ò¥Ü";
+				break;
+			case SEAL_STRIFE:
+				sealName += "¾Ô¶Ã";
+				break;
+		}
+ 
+		return sealName;
+	}
+	
+	public static final String getSealFileName(int seal, boolean shortName) 
+	{
+		String sealName = (!shortName) ? "Seal of " : "";
 		
 		switch (seal) 
 		{

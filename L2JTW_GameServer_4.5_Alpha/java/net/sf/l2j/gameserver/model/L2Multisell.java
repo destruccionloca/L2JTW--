@@ -190,7 +190,7 @@ public class L2Multisell
         	}
         	else if ( ing.getItemId() == 57 )  // && !ing.isTaxIngredient()
         	{
-        		adenaAmount += (int)Math.round(ing.getItemCount()*taxRate);
+        		adenaAmount += ing.getItemCount();
         		continue;	// do not adena yet, as taxIngredient adena entries might occur next (order not guaranteed)
         	}
         	// if it is an armor/weapon, modify the enchantment level appropriately, if necessary
