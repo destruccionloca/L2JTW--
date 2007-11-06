@@ -116,6 +116,7 @@ import net.sf.l2j.gameserver.handler.admincommandhandlers.AdminTarget;
 import net.sf.l2j.gameserver.handler.admincommandhandlers.AdminTeleport;
 import net.sf.l2j.gameserver.handler.admincommandhandlers.AdminTest;
 import net.sf.l2j.gameserver.handler.admincommandhandlers.AdminCTFEngine;
+import net.sf.l2j.gameserver.handler.admincommandhandlers.AdminTvTEvent;
 import net.sf.l2j.gameserver.handler.admincommandhandlers.AdminUnblockIp;
 import net.sf.l2j.gameserver.handler.admincommandhandlers.AdminZone;
 import net.sf.l2j.gameserver.handler.itemhandlers.BeastSoulShot;
@@ -172,6 +173,7 @@ import net.sf.l2j.gameserver.handler.skillhandlers.Pdam;
 import net.sf.l2j.gameserver.handler.skillhandlers.Recall;
 import net.sf.l2j.gameserver.handler.skillhandlers.Resurrect;
 import net.sf.l2j.gameserver.handler.skillhandlers.SiegeFlag;
+import net.sf.l2j.gameserver.handler.skillhandlers.Signets;
 import net.sf.l2j.gameserver.handler.skillhandlers.Sow;
 import net.sf.l2j.gameserver.handler.skillhandlers.Spoil;
 import net.sf.l2j.gameserver.handler.skillhandlers.StrSiegeAssault;
@@ -180,6 +182,9 @@ import net.sf.l2j.gameserver.handler.skillhandlers.SummonTreasureKey;
 import net.sf.l2j.gameserver.handler.skillhandlers.Sweep;
 import net.sf.l2j.gameserver.handler.skillhandlers.TakeCastle;
 import net.sf.l2j.gameserver.handler.skillhandlers.Unlock;
+import net.sf.l2j.gameserver.handler.usercommandhandlers.ChannelDelete;
+import net.sf.l2j.gameserver.handler.usercommandhandlers.ChannelLeave;
+import net.sf.l2j.gameserver.handler.usercommandhandlers.ChannelListUpdate;
 import net.sf.l2j.gameserver.handler.usercommandhandlers.ClanPenalty;
 import net.sf.l2j.gameserver.handler.usercommandhandlers.ClanWarsList;
 import net.sf.l2j.gameserver.handler.usercommandhandlers.DisMount;
@@ -499,6 +504,7 @@ public class GameServer
         _skillHandler.registerSkillHandler(new DeluxeKey());
         _skillHandler.registerSkillHandler(new Sow());
         _skillHandler.registerSkillHandler(new Harvest());
+        _skillHandler.registerSkillHandler(new Signets());
         _log.config("SkillHandler: Loaded " + _skillHandler.size() + " handlers.");
 
 		_adminCommandHandler = AdminCommandHandler.getInstance();
@@ -557,6 +563,7 @@ public class GameServer
         _adminCommandHandler.registerAdminCommandHandler(new AdminCursedWeapons());
         _adminCommandHandler.registerAdminCommandHandler(new AdminGeoEditor());
         _adminCommandHandler.registerAdminCommandHandler(new AdminManor());
+        _adminCommandHandler.registerAdminCommandHandler(new AdminTvTEvent());
         //_adminCommandHandler.registerAdminCommandHandler(new AdminRadar());
         _log.config("AdminCommandHandler: Loaded " + _adminCommandHandler.size() + " handlers.");
 
@@ -570,6 +577,9 @@ public class GameServer
         _userCommandHandler.registerUserCommandHandler(new PartyInfo());
 		_userCommandHandler.registerUserCommandHandler(new Time());
 		_userCommandHandler.registerUserCommandHandler(new OlympiadStat());
+		_userCommandHandler.registerUserCommandHandler(new ChannelLeave());
+		_userCommandHandler.registerUserCommandHandler(new ChannelDelete());
+		_userCommandHandler.registerUserCommandHandler(new ChannelListUpdate());
 
         _log.config("UserCommandHandler: Loaded " + _userCommandHandler.size() + " handlers.");
 

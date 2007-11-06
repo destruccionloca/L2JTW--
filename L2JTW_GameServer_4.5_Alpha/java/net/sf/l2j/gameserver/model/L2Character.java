@@ -381,6 +381,8 @@ public abstract class L2Character extends L2Object
 	 */
 	public void onDecay()
 	{
+		L2WorldRegion reg = getWorldRegion();
+		if(reg != null) reg.removeFromZones(this);
 		decayMe();
 	}
 	
@@ -1663,9 +1665,15 @@ public abstract class L2Character extends L2Object
 		// Stop all active skills effects in progress on the L2Character,
 		// if the Character isn't a Noblesse Blessed L2PlayableInstance
 		if (this instanceof L2PlayableInstance && ((L2PlayableInstance)this).isNoblesseBlessed())
-			((L2PlayableInstance)this).stopNoblesseBlessing(null);
+		{ 
+			((L2PlayableInstance)this).stopNoblesseBlessing(null); 
+			if (((L2PlayableInstance)this).getCharmOfLuck()) //remove Lucky Charm if player have Nobless blessing buff 
+				((L2PlayableInstance)this).stopCharmOfLuck(null); 
+		} 
 		else
 			stopAllEffects();
+		
+		calculateRewards(killer);
 
 		// Send the Server->Client packet StatusUpdate with current HP and MP to all other L2PcInstance to inform
 		broadcastStatusUpdate();
@@ -1673,7 +1681,8 @@ public abstract class L2Character extends L2Object
 		// Notify L2Character AI
 		getAI().notifyEvent(CtrlEvent.EVT_DEAD, null);
 		
-		if (!(this instanceof L2PcInstance) && getWorldRegion() != null) getWorldRegion().removeFromZones(this);
+		if (getWorldRegion() != null)
+				getWorldRegion().onDeath(this);
 
 		// Notify Quest of character's death
 		for (QuestState qs: getNotifyQuestOfDeath())
@@ -1686,6 +1695,10 @@ public abstract class L2Character extends L2Object
 		return true;
 	}
 
+	protected void calculateRewards(L2Character killer)
+	{
+	}
+	
 	/** Sets HP, MP and CP and revives the L2Character. */
 	public void doRevive()
 	{
@@ -1702,6 +1715,8 @@ public abstract class L2Character extends L2Object
 			//broadcastPacket(new SocialAction(getObjectId(), 15));
 
 			broadcastPacket(new Revive(this));
+			if (getWorldRegion() != null)
+				getWorldRegion().onRevive(this);			
 		}
 		else
 			setIsPendingRevive(true);
@@ -2799,7 +2814,7 @@ public abstract class L2Character extends L2Object
 	}
 
 	/**
-	 * Stop and remove the L2Effect corresponding to the L2Skill Identifier and update client magic icone.<BR><BR>
+	 * Stop and remove the L2Effects corresponding to the L2Skill Identifier and update client magic icone.<BR><BR>
 	 *
 	 * <B><U> Concept</U> :</B><BR><BR>
 	 * All active skills effects in progress on the L2Character are identified in ConcurrentHashMap(Integer,L2Effect) <B>_effects</B>.
@@ -2808,10 +2823,16 @@ public abstract class L2Character extends L2Object
 	 * @param effectId The L2Skill Identifier of the L2Effect to remove from _effects
 	 *
 	 */
-	public final void stopEffect(int effectId)
+	public final void stopSkillEffects(int skillId)
 	{
-		L2Effect effect = getEffect(effectId);
-		if(effect != null) effect.exit();
+		// Get all skills effects on the L2Character
+		L2Effect[] effects = getAllEffects();
+		if (effects == null) return;
+
+		for(L2Effect e : effects)
+		{
+			if (e.getSkill().getId() == skillId) e.exit();
+		}
 	}
 
 	/**
@@ -3182,7 +3203,7 @@ public abstract class L2Character extends L2Object
 	 * @return The L2Effect corresponding to the L2Skill Identifier
 	 *
 	 */
-	public final L2Effect getEffect(int index)
+	public final L2Effect getFirstEffect(int index)
 	{
 		FastTable<L2Effect> effects = _effects;
 		if (effects == null) return null;
@@ -3211,7 +3232,7 @@ public abstract class L2Character extends L2Object
 	 * @return The first L2Effect created by the L2Skill
 	 *
 	 */
-	public final L2Effect getEffect(L2Skill skill)
+	public final L2Effect getFirstEffect(L2Skill skill)
 	{
 		FastTable<L2Effect> effects = _effects;
 		if (effects == null) return null;
@@ -3241,7 +3262,7 @@ public abstract class L2Character extends L2Object
 	 * @return The first L2Effect corresponding to the Effect Type
 	 *
 	 */
-	public final L2Effect getEffect(L2Effect.EffectType tp)
+	public final L2Effect getFirstEffect(L2Effect.EffectType tp)
 	{
 		FastTable<L2Effect> effects = _effects;
 		if (effects == null) return null;
@@ -5691,7 +5712,7 @@ public abstract class L2Character extends L2Object
 			return;
 		}
 
-		// Escaping from under skill's radius. First version, not perfect in AoE skills.
+		// Escaping from under skill's radius and peace zone check. First version, not perfect in AoE skills.
 		int escapeRange = 0;
 		if(skill.getEffectRange() > escapeRange) escapeRange = skill.getEffectRange();
 		else if(skill.getCastRange() < 0 && skill.getSkillRadius() > 80) escapeRange = skill.getSkillRadius();
@@ -5703,8 +5724,22 @@ public abstract class L2Character extends L2Object
 			{
 				if (targets[i] instanceof L2Character)
 				{
-					if(!this.isInsideRadius(targets[i],escapeRange,true,false)) continue;
-					else targetList.add((L2Character)targets[i]);
+					if(!this.isInsideRadius(targets[i],escapeRange,true,false)) 
+						continue;
+					if(skill.isOffensive())
+					{
+						if(this instanceof L2PcInstance)
+						{
+							if(((L2Character)targets[i]).isInsidePeaceZone((L2PcInstance)this)) 
+								continue;
+						}
+						else
+						{
+							if(((L2Character)targets[i]).isInsidePeaceZone(this, targets[i])) 
+								continue;
+						}
+					}
+					targetList.add((L2Character)targets[i]);
 				}
 				//else
 				//{
@@ -6046,7 +6081,7 @@ public abstract class L2Character extends L2Object
 			if(skill.isToggle())
 			{
 				// Check if the skill effects are already in progress on the L2Character
-				if(getEffect(skill.getId()) != null)
+				if(getFirstEffect(skill.getId()) != null)
 				{
 					handler = SkillHandler.getInstance().getSkillHandler(skill.getSkillType());
 

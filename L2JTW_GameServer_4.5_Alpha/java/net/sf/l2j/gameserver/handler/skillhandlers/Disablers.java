@@ -640,7 +640,8 @@ public class Disablers implements ISkillHandler
                     		for (L2Effect e : effects)
                     		{ 
                     			if (e.getSkill().getId() != 4082 && e.getSkill().getId() != 4215 && 
-                    					e.getSkill().getId() != 4515 && e.getSkill().getId() != 110 && e.getSkill().getId() != 111) // Cannot cancel skills 4082, 4215, 4515
+                    					e.getSkill().getId() != 4515 && e.getSkill().getId() != 110 && e.getSkill().getId() != 111 && 
+                    					e.getSkill().getId() != 1323 && e.getSkill().getId() != 1325) // Cannot cancel skills 4082, 4215, 4515, 110, 111, 1323, 1325 
                     			{
                     				if(e.getSkill().getSkillType() != SkillType.BUFF) //sleep, slow, surrenders etc
                     					e.exit();
@@ -755,7 +756,7 @@ public class Disablers implements ISkillHandler
         }//end for        
         //_log.warning("Debug: Aura Skill Casting Finish...");
         // self Effect :]
-        L2Effect effect = activeChar.getEffect(skill.getId());        
+        L2Effect effect = activeChar.getFirstEffect(skill.getId());        
         if (effect != null && effect.isSelfEffect())        
         {            
         	//Replace old effect with new one.            

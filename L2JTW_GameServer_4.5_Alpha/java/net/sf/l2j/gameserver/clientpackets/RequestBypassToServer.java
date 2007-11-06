@@ -105,8 +105,6 @@ public final class RequestBypassToServer extends L2GameClientPacket
                 {
     				L2Object object = L2World.getInstance().findObject(Integer.parseInt(id));
 
-    				TvTEvent.onBypass(_command.substring(endOfId+1), activeChar);
-
     				if (_command.substring(endOfId+1).startsWith("event_participate")) L2Event.inscribePlayer(activeChar);
     				
     				if (_command.substring(endOfId+1).startsWith("ctf_player_join "))

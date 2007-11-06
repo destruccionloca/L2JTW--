@@ -100,7 +100,7 @@ public class L2SkillElemental extends L2Skill {
 			if (!_seedAny){
 				for (int i=0;i<_seeds.length;i++){
 					if (_seeds[i]!=0){
-						L2Effect e = target.getEffect(_seeds[i]);
+						L2Effect e = target.getFirstEffect(_seeds[i]);
 
 						if (e==null || !e.getInUse()){
 							charged = false;
@@ -114,7 +114,7 @@ public class L2SkillElemental extends L2Skill {
 
 				for (int i=0;i<_seeds.length;i++){
 					if (_seeds[i]!=0){
-						L2Effect e = target.getEffect(_seeds[i]);
+						L2Effect e = target.getFirstEffect(_seeds[i]);
 
 						if (e!=null && e.getInUse()){
 							charged = true;
@@ -152,9 +152,7 @@ public class L2SkillElemental extends L2Skill {
 			}
 			
 			// activate attacked effects, if any
-			target.stopEffect(getId());
-            if (target.getEffect(getId()) != null)
-                target.removeEffect(target.getEffect(getId()));
+			target.stopSkillEffects(getId());
             getEffects(activeChar, target);
 		}
 	}

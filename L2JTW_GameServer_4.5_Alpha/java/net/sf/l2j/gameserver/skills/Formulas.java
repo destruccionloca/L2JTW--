@@ -1599,6 +1599,12 @@ public final class Formulas
         L2Weapon at_weapon = attacker.getActiveWeaponItem();
 		double shldRate = target.calcStat(Stats.SHIELD_RATE, 0, attacker, null)* DEXbonus[target.getDEX()];
 		if (shldRate == 0.0) return false;
+
+		// Check for passive skill Aegis (316) or Aegis Stance (318)
+		if (target.getKnownSkill(316) == null && target.getFirstEffect(318) == null)
+			if (!target.isFront(attacker)) return false;
+		// if attacker use bow and target wear shield, shield block rate is multiplied by 1.3 (30%)
+
 		if (at_weapon != null && at_weapon.getItemType() == L2WeaponType.BOW)
 			shldRate *= 1.3;
 		double degreeside = target.calcStat(Stats.SHIELD_DEFENCE_ANGLE, 120, null, null);
@@ -1726,26 +1732,35 @@ public final class Formulas
 				{
 					case BLEED:
 						multiplier = target.calcStat(Stats.BLEED_VULN, multiplier, target, null);
+						break;
 					case POISON:
 						multiplier = target.calcStat(Stats.POISON_VULN, multiplier, target, null);
+						break;
 					case STUN:
 						multiplier = target.calcStat(Stats.STUN_VULN, multiplier, target, null);
+						break;
 					case PARALYZE:
 						multiplier = target.calcStat(Stats.PARALYZE_VULN, multiplier, target, null);
+						break;
 					case ROOT:
 						multiplier = target.calcStat(Stats.ROOT_VULN, multiplier, target, null);
+						break;
 					case SLEEP:
 						multiplier = target.calcStat(Stats.SLEEP_VULN, multiplier, target, null);
+						break;
 					case MUTE:
 					case FEAR:
 					case BETRAY:
 					case AGGREDUCE_CHAR:
 						multiplier = target.calcStat(Stats.DERANGEMENT_VULN, multiplier, target, null);
+						break;
 					case CONFUSION:
 						multiplier = target.calcStat(Stats.CONFUSION_VULN, multiplier, target, null);
+						break;
 					case DEBUFF:
 					case WEAKNESS:
 						multiplier = target.calcStat(Stats.DEBUFF_VULN, multiplier, target, null);
+						break;
 					default:
 						;
 				}

@@ -195,7 +195,6 @@ import net.sf.l2j.gameserver.templates.L2Weapon;
 import net.sf.l2j.gameserver.templates.L2WeaponType;
 import net.sf.l2j.gameserver.util.Broadcast;
 import net.sf.l2j.gameserver.util.FloodProtector;
-import net.sf.l2j.gameserver.util.Util;
 import net.sf.l2j.util.Point3D;
 import net.sf.l2j.util.Rnd;
 import net.sf.l2j.gameserver.serverpackets.CharInfoMultiplier;
@@ -2365,7 +2364,7 @@ public final class L2PcInstance extends L2PlayableInstance
 		if (!_waitTypeSitting && !isAttackingDisabled() && !isOutOfControl() && !isImobilised())
 		{
 			breakAttack();
-
+			setIsSitting(true);
 			broadcastPacket(new ChangeWaitType (this, ChangeWaitType.WT_SITTING));
 			// Schedule a sit down task to wait for the animation to finish
 			ThreadPoolManager.getInstance().scheduleGeneral(new SitDownTask(this), 2500);
@@ -2384,7 +2383,6 @@ public final class L2PcInstance extends L2PlayableInstance
 		}
 		public void run()
 		{	
-			setIsSitting(true);
 			_player.setIsParalyzed(false);
 			_player.getAI().setIntention(CtrlIntention.AI_INTENTION_REST);
 		}
@@ -4247,7 +4245,6 @@ public final class L2PcInstance extends L2PlayableInstance
 				}
 			}
 
-			// Clear resurrect xp calculation
 			setExpBeforeDeath(0);
 
 			if (isCursedWeaponEquiped())
@@ -4280,6 +4277,7 @@ public final class L2PcInstance extends L2PlayableInstance
 						{
 							// Reduce the Experience of the L2PcInstance in function of the calculated Death Penalty
 							// NOTE: deathPenalty +- Exp will update karma
+							//_log.warning("DELEVEL");
 							if (getSkillLevel(L2Skill.SKILL_LUCKY) < 0 || getStat().getLevel() > 9)
 								deathPenalty((pk != null && getClan() != null && pk.getClan() != null && pk.getClan().isAtWarWith(getClanId())));
 						} else
@@ -4688,7 +4686,7 @@ public final class L2PcInstance extends L2PlayableInstance
 		// Calculate the Experience loss
 		long lostExp = 0;
 
-		if (!atEvent && (_inEventCTF && !CTF._started) && (!_inEventCTF && CTF._started) && (!_inEventCTF && CTF._started)) 
+		if (!atEvent || (_inEventCTF && !CTF._started) || (!_inEventCTF && CTF._started) || (!_inEventCTF && CTF._started)) 
 			if (lvl < Experience.MAX_LEVEL)
 				lostExp = Math.round((getStat().getExpForLevel(lvl+1) - getStat().getExpForLevel(lvl)) * percentLost /100);
 			else
@@ -7050,7 +7048,7 @@ public final class L2PcInstance extends L2PlayableInstance
 		if (skill.isToggle())
 		{
 			// Get effects of the skill
-            L2Effect effect = getEffect(skill);
+            L2Effect effect = getFirstEffect(skill);
 
 			if (effect != null)
 			{
@@ -7494,6 +7492,10 @@ public final class L2PcInstance extends L2PlayableInstance
     {
     	L2PcInstance looter = (L2PcInstance)L2World.getInstance().findObject(LooterId);
 
+    	// if L2PcInstance is in a CommandChannel
+    	if (isInParty() && getParty().isInCommandChannel() && looter != null)
+    		return getParty().getCommandChannel().getMembers().contains(looter);
+    	
     	if (isInParty() && looter != null)
             return getParty().getPartyMembers().contains(looter);
 
@@ -10198,7 +10200,10 @@ public final class L2PcInstance extends L2PlayableInstance
 
     public void calculateDeathPenaltyBuffLevel(L2Character killer)
     {
-    	if(Rnd.get(100) <= Config.DEATH_PENALTY_CHANCE && !(killer instanceof L2PcInstance))
+    	if(Rnd.get(100) <= Config.DEATH_PENALTY_CHANCE 
+    			&& !(killer instanceof L2PcInstance) 
+    			&& !(this.getCharmOfLuck() && (killer instanceof L2BossInstance || killer instanceof L2RaidBossInstance))) 
+    		
     		increaseDeathPenaltyBuffLevel();
 	}
 

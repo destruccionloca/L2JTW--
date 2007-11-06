@@ -38,7 +38,7 @@ public class L2SkillChargeDmg extends L2Skill
 
 
     final int numCharges;
-    final int charge_skill_id;
+    final int chargeSkillId;
     
     public L2SkillChargeDmg(StatsSet set)
 
@@ -48,7 +48,7 @@ public class L2SkillChargeDmg extends L2Skill
         
         numCharges = set.getInteger("num_charges", getLevel());
         //charge_skill_id = set.getInteger("charge_skill_id");
-        charge_skill_id = 4271;
+        chargeSkillId = 4271;
     }
 
     @Override
@@ -57,7 +57,9 @@ public class L2SkillChargeDmg extends L2Skill
 		if (activeChar instanceof L2PcInstance)
 		{
 			L2PcInstance player = (L2PcInstance)activeChar;
-			EffectCharge e = (EffectCharge)player.getEffect(charge_skill_id);
+
+			EffectCharge e = (EffectCharge)player.getFirstEffect(chargeSkillId);
+
 			if(e == null || e.numCharges < numCharges)
 			{
 				SystemMessage sm = new SystemMessage(SystemMessageId.S1_CANNOT_BE_USED);
@@ -75,20 +77,16 @@ public class L2SkillChargeDmg extends L2Skill
         {
             return;
         }
-        
-        // get the effect
-        EffectCharge effect = (EffectCharge) caster.getEffect(charge_skill_id);
-        if (effect == null || effect.numCharges < this.numCharges)
-        {
-        	//_log.warning("CHARGE 2");
-            SystemMessage sm = new SystemMessage(113);
-            sm.addSkillName(this.getId());
-            caster.sendPacket(sm);
-            return;
-        }
-        
 
-
+		// get the effect
+		EffectCharge effect = (EffectCharge) caster.getFirstEffect(chargeSkillId);
+		if (effect == null || effect.numCharges < numCharges)
+		{
+			SystemMessage sm = new SystemMessage(SystemMessageId.S1_CANNOT_BE_USED);
+			sm.addSkillName(getId());
+			caster.sendPacket(sm);
+			return;
+		}
         double modifier = 0;
 
         modifier = (effect.numCharges-numCharges)*0.33;		
@@ -143,7 +141,7 @@ public class L2SkillChargeDmg extends L2Skill
 
 
         // effect self :]
-        L2Effect seffect = caster.getEffect(getId());
+        L2Effect seffect = caster.getFirstEffect(getId());
         if (seffect != null && seffect.isSelfEffect())
         {             
             //Replace old effect with new one.

@@ -39,11 +39,11 @@ public class L2PeaceZone extends L2ZoneType
 	{
 		character.setInsideZone(L2Character.ZONE_PEACE, true);
 		
-		if (character instanceof L2PcInstance)
+		/*if (character instanceof L2PcInstance)
 		{
             SystemMessage sm = new SystemMessage(116);
             ((L2PcInstance)character).sendPacket(sm);
-		}
+		}*/
 	}
 	
 	@Override
@@ -51,10 +51,18 @@ public class L2PeaceZone extends L2ZoneType
 	{
 		character.setInsideZone(L2Character.ZONE_PEACE, false);
 		
-		if (character instanceof L2PcInstance)
+		/*if (character instanceof L2PcInstance)
 		{
             SystemMessage sm = new SystemMessage(117);
             ((L2PcInstance)character).sendPacket(sm);
-		}
+		}*/
 	}
+	
+
+	@Override
+	protected void onDieInside(L2Character character) {}
+	
+	@Override
+	protected void onReviveInside(L2Character character) {}
+
 }

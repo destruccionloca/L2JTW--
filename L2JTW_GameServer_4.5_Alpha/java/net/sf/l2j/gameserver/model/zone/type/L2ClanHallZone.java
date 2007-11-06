@@ -102,13 +102,19 @@ public class L2ClanHallZone extends L2ZoneType
 		}
 	}
 	
+	@Override
+	protected void onDieInside(L2Character character) {}
+	
+	@Override
+	protected void onReviveInside(L2Character character) {}
+	
 	/**
 	 * Removes all foreigners from the clan hall
 	 * @param owningClanId
 	 */
 	public void banishForeigners(int owningClanId)
 	{
-		for (L2Character temp : _characterList)
+		for (L2Character temp : _characterList.values())
 		{
 			if(!(temp instanceof L2PcInstance)) continue;
 			if (((L2PcInstance)temp).getClanId() == owningClanId) continue;

@@ -58,6 +58,7 @@ public class L2Party {
 	private int _partyLvl = 0;
 	private int _itemDistribution = 0;
 	private int _itemLastLoot = 0;
+	private L2CommandChannel _commandChannel = null;
 	
 	private DimensionalRift _dr;
 	
@@ -334,6 +335,10 @@ public class L2Party {
 					msg.addString(getLeader().getName());
 					broadcastToPartyMembers(msg);
 					broadcastToPartyMembers(new PartySmallWindowUpdate(getLeader()));
+					if (isInCommandChannel())
+					{
+						_commandChannel.setChannelLeader(getPartyMembers().get(0));
+					}
 				}
 			}
 			else
@@ -741,16 +746,34 @@ public class L2Party {
 	public int getLevel() { return _partyLvl; }
 	
 	public int getLootDistribution() { return _itemDistribution; }
+
 	
-	public boolean allowPositionUpdate() {
+	public boolean allowPositionUpdate() 
+	{
 				long newtime=System.currentTimeMillis();
 				if (newtime>_lastPositionUpdate+5000) {
 					_lastPositionUpdate=newtime;
 					return true;
 				}
 				return false;
-			}
+	}
 	
+
+	
+	public boolean isInCommandChannel()
+	{
+		return _commandChannel != null;
+	}
+	
+	public L2CommandChannel getCommandChannel()
+	{
+		return _commandChannel;
+	}
+	
+	public void setCommandChannel(L2CommandChannel channel)
+	{
+		_commandChannel = channel;
+	}
 
 	public boolean isInDimensionalRift() { return _dr != null; }
 

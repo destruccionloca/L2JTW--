@@ -85,8 +85,12 @@ public abstract class L2Effect
         BLUFF,
         BATTLE_FORCE,
         SPELL_FORCE,
+        CHARM_OF_LUCK,
+        INVINCIBLE,
+        
         //-------------
         SLAM, CANCEL_TARGET,CANCEL_TARGET_DISARM,CANCEL_TARGET_SHOCK,CURSE_DOOM,SOULSHOT, CHARGE_SELF,BUFF_SELF
+
     }
 
 

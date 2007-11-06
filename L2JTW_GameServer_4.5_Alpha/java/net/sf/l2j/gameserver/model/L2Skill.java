@@ -236,6 +236,7 @@ public abstract class L2Skill
     	DEBUFF,
     	PASSIVE,
     	CONT,
+    	SIGNET,
 
     	RESURRECT,
     	CHARGE(L2SkillCharge.class),
@@ -1401,7 +1402,7 @@ public abstract class L2Skill
             {
 
                 L2PcInstance player = (L2PcInstance)activeChar;
-                EffectCharge e = (EffectCharge)player.getEffect(4271);
+                EffectCharge e = (EffectCharge)player.getFirstEffect(4271);
                 if(e == null || e.numCharges < this.getChargeNum()
                 		|| !((L2SkillChargeDmg)this).checkCondition(activeChar,activeChar.getTarget(),true))
                 {
@@ -2573,7 +2574,7 @@ public abstract class L2Skill
                 if (e.getEffectType()== L2Effect.EffectType.CHARGE)
                 {
                 	env.skill = SkillTable.getInstance().getInfo(8, effector.getSkillLevel(8));
-                    EffectCharge effect = (EffectCharge) env.target.getEffect(L2Effect.EffectType.CHARGE);
+                    EffectCharge effect = (EffectCharge) env.target.getFirstEffect(L2Effect.EffectType.CHARGE);
                     if (effect != null)
                     {
                     	int effectcharge = effect.getLevel();

@@ -67,7 +67,7 @@ public class L2SkillChargeAtk extends L2Skill {
             }
         }
         
-		EffectCharge effect = (EffectCharge) caster.getEffect(4271);
+		EffectCharge effect = (EffectCharge) caster.getFirstEffect(4271);
 
 		if (effect != null) {
 			if (effect.numCharges < num_charges)

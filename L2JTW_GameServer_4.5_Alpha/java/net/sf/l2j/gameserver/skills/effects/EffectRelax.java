@@ -41,8 +41,14 @@ class EffectRelax extends L2Effect
 	/** Notify started */
 	@Override
 	public void onStart() {
-        setRelax(true);
-		getEffected().getAI().setIntention(CtrlIntention.AI_INTENTION_REST);
+        
+        if(getEffected() instanceof L2PcInstance)
+        {
+        	setRelax(true);
+        	((L2PcInstance)getEffected()).sitDown();
+        }
+        else
+        	getEffected().getAI().setIntention(CtrlIntention.AI_INTENTION_REST);
 		super.onStart();
 	}
 	
@@ -62,8 +68,11 @@ class EffectRelax extends L2Effect
 		if(getEffected().isDead())
             retval = false;
         
-		if(!((L2PcInstance)getEffected()).isSitting())
-            retval = false;
+		if(getEffected() instanceof L2PcInstance)
+		{
+			if(!((L2PcInstance)getEffected()).isSitting())
+				retval = false;
+		}
 		
 		if (getEffected().getCurrentHp()+1 > getEffected().getMaxHp()) {
 			if(getSkill().isToggle())
@@ -103,6 +112,7 @@ class EffectRelax extends L2Effect
     
     private void setRelax(boolean val)
     {
-        ((L2PcInstance)getEffected()).setRelax(val);
+        if(getEffected() instanceof L2PcInstance)
+        	((L2PcInstance)getEffected()).setRelax(val);
     }
 }

@@ -31,6 +31,7 @@ import net.sf.l2j.L2DatabaseFactory;
 
 import net.sf.l2j.gameserver.datatables.ClanTable;
 import net.sf.l2j.gameserver.datatables.SkillTable;
+import net.sf.l2j.gameserver.instancemanager.CastleManager;
 import net.sf.l2j.gameserver.instancemanager.SiegeManager;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.network.SystemMessageId;
@@ -372,7 +373,10 @@ public class L2Clan
 			}
 		}
 		exMember.saveApprenticeAndSponsor(0, 0);
-		
+		if (Config.REMOVE_CASTLE_CIRCLETS)
+		{
+			CastleManager.getInstance().removeCirclet(exMember,getHasCastle());
+		}      
 		if (exMember.isOnline())
 		{
 			L2PcInstance player = exMember.getPlayerInstance();
@@ -470,10 +474,10 @@ public class L2Clan
 		List<L2PcInstance> result = new FastList<L2PcInstance>();
 		for (L2ClanMember temp : _members.values())
 		{
-			if (temp.isOnline() && temp.getPlayerInstance()!=null && !temp.getName().equals(exclude))
-			{
-				result.add(temp.getPlayerInstance());
-			}
+			try	{
+				if (temp.isOnline() && !temp.getName().equals(exclude))
+					result.add(temp.getPlayerInstance());
+			} catch (NullPointerException e) {}
 		}
 		
 		return result.toArray(new L2PcInstance[result.size()]);
@@ -944,14 +948,16 @@ public class L2Clan
                 
             for (L2ClanMember temp : _members.values())
             {
-                if (temp.isOnline() && temp.getPlayerInstance()!=null)
-                {
-                    if (newSkill.getMinPledgeClass() <= temp.getPlayerInstance().getPledgeClass())
-                    {
-                    	temp.getPlayerInstance().addSkill(newSkill, false); // Skill is not saved to player DB
-                        temp.getPlayerInstance().sendPacket(new PledgeSkillListAdd(newSkill.getId(), newSkill.getLevel()));
-                    }
-                }
+                try {
+                	if (temp.isOnline())
+                	{
+                		if (newSkill.getMinPledgeClass() <= temp.getPlayerInstance().getPledgeClass())
+                		{
+                			temp.getPlayerInstance().addSkill(newSkill, false); // Skill is not saved to player DB
+                			temp.getPlayerInstance().sendPacket(new PledgeSkillListAdd(newSkill.getId(), newSkill.getLevel()));
+                		}
+                	}
+                } catch (NullPointerException e) {}
             }
         }
         
@@ -965,11 +971,13 @@ public class L2Clan
         {
             for (L2ClanMember temp : _members.values())
             {
-                if (temp.isOnline() && temp.getPlayerInstance()!=null)
-                {
-                    if (skill.getMinPledgeClass() <= temp.getPlayerInstance().getPledgeClass())
-                    	temp.getPlayerInstance().addSkill(skill, false); // Skill is not saved to player DB
-                }
+                try{
+                	if (temp.isOnline())
+                	{
+                		if (skill.getMinPledgeClass() <= temp.getPlayerInstance().getPledgeClass())
+                			temp.getPlayerInstance().addSkill(skill, false); // Skill is not saved to player DB
+                	}
+                } catch (NullPointerException e) {}
             }
         }
     }
@@ -1006,10 +1014,10 @@ public class L2Clan
 	{
 		for (L2ClanMember member : _members.values())
 		{
-			if (member.isOnline() && member.getPlayerInstance() != null)
-			{
-				member.getPlayerInstance().sendPacket(packet);
-			}
+			try {
+				if (member.isOnline())
+					member.getPlayerInstance().sendPacket(packet);
+			} catch (NullPointerException e) {}
 		}
 	}
 	
@@ -1017,10 +1025,10 @@ public class L2Clan
 	{
 		for (L2ClanMember member : _members.values())
 		{
-			if (member.isOnline() && member.getPlayerInstance() != null && member.getPlayerInstance() != player)
-			{
-				member.getPlayerInstance().sendPacket(packet);
-			}
+			try {
+				if (member.isOnline() && member.getPlayerInstance() != player)
+					member.getPlayerInstance().sendPacket(packet);
+			} catch (NullPointerException e) {}
 		}
 	}
 	
