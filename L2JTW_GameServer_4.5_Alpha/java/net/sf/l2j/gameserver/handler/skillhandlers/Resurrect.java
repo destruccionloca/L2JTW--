@@ -73,7 +73,7 @@ public class Resurrect implements ISkillHandler
         if (targetToRes.size() == 0)
         {
             activeChar.abortCast();
-            activeChar.sendPacket(SystemMessage.sendString("目標錯誤."));
+            activeChar.sendPacket(SystemMessage.sendString("目標錯誤"));
         }
         
         for (L2Character cha: targetToRes)

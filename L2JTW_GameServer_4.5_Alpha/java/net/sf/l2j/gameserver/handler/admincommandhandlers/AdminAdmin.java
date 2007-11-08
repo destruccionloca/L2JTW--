@@ -258,6 +258,11 @@ public class AdminAdmin implements IAdminCommandHandler {
 					activeChar.sendMessage("數值 "+pName+" 成功設定為 "+pValue);
 				else 
 					activeChar.sendMessage("錯誤設定值");
+				
+				 if (command.equals("admin_config_option"))      showOptionConfigPage(activeChar);
+			        if (command.equals("admin_config_altsetting"))  showAltsetConfigPage(activeChar);
+			        if (command.equals("admin_config_other"))       showOtherConfigPage(activeChar);
+			        if (command.equals("admin_config_rate"))        showRateConfigPage(activeChar);
 			}
 			catch(Exception e)
 			{

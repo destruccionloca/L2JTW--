@@ -763,7 +763,7 @@ public class GeoEngine extends GeoData
 	        short height=-1;
 			if(layers <= 0 || layers > 125)
 			{
-				_log.warning("Geo Engine: - invalid layers count: "+layers+" at: "+geox+" "+geoy);				
+				_log.warning("Broken geofile (case1), region: "+region+" - invalid layer count: "+layers+" at: "+geox+" "+geoy);				
 	            return (short)z;
 			}
 	        short temph = Short.MIN_VALUE;
@@ -838,7 +838,7 @@ public class GeoEngine extends GeoData
 	        index++;
 			if(layers <= 0 || layers > 125)
 			{
-				_log.warning("Geo Engine: - invalid layers count: "+layers+" at: "+geox+" "+geoy);				
+				_log.warning("Broken geofile (case2), region: "+region+" - invalid layer count: "+layers+" at: "+geox+" "+geoy);				
 	            return (short)zmin;
 			}			
 	        while(layers > 0)
@@ -930,7 +930,7 @@ public class GeoEngine extends GeoData
 	        short height=-1;		 
 	        if(layers <= 0 || layers > 125)		 
 	        {		     
-                _log.warning("Geo Engine: - invalid layers count: "+layers+" at: "+x+" "+y);
+	        	_log.warning("Broken geofile (case3), region: "+region+" - invalid layer count: "+layers+" at: "+x+" "+y);
 	            return z;
 	        }		
 	        short tempz = Short.MIN_VALUE;
@@ -1025,7 +1025,7 @@ public class GeoEngine extends GeoData
 	        short height=-1;		 
 	        if(layers <= 0 || layers > 125)
 	        {
-	        	_log.warning("Geo Engine: - invalid layers count: "+layers+" at: "+x+" "+y);
+	        	_log.warning("Broken geofile (case4), region: "+region+" - invalid layer count: "+layers+" at: "+x+" "+y);
 	            return false;
 	        }
 	        short tempz = Short.MIN_VALUE; // big negative value
@@ -1147,7 +1147,7 @@ public class GeoEngine extends GeoData
 	        short height=-1;		 
 	        if(layers <= 0 || layers > 125)		 
 	        {		     
-	        	_log.warning("Geo Engine: - invalid layers count: "+layers+" at: "+x+" "+y);
+	        	_log.warning("Broken geofile (case5), region: "+region+" - invalid layer count: "+layers+" at: "+x+" "+y);
 	            return 15;
 	        }
 	        short tempz = Short.MIN_VALUE;
