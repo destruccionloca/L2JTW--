@@ -1257,7 +1257,14 @@ public final class Formulas
 			//Skill Race : Bug
 			if (raceId == 4301) damage *= attacker.getPAtkInsects(target);
 		}
-
+        if (shld)
+        {
+            if (100 - Config.ALT_PERFECT_SHLD_BLOCK < Rnd.get(100)) 
+            {
+                damage = 1;
+                target.sendPacket(new SystemMessage(SystemMessageId.YOUR_EXCELLENT_SHIELD_DEFENSE_WAS_A_SUCCESS));
+            }
+        }
 		if (damage > 0 && damage < 1)
 		{
 			damage = 1;
@@ -1538,30 +1545,22 @@ public final class Formulas
 	}
 
 
-    /** Calculate delay (in milliseconds) before next ATTACK */
-   /*
-	public final int calcPAtkSpd(@SuppressWarnings("unused") L2Character attacker, @SuppressWarnings("unused") L2Character target, double rate)
-    {
-//  will fix freeze at >1800 atkspd, optimum calcation between 0 to 1700
-        if (L2Character._isNPC)
-    return (int)(((Math.pow(rate, 2)-4000*rate + 4074102.5641)/1900+15));
-        else
-    return (int)(((Math.pow(rate, 2)-4000*rate + 4074102.5641)/1900+15)*0.80);
-    
-    }
-	*/
-
-    public final int calcPAtkSpd(@SuppressWarnings("unused")
-    		L2Character attacker, @SuppressWarnings("unused")
-    		L2Character target, double rate)
-    		{
-    			// measured Oct 2006 by Tank6585, formula by Sami
+	/** Calculate delay (in milliseconds) before next ATTACK */
+	public final int calcPAtkSpd(@SuppressWarnings("unused")
+	L2Character attacker, @SuppressWarnings("unused")
+	L2Character target, double rate)
+	{
     	if (L2Character._isNPC)
     	    return (int)(((Math.pow(rate, 2)-4000*rate + 4074102.5641)/1900+15));
-    	
-    			if(rate < 2) return 2700;
-    		    else return (int)(460000/rate);
-    		}
+		// measured Oct 2006 by Tank6585, formula by Sami
+		// attack speed 312 equals 1500 ms delay... (or 300 + 40 ms delay?)
+		if(rate < 2) return 2700;
+	    else return (int)(470000/rate);
+	}
+
+    /** Calculate delay (in milliseconds) before next ATTACK */
+
+
 
 	/** Calculate delay (in milliseconds) for skills cast */
 	public final int calcMAtkSpd(L2Character attacker, @SuppressWarnings("unused")

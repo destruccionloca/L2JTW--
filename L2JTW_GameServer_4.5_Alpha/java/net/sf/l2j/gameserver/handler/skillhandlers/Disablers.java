@@ -83,7 +83,6 @@ public class Disablers implements ISkillHandler
             
         }
 
-        _log.warning("Debug: Aura Skill Casting now...");
         
         if (weaponInst != null)
         {
@@ -176,17 +175,8 @@ public class Disablers implements ISkillHandler
 	
                     if (target instanceof L2Attackable)
                         ((L2Attackable)target).addDamageHate(activeChar, 0, 500);
-                    L2Effect[] effects = target.getAllEffects();
-                    for (L2Effect e : effects)
-                    {
-                        if (e.getSkill().getSkillType() == type) oldeffect = true;
-                    }
-                    if (Formulas.getInstance().calcSkillSuccess(activeChar, target, skill, ss, sps, bss))                
-                    {
-                        //if(target.reflectSkill(skill))
-                        //	target = activeChar;
-                        skill.getEffects(activeChar, target);
-                    }
+                   if (Formulas.getInstance().calcSkillSuccess(activeChar, target, skill, ss, sps, bss))                    
+                    	skill.getEffects(activeChar, target);
 
 
 
@@ -234,20 +224,8 @@ public class Disablers implements ISkillHandler
                     if (target instanceof L2Attackable)
                         ((L2Attackable)target).addDamageHate(activeChar, 0, 500);
                     
-                    L2Effect[] effects = target.getAllEffects();
-                    for (L2Effect e : effects)
-                    {
-                        if (e.getSkill().getSkillType() == type) oldeffect = true;
-                    }
-                    if (Formulas.getInstance().calcSkillSuccess(activeChar, target, skill, ss, sps, bss))          
-                    {
-                    	//if(target.reflectSkill(skill))
-                        //	target = activeChar;
-                        skill.getEffects(activeChar, target);
-                    }
-
-                
-
+                    if (Formulas.getInstance().calcSkillSuccess(activeChar, target, skill, ss, sps, bss))                    
+                    	skill.getEffects(activeChar, target);        
                     else
                     {
                         if (activeChar instanceof L2PcInstance)
@@ -290,12 +268,7 @@ public class Disablers implements ISkillHandler
 
 					if(target.reflectSkill(skill))
                     	target = activeChar;
-//                	 stop same type effect if avaiable
-                    L2Effect[] effects = target.getAllEffects();
-                    for (L2Effect e : effects)
-                    {
-                        if (e.getSkill().getSkillType() == type) oldeffect=true;
-                    }
+
                     if (Formulas.getInstance().calcSkillSuccess(activeChar, target, skill, ss, sps, bss))
                     {
 
@@ -307,15 +280,16 @@ public class Disablers implements ISkillHandler
                         // Make above skills mdef dependant	        		
 
 
-                        if (Formulas.getInstance().calcSkillSuccess(activeChar, target, skill, ss, sps, bss))          
-                        {
-                        	//if(target.reflectSkill(skill))
-                           // 	target = activeChar;
-                            skill.getEffects(activeChar, target);
-                        }
-
-
-                        else
+                       L2Effect[] effects = target.getAllEffects();
+                        for (L2Effect e : effects)                        
+                            if (e.getSkill().getSkillType() == type)
+                            	e.exit();
+                        // then restart
+                        // Make above skills mdef dependant	        		
+                        if (Formulas.getInstance().calcSkillSuccess(activeChar, target, skill, ss, sps, bss))
+                        //if(Formulas.getInstance().calcMagicAffected(activeChar, target, skill))
+                            skill.getEffects(activeChar, target);                        
+                       else
                         {
                             if (activeChar instanceof L2PcInstance)
                             {
@@ -777,8 +751,10 @@ public class Disablers implements ISkillHandler
         	{
         		if (e.getSkill().getSkillType() == type || (e.getSkill().getEffectType() != null && e.getSkill().getEffectType() == type)) {
         			if (skillId != 0)
+        			{
         				if (skillId == e.getSkill().getId())
         					e.exit();
+        			}
         			else
         				e.exit();
         		}
@@ -786,8 +762,10 @@ public class Disablers implements ISkillHandler
         	else if ((e.getSkill().getSkillType() == type && e.getSkill().getPower() <= power) 
         			|| (e.getSkill().getEffectType() != null && e.getSkill().getEffectType() == type && e.getSkill().getEffectLvl() <= power)) {
     			if (skillId != 0)
+    			{
     				if (skillId == e.getSkill().getId())
     					e.exit();
+    			}
     			else
     				e.exit();
         	}

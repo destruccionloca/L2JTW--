@@ -296,7 +296,7 @@ public class AdminEditChar implements IAdminCommandHandler
 				}
 				player.setTitle(val);
 				player.sendMessage("被管理者更改稱號");
-				player.broadcastUserInfo();
+				player.broadcastTitleInfo();
 			}
 			catch (StringIndexOutOfBoundsException e)
 			{   //Case of empty character title

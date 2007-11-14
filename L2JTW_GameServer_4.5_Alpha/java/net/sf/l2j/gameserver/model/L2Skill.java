@@ -2311,12 +2311,14 @@ public abstract class L2Skill
                             	}
                             }
 
-                            targetList.add((L2Character) obj);
+                            
                         	
                         	if (((L2Summon)obj).isInsideZone(L2Character.ZONE_PEACE)) continue;
                         }
 
-                            }}
+                            }
+                            targetList.add((L2Character) obj);
+                    }
                     if (targetList.size() == 0) return null;
                     return targetList.toArray(new L2Character[targetList.size()]);
                  }

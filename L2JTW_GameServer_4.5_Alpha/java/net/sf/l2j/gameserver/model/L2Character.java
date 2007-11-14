@@ -218,7 +218,7 @@ public abstract class L2Character extends L2Object
 	{
 		if (state)
 			_currentZones |= zone;
-		else
+		else if (isInsideZone(zone)) // zone overlap possible
 			_currentZones ^= zone;
 	}
 
@@ -682,7 +682,8 @@ public abstract class L2Character extends L2Object
 		if (isAttackingDisabled())
             return;
 
-		if (this instanceof L2PcInstance) {
+		if (this instanceof L2PcInstance) 
+		{
 	        if (((L2PcInstance)this).inObserverMode())
 	        {
 	            sendPacket(new SystemMessage(SystemMessageId.OBSERVERS_CANNOT_PARTICIPATE));
@@ -693,13 +694,15 @@ public abstract class L2Character extends L2Object
 	        if (target instanceof L2PcInstance)
 	        {
 		        if (((L2PcInstance)target).isCursedWeaponEquiped() && ((L2PcInstance)this).getLevel()<=20){
-		        	((L2PcInstance)this).sendMessage("無法進行攻擊");
+		        	((L2PcInstance)this).sendMessage("無法在等級低於21下進行攻擊");
 		        	sendPacket(new ActionFailed());
 		        	return;
 		        }
 
 		        if (((L2PcInstance)this).isCursedWeaponEquiped() && ((L2PcInstance)target).getLevel()<=20){
-		        	((L2PcInstance)this).sendMessage("無法進行攻擊");
+
+		        	((L2PcInstance)this).sendMessage("無法攻擊新手玩家");
+
 		        	sendPacket(new ActionFailed());
 		        	return;
 		        }
@@ -819,11 +822,11 @@ public abstract class L2Character extends L2Object
             wasSSCharged = (weaponInst != null && weaponInst.getChargedSoulshot() != L2ItemInstance.CHARGED_NONE);
 
 		// Get the Attack Speed of the L2Character (delay (in milliseconds) before next attack)
-		int sAtk = calculateAttackSpeed(target, weaponInst);
+		int timeAtk = calculateTimeBetweenAttacks(target, weaponItem);
 		// the hit is calculated to happen halfway to the animation - might need further tuning e.g. in bow case
-		int sAtkHitMoment = sAtk/2;
+		int timeToHit = timeAtk/2;
 		_attackEndTime = GameTimeController.getGameTicks();
-		_attackEndTime += (sAtk / GameTimeController.MILLIS_IN_TICK);
+		_attackEndTime += (timeAtk / GameTimeController.MILLIS_IN_TICK);
 		_attackEndTime -= 1;
 
         int ssGrade = 0;
@@ -840,23 +843,22 @@ public abstract class L2Character extends L2Object
 		setAttackingBodypart();
 
 		// Get the Attack Reuse Delay of the L2Weapon
-		int reuse = (weaponItem == null) ? 0 : weaponItem.getAttackReuseDelay();
-		reuse *= getStat().getReuseModifier(target);
+		int reuse = calculateReuseTime(target, weaponItem);
 
 		// Select the type of attack to start
 		
 		_isFirstAtk = true;
 
 		if (weaponItem == null)
-			hitted = doAttackHitSimple(attack, target, sAtkHitMoment);
+			hitted = doAttackHitSimple(attack, target, timeToHit);
 		else if (weaponItem.getItemType() == L2WeaponType.BOW)
-			hitted = doAttackHitByBow(attack, target, sAtk, reuse);
+			hitted = doAttackHitByBow(attack, target, timeAtk, reuse);
 		else if (weaponItem.getItemType() == L2WeaponType.POLE)
-			hitted = doAttackHitByPole(attack, sAtkHitMoment);
+			hitted = doAttackHitByPole(attack, timeToHit);
 		else if (isUsingDualWeapon() || weaponItem.getItemType() == L2WeaponType.DUAL || weaponItem.getItemType() == L2WeaponType.DUALFIST)
-	        hitted = doAttackHitByDual(attack, target, sAtkHitMoment);
+	        hitted = doAttackHitByDual(attack, target, timeToHit);
 		else
-			hitted = doAttackHitSimple(attack, target, sAtkHitMoment);
+			hitted = doAttackHitSimple(attack, target, timeToHit);
 
         // Flag the attacker if it's a L2PcInstance outside a PvP area
         L2PcInstance player = null;
@@ -911,8 +913,9 @@ public abstract class L2Character extends L2Object
 			broadcastPacket(attack);
 
 		// Notify AI with EVT_READY_TO_ACT
-		//ThreadPoolManager.getInstance().scheduleAi(new NotifyAITask(CtrlEvent.EVT_READY_TO_ACT), sAtk+reuse);
-		ThreadPoolManager.getInstance().scheduleAi(new NotifyAITask(CtrlEvent.EVT_READY_TO_ACT), sAtk+reuse);
+
+		ThreadPoolManager.getInstance().scheduleAi(new NotifyAITask(CtrlEvent.EVT_READY_TO_ACT), timeAtk+reuse);
+
 	}
 
 	/**
@@ -976,9 +979,6 @@ public abstract class L2Character extends L2Object
 			damage1 = (int)Formulas.getInstance().calcPhysDam(this, target, null, shld1, crit1, false, attack.soulshot);
 
 		}
-
-		// Double check the bow re-use delay
-		if (reuse == 0) reuse = 1500;
 
 		// Check if the L2Character is a L2PcInstance
 		if (this instanceof L2PcInstance)
@@ -4252,7 +4252,7 @@ public abstract class L2Character extends L2Object
 	 * @param offset The size of the interaction area of the L2Character targeted
 	 *
 	 */
-	protected void moveToLocation(int x, int y, int z, int offset)
+	protected synchronized void moveToLocation(int x, int y, int z, int offset)
 	{
 		// Get the Move Speed of the L2Charcater
 		float speed = getStat().getMoveSpeed();
@@ -4356,22 +4356,6 @@ public abstract class L2Character extends L2Object
 				z = destiny.getZ();
 				distance = Math.sqrt((x - curX)*(x - curX) + (y - curY)*(y - curY));
 				
-				// If no distance to go through, the movement is canceled
-				if (distance < 1)
-				{
-					sin = 0;
-					cos = 1;
-					distance = 0;
-					x = curX;
-					y = curY;
-
-					if (Config.DEBUG) _log.fine("already in range, no movement needed.");
-
-					// Notify the AI that the L2Character is arrived at destination
-					getAI().notifyEvent(CtrlEvent.EVT_ARRIVED, null);
-
-					return;
-				}
 			}
 			// Pathfinding checks. Only when geodata setting is 2, the LoS check gives shorter result
 			// than the original movement was and the LoS gives a shorter distance than 2000
@@ -4386,7 +4370,7 @@ public abstract class L2Character extends L2Object
 					int gy = (curY - L2World.MAP_MIN_Y) >> 4;
 				
                 	m.geoPath = GeoPathFinding.getInstance().findPath(gx, gy, (short)curZ, gtx, gty, (short)originalZ);
-                	if (m.geoPath == null) // No path found
+                	if (m.geoPath == null || m.geoPath.size() < 2) // No path found
                 	{
                 		// Even though there's no path found (remember geonodes aren't perfect), 
                 		// the mob is attacking and right now we set it so that the mob will go
@@ -4395,7 +4379,6 @@ public abstract class L2Character extends L2Object
                 				|| (!(this instanceof L2PlayableInstance) && Math.abs(z - curZ) > 140)
                 				|| (this instanceof L2Summon && !((L2Summon)this).getFollowStatus())) 
                 		{
-                			getAI().stopFollow();
                 			getAI().setIntention(CtrlIntention.AI_INTENTION_IDLE);
                 			return;
                 		}
@@ -4409,18 +4392,6 @@ public abstract class L2Character extends L2Object
                 	}
                 	else
                 	{
-                		// check for doors in the route
-                		for (int i = 0; i < m.geoPath.size()-1; i++)
-                		{
-                			if (DoorTable.getInstance().checkIfDoorsBetween(m.geoPath.get(i),m.geoPath.get(i+1)))
-                			{
-                				m.geoPath = null;
-                				getAI().stopFollow();
-                				getAI().setIntention(CtrlIntention.AI_INTENTION_IDLE);
-                				return;
-                			}
-                		}
-                		m.geoPath.get(m.geoPath.size()-1).getX();
                 		m.onGeodataPathIndex = 0; // on first segment
                 		m.geoPathGtx = gtx;
                 		m.geoPathGty = gty;
@@ -4430,6 +4401,23 @@ public abstract class L2Character extends L2Object
                 		x = m.geoPath.get(m.onGeodataPathIndex).getX();
                 		y = m.geoPath.get(m.onGeodataPathIndex).getY();
                 		z = m.geoPath.get(m.onGeodataPathIndex).getZ();
+                		
+                		// check for doors in the route
+                		if (DoorTable.getInstance().checkIfDoorsBetween(curX, curY, curZ, x, y, z))
+            			{
+            				m.geoPath = null;
+            				getAI().setIntention(CtrlIntention.AI_INTENTION_IDLE);
+            				return;
+            			}
+                		for (int i = 0; i < m.geoPath.size()-1; i++)
+                		{
+                			if (DoorTable.getInstance().checkIfDoorsBetween(m.geoPath.get(i),m.geoPath.get(i+1)))
+                			{
+                				m.geoPath = null;
+                				getAI().setIntention(CtrlIntention.AI_INTENTION_IDLE);
+                				return;
+                			}
+                		}
 
                 		// not in use: final check if we can indeed reach first path node (path nodes sometimes aren't accurate enough)
                 		// but if the node is very far, then a shorter check (like 3 blocks) would be enough
@@ -4452,7 +4440,25 @@ public abstract class L2Character extends L2Object
                 		cos = dx/distance;
                 	}
 				}
-			}	
+			}
+			// If no distance to go through, the movement is canceled
+			if (distance < 1 && (Config.GEODATA == 2 
+					|| this instanceof L2PlayableInstance 
+					|| this instanceof L2RiftInvaderInstance))
+			{
+				sin = 0;
+				cos = 1;
+				distance = 0;
+				x = curX;
+				y = curY;
+
+				if (Config.DEBUG) _log.fine("already in range, no movement needed.");
+
+				// Notify the AI that the L2Character is arrived at destination
+				getAI().notifyEvent(CtrlEvent.EVT_ARRIVED, null);
+				getAI().setIntention(CtrlIntention.AI_INTENTION_IDLE); //needed?
+				return;
+			}
 		}
 
 		// Caclulate the Nb of ticks between the current position and the destination
@@ -5415,52 +5421,56 @@ public abstract class L2Character extends L2Object
 	/**
 	 * Return the Attack Speed of the L2Character (delay (in milliseconds) before next attack).<BR><BR>
 	 */
-	public int calculateAttackSpeed(L2Character target, @SuppressWarnings("unused") L2ItemInstance weaponInst)
+	public int calculateTimeBetweenAttacks(L2Character target, L2Weapon weapon)
 	{
 		int atkSpd = 0;
         
-        if (this instanceof L2Summon)
-        {
 
-            _isNPC = true;
-            
-        } 
-        else if(this instanceof L2Attackable)
-        {
+		if (weapon !=null)
+		{
+			switch (weapon.getItemType())
+			{
+			case BOW:
+				atkSpd = getStat().getPAtkSpd();
+				return (int)(1500*345/atkSpd);
+			case DAGGER:
+				atkSpd = getStat().getPAtkSpd();
+				//atkSpd /= 1.15;
+				break;
+			default:
+				atkSpd = getStat().getPAtkSpd();
 
-            
-            _isNPC = true;
-
-        } 
-        else if(this instanceof L2PcInstance)
-        {
-
-            /*
-    		L2Weapon weapon = this.getActiveWeaponItem();
-
-    		if (weapon !=null)
-    		{
-    			switch (weapon.getItemType())
-    			{
-    				//case DAGGER:
-    					//atkSpd = getStat().getPAtkSpd();
-    					//atkSpd /= 1.05;
-    					//break;
-    				default:
-    					atkSpd = getStat().getPAtkSpd();
-
-				}
 			}
-			*/
-            _isNPC = false;
-            
-        }
+
+		}
+		else
+			atkSpd = getPAtkSpd();
 
         atkSpd = getStat().getPAtkSpd();
         
 		return Formulas.getInstance().calcPAtkSpd(this, target, atkSpd);
 	}
-
+	
+	public int calculateReuseTime(L2Character target, L2Weapon weapon)
+	{
+		if (weapon == null) return 0;
+		
+		int reuse = weapon.getAttackReuseDelay();
+		// only bows should continue for now
+		if (reuse == 0) return 0; 
+		// else if (reuse < 10) reuse = 1500;
+		
+		reuse *= getStat().getReuseModifier(target);
+		double atkSpd = getStat().getPAtkSpd();
+		switch (weapon.getItemType())
+		{
+			case BOW:
+				return (int)(reuse*345/atkSpd);
+			default:
+				return (int)(reuse*312/atkSpd);
+		}
+	}
+	
 	/**
 	 * Return True if the L2Character use a dual weapon.<BR><BR>
 	 */
