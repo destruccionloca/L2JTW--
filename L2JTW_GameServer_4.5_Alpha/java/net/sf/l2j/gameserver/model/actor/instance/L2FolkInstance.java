@@ -52,17 +52,18 @@ public class L2FolkInstance extends L2NpcInstance
 	public void showSkillList(L2PcInstance player, ClassId classId)
 	{
 		if (Config.DEBUG)
-            _log.fine("SkillList activated on: "+getObjectId());
+			_log.fine("SkillList activated on: "+getObjectId());
 
-        int npcId = getTemplate().npcId;
+		int npcId = getTemplate().npcId;
 
 		if (_classesToTeach == null)
-        {
+		{
 			NpcHtmlMessage html = new NpcHtmlMessage(getObjectId());
             TextBuilder sb = new TextBuilder();
             sb.append("<html><head><body>");
-            sb.append("我無法交你任何東西.<br> 請告知管理員修正.<br>NPC編號:"+npcId+", 你的職業編號:"+player.getClassId().getId()+"<br>");
+            sb.append("我無法交你任何東西.<br> 請告知管理員修正.<br>NPC編號:"+npcId+", 職業編號:"+player.getClassId().getId()+"<br>");
             sb.append("</body></html>");
+
 			html.setHtml(sb.toString());
 			player.sendPacket(html);
 
@@ -74,6 +75,7 @@ public class L2FolkInstance extends L2NpcInstance
         {
 			NpcHtmlMessage html = new NpcHtmlMessage(getObjectId());
             TextBuilder sb = new TextBuilder();
+
             sb.append("<html><head><body>");
             sb.append("我無法交你任何東西.<br> 你必須尋找你所屬職業的教師.");
             sb.append("</body></html>");
@@ -143,7 +145,7 @@ public class L2FolkInstance extends L2NpcInstance
         {
             NpcHtmlMessage html = new NpcHtmlMessage(getObjectId());
             TextBuilder sb = new TextBuilder();
-            sb.append("<html><head><body>");
+            sb.append("<html><body>");
             sb.append("I cannot teach you. My class list is empty.<br> Ask admin to fix it. Need add my npcid and classes to skill_learn.sql.<br>NpcId:"+npcId+", Your classId:"+player.getClassId().getId()+"<br>");
             sb.append("</body></html>");
             html.setHtml(sb.toString());
@@ -156,7 +158,7 @@ public class L2FolkInstance extends L2NpcInstance
         {
             NpcHtmlMessage html = new NpcHtmlMessage(getObjectId());
             TextBuilder sb = new TextBuilder();
-            sb.append("<html><head><body>");
+            sb.append("<html><body>");
             sb.append("I cannot teach you any skills.<br> You must find your current class teachers.");
             sb.append("</body></html>");
             html.setHtml(sb.toString());
@@ -168,7 +170,7 @@ public class L2FolkInstance extends L2NpcInstance
         {
         	NpcHtmlMessage html = new NpcHtmlMessage(getObjectId());
             TextBuilder sb = new TextBuilder();
-            sb.append("<html><head><body>");
+            sb.append("<html><body>");
             sb.append("You must have 3rd class change quest completed.");
             sb.append("</body></html>");
             html.setHtml(sb.toString());
@@ -190,7 +192,7 @@ public class L2FolkInstance extends L2NpcInstance
         }
         if (counts == 0)
         {
-        	player.sendPacket(new SystemMessage(SystemMessageId.THERE_IS_NO_SKILL_THAT_ENABLES_ENCHANT));
+            player.sendPacket(new SystemMessage(SystemMessageId.THERE_IS_NO_SKILL_THAT_ENABLES_ENCHANT));
             NpcHtmlMessage html = new NpcHtmlMessage(getObjectId());
             int level = player.getLevel();
 
@@ -203,7 +205,7 @@ public class L2FolkInstance extends L2NpcInstance
             else
             {
                 TextBuilder sb = new TextBuilder();
-                sb.append("<html><head><body>");
+                sb.append("<html><body>");
                 sb.append("You've learned all skills for your class.<br>");
                 sb.append("</body></html>");
                 html.setHtml(sb.toString());
@@ -248,23 +250,28 @@ public class L2FolkInstance extends L2NpcInstance
 						}
 					}
 
+
 					String text =
-						"<html>\n"+
-						"<body>\n"+
-						"<center>技能學習:</center>\n"+
-						"<br>\n";
+						"<html>"+
+						"<body>"+
+						"<center>技能學習:</center>"+
+						"<br>";
+
+
 
 					if (!own_class)
                     {
 						String mages = player.getClassId().isMage() ? "fighters" : "mages";
 						text +=
 
-							 "所屬職業是最簡單學習的.<br>\n"+
-	                            "其他職業有點困難.<br>\n"+
-	                            "其他種族將會更難學習.<br>\n"+
+
+							 "所屬職業是最簡單學習的.<br>"+
+	                            "其他職業有點困難.<br>"+
+	                            "其他種族將會更難學習.<br>"+
 	                            "你也可以學習 "+mages+" 的技能, 但是他們更難去學習!"+
-	                            "<br>\n"+
-	                            "<br>\n";
+	                            "<br>"+
+	                            "<br>";
+
 
 					}
 
@@ -297,12 +304,11 @@ public class L2FolkInstance extends L2NpcInstance
                     }
                     else
                     {
-                        text += "No Skills.<br>\n";
+                        text += "No Skills.<br>";
                     }
 
 					text +=
-						"</body>\n"+
-						"</html>";
+						"</body></html>";
 
 					insertObjectIdAndShowChatWindow(player, text);
 					player.sendPacket( new ActionFailed() );

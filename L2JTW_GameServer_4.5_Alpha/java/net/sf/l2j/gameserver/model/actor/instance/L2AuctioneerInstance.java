@@ -491,7 +491,9 @@ public final class L2AuctioneerInstance extends L2FolkInstance
             	SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
                 if (!((player.getClanPrivileges() & L2Clan.CP_CH_AUCTION) == L2Clan.CP_CH_AUCTION))
                 {
+
                     player.sendMessage("Åv­­¤£¨¬!");
+
                     return;
                 }
                 try

@@ -7616,10 +7616,11 @@ public final class L2PcInstance extends L2PlayableInstance
 		return false;
 	}
 
-	public void setMountType(int mountType)
+	// returns false if the change of mount type fails.
+	public boolean setMountType(int mountType)
 	{
-		if (checkLandingState() && mountType !=0)
-			return;
+		if (checkLandingState() && mountType ==2)
+			return false;
 
 		switch(mountType)
 		{
@@ -7645,7 +7646,7 @@ public final class L2PcInstance extends L2PlayableInstance
 		// Send a Server->Client packet InventoryUpdate to the L2PcInstance in order to update speed
 		UserInfo ui = new UserInfo(this);
 		sendPacket(ui);
-
+		return true;
 	}
 
 	/**
@@ -8874,12 +8875,15 @@ public final class L2PcInstance extends L2PlayableInstance
 			// if the rent of a wyvern expires while over a flying zone, tp to down before unmounting
 			if (checkLandingState() && getMountType()==2)
 				teleToLocation(MapRegionTable.TeleportWhereType.Town);
-			_taskRentPet.cancel(true);
-			Ride dismount = new Ride(getObjectId(), Ride.ACTION_DISMOUNT, 0);
-			sendPacket(dismount);
-			broadcastPacket(dismount);
-			_taskRentPet = null;
-			setMountType(0);
+			
+			if(setMountType(0))  // this should always be true now, since we teleported already
+			{
+				_taskRentPet.cancel(true);
+				Ride dismount = new Ride(getObjectId(), Ride.ACTION_DISMOUNT, 0);
+				sendPacket(dismount);
+				broadcastPacket(dismount);
+				_taskRentPet = null;
+			}			
 		}
 	}
 

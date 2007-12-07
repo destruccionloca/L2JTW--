@@ -25,7 +25,6 @@ import java.util.logging.Logger;
 
 import net.sf.l2j.L2DatabaseFactory;
 import net.sf.l2j.gameserver.cache.CrestCache;
-import net.sf.l2j.gameserver.idfactory.BitSetIDFactory;
 import net.sf.l2j.gameserver.idfactory.IdFactory;
 import net.sf.l2j.gameserver.model.L2Clan;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
@@ -52,10 +51,12 @@ public final class RequestExSetPledgeCrestLarge extends L2GameClientPacket
 	protected void readImpl()
 	{
 		_size = readD();
+		if(_size > 2176)
+			return;
 		if(_size > 0) // client CAN send a RequestExSetPledgeCrestLarge with the size set to 0 then format is just chd
 		{
 			_data = new byte[_size];
-			readB(_data);;
+			readB(_data);
 		}
 	}
 
@@ -85,7 +86,7 @@ public final class RequestExSetPledgeCrestLarge extends L2GameClientPacket
             return;
 		}
 
-		if (_data.length > 2176)
+		if (_size > 2176)
         {
         	activeChar.sendMessage("The insignia file size is greater than 2176 bytes.");
         	return;

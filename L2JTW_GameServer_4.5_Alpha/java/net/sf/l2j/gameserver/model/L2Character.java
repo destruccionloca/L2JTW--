@@ -19,6 +19,7 @@
 package net.sf.l2j.gameserver.model;
 
 import static net.sf.l2j.gameserver.ai.CtrlIntention.AI_INTENTION_ATTACK;
+import static net.sf.l2j.gameserver.ai.CtrlIntention.AI_INTENTION_FOLLOW;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -396,10 +397,10 @@ public abstract class L2Character extends L2Object
 
 	public void onTeleported()
 	{
-		setIsTeleporting(false);
-
 		spawnMe(getPosition().getX(), getPosition().getY(), getPosition().getZ());
 
+		setIsTeleporting(false);
+		
 		if (_isPendingRevive) doRevive();
 
 		// Modify the position of the pet if necessary
@@ -615,8 +616,6 @@ public abstract class L2Character extends L2Object
 
 		if (!(this instanceof L2PcInstance))
             onTeleported();
-		else
-			((L2PcInstance)this).revalidateZone(true);
 	}
 
 	public void teleToLocation(int x, int y, int z) { teleToLocation(x, y, z, false); }
@@ -4386,8 +4385,10 @@ public abstract class L2Character extends L2Object
 		final int curZ = super.getZ();
 
 		// Calculate distance (dx,dy) between current position and destination
+        // TODO: improve Z axis move/follow support when dx,dy are small compared to dz
 		double dx = (x - curX);
 		double dy = (y - curY);
+		double dz = (z - curZ);
 		double distance = Math.sqrt(dx*dx + dy*dy);
 
 		if (Config.DEBUG) _log.fine("distance to target:" + distance);
@@ -4408,6 +4409,11 @@ public abstract class L2Character extends L2Object
 		// Check if a movement offset is defined or no distance to go through
 		if (offset > 0 || distance < 1)
 		{
+			// approximation for moving closer when z coordinates are different
+			// TODO: handle Z axis movement better
+			offset -= Math.abs(dz);  
+			if (offset < 5) offset = 5;
+
 			// If no distance to go through, the movement is canceled
 			if (distance < 1 || distance - offset  <= 0)
 			{
@@ -4460,7 +4466,8 @@ public abstract class L2Character extends L2Object
 			// when geodata == 2, for all characters except mobs returning home (could be changed later to teleport if pathfinding fails)
 			// when geodata == 1, for l2playableinstance and l2riftinstance only
 			if ((Config.GEODATA == 2 &&	!(this instanceof L2Attackable && ((L2Attackable)this).isReturningToSpawnPoint())) 
-					|| this instanceof L2PlayableInstance 
+					|| this instanceof L2PcInstance 
+					|| (this instanceof L2Summon && !(this.getAI().getIntention() == AI_INTENTION_FOLLOW)) // assuming intention_follow only when following owner
 					|| this instanceof L2RiftInvaderInstance)
 			{
 				if (isOnGeodataPath())
@@ -4583,9 +4590,7 @@ public abstract class L2Character extends L2Object
 				x = curX;
 				y = curY;
 
-				if (Config.DEBUG) _log.fine("already in range, no movement needed.");
-
-				// Notify the AI that the L2Character is arrived at destination
+				if(this instanceof L2Summon) ((L2Summon)this).setFollowStatus(false);
 				getAI().notifyEvent(CtrlEvent.EVT_ARRIVED, null);
 				getAI().setIntention(CtrlIntention.AI_INTENTION_IDLE); //needed?
 				return;
@@ -4840,7 +4845,7 @@ public abstract class L2Character extends L2Object
     }
 
     /**
-     * Check if this object is inside the given radius around the given object.<BR><BR>
+     * Check if this object is inside the given radius around the given object. Warning: doesn't cover collision radius!<BR><BR>
      *
      * @param object   the target
      * @param radius  the radius around the target
@@ -4855,7 +4860,7 @@ public abstract class L2Character extends L2Object
         return isInsideRadius(object.getX(), object.getY(), object.getZ(), radius, checkZ, strictCheck);
     }
     /**
-     * Check if this object is inside the given plan radius around the given point.<BR><BR>
+     * Check if this object is inside the given plan radius around the given point. Warning: doesn't cover collision radius!<BR><BR>
      *
      * @param x   X position of the target
      * @param y   Y position of the target
@@ -5859,7 +5864,7 @@ public abstract class L2Character extends L2Object
 			{
 				if (targets[i] instanceof L2Character)
 				{
-					if(!this.isInsideRadius(targets[i],escapeRange,true,false)) 
+					if (!Util.checkIfInRange(escapeRange, this, targets[i], true))
 						continue;
 					if(skill.isOffensive())
 					{

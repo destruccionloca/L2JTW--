@@ -151,7 +151,7 @@ import net.sf.l2j.gameserver.handler.itemhandlers.SoulShots;
 import net.sf.l2j.gameserver.handler.itemhandlers.SpecialXMas;
 import net.sf.l2j.gameserver.handler.itemhandlers.SpiritShot;
 import net.sf.l2j.gameserver.handler.itemhandlers.SummonItems;
-import net.sf.l2j.gameserver.handler.itemhandlers.WorldMap;
+import net.sf.l2j.gameserver.handler.itemhandlers.Maps;
 //import net.sf.l2j.gameserver.handler.skillhandlers.BalanceLife;
 import net.sf.l2j.gameserver.handler.skillhandlers.BeastFeed;
 import net.sf.l2j.gameserver.handler.skillhandlers.Blow;
@@ -447,7 +447,7 @@ public class GameServer
         _itemHandler.registerItemHandler(new BeastSoulShot());
         _itemHandler.registerItemHandler(new BeastSpiritShot());
         _itemHandler.registerItemHandler(new PaganKeys());
-		_itemHandler.registerItemHandler(new WorldMap());
+		_itemHandler.registerItemHandler(new Maps());
 		_itemHandler.registerItemHandler(new Potions());
 		_itemHandler.registerItemHandler(new Recipes());
         _itemHandler.registerItemHandler(new ChestKey());

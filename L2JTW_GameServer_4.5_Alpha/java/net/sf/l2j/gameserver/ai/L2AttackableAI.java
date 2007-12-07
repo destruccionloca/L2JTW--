@@ -972,8 +972,10 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
             {
                 _actor.setTarget(getAttackTarget());
                 skills = _actor.getAllSkills();
-                dist2 = Math.sqrt(_actor.getPlanDistanceSq(getAttackTarget().getX(), getAttackTarget().getY()));
-                range = _actor.getPhysicalAttackRange()+((L2Attackable) _actor).getTemplate().collisionRadius;
+
+                dist2 = _actor.getPlanDistanceSq(getAttackTarget().getX(), getAttackTarget().getY());
+                range = _actor.getPhysicalAttackRange() + _actor.getTemplate().collisionRadius + getAttackTarget().getTemplate().collisionRadius;
+
             }
             catch (NullPointerException e)
             {
