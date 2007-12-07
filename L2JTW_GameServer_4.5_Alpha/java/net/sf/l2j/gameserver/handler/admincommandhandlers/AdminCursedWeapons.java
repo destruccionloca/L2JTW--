@@ -130,7 +130,7 @@ public class AdminCursedWeapons implements IAdminCommandHandler {
 
 				}
 				adminReply.replace("%cwinfo%", replyMSG.toString());
-				activeChar.sendPacket(adminReply);				
+				activeChar.sendPacket(adminReply);
 			}
 		}
 		else if (command.startsWith("admin_cw_reload"))
@@ -145,7 +145,7 @@ public class AdminCursedWeapons implements IAdminCommandHandler {
 				String parameter = st.nextToken();
 				if (parameter.matches("[0-9]*"))
 					id = Integer.parseInt(parameter);
-				else 
+				else
 				{
 					parameter = parameter.replace('_', ' ');
 					for (CursedWeapon cwp : cwm.getCursedWeapons())
@@ -176,7 +176,7 @@ public class AdminCursedWeapons implements IAdminCommandHandler {
 			else if (command.startsWith("admin_cw_goto "))
 			{
 				cw.goTo(activeChar);
-			} 
+			}
 			else if (command.startsWith("admin_cw_add"))
 			{
 				if (cw==null)
@@ -186,12 +186,12 @@ public class AdminCursedWeapons implements IAdminCommandHandler {
 				}
 				else if (cw.isActive())
 					activeChar.sendMessage("此受詛咒的武器已正在使用.");
-				else 
+				else
 				{
 					L2Object target = activeChar.getTarget();
 					if (target != null && target instanceof L2PcInstance)
 						((L2PcInstance)target).addItem("AdminCursedWeaponAdd", id, 1, target, true);
-					else 
+					else
 						activeChar.addItem("AdminCursedWeaponAdd", id, 1, activeChar, true);
 				}
 			}

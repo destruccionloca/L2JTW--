@@ -30,8 +30,8 @@ import net.sf.l2j.gameserver.skills.effects.EffectSpellForce;
  */
 public class ConditionForceBuff extends Condition
 {
-	private static int BATTLE_FORCE = 426;
-	private static int SPELL_FORCE = 427;
+	private static int BATTLE_FORCE = 5104;
+	private static int SPELL_FORCE = 5105;
 
 	private int _battleForces;
 	private int _spellForces;
@@ -55,7 +55,7 @@ public class ConditionForceBuff extends Condition
 		if (neededBattle > 0)
 		{
 			L2Effect battleForce = env.player.getFirstEffect(BATTLE_FORCE);
-			if (!(battleForce instanceof EffectBattleForce) || 
+			if (!(battleForce instanceof EffectBattleForce) ||
 			  ((EffectBattleForce)battleForce).forces < neededBattle)
 				return false;
 		}
@@ -63,7 +63,7 @@ public class ConditionForceBuff extends Condition
 		if (neededSpell > 0)
 		{
 			L2Effect spellForce = env.player.getFirstEffect(SPELL_FORCE);
-			if (!(spellForce instanceof EffectSpellForce) || 
+			if (!(spellForce instanceof EffectSpellForce) ||
 			  ((EffectSpellForce)spellForce).forces < neededSpell)
 				return false;
 		}

@@ -42,7 +42,7 @@ import net.sf.l2j.gameserver.skills.Stats;
 
 /**
  * This class ...
- * 
+ *
  * @version $Revision: 1.1.2.1.2.12 $ $Date: 2005/04/11 10:06:07 $
  */
 public abstract class L2Effect
@@ -53,8 +53,7 @@ public abstract class L2Effect
         CREATED, ACTING, FINISHING
     }
 
-
-    public static enum EffectType 
+    public static enum EffectType
     {
         BUFF,
         CHARGE,
@@ -65,18 +64,18 @@ public abstract class L2Effect
         MANA_HEAL_OVER_TIME,
         RELAXING, STUN, ROOT,
         SLEEP,
-        HATE, 
+        HATE,
         FAKE_DEATH,
-        CONFUSION, 
-        CONFUSE_MOB_ONLY, 
+        CONFUSION,
+        CONFUSE_MOB_ONLY,
         MUTE,
         FEAR,
-        SILENT_MOVE, 
-        SEED, 
+        SILENT_MOVE,
+        SEED,
         PARALYZE,
         STUN_SELF,
-        PSYCHICAL_MUTE, 
-        REMOVE_TARGET, 
+        PSYCHICAL_MUTE,
+        REMOVE_TARGET,
         TARGET_ME,
         SILENCE_MAGIC_PHYSICAL,
         BETRAY,
@@ -133,9 +132,9 @@ public abstract class L2Effect
 
     // abnormal effect mask
     private int _abnormalEffect;
-    
-    private boolean _preventExitUpdate;
-    
+
+    public boolean preventExitUpdate;
+
     public final class EffectTask implements Runnable
     {
         protected final int _delay;
@@ -214,7 +213,7 @@ public abstract class L2Effect
     {
         return _count;
     }
-    
+
     public int getTotalCount()
     {
         return _totalCount;
@@ -253,7 +252,7 @@ public abstract class L2Effect
         return (GameTimeController.getGameTicks() - _periodStartTicks)
             / GameTimeController.TICKS_PER_SECOND;
     }
-    
+
     /**
 	 * Returns the elapsed time of the task.
 	 * @return Time in seconds.
@@ -302,12 +301,12 @@ public abstract class L2Effect
     {
         return _skill._effectTemplatesSelf != null;
     }
-    
+
     public boolean isHerbEffect()
     {
     	if (getSkill().getName().contains("Herb"))
     		return true;
-    	
+
     	return false;
     }
 
@@ -340,7 +339,6 @@ public abstract class L2Effect
         _currentTask = new EffectTask(duration, -1);
         _currentFuture = ThreadPoolManager.getInstance().scheduleEffect(_currentTask, duration);
         if (_state == EffectState.ACTING) _effected.addEffect(this);
-        updateEffects(_effected);
     }
 
     private synchronized void startEffectTaskAtFixedRate(int delay, int rate)
@@ -350,36 +348,35 @@ public abstract class L2Effect
         _currentFuture = ThreadPoolManager.getInstance().scheduleEffectAtFixedRate(_currentTask, delay,
                                                                                    rate);
         if (_state == EffectState.ACTING) _effected.addEffect(this);
-        updateEffects(_effected);
     }
 
     /**
      * Stop the L2Effect task and send Server->Client update packet.<BR><BR>
-     * 
+     *
      * <B><U> Actions</U> :</B><BR><BR>
      * <li>Cancel the effect in the the abnormal effect map of the L2Character </li>
      * <li>Stop the task of the L2Effect, remove it and update client magic icone </li><BR><BR>
-     * 
+     *
      */
     public final void exit()
     {
         this.exit(false);
     }
-    
+
     public final void exit(boolean preventUpdate)
     {
-    	_preventExitUpdate = preventUpdate;
+    	preventExitUpdate = preventUpdate;
     	_state = EffectState.FINISHING;
     	scheduleEffect();
     }
 
     /**
      * Stop the task of the L2Effect, remove it and update client magic icone.<BR><BR>
-     * 
+     *
      * <B><U> Actions</U> :</B><BR><BR>
      * <li>Cancel the task </li>
      * <li>Stop and remove L2Effect from L2Character and update client magic icone </li><BR><BR>
-     * 
+     *
      */
     public synchronized void stopEffectTask()
     {
@@ -393,14 +390,7 @@ public abstract class L2Effect
 
             
             _effected.removeEffect(this);
-            
-            
 
-            if (!_preventExitUpdate)
-            {
-            	//_effected.updateStats();
-            	
-            }
         }
     }
 
@@ -475,7 +465,7 @@ public abstract class L2Effect
         {
         	if (_count-- > 0)
             {
-            	if (getInUse()) { // effect has to be in use 
+            	if (getInUse()) { // effect has to be in use
             		if (onActionTime()) return; // false causes effect to finish right away
             	}
             	else if (_count > 0) { // do not finish it yet, in case reactivated
@@ -503,13 +493,6 @@ public abstract class L2Effect
         }
     }
 
-    public void updateEffects(L2Character effectedChar)
-    {
-    	_log.warning("Update Effects");
-    	//useless Packet
-        //effectedChar.updateStats();
-    	//_effected.updatetype(this);
-    }
 
     public Func[] getStatFuncs()
     {

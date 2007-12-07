@@ -25,12 +25,12 @@ import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
 /**
- * 
+ *
  *
  */
 public class Loc implements IUserCommandHandler
 {
-    private static final int[] COMMAND_IDS = { 0 }; 
+    private static final int[] COMMAND_IDS = { 0 };
 
     /* (non-Javadoc)
      * @see net.sf.l2j.gameserver.handler.IUserCommandHandler#useUserCommand(int, net.sf.l2j.gameserver.model.L2PcInstance)
@@ -58,6 +58,7 @@ public class Loc implements IUserCommandHandler
         case 14: msg = SystemMessageId.LOC_RUNE_S1_S2_S3; break;
         case 15: msg = SystemMessageId.LOC_GODDARD_S1_S2_S3; break;
         case 16: msg = SystemMessageId.LOC_SCHUTTGART_S1_S2_S3;break;
+        case 18: msg = SystemMessageId.LOC_PRIMEVAL_ISLE_S1_S2_S3;break;
         default: msg = SystemMessageId.LOC_ADEN_S1_S2_S3;
     	}
         SystemMessage sm = new SystemMessage(msg);

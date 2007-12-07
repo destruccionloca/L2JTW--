@@ -34,24 +34,24 @@ import net.sf.l2j.gameserver.templates.L2NpcTemplate;
 
 /**
  * Olympiad Npc's Instance
- * 
+ *
  * @author godson
  */
 
 public class L2OlympiadManagerInstance extends L2FolkInstance
 {
     private static Logger _logOlymp = Logger.getLogger(L2OlympiadManagerInstance.class.getName());
-    
+
     private static final int GATE_PASS = 6651;
-    
+
     public L2OlympiadManagerInstance (int objectId, L2NpcTemplate template)
     {
         super(objectId, template);
     }
-    
+
     @Override
 	public void onBypassFeedback (L2PcInstance player, String command)
-    {  
+    {
         if (command.startsWith("OlympiadDesc"))
         {
             int val = Integer.parseInt(command.substring(13,14));
@@ -62,11 +62,11 @@ public class L2OlympiadManagerInstance extends L2FolkInstance
         {
         	if (!player.isNoble() || player.getClassId().getId()<88)
                 return;
-            
+
             int val = Integer.parseInt(command.substring(14));
             NpcHtmlMessage reply;
             TextBuilder replyMSG;
-            
+
             switch(val)
             {
                 case 1:
@@ -76,14 +76,14 @@ public class L2OlympiadManagerInstance extends L2FolkInstance
                     int classed = 0;
                     int nonClassed = 0;
                     int[] array = Olympiad.getInstance().getWaitingList();
-                    
+
                     if (array != null)
                     {
                         classed = array[0];
                         nonClassed = array[1];
-                        
+
                     }
-                    
+
                     reply = new NpcHtmlMessage(getObjectId());
                     replyMSG = new TextBuilder("<html><body>");
                     replyMSG.append("奧林匹亞等候參賽名單 " +
@@ -103,9 +103,9 @@ public class L2OlympiadManagerInstance extends L2FolkInstance
                             "<img src=\"L2UI.SquareWhite\" width=270 height=1> <img src=\"L2UI.SquareBlank\" width=1 height=3>" +
                             "<button value=\"返回\" action=\"bypass -h npc_"+getObjectId()+"_OlympiadDesc 2a\" " +
                             "width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></center>");
-                    
+
                     replyMSG.append("</body></html>");
-                   
+
                     reply.setHtml(replyMSG.toString());
                     player.sendPacket(reply);
                     break;
@@ -119,7 +119,7 @@ public class L2OlympiadManagerInstance extends L2FolkInstance
                                 "<br><br>" +
                                 "<a action=\"bypass -h npc_"+getObjectId()+"_OlympiadDesc 2a\">返回</a>");
                         replyMSG.append("</body></html>");
-                        
+
                         reply.setHtml(replyMSG.toString());
                         player.sendPacket(reply);
                     }
@@ -135,11 +135,11 @@ public class L2OlympiadManagerInstance extends L2FolkInstance
                     if (passes > 0)
                     {
                         L2ItemInstance item = player.getInventory().addItem("Olympiad", GATE_PASS, passes, player, this);
-                        
+
                         InventoryUpdate iu = new InventoryUpdate();
                         iu.addModifiedItem(item);
                         player.sendPacket(iu);
-                        
+
                         SystemMessage sm = new SystemMessage(SystemMessageId.EARNED_ITEM);
                         sm.addNumber(passes);
                         sm.addItemName(item.getItemId());
@@ -157,26 +157,26 @@ public class L2OlympiadManagerInstance extends L2FolkInstance
                     default:
                         _logOlymp.warning("Olympiad System: Couldnt send packet for request " + val);
                     break;
-                        
+
             }
         }
         else if (command.startsWith("Olympiad"))
-        { 
+        {
             int val = Integer.parseInt(command.substring(9,10));
 
             NpcHtmlMessage reply = new NpcHtmlMessage(getObjectId());
             TextBuilder replyMSG = new TextBuilder("<html><body>");
-            
+
             switch (val)
             {
                 case 1:
                     String[] matches = Olympiad.getInstance().getMatchList();
-                    
+
                     replyMSG.append("奧林匹亞簡介<br><br>" +
                             "警告: 請先閱讀說明, 如果你想觀賞奧林匹亞比賽, 所有召喚或者寵物將會被移除. 請小心! " +
                             "" +
                             "<br>");
-                    
+
                     if (matches == null)
                         replyMSG.append("<br>目前沒有任何競賽.");
                     else
@@ -188,7 +188,7 @@ public class L2OlympiadManagerInstance extends L2FolkInstance
                         }
                     }
                     replyMSG.append("</body></html>");
-                    
+
                     reply.setHtml(replyMSG.toString());
                     player.sendPacket(reply);
                     break;
@@ -199,14 +199,14 @@ public class L2OlympiadManagerInstance extends L2FolkInstance
                     {
                         replyMSG.append("<center>奧林匹亞排行");
                         replyMSG.append("<img src=\"L2UI.SquareWhite\" width=270 height=1><img src=\"L2UI.SquareBlank\" width=1 height=3>");
-                        
+
                         List<String> names = Olympiad.getInstance().getClassLeaderBoard(classId);
                         if (names.size() != 0)
                         {
                             replyMSG.append("<table width=270 border=0 bgcolor=\"000000\">");
-                            
+
                             int index = 1;
-                            
+
                             for (String name : names)
                             {
                                 replyMSG.append("<tr>");
@@ -215,14 +215,14 @@ public class L2OlympiadManagerInstance extends L2FolkInstance
                                 replyMSG.append("</tr>");
                                 index++;
                             }
-                            
+
                             replyMSG.append("</table>");
                         }
-                        
+
                         replyMSG.append("<img src=\"L2UI.SquareWhite\" width=270 height=1> <img src=\"L2UI.SquareBlank\" width=1 height=3>");
                         replyMSG.append("</center>");
                         replyMSG.append("</body></html>");
-                        
+
                         reply.setHtml(replyMSG.toString());
                         player.sendPacket(reply);
                     }
@@ -242,17 +242,17 @@ public class L2OlympiadManagerInstance extends L2FolkInstance
         else
             super.onBypassFeedback(player, command);
     }
-    
+
     private void showChatWindow(L2PcInstance player, int val, String suffix)
     {
         String filename = Olympiad.OLYMPIAD_HTML_FILE;
-        
+
         filename += "noble_desc" + val;
         filename += (suffix != null)? suffix + ".htm" : ".htm";
-        
+
         if (filename.equals(Olympiad.OLYMPIAD_HTML_FILE + "noble_desc0.htm"))
             filename = Olympiad.OLYMPIAD_HTML_FILE + "noble_main.htm";
-        
+
         showChatWindow(player, filename);
     }
 }

@@ -101,39 +101,39 @@ import net.sf.l2j.util.Rnd;
 /**
  * This class represents a Non-Player-Character in the world. It can be a monster or a friendly character.
  * It also uses a template to fetch some static values. The templates are hardcoded in the client, so we can rely on them.<BR><BR>
- * 
+ *
  * L2Character :<BR><BR>
  * <li>L2Attackable</li>
  * <li>L2BoxInstance</li>
  * <li>L2FolkInstance</li>
- * 
+ *
  * @version $Revision: 1.32.2.7.2.24 $ $Date: 2005/04/11 10:06:09 $
  */
 public class L2NpcInstance extends L2Character
 {
     //private static Logger _log = Logger.getLogger(L2NpcInstance.class.getName());
-    
+
     /** The interaction distance of the L2NpcInstance(is used as offset in MovetoLocation method) */
     public static final int INTERACTION_DISTANCE = 150;
-    
+
     /** The L2Spawn object that manage this L2NpcInstance */
     private L2Spawn _spawn;
 
     /** The flag to specify if this L2NpcInstance is busy */
     private boolean _isBusy = false;
-    
+
     /** The busy message for this L2NpcInstance */
     private String _busyMessage = "";
-    
-    /** True if endDecayTask has already been called */ 
-    volatile boolean _isDecayed = false; 
-    
+
+    /** True if endDecayTask has already been called */
+    volatile boolean _isDecayed = false;
+
     /** True if a Dwarf has used Spoil on this L2NpcInstance */
     private boolean _isSpoil = false;
-    
+
     /** The castle index in the array of L2Castle this L2NpcInstance belongs to */
     private int _castleIndex = -2;
-    
+
     public boolean isEventMob = false,
     			   _isEventMobCTFJoiner = false;
     private boolean _isInTown = false;
@@ -141,7 +141,7 @@ public class L2NpcInstance extends L2Character
     private int _isSpoiledBy = 0;
 
     protected RandomAnimationTask _rAniTask = null;
-    
+
     protected RandomPathTask _rPathTask = null;
     
     
@@ -193,14 +193,14 @@ public class L2NpcInstance extends L2Character
                 {
                 	// Cancel further animation timers until intention is changed to ACTIVE again.
                 	if(getAI().getIntention() != AI_INTENTION_ACTIVE)
-                    	return; 
+                    	return;
                 }
                 else
                 {
-                	if (!isInActiveRegion()) // NPCs in inactive region don't run this task 
+                	if (!isInActiveRegion()) // NPCs in inactive region don't run this task
                 		return;
                 	// update knownlist to remove playable which aren't in range any more
-                	getKnownList().updateKnownObjects(); 
+                	getKnownList().updateKnownObjects();
                 }
 
                 if(!(isDead() || isStunned() || isSleeping() || isParalyzed()))
@@ -229,14 +229,14 @@ public class L2NpcInstance extends L2Character
     {
         if (!hasRandomAnimation())
             return;
-        
+
     	int minWait =  isMob() ? Config.MIN_MONSTER_ANIMATION : Config.MIN_NPC_ANIMATION;
         int maxWait = isMob() ? Config.MAX_MONSTER_ANIMATION : Config.MAX_NPC_ANIMATION;
 
         // Calculate the delay before the next animation
         int interval = Rnd.get(minWait, maxWait) * 1000;
 
-        // Create a RandomAnimation Task that will be launched after the calculated delay 
+        // Create a RandomAnimation Task that will be launched after the calculated delay
         _rAniTask = new RandomAnimationTask();
         ThreadPoolManager.getInstance().scheduleGeneral(_rAniTask, interval);
     }
@@ -252,12 +252,12 @@ public class L2NpcInstance extends L2Character
     public class destroyTemporalNPC implements Runnable
     {
         private L2Spawn _oldSpawn;
-        
+
         public destroyTemporalNPC(L2Spawn spawn)
         {
             _oldSpawn = spawn;
         }
-        
+
         public void run()
         {
             try
@@ -265,94 +265,94 @@ public class L2NpcInstance extends L2Character
                 _oldSpawn.getLastSpawn().deleteMe();
                 _oldSpawn.stopRespawn();
                 SpawnTable.getInstance().deleteSpawn(_oldSpawn, false);
-            } 
+            }
             catch (Throwable t) {
                 t.printStackTrace();
             }
         }
     }
-    
+
     public class destroyTemporalSummon implements Runnable
     {
         L2Summon _summon;
         L2PcInstance _player;
-        
+
         public destroyTemporalSummon(L2Summon summon, L2PcInstance player)
         {
             _summon = summon;
             _player = player;
         }
-        
+
         public void run()
         {
             _summon.unSummon(_player);
         }
     }
-    
+
     /**
      * Constructor of L2NpcInstance (use L2Character constructor).<BR><BR>
-     *  
+     *
      * <B><U> Actions</U> :</B><BR><BR>
      * <li>Call the L2Character constructor to set the _template of the L2Character (copy skills from template to object and link _calculators to NPC_STD_CALCULATOR)  </li>
      * <li>Set the name of the L2Character</li>
      * <li>Create a RandomAnimation Task that will be launched after the calculated delay if the server allow it </li><BR><BR>
-     * 
+     *
      * @param objectId Identifier of the object to initialized
      * @param template The L2NpcTemplate to apply to the NPC
-     * 
+     *
      */
     public L2NpcInstance(int objectId, L2NpcTemplate template)
     {
-        // Call the L2Character constructor to set the _template of the L2Character, copy skills from template to object 
+        // Call the L2Character constructor to set the _template of the L2Character, copy skills from template to object
         // and link _calculators to NPC_STD_CALCULATOR
         super(objectId, template);
-        getKnownList();   // init knownlist 
-        getStat();                        // init stats 
-        getStatus();              // init status 
+        getKnownList();   // init knownlist
+        getStat();                        // init stats
+        getStatus();              // init status
         initCharStatusUpdateValues();
-        
+
         if (template == null)
         {
             _log.severe("No template for Npc. Please check your datapack is setup correctly.");
             return;
         }
-        
+
         // Set the name of the L2Character
         setName(template.name);
-        
+
     }
 
     @Override
-	public NpcKnownList getKnownList() 
-	{ 
-    	if(super.getKnownList() == null || !(super.getKnownList() instanceof NpcKnownList)) 
-    		setKnownList(new NpcKnownList(this)); 
-    	return (NpcKnownList)super.getKnownList(); 
+	public NpcKnownList getKnownList()
+	{
+    	if(super.getKnownList() == null || !(super.getKnownList() instanceof NpcKnownList))
+    		setKnownList(new NpcKnownList(this));
+    	return (NpcKnownList)super.getKnownList();
 	}
-    
+
 	@Override
-	public NpcStat getStat() 
-	{ 
-		if(super.getStat() == null || !(super.getStat() instanceof NpcStat)) 
-			setStat(new NpcStat(this)); 
-		return (NpcStat)super.getStat(); 
+	public NpcStat getStat()
+	{
+		if(super.getStat() == null || !(super.getStat() instanceof NpcStat))
+			setStat(new NpcStat(this));
+		return (NpcStat)super.getStat();
 	}
-	
+
 	@Override
-	public NpcStatus getStatus() 
-	{ 
-		if(super.getStatus() == null || !(super.getStatus() instanceof NpcStatus)) 
-			setStatus(new NpcStatus(this)); 
-		return (NpcStatus)super.getStatus(); 
+	public NpcStatus getStatus()
+	{
+		if(super.getStatus() == null || !(super.getStatus() instanceof NpcStatus))
+			setStatus(new NpcStatus(this));
+		return (NpcStatus)super.getStatus();
 	}
-    
+
     /** Return the L2NpcTemplate of the L2NpcInstance. */
     @Override
-	public final L2NpcTemplate getTemplate() 
-    { 
-        return (L2NpcTemplate)super.getTemplate(); 
+	public final L2NpcTemplate getTemplate()
+    {
+        return (L2NpcTemplate)super.getTemplate();
     }
-    
+
     /**
      * Return the generic Identifier of this L2NpcInstance contained in the L2NpcTemplate.<BR><BR>
      */
@@ -360,34 +360,34 @@ public class L2NpcInstance extends L2Character
     {
         return getTemplate().npcId;
     }
-    
+
     @Override
 	public boolean isAttackable()
     {
         return false;
     }
-    
+
     /**
      * Return the faction Identifier of this L2NpcInstance contained in the L2NpcTemplate.<BR><BR>
-     * 
+     *
      * <B><U> Concept</U> :</B><BR><BR>
      * If a NPC belows to a Faction, other NPC of the faction inside the Faction range will help it if it's attacked<BR><BR>
-     * 
+     *
      */
     public final String getFactionId()
     {
         return getTemplate().factionId;
     }
-    
+
     /**
      * Return the Level of this L2NpcInstance contained in the L2NpcTemplate.<BR><BR>
      */
     @Override
-	public final int getLevel() 
+	public final int getLevel()
     {
         return getTemplate().level;
     }
-    
+
     /**
      * Return True if the L2NpcInstance is agressive (ex : L2MonsterInstance in function of aggroRange).<BR><BR>
      */
@@ -395,7 +395,7 @@ public class L2NpcInstance extends L2Character
     {
         return false;
     }
-    
+
     /**
      * Return the Aggro Range of this L2NpcInstance contained in the L2NpcTemplate.<BR><BR>
      */
@@ -403,7 +403,7 @@ public class L2NpcInstance extends L2Character
     {
         return getTemplate().aggroRange;
     }
-    
+
     /**
      * Return the Faction Range of this L2NpcInstance contained in the L2NpcTemplate.<BR><BR>
      */
@@ -411,7 +411,7 @@ public class L2NpcInstance extends L2Character
     {
         return getTemplate().factionRange;
     }
-    
+
 
 
     public int getBaseAtkSpd()
@@ -556,7 +556,7 @@ public class L2NpcInstance extends L2Character
     {
         return getTemplate().isUndead;
     }
-    
+
     
     
     /**
@@ -567,75 +567,75 @@ public class L2NpcInstance extends L2Character
     {
         //NpcInfo info = new NpcInfo(this);
         //broadcastPacket(info);
-        
+
         // Send a Server->Client packet NpcInfo with state of abnormal effect to all L2PcInstance in the _KnownPlayers of the L2NpcInstance
         for (L2PcInstance player : getKnownList().getKnownPlayers().values())
             if (player != null)
                 player.sendPacket(new NpcInfo(this, player));
     }
-    
+
     /**
      * Return the distance under which the object must be add to _knownObject in function of the object type.<BR><BR>
-     *   
+     *
      * <B><U> Values </U> :</B><BR><BR>
      * <li> object is a L2FolkInstance : 0 (don't remember it) </li>
      * <li> object is a L2Character : 0 (don't remember it) </li>
      * <li> object is a L2PlayableInstance : 1500 </li>
-     * <li> others : 500 </li><BR><BR> 
-     * 
+     * <li> others : 500 </li><BR><BR>
+     *
      * <B><U> Overriden in </U> :</B><BR><BR>
-     * <li> L2Attackable</li><BR><BR> 
-     * 
+     * <li> L2Attackable</li><BR><BR>
+     *
      * @param object The Object to add to _knownObject
-     * 
+     *
      */
     public int getDistanceToWatchObject(L2Object object)
     {
         if (object instanceof L2FestivalGuideInstance)
             return 10000;
-        
+
         if (object instanceof L2FolkInstance || !(object instanceof L2Character))
             return 0;
-        
-        if (object instanceof L2PlayableInstance) 
+
+        if (object instanceof L2PlayableInstance)
             return 1500;
-        
+
         return 500;
     }
-    
+
     /**
      * Return the distance after which the object must be remove from _knownObject in function of the object type.<BR><BR>
-     *   
+     *
      * <B><U> Values </U> :</B><BR><BR>
      * <li> object is not a L2Character : 0 (don't remember it) </li>
      * <li> object is a L2FolkInstance : 0 (don't remember it)</li>
      * <li> object is a L2PlayableInstance : 3000 </li>
      * <li> others : 1000 </li><BR><BR>
-     * 
+     *
      * <B><U> Overriden in </U> :</B><BR><BR>
-     * <li> L2Attackable</li><BR><BR> 
-     * 
+     * <li> L2Attackable</li><BR><BR>
+     *
      * @param object The Object to remove from _knownObject
-     * 
+     *
      */
     public int getDistanceToForgetObject(L2Object object)
     {
         return 2*getDistanceToWatchObject(object);
     }
-    
+
     /**
      * Return False.<BR><BR>
-     *   
+     *
      * <B><U> Overriden in </U> :</B><BR><BR>
      * <li> L2MonsterInstance : Check if the attacker is not another L2MonsterInstance</li>
      * <li> L2PcInstance</li><BR><BR>
      */
     @Override
-	public boolean isAutoAttackable(@SuppressWarnings("unused") L2Character attacker) 
+	public boolean isAutoAttackable(@SuppressWarnings("unused") L2Character attacker)
     {
         return false;
     }
-    
+
     
     /**
      * Return the Identifier of the item in the left hand of this L2NpcInstance contained in the L2NpcTemplate.<BR><BR>
@@ -644,7 +644,7 @@ public class L2NpcInstance extends L2Character
     {
         return getTemplate().lhand;
     }
-    
+
     /**
      * Return the Identifier of the item in the right hand of this L2NpcInstance contained in the L2NpcTemplate.<BR><BR>
      */
@@ -652,33 +652,33 @@ public class L2NpcInstance extends L2Character
     {
         return getTemplate().rhand;
     }
-    
+
     /**
      * Return True if this L2NpcInstance has drops that can be sweeped.<BR><BR>
      */
-    public boolean isSpoil() 
+    public boolean isSpoil()
     {
         return _isSpoil;
     }
-    
+
     /**
      * Set the spoil state of this L2NpcInstance.<BR><BR>
      */
-    public void setSpoil(boolean isSpoil) 
+    public void setSpoil(boolean isSpoil)
     {
         _isSpoil = isSpoil;
     }
 
-    public final int getIsSpoiledBy() 
-    { 
-    	return _isSpoiledBy; 
+    public final int getIsSpoiledBy()
+    {
+    	return _isSpoiledBy;
     }
-    
-    public final void setIsSpoiledBy(int value) 
-    { 
-    	_isSpoiledBy = value; 
+
+    public final void setIsSpoiledBy(int value)
+    {
+    	_isSpoiledBy = value;
     }
-    
+
     /**
      * Return the busy status of this L2NpcInstance.<BR><BR>
      */
@@ -686,7 +686,7 @@ public class L2NpcInstance extends L2Character
     {
         return _isBusy;
     }
-    
+
     /**
      * Set the busy status of this L2NpcInstance.<BR><BR>
      */
@@ -694,7 +694,7 @@ public class L2NpcInstance extends L2Character
     {
         _isBusy = isBusy;
     }
-    
+
     /**
      * Return the busy message of this L2NpcInstance.<BR><BR>
      */
@@ -702,7 +702,7 @@ public class L2NpcInstance extends L2Character
     {
         return _busyMessage;
     }
-    
+
     /**
      * Set the busy message of this L2NpcInstance.<BR><BR>
      */
@@ -710,33 +710,33 @@ public class L2NpcInstance extends L2Character
     {
         _busyMessage = message;
     }
-    
+
     /**
      * Manage actions when a player click on the L2NpcInstance.<BR><BR>
-     * 
+     *
      * <B><U> Actions on first click on the L2NpcInstance (Select it)</U> :</B><BR><BR>
      * <li>Set the L2NpcInstance as target of the L2PcInstance player (if necessary)</li>
      * <li>Send a Server->Client packet MyTargetSelected to the L2PcInstance player (display the select window)</li>
      * <li>If L2NpcInstance is autoAttackable, send a Server->Client packet StatusUpdate to the L2PcInstance in order to update L2NpcInstance HP bar </li>
      * <li>Send a Server->Client packet ValidateLocation to correct the L2NpcInstance position and heading on the client </li><BR><BR>
-     * 
+     *
      * <B><U> Actions on second click on the L2NpcInstance (Attack it/Intercat with it)</U> :</B><BR><BR>
      * <li>Send a Server->Client packet MyTargetSelected to the L2PcInstance player (display the select window)</li>
      * <li>If L2NpcInstance is autoAttackable, notify the L2PcInstance AI with AI_INTENTION_ATTACK (after a height verification)</li>
      * <li>If L2NpcInstance is NOT autoAttackable, notify the L2PcInstance AI with AI_INTENTION_INTERACT (after a distance verification) and show message</li><BR><BR>
-     * 
+     *
      * <FONT COLOR=#FF0000><B> <U>Caution</U> : Each group of Server->Client packet must be terminated by a ActionFailed packet in order to avoid
      * that client wait an other packet</B></FONT><BR><BR>
-     * 
+     *
      * <B><U> Example of use </U> :</B><BR><BR>
      * <li> Client packet : Action, AttackRequest</li><BR><BR>
-     * 
+     *
      * <B><U> Overriden in </U> :</B><BR><BR>
      * <li> L2ArtefactInstance : Manage only fisrt click to select Artefact</li><BR><BR>
      * <li> L2GuardInstance : </li><BR><BR>
-     * 
+     *
      * @param player The L2PcInstance that start an action on the L2NpcInstance
-     * 
+     *
      */
     @Override
     public void onAction(L2PcInstance player)
@@ -750,25 +750,25 @@ public class L2NpcInstance extends L2Character
         if (this != player.getTarget())
         {
             if (Config.DEBUG) _log.fine("new target selected:"+getObjectId());
-            
+
             // Set the target of the L2PcInstance player
             player.setTarget(this);
-            
+
             // Send a Server->Client packet MyTargetSelected to the L2PcInstance player
             // The player.getLevel() - getLevel() permit to display the correct color in the select window
             MyTargetSelected my = new MyTargetSelected(getObjectId(), player.getLevel() - getLevel());
             player.sendPacket(my);
-            
+
             // Check if the player is attackable (without a forced attack)
             if (isAutoAttackable(player))
-            {	
+            {
                 // Send a Server->Client packet StatusUpdate of the L2NpcInstance to the L2PcInstance to update its HP bar
                 StatusUpdate su = new StatusUpdate(getObjectId());
                 su.addAttribute(StatusUpdate.CUR_HP, (int)getCurrentHp() );
                 su.addAttribute(StatusUpdate.MAX_HP, getMaxHp() );
                 player.sendPacket(su);
             }
-            
+
             // Send a Server->Client packet ValidateLocation to correct the L2NpcInstance position and heading on the client
             player.sendPacket(new ValidateLocation(this));
         }
@@ -791,9 +791,8 @@ public class L2NpcInstance extends L2Character
                     player.sendPacket(new ActionFailed());
                 }
             }
-            
-            
-            if(!isAutoAttackable(player)) 
+
+            else if(!isAutoAttackable(player)) 
             {
                 // Calculate the distance between the L2PcInstance and the L2NpcInstance
                 if (!isInsideRadius(player, INTERACTION_DISTANCE, false, false))
@@ -801,25 +800,27 @@ public class L2NpcInstance extends L2Character
                     // player.setCurrentState(L2Character.STATE_INTERACT);
                     // player.setInteractTarget(this);
                     // player.moveTo(this.getX(), this.getY(), this.getZ(), INTERACTION_DISTANCE);
-                	
+
                     // Notify the L2PcInstance AI with AI_INTENTION_INTERACT
                     player.getAI().setIntention(CtrlIntention.AI_INTENTION_INTERACT, this);
-                    
-                } 
-                else 
+
+                }
+                else
                 {
                     // Send a Server->Client packet SocialAction to the all L2PcInstance on the _knownPlayer of the L2NpcInstance
                     // to display a social action of the L2NpcInstance on their client
                     SocialAction sa = new SocialAction(getObjectId(), Rnd.get(8));
                     broadcastPacket(sa);
-                    
+
                     // Open a chat window on client with the text of the L2NpcInstance
 
                     if(isEventMob){ L2Event.showEventHtml(player, String.valueOf(getObjectId())); }
+
                     else if (this._isEventMobCTFJoiner)
                     	CTF.showEventHtml(player, String.valueOf(this.getObjectId()));
 
                     else 
+
                     {
                         Quest[] qlst = getTemplate().getEventQuests(Quest.QuestEventType.NPC_FIRST_TALK);
                         if ( (qlst != null) && qlst.length == 1)
@@ -830,6 +831,8 @@ public class L2NpcInstance extends L2Character
 
                 }
             }
+			else
+				player.sendPacket(new ActionFailed());
         }
     }
     
@@ -857,28 +860,28 @@ public class L2NpcInstance extends L2Character
         // Get the L2PcInstance corresponding to the thread
         L2PcInstance player = client.getActiveChar();
         if (player == null) return;
-        
+
         // Check if the L2PcInstance is a GM
         if (player.getAccessLevel() >= Config.GM_ACCESSLEVEL)
         {
             // Set the target of the L2PcInstance player
             player.setTarget(this);
-            
+
             // Send a Server->Client packet MyTargetSelected to the L2PcInstance player
             // The player.getLevel() - getLevel() permit to display the correct color in the select window
             MyTargetSelected my = new MyTargetSelected(getObjectId(), player.getLevel() - getLevel());
             player.sendPacket(my);
-            
+
             // Check if the player is attackable (without a forced attack)
             if (isAutoAttackable(player))
-            {	
+            {
                 // Send a Server->Client packet StatusUpdate of the L2NpcInstance to the L2PcInstance to update its HP bar
                 StatusUpdate su = new StatusUpdate(getObjectId());
                 su.addAttribute(StatusUpdate.CUR_HP, (int)getCurrentHp() );
                 su.addAttribute(StatusUpdate.MAX_HP, getMaxHp() );
                 player.sendPacket(su);
             }
-            
+
             // Send a Server->Client NpcHtmlMessage() containing the GM console about this L2NpcInstance
             NpcHtmlMessage html = new NpcHtmlMessage(0);
 
@@ -886,20 +889,26 @@ public class L2NpcInstance extends L2Character
 
             String className = getClass().getName().substring(43);
             html1.append("<br>");
-            
+
+
+            html1.append("種類: " + className + "<br1>群組: " + getFactionId() + "<br1>位置: " + (getSpawn() != null ? getSpawn().getLocation() : 0) + "<br1>");
+
+
             if (this instanceof L2ControllableMobInstance)
                 html1.append("群組:" + MobGroupTable.getInstance().getGroupForMob((L2ControllableMobInstance)this).getGroupId() + "<br>");
             else
 
                 html1.append("時間:" + (getSpawn()!=null ? (getSpawn().getRespawnDelay() / 1000)+"秒<br>" : "秒<br>"));
-            
+
 
             html1.append("<table border=\"0\" width=\"100%\">");
             html1.append("<tr><td>物件</td><td>"+getObjectId()+"</td><td>編號</td><td>"+getTemplate().npcId+"</td></tr>");
             html1.append("<tr><td>區域</td><td>"+getCastle().getCastleId()+"</td><td>位置:</td><td>"+getX()+","+getY()+","+getZ()+"</td></tr>");
             html1.append("<tr><td>等級</td><td>"+getLevel()+"</td><td>主動性</td><td>"+((this instanceof L2Attackable)? ((L2Attackable)this).getAggroRange() : 0)+"</td></tr>");
             html1.append("</table><br>");
+
             html1.append("<font color=\"LEVEL\">戰鬥資料</font>");
+
             html1.append("<table border=\"0\" width=\"100%\">");
 
             html1.append("<tr><td>目前HP</td><td>"+getCurrentHp()+"</td><td>目前MP</td><td>"+getCurrentMp()+"</td></tr>");
@@ -912,21 +921,22 @@ public class L2NpcInstance extends L2Character
             html1.append("<tr><td>種族</td><td>"+getTemplate().race+"</td><td></td><td></td></tr>");
             html1.append("</table>");
 
-            
+
             html1.append("<font color=\"LEVEL\">基本屬性</font>");
             html1.append("<table border=\"0\" width=\"100%\">");
             html1.append("<tr><td>STR</td><td>"+getSTR()+"</td><td>DEX</td><td>"+getDEX()+"</td><td>CON</td><td>"+getCON()+"</td></tr>");
             html1.append("<tr><td>INT</td><td>"+getINT()+"</td><td>WIT</td><td>"+getWIT()+"</td><td>MEN</td><td>"+getMEN()+"</td></tr>");
             html1.append("</table>");
-            
+
 
             html1.append("<br><center><table><tr><td><button value=\"修改\" action=\"bypass -h admin_edit_npc " + getTemplate().npcId + "\" width=100 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"><br1></td>");
-            html1.append("<td><button value=\"滅亡\" action=\"bypass -h admin_kill_monster\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
-            html1.append("<tr><td><button value=\"掉落\" action=\"bypass -h admin_show_droplist " + getTemplate().npcId + "\" width=100 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");			
+            html1.append("<td><button value=\"滅亡\" action=\"bypass -h admin_kill\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td><br1></tr>");
+            html1.append("<tr><td><button value=\"掉落檢視\" action=\"bypass -h admin_show_droplist " + getTemplate().npcId + "\" width=100 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
             html1.append("<td><button value=\"刪除\" action=\"bypass -h admin_delete\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
+
             html1.append("</table></center><br>");
             html1.append("</body></html>");
-            
+
             html.setHtml(html1.toString());
             player.sendPacket(html);
         }
@@ -934,25 +944,25 @@ public class L2NpcInstance extends L2Character
         {
             // Set the target of the L2PcInstance player
             player.setTarget(this);
-            
+
             // Send a Server->Client packet MyTargetSelected to the L2PcInstance player
             // The player.getLevel() - getLevel() permit to display the correct color in the select window
             MyTargetSelected my = new MyTargetSelected(getObjectId(), player.getLevel() - getLevel());
             player.sendPacket(my);
-            
+
             // Check if the player is attackable (without a forced attack)
             if (isAutoAttackable(player))
-            {	
+            {
                 // Send a Server->Client packet StatusUpdate of the L2NpcInstance to the L2PcInstance to update its HP bar
                 StatusUpdate su = new StatusUpdate(getObjectId());
                 su.addAttribute(StatusUpdate.CUR_HP, (int)getCurrentHp() );
                 su.addAttribute(StatusUpdate.MAX_HP, getMaxHp() );
                 player.sendPacket(su);
             }
-            
+
             NpcHtmlMessage html = new NpcHtmlMessage(0);
             TextBuilder html1 = new TextBuilder("<html><body>");
-            
+
             html1.append("<br><center><font color=\"LEVEL\">[戰鬥狀態]</font></center>");
             html1.append("<table border=0 width=\"100%\">");
 
@@ -973,35 +983,36 @@ public class L2NpcInstance extends L2Character
             html1.append("<tr><td>STR</td><td>"+getSTR()+"</td><td>DEX</td><td>"+getDEX()+"</td><td>CON</td><td>"+getCON()+"</td></tr>");
             html1.append("<tr><td>INT</td><td>"+getINT()+"</td><td>WIT</td><td>"+getWIT()+"</td><td>MEN</td><td>"+getMEN()+"</td></tr>");
             html1.append("</table>");
-            
+
             html1.append("<br><center><font color=\"LEVEL\">[掉落資訊]</font></center>");
             html1.append("機率: <font color=\"ff0000\">50%+</font> <font color=\"00ff00\">30%+</font> <font color=\"0000ff\">低於 30%</font>");
             html1.append("<table border=0 width=\"100%\">");
-            
-            for(L2DropCategory cat:getTemplate().getDropData()) 
-            for(L2DropData drop : cat.getAllDrops()) 
-            { 
-            String name = ItemTable.getInstance().getTemplate(drop.getItemId()).getName(); 
-            
-             if(drop.getChance() >= 600000) 
-             	html1.append("<tr><td><font color=\"ff0000\">" + name + "</font></td><td>" + (drop.isQuestDrop()?"Quest":(cat.isSweep()?"Sweep":"Drop")) + "</td></tr>"); 
-             	else if(drop.getChance() >= 300000) 
-             	html1.append("<tr><td><font color=\"00ff00\">" + name + "</font></td><td>" + (drop.isQuestDrop()?"Quest":(cat.isSweep()?"Sweep":"Drop")) + "</td></tr>"); 
-             	else 
-             	html1.append("<tr><td><font color=\"0000ff\">" + name + "</font></td><td>" + (drop.isQuestDrop()?"Quest":(cat.isSweep()?"Sweep":"Drop")) + "</td></tr>"); 
-            } 
-    	    
+
+
+            for(L2DropCategory cat:getTemplate().getDropData())
+	    	    for(L2DropData drop : cat.getAllDrops())
+	    	    {
+	    	    	String name = ItemTable.getInstance().getTemplate(drop.getItemId()).getName();
+
+	    	    	if(drop.getChance() >= 600000)
+	    	    		html1.append("<tr><td><font color=\"ff0000\">" + name + "</font></td><td>" + (drop.isQuestDrop()?"Quest":(cat.isSweep()?"Sweep":"Drop")) + "</td></tr>");
+	    	    	else if(drop.getChance() >= 300000)
+	    	    		html1.append("<tr><td><font color=\"00ff00\">" + name + "</font></td><td>" + (drop.isQuestDrop()?"Quest":(cat.isSweep()?"Sweep":"Drop")) + "</td></tr>");
+	    	    	else
+	    	    		html1.append("<tr><td><font color=\"0000ff\">" + name + "</font></td><td>" + (drop.isQuestDrop()?"Quest":(cat.isSweep()?"Sweep":"Drop")) + "</td></tr>");
+	    	    }
+
     	    html1.append("</table>");
     	    html1.append("</body></html>");
 
             html.setHtml(html1.toString());
             player.sendPacket(html);
         }
-        
+
         // Send a Server->Client ActionFailed to the L2PcInstance in order to avoid that the client wait another packet
         player.sendPacket(new ActionFailed());
     }
-    
+
     /** Return the L2Castle this L2NpcInstance belongs to. */
     public final Castle getCastle()
     {
@@ -1011,10 +1022,10 @@ public class L2NpcInstance extends L2Character
 
 		{
 			L2TownZone town = TownManager.getInstance().getTown(getX(), getY(), getZ());
-			
+
 			if (town != null)
 				_castleIndex = CastleManager.getInstance().getCastleIndex(town.getTaxById());
-			
+
 			if (_castleIndex < 0)
 			{
 				_castleIndex = CastleManager.getInstance().findNearestCastleIndex(this);
@@ -1027,21 +1038,21 @@ public class L2NpcInstance extends L2Character
 		return CastleManager.getInstance().getCastles().get(_castleIndex);
 
     }
-    
+
     public final boolean getIsInTown()
     {
         if (_castleIndex < 0) getCastle();
         return _isInTown;
     }
-    
+
     /**
      * Open a quest or chat window on client with the text of the L2NpcInstance in function of the command.<BR><BR>
-     * 
+     *
      * <B><U> Example of use </U> :</B><BR><BR>
      * <li> Client packet : RequestBypassToServer</li><BR><BR>
-     * 
+     *
      * @param command The command string received from client
-     * 
+     *
      */
     public void onBypassFeedback(L2PcInstance player, String command)
     {
@@ -1050,13 +1061,13 @@ public class L2NpcInstance extends L2Character
         {
             player.getAI().setIntention(CtrlIntention.AI_INTENTION_ATTACK, this);
             // player.moveTo(this.getX(), this.getY(), this.getZ(), INTERACTION_DISTANCE);
-        } 
-        else 
+        }
+        else
         {
             if (isBusy() && getBusyMessage().length()>0)
             {
                 player.sendPacket( new ActionFailed() );
-                
+
                 NpcHtmlMessage html = new NpcHtmlMessage(getObjectId());
                 html.setFile("data/html/npcbusy.htm");
                 html.replace("%busymessage%", getBusyMessage());
@@ -1068,57 +1079,35 @@ public class L2NpcInstance extends L2Character
             else if (command.equalsIgnoreCase("TerritoryStatus"))
             {
 
-            	/*
-                NpcHtmlMessage html = new NpcHtmlMessage(getObjectId());
-                html.setFile("data/html/territorystatus.htm");
-                html.replace("%objectId%", String.valueOf(getObjectId()));
-                html.replace("%npcname%", getName());
-                */
-                
-                if (getIsInTown())
-                {
-                    if (getCastle().getOwnerId() > 0)
-                    {
+            	NpcHtmlMessage html = new NpcHtmlMessage(getObjectId()); 
+            	{ 
+            		if (getCastle().getOwnerId() > 0) 
+            		{ 
+            			html.setFile("data/html/territorystatus.htm"); 
+            			L2Clan clan = ClanTable.getInstance().getClan(getCastle().getOwnerId()); 
+            			html.replace("%clanname%", clan.getName()); 
+            			html.replace("%clanleadername%", clan.getLeaderName()); 
+            		} 
+            		else 
+            		{ 
+            			html.setFile("data/html/territorynoclan.htm"); 
+            		} 
+            	} 
+            	html.replace("%castlename%", getCastle().getName()); 
+            	html.replace("%taxpercent%", "" + getCastle().getTaxPercent()); 
+            	html.replace("%objectId%", String.valueOf(getObjectId())); 
+            	{ 
+            		if (getCastle().getCastleId() > 6) 
+            		{ 
+            			html.replace("%territory%", "艾爾摩王國"); 
+            		} 
+            		else 
+            		{ 
+            			html.replace("%territory%", "亞丁王國"); 
+            		} 
+            	} 
+            	player.sendPacket(html); 
 
-                       NpcHtmlMessage html = new NpcHtmlMessage(1);
-                       html.setFile("data/html/territorystaus.htm");
-                       html.replace("%objectId%", String.valueOf(getObjectId()));
-                       html.replace("%npcname%", getName());
-
-                        html.replace("%castlename%", getCastle().getName());//fix chinese name of Castle by game
-                        
-                        L2Clan clan = new L2Clan(getCastle().getOwnerId());
-
-                        html.replace("%clanname%", clan.getName());
-                        html.replace("%clanleadername%", clan.getLeaderName());
-                        html.replace("%taxpercent%", "" + getCastle().getTaxPercent());
-                        player.sendPacket(html);
-                    }
-                    else
-                    {
-                		NpcHtmlMessage html = new NpcHtmlMessage(5);		
-                		StringBuffer replyMSG = new StringBuffer("<html><body>");
-                		replyMSG.append("<br><font color=\"LEVEL\">[領地現況公告]</font><br><br>");
-                		replyMSG.append("名稱:亞丁王國的"+getCastle().getName()+"領地<br>目前沒有統治此地區的血盟。");
-                		replyMSG.append("<br><br>");
-                		replyMSG.append("<button value=\"初始畫面\" action=\"bypass -h npc_"+String.valueOf(getObjectId())+"_Chat 0\" back=\"l2ui_ch3.smallbutton2_down\" width=65 height=20 fore=\"l2ui_ch3.smallbutton2\">");  
-                		replyMSG.append("</body></html>");
-                		html.setHtml(replyMSG.toString());
-                        player.sendPacket(html);
-                    }
-                }
-                else
-                {
-            		NpcHtmlMessage html = new NpcHtmlMessage(5);		
-            		StringBuffer replyMSG = new StringBuffer("<html><body>");
-            		replyMSG.append("<br><font color=\"LEVEL\">[領地現況公告]</font><br><br>");
-            		replyMSG.append("名稱:亞丁王國的"+getCastle().getName()+"領地<br>目前沒有統治此地區的血盟。");
-            		replyMSG.append("<br><br>");
-            		replyMSG.append("<button value=\"初始畫面\" action=\"bypass -h npc_"+String.valueOf(getObjectId())+"_Chat 0\" back=\"l2ui_ch3.smallbutton2_down\" width=65 height=20 fore=\"l2ui_ch3.smallbutton2\">");  
-            		replyMSG.append("</body></html>");
-            		html.setHtml(replyMSG.toString());
-                    player.sendPacket(html);
-                }
             }
             else if (command.startsWith("Quest"))
             {

@@ -43,7 +43,7 @@ import net.sf.l2j.gameserver.templates.StatsSet;
 
 /**
  * This class ...
- * 
+ *
  * @version $Revision: 1.8.2.6.2.9 $ $Date: 2005/04/06 16:13:25 $
  */
 public class NpcTable
@@ -76,7 +76,7 @@ public class NpcTable
 
 		try
 		{
-			try 
+			try
 			{
 				con = L2DatabaseFactory.getInstance().getConnection();
 				PreparedStatement statement;
@@ -86,12 +86,12 @@ public class NpcTable
 				fillNpcTable(npcdata);
 				npcdata.close();
 				statement.close();
-			} 
+			}
 			catch (Exception e) {
 				_log.severe("NPCTable: Error creating NPC table: " + e);
 			}
 
-			try 
+			try
 			{
 				con = L2DatabaseFactory.getInstance().getConnection();
 				PreparedStatement statement = con.prepareStatement("SELECT npcid, skillid, level FROM npcskills");
@@ -110,15 +110,12 @@ public class NpcTable
 					int skillId = npcskills.getInt("skillid");
 					int level = npcskills.getInt("level");
 
-					if (npcDat.race == 0)
+					if (npcDat.race == null && skillId == 4416)
 					{
-						if (skillId >= 4290 && skillId <= 4302)
-						{
-							npcDat.setRace(skillId);
-							continue;
-						}
+						npcDat.setRace(level);
+						continue;
 					}
-
+					
 					npcSkill = SkillTable.getInstance().getInfo(skillId, level);
 
 					if (npcSkill == null)

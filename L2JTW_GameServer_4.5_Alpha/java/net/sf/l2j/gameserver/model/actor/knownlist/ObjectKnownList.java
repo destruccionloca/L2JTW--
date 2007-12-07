@@ -36,7 +36,7 @@ public class ObjectKnownList
     // Data Field
     private L2Object _activeObject;
     private Map<Integer, L2Object> _knownObjects;
-    
+
     // =========================================================
     // Constructor
     public ObjectKnownList(L2Object activeObject)
@@ -54,7 +54,7 @@ public class ObjectKnownList
         // Check if already know object
         if (knowsObject(object))
         {
-    		
+
             if (!object.isVisible()) removeKnownObject(object);
             return false;
         }
@@ -63,20 +63,21 @@ public class ObjectKnownList
         if (!Util.checkIfInRange(getDistanceToWatchObject(object), getActiveObject(), object, true)) return false;
         if(Math.abs(object.getZ()-getActiveObject().getZ()) > 600) return false;
 
+
         return (getKnownObjects().put(object.getObjectId(), object) == null);
     }
 
     public final boolean knowsObject(L2Object object) { return getActiveObject() == object || getKnownObjects().containsKey(object.getObjectId()); }
-    
+
     /** Remove all L2Object from _knownObjects */
     public void removeAllKnownObjects() { getKnownObjects().clear(); }
 
-    public boolean removeKnownObject(L2Object object) 
-    { 
+    public boolean removeKnownObject(L2Object object)
+    {
     	if (object == null) return false;
-    	return (getKnownObjects().remove(object.getObjectId()) != null); 
+    	return (getKnownObjects().remove(object.getObjectId()) != null);
     }
-    
+
     /**
      * Update the _knownObject and _knowPlayers of the L2Character and of its already known L2Object.<BR><BR>
      *
@@ -86,7 +87,7 @@ public class ObjectKnownList
      * <li>Add L2Character to _knowObject and if necessary to _knownPlayers of L2Object alreday known by the L2Character </li><BR><BR>
      *
      */
-    public final synchronized void updateKnownObjects()  
+    public final synchronized void updateKnownObjects()
     {
         // Only bother updating knownobjects for L2Character; don't for L2Object
         if (getActiveObject() instanceof L2Character)
@@ -101,12 +102,12 @@ public class ObjectKnownList
     private final void findCloseObjects()
     {
     	boolean isActiveObjectPlayable = (getActiveObject() instanceof L2PlayableInstance);
-    	
+
         if(isActiveObjectPlayable)
         {
         	Collection<L2Object> objects = L2World.getInstance().getVisibleObjects(getActiveObject());
             if (objects == null) return;
-            
+
         	// Go through all visible L2Object near the L2Character
         	for (L2Object object : objects)
         	{
@@ -125,7 +126,7 @@ public class ObjectKnownList
         {
         	Collection<L2PlayableInstance> playables = L2World.getInstance().getVisiblePlayable(getActiveObject());
         	if (playables == null) return;
-                
+
         	// Go through all visible L2Object near the L2Character
         	for (L2Object playable : playables)
         	{
@@ -142,22 +143,22 @@ public class ObjectKnownList
 
     private final void forgetObjects()
     {
-    	// Go through knownObjects    
+    	// Go through knownObjects
     	Collection<L2Object> knownObjects = getKnownObjects().values();
-    	
+
     	if (knownObjects == null || knownObjects.size() == 0) return;
-    	
+
     	for (L2Object object: knownObjects)
     	{
-    		if (object == null) continue;  
-    		
+    		if (object == null) continue;
+
     		// Remove all invisible object
     		// Remove all too far object
     		if (
     				!object.isVisible() ||
     				!Util.checkIfInRange(getDistanceToForgetObject(object), getActiveObject(), object, true)
     		)
-    			if (object instanceof L2BoatInstance && getActiveObject() instanceof L2PcInstance) 
+    			if (object instanceof L2BoatInstance && getActiveObject() instanceof L2PcInstance)
     			{
     				if(((L2BoatInstance)(object)).getVehicleDeparture() == null )
     				{
@@ -189,7 +190,7 @@ public class ObjectKnownList
     // =========================================================
     // Property - Public
     public L2Object getActiveObject()
-    {        
+    {
         return _activeObject;
     }
 
@@ -203,7 +204,7 @@ public class ObjectKnownList
         if (_knownObjects == null) _knownObjects = new FastMap<Integer, L2Object>().setShared(true);
         return _knownObjects;
     }
-    
+
     public static class KnownListAsynchronousUpdateTask implements Runnable
     {
     	private L2Object _obj;
@@ -219,7 +220,7 @@ public class ObjectKnownList
 		public void run()
 		{
 			if(_obj != null)
-				_obj.getKnownList().updateKnownObjects();			
+				_obj.getKnownList().updateKnownObjects();
 		}
     }
 }

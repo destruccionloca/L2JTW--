@@ -33,15 +33,15 @@ public class L2SkillElemental extends L2Skill {
 
 	private final int[] _seeds;
 	private final boolean _seedAny;
-	
+
 	public L2SkillElemental(StatsSet set) {
 		super(set);
-		
+
 		_seeds = new int[3];
 		_seeds[0] = set.getInteger("seed1",0);
 		_seeds[1] = set.getInteger("seed2",0);
 		_seeds[2] = set.getInteger("seed3",0);
-		
+
 		if (set.getInteger("seed_any",0)==1)
 			_seedAny = true;
 		else
@@ -55,18 +55,18 @@ public class L2SkillElemental extends L2Skill {
 
 		boolean ss = false;
 		boolean bss = false;
-		
+
 		L2ItemInstance weaponInst = activeChar.getActiveWeaponInstance();
 
 
 		if (weaponInst != null) 
         {
-			if (weaponInst.getChargedSpiritshot() == L2ItemInstance.CHARGED_BLESSED_SPIRITSHOT) 
+			if (weaponInst.getChargedSpiritshot() == L2ItemInstance.CHARGED_BLESSED_SPIRITSHOT)
 			{
 				bss = true;
 				weaponInst.setChargedSpiritshot(L2ItemInstance.CHARGED_NONE);
 			}
-	        else if (weaponInst.getChargedSpiritshot() == L2ItemInstance.CHARGED_SPIRITSHOT) 
+	        else if (weaponInst.getChargedSpiritshot() == L2ItemInstance.CHARGED_SPIRITSHOT)
 			{
 				ss = true;
 				weaponInst.setChargedSpiritshot(L2ItemInstance.CHARGED_NONE);
@@ -76,7 +76,7 @@ public class L2SkillElemental extends L2Skill {
         else if (activeChar instanceof L2Summon)
         {
             L2Summon activeSummon = (L2Summon)activeChar;
-            
+
             if (activeSummon.getChargedSpiritShot() == L2ItemInstance.CHARGED_BLESSED_SPIRITSHOT)
             {
                 bss = true;
@@ -88,13 +88,13 @@ public class L2SkillElemental extends L2Skill {
                 activeSummon.setChargedSpiritShot(L2ItemInstance.CHARGED_NONE);
             }
         }
-		
+
         for (int index = 0; index < targets.length; index++)
         {
 			L2Character target = (L2Character)targets[index];
 			if (target.isAlikeDead())
 				continue;
-			
+
 			boolean charged = true;
 
 			if (!_seedAny){
@@ -127,30 +127,31 @@ public class L2SkillElemental extends L2Skill {
 				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 				sm.addString("SYS"); 
 				sm.addString("所需的元素不足."); 
+
 				activeChar.sendPacket(sm);
 				continue;
 			}
-			
+
 			boolean mcrit = Formulas.getInstance().calcMCrit(activeChar.getMCriticalHit(target, this));
-			
+
 			int damage = (int)Formulas.getInstance().calcMagicDam(
 					activeChar, target, this, ss, bss, mcrit);
-			
+
 			if (damage > 0)
 			{
 				target.reduceCurrentHp(damage, activeChar);
-	
+
 	            // Manage attack or cast break of the target (calculating rate, sending message...)
 	            if (!target.isRaid() && Formulas.getInstance().calcAtkBreak(target, damage))
 	            {
 	                target.breakAttack();
 	                target.breakCast();
 	            }
-	
+
             	activeChar.sendDamageMessage(target, damage, false, false, false);
 
 			}
-			
+
 			// activate attacked effects, if any
 			target.stopSkillEffects(getId());
             getEffects(activeChar, target);

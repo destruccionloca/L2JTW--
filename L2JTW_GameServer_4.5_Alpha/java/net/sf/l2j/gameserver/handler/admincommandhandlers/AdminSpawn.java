@@ -44,7 +44,7 @@ import net.sf.l2j.gameserver.templates.L2NpcTemplate;
  * This class handles following admin commands: - show_spawns = shows menu -
  * spawn_index lvl = shows menu for monsters with respective level -
  * spawn_monster id = spawns monster id on target
- * 
+ *
  * @version $Revision: 1.2.2.5.2.5 $ $Date: 2005/04/11 10:06:06 $
  */
 public class AdminSpawn implements IAdminCommandHandler
@@ -99,7 +99,7 @@ public class AdminSpawn implements IAdminCommandHandler
 				try
 				{
 					from = Integer.parseInt(st.nextToken());
-				} 
+				}
 				catch (NoSuchElementException nsee) {}
 				showNpcs(activeChar, letter, from);
 			}
@@ -115,7 +115,7 @@ public class AdminSpawn implements IAdminCommandHandler
 			{
 				String cmd = st.nextToken();
 				String id = st.nextToken();
-				int respawnTime = 0; 
+				int respawnTime = 0;
 				int mobCount = 1;
 				if (st.hasMoreTokens())
 					mobCount = Integer.parseInt(st.nextToken());
@@ -190,11 +190,11 @@ public class AdminSpawn implements IAdminCommandHandler
 			int monsterTemplate = Integer.parseInt(monsterId);
 			template1 = NpcTable.getInstance().getTemplate(monsterTemplate);
 		}
-		else 
+		else
 		{
 			//First parameter wasn't just numbers so go by name not ID
 			monsterId = monsterId.replace('_', ' ');
-			template1 = NpcTable.getInstance().getTemplateByName(monsterId); 
+			template1 = NpcTable.getInstance().getTemplateByName(monsterId);
 		}
 
 		try
@@ -218,7 +218,7 @@ public class AdminSpawn implements IAdminCommandHandler
 				if (!permanent)
 					spawn.stopRespawn();
 				activeChar.sendMessage("³Ð³y " + template1.name + " ¦b " + target.getObjectId());
-			} 
+			}
 		}
 		catch (Exception e)
 		{

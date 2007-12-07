@@ -40,10 +40,10 @@ public class L2SkillSummon extends L2Skill {
 	private int     _npcId;
 	private float   _expPenalty;
 	private boolean _isCubic;
-	
+
 	public L2SkillSummon(StatsSet set) {
 		super(set);
-		
+
 		_npcId      = set.getInteger("npcId", 0); // default for undescribed skills
 		_expPenalty = set.getFloat ("expPenalty", 0.f);
 		_isCubic    = set.getBool  ("isCubic", false);
@@ -55,14 +55,15 @@ public class L2SkillSummon extends L2Skill {
 		{
 			L2PcInstance player = (L2PcInstance)activeChar;
 			if (_isCubic) {
- if (getTargetType() != L2Skill.SkillTargetType.TARGET_SELF)
- {
- return true; //Player is always able to cast mass cubic skill
- } 
+
+				if (getTargetType() != L2Skill.SkillTargetType.TARGET_SELF)
+				{
+					return true; //Player is always able to cast mass cubic skill
+				}
 				int mastery = player.getSkillLevel(L2Skill.SKILL_CUBIC_MASTERY);
 				if (mastery < 0)
 					mastery = 0;
-				int count = player.getCubics().size(); 
+				int count = player.getCubics().size();
 				if (count > mastery) {
 					SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 					sm.addString("SYS");
@@ -71,7 +72,7 @@ public class L2SkillSummon extends L2Skill {
 					return false;
 				}
 			} else {
-				if (player.inObserverMode()) 
+				if (player.inObserverMode())
 					return false;
 				if (player.getPet() != null)
 				{
@@ -85,7 +86,7 @@ public class L2SkillSummon extends L2Skill {
 		}
 		return super.checkCondition(activeChar, null, false);
 	}
-	
+
 
 	@Override
 	public void useSkill(L2Character caster, L2Object[] targets) {
@@ -101,7 +102,7 @@ public class L2SkillSummon extends L2Skill {
 			activeChar.sendPacket(sm);
 			return;
 		}
-		
+
 		if (_isCubic) {
 			if (targets.length > 1) //Mass cubic skill
 			{
@@ -121,8 +122,8 @@ public class L2SkillSummon extends L2Skill {
                             c = null;
                         }
 						player.getCubics().clear();
-					}				
-					if (player.getCubics().size() > mastery) continue;		
+					}
+					if (player.getCubics().size() > mastery) continue;
                     if (player.getCubics().containsKey(_npcId))
                     {
                         player.sendMessage("已經召喚此晶體");
@@ -131,7 +132,7 @@ public class L2SkillSummon extends L2Skill {
                     {
 
 						player.addCubic(_npcId, getLevel());
-						player.broadcastUserInfo();		
+						player.broadcastUserInfo();
                     }
 				}
 				return;
@@ -156,7 +157,7 @@ public class L2SkillSummon extends L2Skill {
 				activeChar.addCubic(_npcId, getLevel());
 				activeChar.broadcastUserInfo();
 				return;
-			}			
+			}
 
 		}
 
@@ -165,14 +166,14 @@ public class L2SkillSummon extends L2Skill {
 				_log.fine("player has a pet already. ignore summon skill");
 			return;
 		}
-		
+
 		L2SummonInstance summon;
 		L2NpcTemplate summonTemplate = NpcTable.getInstance().getTemplate(_npcId);
 		if (summonTemplate.type.equalsIgnoreCase("L2SiegeSummon"))
-			summon = new L2SiegeSummonInstance(IdFactory.getInstance().getNextId(), summonTemplate, activeChar, this);			
-		else 
+			summon = new L2SiegeSummonInstance(IdFactory.getInstance().getNextId(), summonTemplate, activeChar, this);
+		else
 			summon = new L2SummonInstance(IdFactory.getInstance().getNextId(), summonTemplate, activeChar, this);
-		
+
         summon.setName(summonTemplate.name);
         summon.setTitle(activeChar.getName());
         summon.setExpPenalty(_expPenalty);
@@ -190,10 +191,10 @@ public class L2SkillSummon extends L2Skill {
 		summon.setHeading(activeChar.getHeading());
     	summon.setRunning();
 		activeChar.setPet(summon);
-    		
+
     	L2World.getInstance().storeObject(summon);
         summon.spawnMe(activeChar.getX()+50, activeChar.getY()+100, activeChar.getZ());
-    		
+
     	summon.setFollowStatus(true);
         summon.setShowSummonAnimation(false); // addVisibleObject created the info packets with summon animation
                                               // if someone comes into range now, the animation shouldnt show any more

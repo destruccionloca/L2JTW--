@@ -16,7 +16,7 @@
  *
  * http://www.gnu.org/copyleft/gpl.html
  */
-package net.sf.l2j.gameserver.handler.skillhandlers; 
+package net.sf.l2j.gameserver.handler.skillhandlers;
 
 import net.sf.l2j.gameserver.ai.CtrlEvent;
 import net.sf.l2j.gameserver.ai.CtrlIntention;
@@ -34,36 +34,36 @@ import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.skills.Formulas;
 
-import java.util.logging.Logger;
-/** 
- * @author _drunk_ 
- * 
- * TODO To change the template for this generated type comment go to 
- * Window - Preferences - Java - Code Style - Code Templates 
- */ 
-public class Spoil implements ISkillHandler 
-{ 
-    //private static Logger _log = Logger.getLogger(Spoil.class.getName()); 
+
+/**
+ * @author _drunk_
+ *
+ * TODO To change the template for this generated type comment go to
+ * Window - Preferences - Java - Code Style - Code Templates
+ */
+public class Spoil implements ISkillHandler
+{
+    //private static Logger _log = Logger.getLogger(Spoil.class.getName());
 
 	private static final SkillType[] SKILL_IDS = {SkillType.SPOIL, SkillType.SPOILATK};
 
+
     public void useSkill(L2Character activeChar, L2Skill skill, @SuppressWarnings("unused") L2Object[] targets)
-    { 
+    {
     	
     	
         if (!(activeChar instanceof L2PcInstance))
 			return;
      
-		//L2Object[] targetList = skill.getTargetList(activeChar);
-        
-        //if (targetList == null)
-        //{
-        //    return;
-        //}
-        
-        
-	
-		for (int index = 0; index < targets.length; index++) 
+		L2Object[] targetList = skill.getTargetList(activeChar);
+
+
+        if (targetList == null)
+        {
+            return;
+        }
+
+		for (int index = 0; index < targetList.length; index++)
 		{
 			if (!(targets[index] instanceof L2MonsterInstance))
 				continue;
@@ -113,7 +113,7 @@ public class Spoil implements ISkillHandler
 					activeChar.sendPacket(sm);
 				}				
 				target.getAI().notifyEvent(CtrlEvent.EVT_ATTACKED, activeChar);
-				//activeChar.getAI().setIntention(CtrlIntention.AI_INTENTION_ATTACK, target);
+
 			}
 		}
     } 

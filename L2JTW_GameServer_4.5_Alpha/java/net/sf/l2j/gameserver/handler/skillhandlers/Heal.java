@@ -37,7 +37,7 @@ import java.util.logging.Logger;
 
 /**
  * This class ...
- * 
+ *
  * @version $Revision: 1.1.2.2.2.4 $ $Date: 2005/04/06 16:13:48 $
  */
 
@@ -46,14 +46,14 @@ public class Heal implements ISkillHandler
 
 	// all the items ids that this handler knowns
 	//private static Logger _log = Logger.getLogger(Heal.class.getName());
-	
+
 	/* (non-Javadoc)
 	 * @see net.sf.l2j.gameserver.handler.IItemHandler#useItem(net.sf.l2j.gameserver.model.L2PcInstance, net.sf.l2j.gameserver.model.L2ItemInstance)
 	 */
 
 	private static final SkillType[] SKILL_IDS = {SkillType.HEAL, SkillType.HEAL_PERCENT, SkillType.HEAL_STATIC, SkillType.BALANCE};
 
-	
+
 	/* (non-Javadoc)
 	 * @see net.sf.l2j.gameserver.handler.IItemHandler#useItem(net.sf.l2j.gameserver.model.L2PcInstance, net.sf.l2j.gameserver.model.L2ItemInstance)
 	 */
@@ -68,10 +68,11 @@ public class Heal implements ISkillHandler
 		//check for other effects
 	    try {
 	        ISkillHandler handler = SkillHandler.getInstance().getSkillHandler(SkillType.BUFF);
-		
+
             if (handler != null)
                 handler.useSkill(activeChar, skill, targets);
-        } 
+
+	    }
         catch (Exception e) {}
         
         
@@ -88,14 +89,14 @@ public class Heal implements ISkillHandler
                 
             }
         }
+
 		L2PcInstance player = null;
 		if (activeChar instanceof L2PcInstance)
 			player = (L2PcInstance)activeChar;
-		
+
         for (int index = 0; index < targets.length; index++)
         {
             target = (L2Character)targets[index];
-            
             // We should not heal if char is dead
             if (target == null || target.isDead())
                 continue;
@@ -103,7 +104,7 @@ public class Heal implements ISkillHandler
             // We should not heal walls and door
             if(target instanceof L2DoorInstance)
             	continue;
-            
+
             // Player holding a cursed weapon can't be healed and can't heal
             if (target != activeChar)
             {
@@ -115,7 +116,7 @@ public class Heal implements ISkillHandler
 
             double hp = (skill.getSkillType() == SkillType.HEAL) ? target.calcStat(Stats.HEAL_HP_RATE, skill.getPower(), null, null) : skill.getPower();
 
-            
+
             if (skill.getSkillType() == SkillType.HEAL_PERCENT)
             {
                 hp = target.getMaxHp() * hp / 100.0;
@@ -153,7 +154,7 @@ public class Heal implements ISkillHandler
                 {
 
                     L2Summon activeSummon = (L2Summon)activeChar;
-                    
+
                     if (activeSummon.getChargedSpiritShot() == L2ItemInstance.CHARGED_BLESSED_SPIRITSHOT)
                     {
                         //hp *= 1.5;
@@ -175,23 +176,23 @@ public class Heal implements ISkillHandler
 
             if (skill.getSkillType() != SkillType.BALANCE)
             {
-            
+
 
 			//int cLev = activeChar.getLevel();
-			//hp += skill.getPower()/*+(Math.sqrt(cLev)*cLev)+cLev*/; 
+			//hp += skill.getPower()/*+(Math.sqrt(cLev)*cLev)+cLev*/;
             if (skill.getSkillType() == SkillType.HEAL_STATIC)
             	hp = skill.getPower();
             else if (skill.getSkillType() != SkillType.HEAL_PERCENT)
 
 				hp *= target.calcStat(Stats.HEAL_HP_RATE, 100, null, null) / 100;		
 
-            
-			target.setCurrentHp(hp + target.getCurrentHp()); 
-			target.setLastHealAmount((int)hp);            
+
+			target.setCurrentHp(hp + target.getCurrentHp());
+			target.setLastHealAmount((int)hp);
 			StatusUpdate su = new StatusUpdate(target.getObjectId());
 			su.addAttribute(StatusUpdate.CUR_HP, (int)target.getCurrentHp());
 			target.sendPacket(su);
-            
+
             if (target instanceof L2PcInstance)
             {
 
@@ -246,6 +247,7 @@ public class Heal implements ISkillHandler
     {
         return SKILL_IDS;
     }
+
 
 }
 

@@ -46,9 +46,9 @@ import net.sf.l2j.gameserver.skills.Stats;
 import net.sf.l2j.gameserver.skills.funcs.Func;
 import net.sf.l2j.util.Rnd;
 
-/** 
+/**
  * This Handles Disabler skills
- * @author _drunk_ 
+ * @author _drunk_
  */
 public class Disablers implements ISkillHandler
 {
@@ -66,7 +66,7 @@ public class Disablers implements ISkillHandler
     private  String[] _negateStats=null;
     private  float _negatePower=0.f;
     private int _negateId=0;
-    
+
     public void useSkill(L2Character activeChar, L2Skill skill, L2Object[] targets)
     {
         SkillType type = skill.getSkillType();
@@ -101,7 +101,7 @@ public class Disablers implements ISkillHandler
 	                	weaponInst.setChargedSpiritshot(L2ItemInstance.CHARGED_NONE);
 	            }
         	}
-            else 
+            else
             	if (weaponInst.getChargedSoulshot() == L2ItemInstance.CHARGED_SOULSHOT)
 	            {
 	                ss = true;
@@ -127,7 +127,7 @@ public class Disablers implements ISkillHandler
 	                activeSummon.setChargedSpiritShot(L2ItemInstance.CHARGED_NONE);
 	            }
         	}
-            else 
+            else
             	if (activeSummon.getChargedSoulShot() == L2ItemInstance.CHARGED_SOULSHOT)
 	            {
 	                ss = true;
@@ -141,23 +141,23 @@ public class Disablers implements ISkillHandler
             if (!(targets[index] instanceof L2Character)) continue;
 
             L2Character target = (L2Character) targets[index];
-            
+
             if (target == null || target.isDead()) //bypass if target is null or dead
         		continue;
-          
+
             switch (type)
             {
-        		case BETRAY: 
-        	 	{ 
-        	 		if (Formulas.getInstance().calcSkillSuccess(activeChar, target, skill, ss, sps, bss)) 
-        	 			skill.getEffects(activeChar, target); 
-        	 		else 
+        		case BETRAY:
+        	 	{
+        	 		if (Formulas.getInstance().calcSkillSuccess(activeChar, target, skill, ss, sps, bss))
+        	 			skill.getEffects(activeChar, target);
+        	 		else
         	 		{
-        	 			SystemMessage sm = new SystemMessage(SystemMessageId.S1_WAS_UNAFFECTED_BY_S2); 
-        	 			sm.addString(target.getName()); 
-        	 			sm.addSkillName(skill.getId()); 
-        	 			activeChar.sendPacket(sm);  
-        	 		} 
+        	 			SystemMessage sm = new SystemMessage(SystemMessageId.S1_WAS_UNAFFECTED_BY_S2);
+        	 			sm.addString(target.getName());
+        	 			sm.addSkillName(skill.getId());
+        	 			activeChar.sendPacket(sm);
+        	 		}
         	 		break;
         	 	}
                 case FAKE_DEATH:
@@ -172,14 +172,12 @@ public class Disablers implements ISkillHandler
 
 					if(target.reflectSkill(skill))
                     	target = activeChar;
+
 	
                     if (target instanceof L2Attackable)
                         ((L2Attackable)target).addDamageHate(activeChar, 0, 500);
-                   if (Formulas.getInstance().calcSkillSuccess(activeChar, target, skill, ss, sps, bss))                    
+                    if (Formulas.getInstance().calcSkillSuccess(activeChar, target, skill, ss, sps, bss))
                     	skill.getEffects(activeChar, target);
-
-
-
                     else
                     {
                         if (activeChar instanceof L2PcInstance)
@@ -220,12 +218,13 @@ public class Disablers implements ISkillHandler
                 {
                 	if(target.reflectSkill(skill))
                     	target = activeChar;
-                    	
-                    if (target instanceof L2Attackable)
-                        ((L2Attackable)target).addDamageHate(activeChar, 0, 500);
-                    
-                    if (Formulas.getInstance().calcSkillSuccess(activeChar, target, skill, ss, sps, bss))                    
-                    	skill.getEffects(activeChar, target);        
+
+                	if (target instanceof L2Attackable)
+                		((L2Attackable)target).addDamageHate(activeChar, 0, 500);
+	
+                    if (Formulas.getInstance().calcSkillSuccess(activeChar, target, skill, ss, sps, bss))
+                    	skill.getEffects(activeChar, target);
+
                     else
                     {
                         if (activeChar instanceof L2PcInstance)
@@ -281,14 +280,14 @@ public class Disablers implements ISkillHandler
 
 
                        L2Effect[] effects = target.getAllEffects();
-                        for (L2Effect e : effects)                        
+                        for (L2Effect e : effects)
                             if (e.getSkill().getSkillType() == type)
                             	e.exit();
                         // then restart
-                        // Make above skills mdef dependant	        		
+                        // Make above skills mdef dependant
                         if (Formulas.getInstance().calcSkillSuccess(activeChar, target, skill, ss, sps, bss))
                         //if(Formulas.getInstance().calcMagicAffected(activeChar, target, skill))
-                            skill.getEffects(activeChar, target);                        
+                            skill.getEffects(activeChar, target);
                        else
                         {
                             if (activeChar instanceof L2PcInstance)
@@ -382,9 +381,9 @@ public class Disablers implements ISkillHandler
                     {
                     	skill.getEffects(activeChar, target);
 
-                    	double aggdiff = ((L2Attackable)target).getHating(activeChar) 
-                    					   - target.calcStat(Stats.AGGRESSION, ((L2Attackable)target).getHating(activeChar), target, skill); 
-                    						
+                    	double aggdiff = ((L2Attackable)target).getHating(activeChar)
+                    					   - target.calcStat(Stats.AGGRESSION, ((L2Attackable)target).getHating(activeChar), target, skill);
+
                     	if (skill.getPower() > 0)
                     		((L2Attackable)target).reduceHate(null, (int) skill.getPower());
                     	else if (aggdiff > 0)
@@ -406,7 +405,7 @@ public class Disablers implements ISkillHandler
                            		((L2AttackableAI)targ.getAI()).setGlobalAggro(-25);
                         		targ.clearAggroList();
                         		targ.getAI().setIntention(CtrlIntention.AI_INTENTION_ACTIVE);
-                        		targ.setWalking();	
+                        		targ.setWalking();
                             }
                         }
                     	skill.getEffects(activeChar, target);
@@ -516,11 +515,11 @@ public class Disablers implements ISkillHandler
                 	{
                 		L2PcInstance summonOwner = null;
                 		L2Summon summonPet = null;
-                		summonOwner = ((L2Summon)target).getOwner();                		
+                		summonOwner = ((L2Summon)target).getOwner();
                 		summonPet = summonOwner.getPet();
                 		summonPet.unSummon(summonOwner);
                         SystemMessage sm = new SystemMessage(SystemMessageId.LETHAL_STRIKE);
-				        summonOwner.sendPacket(sm);                		 
+				        summonOwner.sendPacket(sm);
                 	}
                 	else
                     {
@@ -539,13 +538,13 @@ public class Disablers implements ISkillHandler
                     for(L2Object t: targets)
                     {
                     	L2Character target1 = (L2Character) t;
-                    	
+
                         if(target1.reflectSkill(skill))
                         	target1 = activeChar;
-                        
+
                     	if (! Formulas.getInstance().calcSkillSuccess(activeChar, target1, skill, ss, sps, bss))
                     		continue;
-                    
+
                     	 L2Effect[] effects = target1.getAllEffects();
                     	 for(L2Effect e: effects)
                     	 {
@@ -566,13 +565,13 @@ public class Disablers implements ISkillHandler
                     for(L2Object t: targets)
                     {
                     	L2Character target1 = (L2Character) t;
-                    	
+
                         if(target1.reflectSkill(skill))
                         	target1 = activeChar;
-                        
+
                     	if (! Formulas.getInstance().calcSkillSuccess(activeChar, target1, skill, ss, sps, bss))
                     		continue;
-                    
+
                     	 L2Effect[] effects = target1.getAllEffects();
                     	 for(L2Effect e: effects)
                     	 {
@@ -584,7 +583,7 @@ public class Disablers implements ISkillHandler
                     				 break;
                     			 }
                     		 }
-                    	 }                    	 
+                    	 }
                     }
                     break;
             	}
@@ -593,7 +592,7 @@ public class Disablers implements ISkillHandler
                 {
                     if(target.reflectSkill(skill))
                     	target = activeChar;
-                    
+
                 	//TODO@   Rewrite it to properly use Formulas class.
                     // cancel
                     if (target instanceof L2Attackable)
@@ -604,18 +603,18 @@ public class Disablers implements ISkillHandler
                     	if(skill.getMagicLevel()==12) lvlmodifier = (Experience.MAX_LEVEL - 1);
                     	int landrate = 90;
                     	if((target.getLevel() - lvlmodifier)>0) landrate = 90-4*(target.getLevel()-lvlmodifier);
-                    	
+
                     	landrate = (int) activeChar.calcStat(Stats.CANCEL_VULN, landrate, target, null);
-                    	
+
                     	if(Rnd.get(100) < landrate)
                     	{
                     		L2Effect[] effects = target.getAllEffects();
                     		int maxfive = 5;
                     		for (L2Effect e : effects)
-                    		{ 
-                    			if (e.getSkill().getId() != 4082 && e.getSkill().getId() != 4215 && 
-                    					e.getSkill().getId() != 4515 && e.getSkill().getId() != 110 && e.getSkill().getId() != 111 && 
-                    					e.getSkill().getId() != 1323 && e.getSkill().getId() != 1325) // Cannot cancel skills 4082, 4215, 4515, 110, 111, 1323, 1325 
+                    		{
+                    			if (e.getSkill().getId() != 4082 && e.getSkill().getId() != 4215 &&
+                    					e.getSkill().getId() != 4515 && e.getSkill().getId() != 110 && e.getSkill().getId() != 111 &&
+                    					e.getSkill().getId() != 1323 && e.getSkill().getId() != 1325) // Cannot cancel skills 4082, 4215, 4515, 110, 111, 1323, 1325
                     			{
                     				if(e.getSkill().getSkillType() != SkillType.BUFF) //sleep, slow, surrenders etc
                     					e.exit();
@@ -674,7 +673,7 @@ public class Disablers implements ISkillHandler
                     else if (skill.getId() == 2275) {
                 	 _negatePower = skill.getNegatePower();
                 	 _negateId = skill.getNegateId();
-                	 
+
                 		 negateEffect(target,SkillType.BUFF,_negatePower,_negateId);
                     }
                 	// all others negate type skills
@@ -682,19 +681,19 @@ public class Disablers implements ISkillHandler
                     {
                     	 _negateStats = skill.getNegateStats();
                     	 _negatePower = skill.getNegatePower();
-                    	 
+
                     	 for (String stat : _negateStats)
-                    	 {                                
+                    	 {
                     		 stat = stat.toLowerCase().intern();
-                        	 if (stat == "buff") 
+                        	 if (stat == "buff")
                         	 {
                              	int lvlmodifier= 52+skill.getMagicLevel()*2;
                             	if(skill.getMagicLevel()==12) lvlmodifier = (Experience.MAX_LEVEL - 1);
                             	int landrate = 90;
                             	if((target.getLevel() - lvlmodifier)>0) landrate = 90-4*(target.getLevel()-lvlmodifier);
-                            	
+
                             	landrate = (int) activeChar.calcStat(Stats.CANCEL_VULN, landrate, target, null);
-                            	
+
                             	if(Rnd.get(100) < landrate)
                             		negateEffect(target,SkillType.BUFF,-1);
                         	 }
@@ -723,27 +722,29 @@ public class Disablers implements ISkillHandler
 	                    		 _log.log(Level.WARNING, "", e);
 	                    		 }
                               }
-                          }//end for                                              	               
+                          }//end for
                     }//end else
-                }// end case                                    
+                }// end case
             }//end switch
-        }//end for        
-        //_log.warning("Debug: Aura Skill Casting Finish...");
+
+        }//end for
+
+
         // self Effect :]
-        L2Effect effect = activeChar.getFirstEffect(skill.getId());        
-        if (effect != null && effect.isSelfEffect())        
-        {            
-        	//Replace old effect with new one.            
-        	effect.exit();        
-        }        
+        L2Effect effect = activeChar.getFirstEffect(skill.getId());
+        if (effect != null && effect.isSelfEffect())
+        {
+        	//Replace old effect with new one.
+        	effect.exit();
+        }
         skill.getEffectsSelf(activeChar);
-        
+
     } //end void
-    
+
     private void negateEffect(L2Character target, SkillType type, double power) {
     	negateEffect(target, type, power, 0);
     }
-    
+
     private void negateEffect(L2Character target, SkillType type, double power, int skillId) {
         L2Effect[] effects = target.getAllEffects();
         for (L2Effect e : effects)
@@ -759,7 +760,7 @@ public class Disablers implements ISkillHandler
         				e.exit();
         		}
         	}
-        	else if ((e.getSkill().getSkillType() == type && e.getSkill().getPower() <= power) 
+        	else if ((e.getSkill().getSkillType() == type && e.getSkill().getPower() <= power)
         			|| (e.getSkill().getEffectType() != null && e.getSkill().getEffectType() == type && e.getSkill().getEffectLvl() <= power)) {
     			if (skillId != 0)
     			{

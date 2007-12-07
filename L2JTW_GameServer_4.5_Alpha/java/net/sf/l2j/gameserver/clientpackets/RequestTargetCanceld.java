@@ -22,16 +22,16 @@ import net.sf.l2j.gameserver.model.L2Character;
 
 /**
  * This class ...
- * 
+ *
  * @version $Revision: 1.3.4.2 $ $Date: 2005/03/27 15:29:30 $
  */
 public final class RequestTargetCanceld extends L2GameClientPacket
 {
 	private static final String _C__37_REQUESTTARGETCANCELD = "[C] 37 RequestTargetCanceld";
 	//private static Logger _log = Logger.getLogger(RequestTargetCanceld.class.getName());
-    
-    private int _unselect; 
-    
+
+    private int _unselect;
+
 	@Override
 	protected void readImpl()
 	{
@@ -46,7 +46,7 @@ public final class RequestTargetCanceld extends L2GameClientPacket
         {
             if (_unselect == 0)
             {
-            	if (activeChar.isCastingNow())
+            	if (activeChar.isCastingNow() && activeChar.canAbortCast())
             		activeChar.abortCast();
             	else if (activeChar.getTarget() != null)
             		activeChar.setTarget(null);

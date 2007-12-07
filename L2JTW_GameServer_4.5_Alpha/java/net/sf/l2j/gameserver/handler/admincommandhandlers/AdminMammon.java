@@ -18,13 +18,15 @@
  */
 package net.sf.l2j.gameserver.handler.admincommandhandlers;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.SevenSigns;
+import net.sf.l2j.gameserver.datatables.NpcTable;
 import net.sf.l2j.gameserver.datatables.SpawnTable;
 import net.sf.l2j.gameserver.handler.IAdminCommandHandler;
 import net.sf.l2j.gameserver.model.AutoSpawnHandler;
-import net.sf.l2j.gameserver.model.L2Object;
-import net.sf.l2j.gameserver.model.L2World;
 import net.sf.l2j.gameserver.model.AutoSpawnHandler.AutoSpawnInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
@@ -32,156 +34,150 @@ import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
 /**
  * Admin Command Handler for Mammon NPCs
- * 
+ *
  * @author Tempy
  */
-public class AdminMammon implements IAdminCommandHandler {
+public class AdminMammon implements IAdminCommandHandler
+{
 
+	private static final String[] ADMIN_COMMANDS = {"admin_mammon_find", "admin_mammon_respawn", "admin_list_spawns", "admin_msg"};
+	private static final int REQUIRED_LEVEL = Config.GM_MENU;
 
-    private static String[] ADMIN_COMMANDS = {"admin_mammon_find", "admin_mammon_respawn", "admin_list_spawns", "admin_msg"};
+	private boolean _isSealValidation = SevenSigns.getInstance().isSealValidationPeriod();
 
-    private static final int REQUIRED_LEVEL = Config.GM_MENU;
-    
-    private boolean _isSealValidation = SevenSigns.getInstance().isSealValidationPeriod();
-    
-    public boolean useAdminCommand(String command, L2PcInstance activeChar) 
-    {
-        if (!Config.ALT_PRIVILEGES_ADMIN)
-        {
-            if (!(checkLevel(activeChar.getAccessLevel()) && activeChar.isGM())) 
-                return false;
-        }
-        
-        int npcId = 0;
-        int teleportIndex = -1;
-        AutoSpawnInstance blackSpawnInst = AutoSpawnHandler.getInstance().getAutoSpawnInstance(SevenSigns.MAMMON_BLACKSMITH_ID, false);
-        AutoSpawnInstance merchSpawnInst = AutoSpawnHandler.getInstance().getAutoSpawnInstance(SevenSigns.MAMMON_MERCHANT_ID, false);
-        
-        if (command.startsWith("admin_mammon_find"))
-        {
-            try {
-                if (command.length() > 17)
-                    teleportIndex = Integer.parseInt(command.substring(18));
-            }
-            catch (Exception NumberFormatException) {
-                activeChar.sendMessage("格式為 //mammon_find <teleportIndex> (where 1 = Blacksmith, 2 = Merchant)");
-            }
+	public boolean useAdminCommand(String command, L2PcInstance activeChar)
+	{
+		if (!Config.ALT_PRIVILEGES_ADMIN)
+			if (!(checkLevel(activeChar.getAccessLevel()) && activeChar.isGM()))
+				return false;
 
-            if (!_isSealValidation) {
-                activeChar.sendMessage("目前為競爭時期.");
-                return true;
-            }
-            
-            L2NpcInstance[] blackInst = blackSpawnInst.getNPCInstanceList();
-            L2NpcInstance[] merchInst = merchSpawnInst.getNPCInstanceList();
-            
-            if (blackInst.length > 0) {
-                activeChar.sendMessage("財富的鐵匠: " + blackInst[0].getX() + " " + blackInst[0].getY() + " " + blackInst[0].getZ());
-                
-                if (teleportIndex == 0)
+		int npcId = 0;
+		int teleportIndex = -1;
+		AutoSpawnInstance blackSpawnInst = AutoSpawnHandler.getInstance().getAutoSpawnInstance(
+				SevenSigns.MAMMON_BLACKSMITH_ID,
+				false);
+		AutoSpawnInstance merchSpawnInst = AutoSpawnHandler.getInstance().getAutoSpawnInstance(
+				SevenSigns.MAMMON_MERCHANT_ID,
+				false);
 
-                    activeChar.teleToLocation(blackInst[0].getX(), blackInst[0].getY(),
-                                              blackInst[0].getZ(), true);
+		if (command.startsWith("admin_mammon_find"))
+		{
+			try
+			{
+				if (command.length() > 17) teleportIndex = Integer.parseInt(command.substring(18));
+			}
+			catch (Exception NumberFormatException)
+			{
+				activeChar.sendMessage("用法: //mammon_find [teleportIndex] (where 1 = Blacksmith, 2 = Merchant)");
+			}
 
-            }
-            
-            if (merchInst.length > 0) {
-                activeChar.sendMessage("財富的商人: " + merchInst[0].getX() + " " + merchInst[0].getY() + " " + merchInst[0].getZ());
-                
-                if (teleportIndex == 1)
+			if (!_isSealValidation)
+			{
+				activeChar.sendMessage("目前為競爭時期.");
+				return true;
+			}
+			if (blackSpawnInst!=null)
+			{
+				L2NpcInstance[] blackInst = blackSpawnInst.getNPCInstanceList();
+				if (blackInst.length > 0)
+				{
+					int x1=blackInst[0].getX(),y1=blackInst[0].getY(),z1=blackInst[0].getZ();
+					activeChar.sendMessage("Blacksmith of Mammon: "+x1+" "+y1+" "+z1);
+					if (teleportIndex == 1)
+						activeChar.teleToLocation(x1, y1, z1, true);
+				}
+			}
+			else
+				activeChar.sendMessage("財富鐵匠/財富商人並未在 Spawn 資料內.");
+			if (merchSpawnInst!=null)
+			{
+				L2NpcInstance[] merchInst = merchSpawnInst.getNPCInstanceList();
+				if (merchInst.length > 0)
+				{
+					int x2=merchInst[0].getX(),y2=merchInst[0].getY(),z2=merchInst[0].getZ();
+					activeChar.sendMessage("財富鐵匠: "+x2+" "+y2+" "+z2);
+					if (teleportIndex == 2)
+						activeChar.teleToLocation(x2, y2, z2, true);
+				}
+			}
+			else
+				activeChar.sendMessage("財富鐵匠/財富商人並未在 Spawn 資料內.");
+		}
 
-                    activeChar.teleToLocation(merchInst[0].getX(), merchInst[0].getY(),
-                                              merchInst[0].getZ(), true);
+		else if (command.startsWith("admin_mammon_respawn"))
+		{
+			if (!_isSealValidation)
+			{
+				activeChar.sendMessage("目前為競爭時期.");
+				return true;
+			}
+			if (merchSpawnInst!=null)
+			{
+				long merchRespawn = AutoSpawnHandler.getInstance().getTimeToNextSpawn(merchSpawnInst);
+				activeChar.sendMessage("財富商人將在 "+(merchRespawn/60000)+" 分鐘後重新定位");
+			}
+			else
+				activeChar.sendMessage("財富鐵匠/財富商人並未在 Spawn 資料內.");
+			if (blackSpawnInst!=null)
+			{
+				long blackRespawn = AutoSpawnHandler.getInstance().getTimeToNextSpawn(blackSpawnInst);
+				activeChar.sendMessage("財富鐵匠將在 "+(blackRespawn/60000)+" 分鐘重新後定位.");
+			}
+			else
+				activeChar.sendMessage("財富鐵匠/財富商人並未在 Spawn 資料內.");
+		}
 
-            }
-        }
-        
-        else if (command.startsWith("admin_mammon_respawn"))
-        {
-            if (!_isSealValidation) {
-                activeChar.sendMessage("目前為競爭時期.");
-                return true;
-            }
-                
-            long blackRespawn = AutoSpawnHandler.getInstance().getTimeToNextSpawn(blackSpawnInst);
-            long merchRespawn = AutoSpawnHandler.getInstance().getTimeToNextSpawn(merchSpawnInst);
+		else if (command.startsWith("admin_list_spawns"))
+		{
+			try
+			{ // admin_list_spawns x[xxxx] x[xx]
+				String[] params = command.split(" ");
+				Pattern pattern = Pattern.compile("[0-9]*");
+				Matcher regexp = pattern.matcher(params[1]);
+				if (regexp.matches())
+					npcId = Integer.parseInt(params[1]);
+				else
+				{
+					params[1] = params[1].replace('_', ' ');
+					npcId = NpcTable.getInstance().getTemplateByName(params[1]).npcId;
+				}
+				if (params.length > 2) teleportIndex = Integer.parseInt(params[2]);
+			}
+			catch (Exception e)
+			{
+				activeChar.sendPacket(SystemMessage.sendString("指令為 //list_spawns <npcId|npc_name> [tele_index]"));
+			}
 
-            activeChar.sendMessage("財富的鐵匠將在 " + (merchRespawn / 1000 / 60) + " 分鐘內出現.");
-            activeChar.sendMessage("財富的商人將在 " + (blackRespawn / 1000 / 60) + " 分鐘內出現.");
+			SpawnTable.getInstance().findNPCInstances(activeChar, npcId, teleportIndex);
+		}
 
-        }
-        
-        else if (command.startsWith("admin_list_spawns"))
-        {
-            try { // admin_list_spawns x[xxxx] x[xx]
-                String[] params = command.split(" ");
-                
-                npcId = Integer.parseInt(params[1]);
-                
-                if (params.length > 2)
-                    teleportIndex = Integer.parseInt(params[2]);
-            }
-            catch (Exception e) {
-                activeChar.sendMessage("指令為 //list_spawns <NPC_ID> <TELE_INDEX>");
-            }
+		// Used for testing SystemMessage IDs	- Use //msg <ID>
+		else if (command.startsWith("admin_msg"))
+		{
+			int msgId = -1;
 
-            findNPCInstances(activeChar, npcId, teleportIndex);
-        }
-        
-        // Used for testing SystemMessage IDs   - Use //msg <ID>
-        else if (command.startsWith("admin_msg"))
-        {
-            int msgId = -1;
-            
-            try {
-                msgId = Integer.parseInt(command.substring(10).trim());
-            }
-            catch (Exception e) {
-                activeChar.sendMessage("指令為 //msg <SYSTEM_MSG_ID>");
-                return true;
-            }
-        
-            activeChar.sendPacket(new SystemMessage(msgId));
-        }
+			try
+			{
+				msgId = Integer.parseInt(command.substring(10).trim());
+			}
+			catch (Exception e)
+			{
+				activeChar.sendMessage("指令為: //msg <SYSTEM_MSG_ID>");
+				return true;
+			}
+			activeChar.sendPacket(new SystemMessage(msgId));
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    public String[] getAdminCommandList()
-    {
-        return ADMIN_COMMANDS;
-    }
+	public String[] getAdminCommandList()
+	{
+		return ADMIN_COMMANDS;
+	}
 
-    private boolean checkLevel(int level) 
-    {
-        return (level >= REQUIRED_LEVEL);
-    }
-
-    // FIXME: Need a good viable alternative than getAllVisibleObjects() but a SpawnListener
-    // seems unusable for this method.
-    public void findNPCInstances(L2PcInstance activeChar, int npcId, int teleportIndex)
-    {
-        int index = 0;
-        
-        for (L2Object obj : L2World.getInstance().getAllVisibleObjects()) 
-        {
-            if (obj instanceof L2NpcInstance) {
-                L2NpcInstance npcInst = (L2NpcInstance)obj;
-                int currNpcId = npcInst.getNpcId();
-                
-                if (currNpcId == npcId) 
-                {
-                    index++;
-                    
-                    if (teleportIndex > -1 && teleportIndex == index)
-                        activeChar.teleToLocation(npcInst.getX(), npcInst.getY(), npcInst.getZ());
-                    else
-                        activeChar.sendMessage(index + " - " + npcInst.getName() + " (" + npcInst.getObjectId() + "): " + npcInst.getX() + " " + npcInst.getY() + " " + npcInst.getZ());
-                }
-            }
-        }
-        
-        if (index == 0)
-            activeChar.sendMessage("無法搜尋");
-    }
+	private boolean checkLevel(int level)
+	{
+		return (level >= REQUIRED_LEVEL);
+	}
 }

@@ -17,7 +17,6 @@
  */
 package net.sf.l2j.gameserver.handler.skillhandlers;
 
-import net.sf.l2j.gameserver.ai.CtrlIntention;
 import net.sf.l2j.gameserver.handler.ISkillHandler;
 import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.L2Effect;
@@ -43,12 +42,12 @@ import net.sf.l2j.util.Rnd;
 public class Blow implements ISkillHandler
 {
 	private static final SkillType[] SKILL_IDS = {SkillType.BLOW};
-	
+
 	private int _successChance;
 	public final static int FRONT = 50;
 	public final static int SIDE = 60;
 	public final static int BEHIND = 70;
-	
+
 	public void useSkill(L2Character activeChar, L2Skill skill, L2Object[] targets){
 		if(activeChar.isAlikeDead())
 			return;
@@ -63,7 +62,7 @@ public class Blow implements ISkillHandler
 				_successChance = FRONT;
 			else
 				_successChance = SIDE;
-			//If skill requires Crit or skill requires behind, 
+			//If skill requires Crit or skill requires behind,
 			//calculate chance based on DEX, Position and on self BUFF
 			if(((skill.getCondition() & L2Skill.COND_CRIT) != 0) && L2Skill.CRIT_ATTACK==1)
 			{
@@ -108,15 +107,15 @@ public class Blow implements ISkillHandler
 						}
 					}
 				}
- 
-				if (soul && weapon != null) 
+
+				if (soul && weapon != null)
 	            	weapon.setChargedSoulshot(L2ItemInstance.CHARGED_NONE);
 				if(skill.getDmgDirectlyToHP() && target instanceof L2PcInstance)
 	        	{
 					L2PcInstance player = (L2PcInstance)target;
 	        		if (!player.isInvul())
 					{
-	        	       if (damage >= player.getCurrentHp()) 
+	        	       if (damage >= player.getCurrentHp())
 	        	       {
 	        	    	   if(player.isInDuel()) player.setCurrentHp(1);
 	        	    	   else
@@ -132,7 +131,7 @@ public class Blow implements ISkillHandler
 	        	    			   player.doDie(activeChar);
 	        	    	   }
 	        	       }
-	        	       else 
+	        	       else
 	        		      player.setCurrentHp(player.getCurrentHp() - damage);
 					}
 	        		SystemMessage smsg = new SystemMessage(SystemMessageId.S1_GAVE_YOU_S2_DMG);
@@ -149,13 +148,13 @@ public class Blow implements ISkillHandler
 	            activeChar.sendPacket(sm);
 			}
 			//Possibility of a lethal strike
-			if(!target.isRaid() 
+			if(!target.isRaid()
 					&& !(target instanceof L2DoorInstance)
 					&& !(target instanceof L2NpcInstance && ((L2NpcInstance)target).getNpcId() == 35062))
 			{
 				int chance = Rnd.get(100);
 				//2nd lethal effect activate (cp,hp to 1 or if target is npc then hp to 1)
-				if(skill.getLethalChance2() > 0 && chance < Formulas.getInstance().calcLethal(activeChar, target, skill.getLethalChance2())) 
+				if(skill.getLethalChance2() > 0 && chance < Formulas.getInstance().calcLethal(activeChar, target, skill.getLethalChance2()))
 	            {
 	            	if (target instanceof L2NpcInstance)
                         target.reduceCurrentHp(target.getCurrentHp()-1, activeChar);
@@ -167,10 +166,10 @@ public class Blow implements ISkillHandler
     						player.setCurrentCp(1);
         				}
         			}
-	            	activeChar.sendPacket(new SystemMessage(SystemMessageId.LETHAL_STRIKE));   
+	            	activeChar.sendPacket(new SystemMessage(SystemMessageId.LETHAL_STRIKE));
 	            }
 	            else if(skill.getLethalChance1() > 0 && chance < Formulas.getInstance().calcLethal(activeChar, target, skill.getLethalChance1())){
-            		if (target instanceof L2PcInstance) 
+            		if (target instanceof L2PcInstance)
          		   	{
             			L2PcInstance player = (L2PcInstance)target;
         				if (!player.isInvul())
@@ -178,15 +177,16 @@ public class Blow implements ISkillHandler
          		   	}
             		else if (target instanceof L2NpcInstance) // If is a monster remove first damage and after 50% of current hp
             			target.reduceCurrentHp(target.getCurrentHp()/2, activeChar);
-	            	activeChar.sendPacket(new SystemMessage(SystemMessageId.LETHAL_STRIKE));   
+	            	activeChar.sendPacket(new SystemMessage(SystemMessageId.LETHAL_STRIKE));
 				}
 			}
+
 			if(L2Skill.CRIT_ATTACK==1)
 			{
             L2Effect effect = activeChar.getFirstEffect(skill.getId());    
             //Self Effect
-            if (effect != null && effect.isSelfEffect())                   
-            	effect.exit();            
+            if (effect != null && effect.isSelfEffect())
+            	effect.exit();
             skill.getEffectsSelf(activeChar);
 			}
 			else
@@ -195,9 +195,10 @@ public class Blow implements ISkillHandler
             
             
             L2Skill.CRIT_ATTACK = 0;
+
         }
 	}
-	
+
 	public SkillType[] getSkillIds()
     {
         return SKILL_IDS;

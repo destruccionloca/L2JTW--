@@ -33,7 +33,7 @@ public class MercTicket implements IItemHandler
                                          "已經準備好了我的君主,只差時間還未到.",
                                          "你召喚了我."
                                         };
-    
+
     /**
      * handler for using mercenary tickets.  Things to do:
      * 1) Check constraints:
@@ -44,7 +44,7 @@ public class MercTicket implements IItemHandler
      * 1.e) Check if max number of tickets has been reached
      * 1.f) Check if max number of tickets from this ticket's TYPE has been reached
      * 2) If allowed, call the MercTicketManager to add the item and spawn in the world
-     * 3) Remove the item from the person's inventory  
+     * 3) Remove the item from the person's inventory
      */
     public void useItem(L2PlayableInstance playable, L2ItemInstance item)
     {
@@ -53,7 +53,7 @@ public class MercTicket implements IItemHandler
     	Castle castle = CastleManager.getInstance().getCastle(activeChar);
     	int castleId = -1;
     	if (castle != null) castleId = castle.getCastleId();
-    	
+
     	//add check that certain tickets can only be placed in certain castles
     	if (MercTicketManager.getInstance().getTicketCastleId(itemId) != castleId)
     	{
@@ -72,19 +72,19 @@ public class MercTicket implements IItemHandler
     		default: activeChar.sendMessage("Mercenary Tickets can only be used in a castle.");return;
     		}
     	}
-    	
+
         if (!activeChar.isCastleLord(castleId))
         {
         	activeChar.sendMessage("You are not the lord of this castle!");
             return;
         }
-        
+
         if (castle.getSiege().getIsInProgress())
         {
             activeChar.sendMessage("現在無法聘請傭兵!");
             return;
         }
-        
+
         if(MercTicketManager.getInstance().isAtCasleLimit(item.getItemId()))
         {
             activeChar.sendMessage("You cannot hire any more mercenaries");
@@ -97,7 +97,7 @@ public class MercTicket implements IItemHandler
             return;
 
         }
- 
+
         int npcId = MercTicketManager.getInstance().addTicket(item.getItemId(), activeChar, MESSAGES);
         activeChar.destroyItem("Consume", item.getObjectId(), 1, null, false); // Remove item from char's inventory
         activeChar.sendMessage("傭兵聘請 ("+itemId+","+npcId+") 位置:" + activeChar.getX() + "," + activeChar.getY() + "," + activeChar.getZ() + " 面向:" + activeChar.getHeading());

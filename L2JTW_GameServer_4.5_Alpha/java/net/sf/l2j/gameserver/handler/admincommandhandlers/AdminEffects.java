@@ -91,9 +91,9 @@ public class AdminEffects implements IAdminCommandHandler
 		if (!Config.ALT_PRIVILEGES_ADMIN)
 			if (!(checkLevel(activeChar.getAccessLevel()) && activeChar.isGM()))
 				return false;
-		
+
 		GMAudit.auditGMAction(activeChar.getName(), command, (activeChar.getTarget() != null?activeChar.getTarget().getName():"no-target"), "");
-		
+
 		StringTokenizer st = new StringTokenizer(command);
 		st.nextToken();
 
@@ -257,10 +257,10 @@ public class AdminEffects implements IAdminCommandHandler
 		else if (command.startsWith("admin_bighead"))
 		{
 			try
-			{   
+			{
 				L2Object target = activeChar.getTarget();
 				L2Character player = null;
-				if (target instanceof L2Character) 
+				if (target instanceof L2Character)
 				{
 					player = (L2Character)target;
 					player.startAbnormalEffect(0x2000);
@@ -276,7 +276,7 @@ public class AdminEffects implements IAdminCommandHandler
 			{
 				L2Object target = activeChar.getTarget();
 				L2Character player = null;
-				if (target instanceof L2Character) 
+				if (target instanceof L2Character)
 				{
 					player = (L2Character)target;
 					player.stopAbnormalEffect((short)0x2000);
@@ -309,7 +309,7 @@ public class AdminEffects implements IAdminCommandHandler
 			{
 				activeChar.sendMessage("使用方法 //gmspeed value (0=off...4=max).");
 			}
-			finally 
+			finally
 			{
 				activeChar.updateEffectIcons();
 			}
@@ -543,7 +543,7 @@ public class AdminEffects implements IAdminCommandHandler
 					int abnormal = Integer.decode("0x"+st.nextToken());
 					if (obj == null)
 						obj = activeChar;
-					if (obj != null) 
+					if (obj != null)
 					{
 						if (performAbnormal(abnormal,obj))
 							activeChar.sendMessage(obj.getName()+ "'s abnormal status was affected by your request.");
@@ -575,7 +575,7 @@ public class AdminEffects implements IAdminCommandHandler
 					hittime = Integer.parseInt(st.nextToken());
 				if (obj == null)
 					obj = activeChar;
-				if (obj != null) 
+				if (obj != null)
 				{
 					if (!(obj instanceof L2Character))
 						activeChar.sendPacket(new SystemMessage(SystemMessageId.INCORRECT_TARGET));
@@ -603,8 +603,8 @@ public class AdminEffects implements IAdminCommandHandler
 
 	/**
 	 * @param action bitmask that should be applied over target's abnormal
-	 * @param target 
-	 * @return <i>true</i> if target's abnormal state was affected , <i>false</i> otherwise. 
+	 * @param target
+	 * @return <i>true</i> if target's abnormal state was affected , <i>false</i> otherwise.
 	 */
 	private boolean performAbnormal(int action, L2Object target)
 	{
@@ -655,7 +655,7 @@ public class AdminEffects implements IAdminCommandHandler
 	}
 
 	/**
-	 * 
+	 *
 	 * @param type - atmosphere type (signssky,sky)
 	 * @param state - atmosphere state(night,day)
 	 */

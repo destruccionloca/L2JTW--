@@ -34,7 +34,7 @@ public class PcStatus extends PlayableStatus
 {
     // =========================================================
     // Data Field
-    
+
     // =========================================================
     // Constructor
     public PcStatus(L2PcInstance activeChar)
@@ -48,7 +48,7 @@ public class PcStatus extends PlayableStatus
     public final void reduceHp(double value, L2Character attacker, boolean awake, boolean isDOT)
     {
         if (getActiveChar().isInvul()) return;
-        
+
         if ( attacker instanceof L2PcInstance)
         {
             if ( getActiveChar().isDead() && !getActiveChar().isFakeDeath()) return;
@@ -98,30 +98,30 @@ public class PcStatus extends PlayableStatus
 				// the duel is finishing - players do not recive damage
 				if (getActiveChar().getDuelState() == Duel.DUELSTATE_DEAD) return;
 				else if (getActiveChar().getDuelState() == Duel.DUELSTATE_WINNER) return;
-				
+
 				// cancel duel if player got hit by another player, that is not part of the duel
 				if (((L2PcInstance)attacker).getDuelId() != getActiveChar().getDuelId())
 					getActiveChar().setDuelState(Duel.DUELSTATE_INTERRUPTED);
 			}
-			
+
 			if (getActiveChar().isDead() && !getActiveChar().isFakeDeath()) return;
 		} else {
 			// if attacked by a non L2PcInstance & non L2SummonInstance the duel gets canceled
 			if (getActiveChar().isInDuel() && !(attacker instanceof L2SummonInstance)) getActiveChar().setDuelState(Duel.DUELSTATE_INTERRUPTED);
 			if (getActiveChar().isDead()) return;
 		}
-		
+
 		int fullValue = (int) value;
-		
+
         if (attacker != null && attacker != getActiveChar())
         {
             // Check and calculate transfered damage
             L2Summon summon = getActiveChar().getPet();
-            //TODO correct range 
+            //TODO correct range
             if (summon != null && summon instanceof L2SummonInstance && Util.checkIfInRange(900, getActiveChar(), summon, true))
             {
                 int tDmg = (int)value * (int)getActiveChar().getStat().calcStat(Stats.TRANSFER_DAMAGE_PERCENT, 0, null, null) /100;
-                
+
                 // Only transfer dmg up to current HP, it should not be killed
                 if (summon.getCurrentHp() < tDmg) tDmg = (int)summon.getCurrentHp() - 1;
                 if (tDmg > 0)
@@ -149,10 +149,10 @@ public class PcStatus extends PlayableStatus
 
         super.reduceHp(value, attacker, awake);
 
-        if (!getActiveChar().isDead() && getActiveChar().isSitting()) 
+        if (!getActiveChar().isDead() && getActiveChar().isSitting())
             getActiveChar().standUp();
-        
-        if (getActiveChar().isFakeDeath()) 
+
+        if (getActiveChar().isFakeDeath())
             getActiveChar().stopFakeDeath(null);
 
         if (attacker != null && attacker != getActiveChar() && fullValue > 0)
@@ -167,9 +167,12 @@ public class PcStatus extends PlayableStatus
             if (attacker instanceof L2NpcInstance)
             {
                 int mobId = ((L2NpcInstance)attacker).getTemplate().idTemplate;
+
                 boolean serversidename = ((L2NpcInstance)attacker).getTemplate().serverSideName;
                 if (Config.DEBUG) 
+
                     _log.fine("mob id:" + mobId);
+
                 if (serversidename||((L2NpcInstance)attacker).getIsChar() >0)
                     smsg.addString(((L2NpcInstance)attacker).getTemplate().name);
                 else
@@ -179,7 +182,7 @@ public class PcStatus extends PlayableStatus
             {
             	boolean serversidename = ((L2Summon)attacker).getTemplate().serverSideName;
                 int mobId = ((L2Summon)attacker).getTemplate().idTemplate;
-                
+
                 if (serversidename)
                     smsg.addString(((L2Summon)attacker).getTemplate().name);
                 else
@@ -189,7 +192,7 @@ public class PcStatus extends PlayableStatus
             {
                 smsg.addString(attacker.getName());
             }
-            
+
             smsg.addNumber(fullValue);
             getActiveChar().sendPacket(smsg);
         }

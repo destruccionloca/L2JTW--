@@ -62,7 +62,7 @@ public class AdminAdmin implements IAdminCommandHandler {
 
                                            "admin_config_option", "admin_config_altsetting", "admin_config_other", "admin_config_rate",
                                            "admin_reload", "admin_set", "admin_admin2","admin_admin3", "admin_admin4", "admin_admin5", "admin_cache", "admin_saveolymp", "admin_manualhero","admin_eventmenu"
-                                           ,"admin_manualhero","admin_set_mod", "admin_set", "admin_set_menu"};
+                                           ,"admin_set_mod", "admin_set", "admin_set_menu"};
 
 
 
@@ -89,9 +89,9 @@ public class AdminAdmin implements IAdminCommandHandler {
 		if (!Config.ALT_PRIVILEGES_ADMIN)
 			if (!(checkLevel(activeChar.getAccessLevel()) && activeChar.isGM()))
 				return false;
-		
+
 		GMAudit.auditGMAction(activeChar.getName(), command, (activeChar.getTarget() != null?activeChar.getTarget().getName():"no-target"), "");
-		
+
 		if (command.startsWith("admin_admin"))
 		{
 			showPage(activeChar,command);
@@ -107,7 +107,7 @@ public class AdminAdmin implements IAdminCommandHandler {
 			activeChar.sendMessage("移除GM列表");
 		}
 		else if(command.startsWith("admin_silence"))
-		{     	
+		{
 			if (activeChar.getMessageRefusal()) // already in message refusal mode
 			{
 				activeChar.setMessageRefusal(false);
@@ -117,7 +117,7 @@ public class AdminAdmin implements IAdminCommandHandler {
 			{
 				activeChar.setMessageRefusal(true);
 				activeChar.sendPacket(new SystemMessage(SystemMessageId.MESSAGE_REFUSAL_MODE));
-			}	    
+			}
 		}
 
         
@@ -195,6 +195,7 @@ public class AdminAdmin implements IAdminCommandHandler {
             }            
         }
 
+
 		else if(command.startsWith("admin_reload"))
 		{
 			StringTokenizer st = new StringTokenizer(command);
@@ -256,7 +257,7 @@ public class AdminAdmin implements IAdminCommandHandler {
 				String pValue = parameter[1].trim();
 				if (Config.setParameterValue(pName, pValue))
 					activeChar.sendMessage("數值 "+pName+" 成功設定為 "+pValue);
-				else 
+				else
 					activeChar.sendMessage("錯誤設定值");
 				
 				 if (command.equals("admin_config_option"))      showOptionConfigPage(activeChar);
@@ -289,7 +290,7 @@ public class AdminAdmin implements IAdminCommandHandler {
 		return ADMIN_COMMANDS;
 	}
 
-	private boolean checkLevel(int level) 
+	private boolean checkLevel(int level)
 	{
 		return (level >= REQUIRED_LEVEL);
 	}

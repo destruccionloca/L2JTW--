@@ -33,7 +33,7 @@ public class EffectCharge extends L2Effect
 {
 
 	public int numCharges;
-	
+
 	public EffectCharge(Env env, EffectTemplate template)
 	{
 		super(env, template);
@@ -65,7 +65,7 @@ public class EffectCharge extends L2Effect
 
 	@Override
 	public int getLevel() { return numCharges; }
-	
+
 	public void addNumCharges(int i) { numCharges = numCharges + i; }
 }
 

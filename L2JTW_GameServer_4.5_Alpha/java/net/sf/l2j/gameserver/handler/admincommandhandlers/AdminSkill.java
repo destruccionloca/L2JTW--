@@ -33,6 +33,7 @@ import net.sf.l2j.gameserver.model.L2SkillLearn;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.NpcHtmlMessage;
+import net.sf.l2j.gameserver.serverpackets.PledgeSkillList;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
 /**
@@ -48,7 +49,7 @@ import net.sf.l2j.gameserver.serverpackets.SystemMessage;
  * - give_all_skills
  * - remove_all_skills
  * - add_clan_skills
- * 
+ *
  * @version $Revision: 1.2.4.7 $ $Date: 2005/04/11 10:06:02 $
  */
 public class AdminSkill implements IAdminCommandHandler {
@@ -83,7 +84,7 @@ public class AdminSkill implements IAdminCommandHandler {
 			showMainPage(activeChar);
 		else if (command.startsWith("admin_remove_skills"))
 		{
-			try 
+			try
 			{
 				String val = command.substring(20);
 				removeSkillsPage(activeChar, Integer.parseInt(val));
@@ -107,7 +108,7 @@ public class AdminSkill implements IAdminCommandHandler {
 		{
 			try
 			{
-				String val = command.substring(15); 
+				String val = command.substring(15);
 				if (activeChar == activeChar.getTarget() || activeChar.getAccessLevel() >= REQUIRED_LEVEL2)
 					adminAddSkill(activeChar, val);
 			}
@@ -116,7 +117,7 @@ public class AdminSkill implements IAdminCommandHandler {
 			{
 				activeChar.sendMessage("使用方法: //add_skill <skill_id> <level>");
 
-			}			
+			}
 		}
 		else if (command.startsWith("admin_remove_skill"))
 		{
@@ -132,7 +133,7 @@ public class AdminSkill implements IAdminCommandHandler {
 			{
 				activeChar.sendMessage("使用方法: //remove_skill <skill_id>");
 
-			}			
+			}
 		}
 		else if (command.equals("admin_get_skills"))
 		{
@@ -159,6 +160,7 @@ public class AdminSkill implements IAdminCommandHandler {
 					player.removeSkill(skill);
 				activeChar.sendMessage("移除" + player.getName() + "所有技能.");
 		        player.sendMessage("管理員將您的技能全部移除");
+				player.sendSkillList(); 
 			}
 
 		}
@@ -188,7 +190,7 @@ public class AdminSkill implements IAdminCommandHandler {
 		L2PcInstance player = null;
 		if (target instanceof L2PcInstance)
 			player = (L2PcInstance)target;
-		else 
+		else
 		{
 			activeChar.sendPacket(new SystemMessage(SystemMessageId.INCORRECT_TARGET));
 			return;
@@ -218,6 +220,7 @@ public class AdminSkill implements IAdminCommandHandler {
 		//Notify player and admin
         player.sendMessage("管理員增加" + skillCounter + "個技能到技能表內.");
         activeChar.sendMessage("增加" + skillCounter + "個技能給" + player.getName());
+		player.sendSkillList();
 	}
 
 	public String[] getAdminCommandList() {
@@ -256,7 +259,7 @@ public class AdminSkill implements IAdminCommandHandler {
 		if (SkillsEnd - SkillsStart > MaxSkillsPerPage)
 			SkillsEnd = SkillsStart + MaxSkillsPerPage;
 
-		NpcHtmlMessage adminReply = new NpcHtmlMessage(5);		
+		NpcHtmlMessage adminReply = new NpcHtmlMessage(5);
 		TextBuilder replyMSG = new TextBuilder("<html><body>");
 		replyMSG.append("<table width=260><tr>");
 		replyMSG.append("<td width=40><button value=\"首頁\" action=\"bypass -h admin_admin\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
@@ -278,7 +281,7 @@ public class AdminSkill implements IAdminCommandHandler {
 		}
 		pages += "</tr></table></center>";
 		replyMSG.append(pages);
-		replyMSG.append("<br><table width=270>");		
+		replyMSG.append("<br><table width=270>");
 		replyMSG.append("<tr><td width=80>名稱:</td><td width=60>等級:</td><td width=40>編號:</td></tr>");
 		for (int i = SkillsStart; i < SkillsEnd; i++)
 			replyMSG.append("<tr><td width=80><a action=\"bypass -h admin_remove_skill "+skills[i].getId()+"\">"+skills[i].getName()+"</a></td><td width=60>"+skills[i].getLevel()+"</td><td width=40>"+skills[i].getId()+"</td></tr>");
@@ -287,7 +290,7 @@ public class AdminSkill implements IAdminCommandHandler {
 		replyMSG.append("移除特殊技能:");
 		replyMSG.append("<tr><td>Id: </td>");
 		replyMSG.append("<td><edit var=\"id_to_remove\" width=110></td></tr>");
-		replyMSG.append("</table></center>");		
+		replyMSG.append("</table></center>");
 		replyMSG.append("<center><button value=\"移除技能\" action=\"bypass -h admin_remove_skill $id_to_remove\" width=110 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></center>");
 		replyMSG.append("<br><center><button value=\"返回\" action=\"bypass -h admin_current_player\" width=40 height=15></center>");
 		replyMSG.append("</body></html>");
@@ -351,7 +354,7 @@ public class AdminSkill implements IAdminCommandHandler {
 			player = (L2PcInstance)target;
 
 		else
-		{			
+		{
 			activeChar.sendPacket(new SystemMessage(SystemMessageId.INCORRECT_TARGET));
 
 			return;
@@ -371,6 +374,7 @@ public class AdminSkill implements IAdminCommandHandler {
 
 			activeChar.sendMessage("取得"+player.getName()+"所有技能.");
 
+			activeChar.sendSkillList(); 
 		}
 		showMainPage(activeChar);
 	}
@@ -381,7 +385,7 @@ public class AdminSkill implements IAdminCommandHandler {
 		L2PcInstance player = null;
 		if (target instanceof L2PcInstance)
 			player = (L2PcInstance)target;
-		else 
+		else
 		{
 			activeChar.sendPacket(new SystemMessage(SystemMessageId.INCORRECT_TARGET));
 			return;
@@ -405,6 +409,7 @@ public class AdminSkill implements IAdminCommandHandler {
 			activeChar.sendMessage("技能恢復");
 
 			adminSkills=null;
+			activeChar.sendSkillList();
 		}
 		showMainPage(activeChar);
 	}
@@ -443,10 +448,11 @@ public class AdminSkill implements IAdminCommandHandler {
 				String name = skill.getName();
 				player.sendMessage("管理員增加 "+name+" 技能.");
 				player.addSkill(skill, true);
-				//Admin information	
+				//Admin information
 				activeChar.sendMessage("增加 "+name+" 技能給人物 "+player.getName()+".");
 				if (Config.DEBUG)
 					_log.fine("[GM]"+activeChar.getName()+" gave skill "+name+" to "+player.getName()+".");
+				activeChar.sendSkillList(); 
 			}
 			else
 				activeChar.sendMessage("錯誤資料.");
@@ -479,6 +485,7 @@ public class AdminSkill implements IAdminCommandHandler {
 
 			if (Config.DEBUG)
 				_log.fine("[GM]"+activeChar.getName()+" removed skill "+skillname+" from "+player.getName()+".");
+			activeChar.sendSkillList(); 
 		}
 		else
 
@@ -529,6 +536,13 @@ public class AdminSkill implements IAdminCommandHandler {
 				player.getClan().broadcastToOnlineMembers(sm);
 				player.getClan().addNewSkill(skill);
 				activeChar.sendMessage("增加血盟技能l: "+skillname+" 給血盟 "+player.getClan().getName()+".");
+				
+				activeChar.getClan().broadcastToOnlineMembers(new PledgeSkillList(activeChar.getClan()));  
+				for(L2PcInstance member: activeChar.getClan().getOnlineMembers(""))  
+				{  
+					member.sendSkillList();  
+				}  
+
 				showMainPage(activeChar);
 				return;
 			}

@@ -25,12 +25,12 @@ import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
 class EffectDamOverTime extends L2Effect
-{		
+{
 	public EffectDamOverTime(Env env, EffectTemplate template)
 	{
 		super(env, template);
 	}
-	
+
 	@Override
 	public EffectType getEffectType()
 	{
@@ -40,12 +40,12 @@ class EffectDamOverTime extends L2Effect
 
 	@Override
 	public boolean onActionTime()
-	{	
+	{
 		if (getEffected().isDead())
 			return false;
-		
+
 		double damage = calc();
-        
+
 		if (damage >= getEffected().getCurrentHp())
 		{
 			if (getSkill().isToggle())
@@ -54,7 +54,7 @@ class EffectDamOverTime extends L2Effect
 				getEffected().sendPacket(sm);
 				return false;
 			}
-            
+
             // ** This is just hotfix, needs better solution **
             // 1947: "DOT skills shouldn't kill"
             // Well, some of them should ;-)
@@ -62,9 +62,9 @@ class EffectDamOverTime extends L2Effect
 		}
 
         boolean awake = !(getEffected() instanceof L2Attackable)
-        					&& !(getSkill().getTargetType() == SkillTargetType.TARGET_SELF 
+        					&& !(getSkill().getTargetType() == SkillTargetType.TARGET_SELF
         							&& getSkill().isToggle());
-        
+
 
 /*
         if((getSkill().getSkillType() == SkillType.POISON || getSkill().getSkillType() == SkillType.BLEED || getSkill().getSkillType() == SkillType.DOT)&& getEffected().getCurrentHp() > damage)
@@ -78,6 +78,7 @@ class EffectDamOverTime extends L2Effect
 */
 
         
+
         getEffected().reduceCurrentHp(damage, getEffector(),awake,true);
 
 

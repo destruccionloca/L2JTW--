@@ -45,9 +45,9 @@ import net.sf.l2j.gameserver.model.zone.type.L2ClanHallZone;
 public class MapRegionTable
 {
 	private static Logger _log = Logger.getLogger(MapRegionTable.class.getName());
-	
+
 	private static MapRegionTable _instance;
-	
+
 	private final int[][] _regions = new int[19][21];
 
     private final int[][] _pointsWithKarmas;
@@ -59,7 +59,7 @@ public class MapRegionTable
         SiegeFlag,
         Town
     }
-	
+
 	public static MapRegionTable getInstance()
 	{
 		if (_instance == null)
@@ -68,11 +68,11 @@ public class MapRegionTable
 		}
 		return _instance;
 	}
-	
+
 	private MapRegionTable()
 	{
 		int count2 = 0;
-		
+
 		//LineNumberReader lnr = null;
 		java.sql.Connection con = null;
 		try
@@ -84,7 +84,7 @@ public class MapRegionTable
 			while (rset.next())
 			{
 				region = rset.getInt(1);
-				
+
 				for (int j=0; j<10; j++)
 				{
 					_regions[j][region] = rset.getInt(j+2);
@@ -92,7 +92,7 @@ public class MapRegionTable
 					//_log.fine(j+","+region+" -> "+rset.getInt(j+2));
 				}
 			}
-			
+
 			rset.close();
 			statement.close();
 			if (Config.DEBUG) _log.fine(count2 +" mapregion loaded");
@@ -100,13 +100,13 @@ public class MapRegionTable
 		catch (Exception e)
 		{
 			_log.warning("error while creating map region data: "+e);
-		} 
-		finally 
+		}
+		finally
 		{
 			try { con.close(); } catch (Exception e) {}
 		}
-        
-        _pointsWithKarmas = new int[17][3];
+
+        _pointsWithKarmas = new int[19][3];
         //Talking Island
         _pointsWithKarmas[0][0] = -79077;
         _pointsWithKarmas[0][1] = 240355;
@@ -175,28 +175,32 @@ public class MapRegionTable
         _pointsWithKarmas[16][0] = 85184;
         _pointsWithKarmas[16][1] = -138560;
         _pointsWithKarmas[16][2] = -2256;
+        // Primeval Isle
+        //_pointsWithKarmas[18][0] = 10468;
+        //_pointsWithKarmas[18][1] = -24569;
+        //_pointsWithKarmas[18][2] = -3645;
 	}
-	
+
 	public final int getMapRegion(int posX, int posY)
 	{
 		return _regions[getMapRegionX(posX)][getMapRegionY(posY)];
 	}
-	
+
 	public final int getMapRegionX(int posX)
 	{
 		return ( posX >> 15 ) + 4;// + centerTileX;
 	}
-	
+
 	public final int getMapRegionY(int posY)
 	{
 		return ( posY >> 15 ) + 10;// + centerTileX;
 	}
-	
+
 	public int getAreaCastle(L2Character activeChar)
 	{
 		int area = getClosestTownNumber(activeChar);
 		int castle;
-		switch (area) 
+		switch (area)
 		{
 		case 0:  castle = 1; break;//Talking Island Village
         case 1:  castle = 4; break; //Elven Village
@@ -214,7 +218,7 @@ public class MapRegionTable
         case 13: castle = 6; break; //Heine
         case 14: castle = 8; break; //Rune Township
         case 15: castle = 7; break; //Town of Goddard
-        case 16: castle = 9; break; //Town of Shuttgart 
+        case 16: castle = 9; break; //Town of Shuttgart
         case 17: castle = 4; break; //Ivory Tower
         case 18: castle = 8; break; //Primeval Isle Wharf
         default: castle = 5; break; //Town of Aden
@@ -226,12 +230,12 @@ public class MapRegionTable
     {
         return getMapRegion(activeChar.getX(), activeChar.getY());
     }
-    
+
     public String getClosestTownName(L2Character activeChar)
     {
         int nearestTownId = getMapRegion(activeChar.getX(), activeChar.getY());
         String nearestTown;
-        
+
         switch (nearestTownId)
         {
 
@@ -251,13 +255,14 @@ public class MapRegionTable
             case 13: nearestTown = "马"; break;
             case 14: nearestTown = "緗马"; break;
             case 15: nearestTown = "蔼笷疭马"; break;
-            case 16: nearestTown = "Shuttgart"; break;  ////TODO@ (Check mapregion table)[Luno]
+            case 16: nearestTown = "疭"; break;  ////TODO@ (Check mapregion table)[Luno]
+            case 18: nearestTown = "Primeval Isle";break;
             default: nearestTown = "ㄈ马"; break;
 
 
-           
+
         }
-        
+
         return nearestTown;
     }
 
@@ -272,7 +277,7 @@ public class MapRegionTable
             // If in Monster Derby Track
             if (player.isInsideZone(L2Character.ZONE_MONSTERTRACK))
                 return new Location(12661, 181687, -3560);
-            
+
             Castle castle = null;
             ClanHall clanhall = null;
 
@@ -281,21 +286,21 @@ public class MapRegionTable
             	// If teleport to clan hall
             	if (teleportWhere == TeleportWhereType.ClanHall)
                 {
-            		
+
             	    clanhall = ClanHallManager.getInstance().getClanHallByOwner(player.getClan());
             	    if (clanhall != null)
             	    {
             	    	L2ClanHallZone zone = clanhall.getZone();
             	        if (zone != null)
             	        {
-            	            return zone.getSpawn(); 
+            	            return zone.getSpawn();
             	        }
             	    }
                 }
-                
+
             	// If teleport to castle
             	if (teleportWhere == TeleportWhereType.Castle) castle = CastleManager.getInstance().getCastleByOwner(player.getClan());
-            	
+
             	// Check if player is on castle ground
                 if (castle == null) castle = CastleManager.getInstance().getCastle(player);
 
@@ -306,9 +311,9 @@ public class MapRegionTable
             		if (teleportWhere == TeleportWhereType.Castle || (teleportWhere == TeleportWhereType.Castle && castle.getSiege().getIsInProgress() && castle.getSiege().getDefenderClan(player.getClan()) != null))
             		{
            				coord = castle.getZone().getSpawn();
-            			return new Location(coord[0], coord[1], coord[2]); 
+            			return new Location(coord[0], coord[1], coord[2]);
             		}
-            		
+
             		if (teleportWhere == TeleportWhereType.SiegeFlag && castle.getSiege().getIsInProgress())
                     {
                         // Check if player's clan is attacker
@@ -334,20 +339,20 @@ public class MapRegionTable
                 else
                 	return new Location(17817, 170079, -3530);
             }
-            
+
             // Checking if in arena
             L2ArenaZone arena = ArenaManager.getInstance().getArena(player);
             if (arena != null)
             {
                 coord = arena.getSpawnLoc();
-                return new Location(coord[0], coord[1], coord[2]); 
+                return new Location(coord[0], coord[1], coord[2]);
             }
         }
 
         // Get the nearest town
         // TODO: Micht: Maybe we should add some checks to prevent exception here.
         coord = TownManager.getInstance().getClosestTown(activeChar).getSpawnLoc();
-        
+
         return new Location(coord[0], coord[1], coord[2]);
     }
 }

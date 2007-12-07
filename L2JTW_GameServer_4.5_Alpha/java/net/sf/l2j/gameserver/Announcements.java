@@ -44,13 +44,13 @@ import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
 /**
  * This class ...
- * 
+ *
  * @version $Revision: 1.5.2.1.2.7 $ $Date: 2005/03/29 23:15:14 $
  */
 public class Announcements
 {
 	private static Logger _log = Logger.getLogger(Announcements.class.getName());
-	
+
 	private static Announcements _instance;
 	private List<String> _announcements = new FastList<String>();
 
@@ -67,16 +67,17 @@ public class Announcements
 		loadAnnouncements();
 		loadAnnouncCycle();
 	}
-	
+
 	public static Announcements getInstance()
 	{
 		if (_instance == null)
 		{
 			_instance = new Announcements();
 		}
-		
+
 		return _instance;
 	}
+
 	
 	/** The task launching the function doAnnouncCycle() */
 	class AnnouncTask implements Runnable
@@ -98,6 +99,7 @@ public class Announcements
 		}
 	}
 	
+
     public void doAnnouncCycle()
     {
     	AnnouncTask rs = new AnnouncTask();//建立執行緒
@@ -117,7 +119,7 @@ public class Announcements
 			_log.config("data/announcements.txt 檔案不存在");
 		}
 	}
-	
+
 	public void loadAnnouncCycle()//讀取循環公告
 	{
 		_announcecycle.clear();
@@ -141,15 +143,15 @@ public class Announcements
 			CreatureSay cs = new CreatureSay(0, Say2.ANNOUNCEMENT, activeChar.getName(), _announcements.get(i).toString());
 			activeChar.sendPacket(cs);
 		}
-		
+
 		for (int i = 0; i < eventAnnouncements.size(); i++)
 		{
 		    List<Object> entry   = eventAnnouncements.get(i);
-            
+
             DateRange validDateRange  = (DateRange)entry.get(0);
             String[] msg              = (String[])entry.get(1);
 		    Date currentDate          = new Date();
-		    
+
 		    if (!validDateRange.isValid() || validDateRange.isWithinRange(currentDate))
 		    {
                 SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);
@@ -159,10 +161,10 @@ public class Announcements
                 }
                 activeChar.sendPacket(sm);
 		    }
-		    
+
 		}
 	}
-	
+
 	
 	
 	/** 
@@ -192,10 +194,10 @@ public class Announcements
 	    entry.add(msg);
 	    _eventAnnouncements.add(entry);
 	}
-	
+
     /** 開啟公告發布功能頁*/
 	public void listAnnouncements(L2PcInstance activeChar)
-	{		
+	{
 
 		/*
 		NpcHtmlMessage adminReply = new NpcHtmlMessage(5);
@@ -236,19 +238,19 @@ public class Announcements
         adminReply.replace("%announces%", replyMSG.toString());
 		activeChar.sendPacket(adminReply);
 	}
-	
+
 	public void addAnnouncement(String text)
 	{
 		_announcements.add(text);
 		saveToDisk();
 	}
-	
+
 	public void delAnnouncement(int line)
 	{
 		_announcements.remove(line);
 		saveToDisk();
 	}
-	
+
 	private void readFromDisk(File file)
 	{
 		LineNumberReader lnr = null;
@@ -261,14 +263,14 @@ public class Announcements
 			{
 				StringTokenizer st = new StringTokenizer(line,"\n\r");
 				if (st.hasMoreTokens())
-				{	
+				{
 					String announcement = st.nextToken();
 					_announcements.add(announcement);
-					
+
 					i++;
 				}
 			}
-			
+
 			_log.config("Announcements: Loaded " + i + " Announcements.");
 		}
 		catch (IOException e1)
@@ -287,7 +289,7 @@ public class Announcements
 			}
 		}
 	}
-	
+
 	private void readFromDiskmulti(File file)
 	{ //循環公告多型法讀取應用
 		LineNumberReader lnr = null;
@@ -330,7 +332,7 @@ public class Announcements
 	private void saveToDisk()
 	{
 		File file = new File("data/announcements.txt");
-		FileWriter save = null; 
+		FileWriter save = null;
 
 		try
 		{
@@ -349,17 +351,17 @@ public class Announcements
 			_log.warning("saving the announcements file has failed: " + e);
 		}
 	}
-	
+
 	public void announceToAll(String text) {
 		CreatureSay cs = new CreatureSay(0, Say2.ANNOUNCEMENT, "", text);
-		
+
 		for (L2PcInstance player : L2World.getInstance().getAllPlayers())
 		{
 			player.sendPacket(cs);
 		}
 	}
 	public void announceToAll(SystemMessage sm) {
-		
+
 		for (L2PcInstance player : L2World.getInstance().getAllPlayers())
 		{
 			player.sendPacket(sm);
@@ -375,7 +377,7 @@ public class Announcements
 			String text = command.substring(lengthToTrim);
 			Announcements.getInstance().announceToAll(text);
 		}
-		
+
 		// No body cares!
 		catch (StringIndexOutOfBoundsException e)
 		{

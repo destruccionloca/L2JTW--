@@ -38,7 +38,7 @@ import net.sf.l2j.gameserver.templates.L2NpcTemplate;
 
 /**
  * Dawn/Dusk Seven Signs Priest Instance
- * 
+ *
  * @author Tempy
  */
 public class L2SignsPriestInstance extends L2FolkInstance
@@ -197,7 +197,7 @@ public class L2SignsPriestInstance extends L2FolkInstance
                                 /*
                                  * If the player is trying to join the Lords of Dawn, check if they are
                                  * carrying a Lord's certificate.
-                                 * 
+                                 *
                                  * If not then try to take the required amount of adena instead.
                                  */
                                 if (cabal == SevenSigns.CABAL_DAWN)

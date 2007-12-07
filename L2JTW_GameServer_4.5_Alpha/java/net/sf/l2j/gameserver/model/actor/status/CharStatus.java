@@ -17,14 +17,12 @@
  */
 package net.sf.l2j.gameserver.model.actor.status;
 
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javolution.util.FastList;
 import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.ThreadPoolManager;
 import net.sf.l2j.gameserver.ai.CtrlIntention;
@@ -50,30 +48,21 @@ public class CharStatus
     private double _currentCp               = 0; //Current CP of the L2Character
     private double _currentHp               = 0; //Current HP of the L2Character
     private double _currentMp               = 0; //Current MP of the L2Character
-    private List<Double> _hpStatusWatch     = new FastList<Double>();
 
     /** Array containing all clients that need to be notified about hp/mp updates of the L2Character */
     private Set<L2Character> _StatusListener;
-    
+
     private Future _regTask;
     private byte _flagsRegenActive           = 0;
     private static final byte REGEN_FLAG_CP  = 4;
     private static final byte REGEN_FLAG_HP  = 1;
     private static final byte REGEN_FLAG_MP  = 2;
-    
+
     // =========================================================
     // Constructor
     public CharStatus(L2Character activeChar)
     {
         _activeChar = activeChar;
-    }
-
-    // =========================================================
-    // Method - Public
-    /** Add the decimal value of a percent (current hp/max hp) when a status update should kick in */
-    public final void addHpStatusWatch(double percenAsDecimal)
-    {
-        _hpStatusWatch.add(percenAsDecimal);
     }
 
     /**
@@ -124,7 +113,7 @@ public class CharStatus
     public void reduceHp(double value, L2Character attacker, boolean awake)
     {
     	if (getActiveChar().isInvul()) return;
-    	
+
     	if (getActiveChar() instanceof L2PcInstance)
     	{
     		if (((L2PcInstance)getActiveChar()).isInDuel())
@@ -132,7 +121,7 @@ public class CharStatus
 				// the duel is finishing - players do not recive damage
 				if (((L2PcInstance)getActiveChar()).getDuelState() == Duel.DUELSTATE_DEAD) return;
 				else if (((L2PcInstance)getActiveChar()).getDuelState() == Duel.DUELSTATE_WINNER) return;
-				
+
 				// cancel duel if player got hit by another player, that is not part of the duel or a monster
 				if ( !(attacker instanceof L2SummonInstance) && !(attacker instanceof L2PcInstance
 						&& ((L2PcInstance)attacker).getDuelId() == ((L2PcInstance)getActiveChar()).getDuelId()) )
@@ -145,7 +134,7 @@ public class CharStatus
     	else
     	{
     	    if (getActiveChar().isDead()) return; // Disabled == null check so skills like Body to Mind work again untill another solution is found
-    	    
+
     	    if (attacker instanceof L2PcInstance && ((L2PcInstance)attacker).isInDuel() &&
     	    		!(getActiveChar() instanceof L2SummonInstance &&
     	    		((L2SummonInstance)getActiveChar()).getOwner().getDuelId() == ((L2PcInstance)attacker).getDuelId()) ) // Duelling player attacks mob
@@ -202,7 +191,7 @@ public class CharStatus
         {
         	getActiveChar().abortAttack();
             getActiveChar().abortCast();
-        	
+
         	if (getActiveChar() instanceof L2PcInstance)
             {
                 if(((L2PcInstance)getActiveChar()).isInOlympiadMode())
@@ -393,23 +382,23 @@ public class CharStatus
             _flagsRegenActive = 0;
         }
     }
-    
+
     // =========================================================
     // Method - Private
 
     // =========================================================
     // Property - Public
     public L2Character getActiveChar()
-    {        
+    {
         return _activeChar;
     }
-    
+
     public final double getCurrentCp() { return _currentCp; }
-    
+
     public final void setCurrentCp(double newCp) {
     	setCurrentCp(newCp, true);
     }
-    
+
     public final void setCurrentCp(double newCp, boolean broadcastPacket)
     {
         synchronized (this)
@@ -445,11 +434,11 @@ public class CharStatus
     }
 
     public final double getCurrentHp() { return _currentHp; }
-    
+
     public final void setCurrentHp(double newHp) {
     	setCurrentHp(newHp, true);
     }
-    
+
     public final void setCurrentHp(double newHp, boolean broadcastPacket)
     {
         synchronized (this)
@@ -477,16 +466,6 @@ public class CharStatus
                 // Start the HP/MP/CP Regeneration task with Medium priority
                 startHpMpRegeneration();
             }
-
-            if (_hpStatusWatch.size() > 0)
-            {
-                maxHp = getCurrentHp() / maxHp; // Reused maxHp var as percentOfMaxHp so that we don't have to waste memory
-                for (Double d: _hpStatusWatch)
-                {
-                    if (maxHp < d) continue;
-                    getActiveChar().updateStats();
-                }
-            }
         }
 
         // Send the Server->Client packet StatusUpdate with current HP and MP to all other L2PcInstance to inform
@@ -499,9 +478,9 @@ public class CharStatus
         setCurrentHp(newHp,false);
         setCurrentMp(newMp,true); //send the StatusUpdate only once
     }
-    
+
     public final double getCurrentMp() { return _currentMp; }
-    
+
     public final void setCurrentMp(double newMp) {
     	setCurrentMp(newMp, true);
     }
@@ -548,12 +527,12 @@ public class CharStatus
      * @return The list of L2Character to inform or null if empty
      *
      */
-    public final Set<L2Character> getStatusListener() 
-    { 
+    public final Set<L2Character> getStatusListener()
+    {
     	if (_StatusListener == null) _StatusListener = new CopyOnWriteArraySet<L2Character>();
-    	return _StatusListener; 
+    	return _StatusListener;
     }
-    
+
     // =========================================================
     // Runnable
     /** Task of HP/MP/CP regeneration */
@@ -564,7 +543,7 @@ public class CharStatus
             try
             {
                 CharStat charstat = getActiveChar().getStat();
-                
+
                 // Modify the current CP of the L2Character and broadcast Server->Client packet StatusUpdate
                 if (getCurrentCp() < charstat.getMaxCp()) setCurrentCp(getCurrentCp() + Formulas.getInstance().calcCpRegen(getActiveChar()),false);
 
@@ -573,7 +552,7 @@ public class CharStatus
 
                 // Modify the current MP of the L2Character and broadcast Server->Client packet StatusUpdate
                 if (getCurrentMp() < charstat.getMaxMp()) setCurrentMp(getCurrentMp() + Formulas.getInstance().calcMpRegen(getActiveChar()),false);
-                
+
                 if(!getActiveChar().isInActiveRegion())
                 {
                     // no broadcast necessary for characters that are in inactive regions.

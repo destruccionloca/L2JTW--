@@ -26,7 +26,6 @@ import java.util.logging.Logger;
 
 import javolution.text.TextBuilder;
 import javolution.util.FastList;
-import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.GeoData;
 import net.sf.l2j.gameserver.datatables.HeroSkillTable;
 import net.sf.l2j.gameserver.datatables.SkillTable;
@@ -62,6 +61,7 @@ import net.sf.l2j.gameserver.skills.funcs.FuncTemplate;
 import net.sf.l2j.gameserver.skills.l2skills.L2SkillCharge;
 import net.sf.l2j.gameserver.skills.l2skills.L2SkillChargeAtk;
 import net.sf.l2j.gameserver.skills.l2skills.L2SkillChargeDmg;
+import net.sf.l2j.gameserver.skills.l2skills.L2SkillChargeEffect;
 import net.sf.l2j.gameserver.skills.l2skills.L2SkillCreateItem;
 import net.sf.l2j.gameserver.skills.l2skills.L2SkillDefault;
 import net.sf.l2j.gameserver.skills.l2skills.L2SkillDrain;
@@ -154,6 +154,8 @@ public abstract class L2Skill
     	DEATHLINK,
     	BLOW,
 
+    	CHARGE(L2SkillCharge.class),
+    	CHARGE_EFFECT(L2SkillChargeEffect.class),
         CHARGEATK   (L2SkillChargeAtk.class),  
 	    DEATHLINK_PDAM,
 	    CHARGEDAM (L2SkillChargeDmg.class),
@@ -211,6 +213,7 @@ public abstract class L2Skill
     	DELUXE_KEY_UNLOCK,
     	SOW,
         HARVEST,
+        GET_PLAYER,
 
     	// Creation
     	COMMON_CRAFT,
@@ -239,7 +242,7 @@ public abstract class L2Skill
     	SIGNET,
 
     	RESURRECT,
-    	CHARGE(L2SkillCharge.class),
+
     	MHOT,
     	DETECT_WEAKNESS,
     	LUCK,
@@ -410,23 +413,23 @@ public abstract class L2Skill
     private final int _itemConsumeIdOT;
     // how many times to consume an item
     private final int _itemConsumeSteps;
-    // for summon spells: 
+    // for summon spells:
     // a) What is the total lifetime of summons (in millisecs)
     private final int _summonTotalLifeTime;
-    // b) how much lifetime is lost per second of idleness (non-fighting) 
+    // b) how much lifetime is lost per second of idleness (non-fighting)
     private final int _summonTimeLostIdle;
-    // c) how much time is lost per second of activity (fighting) 
+    // c) how much time is lost per second of activity (fighting)
     private final int _summonTimeLostActive;
-    
+
     // item consume time in milliseconds
     private final int _itemConsumeTime;
     private final int _castRange;
     private final int _effectRange;
 
     // all times in milliseconds
-    private final int _skillTime;
-    private final int _skillInterruptTime;
     private final int _hitTime;
+    //private final int _skillInterruptTime;
+    private final int _coolTime;
     private final int _reuseDelay;
     private final int _buffDuration;
 
@@ -487,8 +490,8 @@ public abstract class L2Skill
     private final boolean _isDance;      // If true then casting more dances will cost more MP
     private final int _nextDanceCost;
     private final float _sSBoost;	//If true skill will have SoulShot boost (power*2)
-    private final int _aggroPoints; 
-    
+    private final int _aggroPoints;
+
     protected Condition _preCondition;
     protected Condition _itemPreCondition;
     protected FuncTemplate[] _funcTemplates;
@@ -534,9 +537,10 @@ public abstract class L2Skill
 
         _castRange = set.getInteger("castRange", 0);
         _effectRange = set.getInteger("effectRange", -1);
-        _skillTime = set.getInteger("skillTime", 0);
-        _skillInterruptTime = set.getInteger("skillTime", _skillTime / 2);
+        
         _hitTime = set.getInteger("hitTime", 0);
+        _coolTime = set.getInteger("coolTime", 0);
+        //_skillInterruptTime = set.getInteger("hitTime", _hitTime / 2);
         _reuseDelay = set.getInteger("reuseDelay", 0);
         _buffDuration = set.getInteger("buffDuration", 0);
 
@@ -594,7 +598,7 @@ public abstract class L2Skill
         _nextDanceCost = set.getInteger("nextDanceCost", 0);
         _sSBoost = set.getFloat("SSBoost", 0.f);
         _aggroPoints = set.getInteger("aggroPoints", 0);
-        
+
         String canLearn = set.getString("canLearn", null);
         if (canLearn == null)
         {
@@ -798,14 +802,6 @@ public abstract class L2Skill
         return _charge;
     }
     /**
-     * @return Returns the hitTime.
-     */
-    public final int getHitTime()
-    {
-        return Math.round(Config.ALT_GAME_SKILL_HIT_RATE * _hitTime);
-    }
-
-    /**
      * @return Returns the hpConsume.
      */
     public final int getHpConsume()
@@ -961,14 +957,23 @@ public abstract class L2Skill
         return _reuseDelay;
     }
 
+    @Deprecated
     public final int getSkillTime()
     {
-        return _skillTime;
+        return _hitTime;
     }
 
-    public final int getSkillInterruptTime()
+    public final int getHitTime()
     {
-        return _skillInterruptTime;
+        return _hitTime;
+    }
+
+    /**
+     * @return Returns the coolTime.
+     */
+    public final int getCoolTime()
+    {
+        return _coolTime;
     }
 
     public final int getSkillRadius()
@@ -1158,6 +1163,12 @@ public abstract class L2Skill
         return _isHeroSkill;
     }
 
+    public final int getNumCharges()
+    {
+        return _numCharges;
+    }
+
+    
     public final int getBaseCritRate()
     {
     	return _baseCritRate;

@@ -75,7 +75,7 @@ public class L2SummonInstance extends L2Summon
         }
         _timeRemaining = _totalLifeTime;
         lastShowntimeRemaining = _totalLifeTime;
-        
+
         if (_itemConsumeId == 0)
         	_nextItemConsumeTime = -1;	// do not consume
         else if (_itemConsumeSteps == 0)
@@ -139,7 +139,7 @@ public class L2SummonInstance extends L2Summon
     public int getNextItemConsumeTime()
     {
         return _nextItemConsumeTime;
-    }    
+    }
 
     public int getTotalLifeTime()
     {
@@ -155,27 +155,27 @@ public class L2SummonInstance extends L2Summon
     {
         return _timeLostActive;
     }
-    
+
     public int getTimeRemaining()
     {
         return _timeRemaining;
     }
-    
+
     public void setNextItemConsumeTime(int value)
     {
         _nextItemConsumeTime = value;
-    }    
+    }
 
     public void decNextItemConsumeTime(int value)
     {
         _nextItemConsumeTime -= value;
-    }    
+    }
 
     public void decTimeRemaining(int value)
     {
     	_timeRemaining -= value;
     }
-    
+
     public void addExpAndSp(int addToExp, int addToSp)
     {
         getOwner().addExpAndSp(addToExp, addToSp);
@@ -205,7 +205,7 @@ public class L2SummonInstance extends L2Summon
     {
     	if (!super.doDie(killer))
     		return false;
-    	
+
     	if (Config.DEBUG)
             _log.warning("L2SummonInstance: " + getTemplate().name + " (" + getOwner().getName()
                 + ") has been killed.");
@@ -216,7 +216,7 @@ public class L2SummonInstance extends L2Summon
             _summonLifeTask = null;
         }
         return true;
-        
+
     }
 
     /*
@@ -226,7 +226,7 @@ public class L2SummonInstance extends L2Summon
      {
      getOwner().sendPacket(new SystemMessage(SystemMessage.SUMMON_CRITICAL_HIT));
      }
-     
+
      if (miss)
      {
      getOwner().sendPacket(new SystemMessage(SystemMessage.MISSED_TARGET));
@@ -250,7 +250,7 @@ public class L2SummonInstance extends L2Summon
             _activeChar = activeChar;
             _summon = newpet;
         }
-        
+
 		public void run()
 		{
             if (Config.DEBUG)
@@ -262,7 +262,7 @@ public class L2SummonInstance extends L2Summon
 				double oldTimeRemaining = _summon.getTimeRemaining();
 				int maxTime = _summon.getTotalLifeTime();
 				double newTimeRemaining;
-				
+
 				// if pet is attacking
 				if (_summon.isAttackingNow())
 				{
@@ -282,7 +282,7 @@ public class L2SummonInstance extends L2Summon
 				else if ( (newTimeRemaining <= _summon.getNextItemConsumeTime()) && (oldTimeRemaining > _summon.getNextItemConsumeTime()) )
 				{
 					_summon.decNextItemConsumeTime(maxTime/(_summon.getItemConsumeSteps()+1));
-					
+
 		            // check if owner has enought itemConsume, if requested
 		            if (_summon.getItemConsumeCount() > 0
 		                && _summon.getItemConsumeId() != 0
@@ -293,7 +293,7 @@ public class L2SummonInstance extends L2Summon
 		                _summon.unSummon(_activeChar);
 		            }
 				}
-				
+
 				// prevent useless packet-sending when the difference isn't visible.
 				if ((_summon.lastShowntimeRemaining - newTimeRemaining) > maxTime/352)
 				{
@@ -301,9 +301,9 @@ public class L2SummonInstance extends L2Summon
 					_summon.lastShowntimeRemaining = (int) newTimeRemaining;
 				}
 			}
-            catch (Throwable e) 
+            catch (Throwable e)
             {
-            	if (Config.DEBUG) 
+            	if (Config.DEBUG)
             		log.warning("Summon of player [#"+_activeChar.getName()+"] has encountered item consumption errors: "+e);
             }
         }
@@ -342,12 +342,12 @@ public class L2SummonInstance extends L2Summon
 
         return getOwner().destroyItemByItemId(process, itemId, count, reference, sendMessage);
     }
-    
+
     @Override
 	public final void sendDamageMessage(L2Character target, int damage, boolean mcrit, boolean pcrit, boolean miss)
     {
     	if (miss) return;
-        	
+
     	// Prevents the double spam of system messages, if the target is the owning player.
     	if (target.getObjectId() != getOwner().getObjectId())
     	{
@@ -359,5 +359,5 @@ public class L2SummonInstance extends L2Summon
     		getOwner().sendPacket(sm);
         }
     }
-    
+
 }

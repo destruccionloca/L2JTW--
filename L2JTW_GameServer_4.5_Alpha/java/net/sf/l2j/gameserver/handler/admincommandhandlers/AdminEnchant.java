@@ -39,7 +39,7 @@ import net.sf.l2j.gameserver.serverpackets.NpcHtmlMessage;
 /**
  * This class handles following admin commands:
  * - enchant_armor
- * 
+ *
  * @version $Revision: 1.3.2.1.2.10 $ $Date: 2005/08/24 21:06:06 $
  */
 public class AdminEnchant implements IAdminCommandHandler
@@ -74,7 +74,7 @@ public class AdminEnchant implements IAdminCommandHandler
         } else
         {
             int armorType = -1;
-            
+
             if (command.startsWith("admin_seteh"))
                 armorType = Inventory.PAPERDOLL_HEAD;
             else if (command.startsWith("admin_setec"))
@@ -103,13 +103,13 @@ public class AdminEnchant implements IAdminCommandHandler
                 armorType = Inventory.PAPERDOLL_UNDER;
             else if (command.startsWith("admin_setba"))
                 armorType = Inventory.PAPERDOLL_BACK;
-            
+
             if (armorType != -1)
             {
                 try
                 {
                     int ench = Integer.parseInt(command.substring(12));
-                    
+
                     // check value
                     if (ench < 0 || ench > 65535)
                         activeChar.sendMessage("範圍為 0-65535.");
@@ -127,11 +127,11 @@ public class AdminEnchant implements IAdminCommandHandler
                     activeChar.sendMessage("請輸入新的數值.");
                 }
             }
-            
+
             // show the enchant menu after an action
             showMainPage(activeChar);
         }
-        
+
         return true;
     }
 
@@ -160,18 +160,18 @@ public class AdminEnchant implements IAdminCommandHandler
         if (parmorInstance != null && parmorInstance.getEquipSlot() == armorType)
         {
             itemInstance = parmorInstance;
-        } else 
+        } else
         {
             // for bows and double handed weapons
             parmorInstance = player.getInventory().getPaperdollItem(Inventory.PAPERDOLL_LRHAND);
             if (parmorInstance != null && parmorInstance.getEquipSlot() == Inventory.PAPERDOLL_LRHAND)
                 itemInstance = parmorInstance;
         }
-        
+
         if (itemInstance != null)
         {
             curEnchant = itemInstance.getEnchantLevel();
-            
+
             // set enchant value
             player.getInventory().unEquipItemInSlotAndRecord(armorType);
             itemInstance.setEnchantLevel(ench);
@@ -190,7 +190,7 @@ public class AdminEnchant implements IAdminCommandHandler
             smA.addString("改變裝備");
             smA.addString("("+itemInstance.getItem().getName()+") 從 +"+curEnchant+" 到 +"+ench+".");       
             activeChar.sendPacket(smA);
-            
+
             // 玩家訊息
             SystemMessage sm = new SystemMessage(614);
             sm.addString("GM");

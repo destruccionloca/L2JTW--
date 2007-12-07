@@ -33,15 +33,15 @@ import net.sf.l2j.gameserver.model.L2Object;
 
 
 /**
- * 
+ *
  * sample
- * 
+ *
  * 0000: 8e  d8 a8 10 48  10 04 00 00  01 00 00 00  01 00 00    ....H...........
  * 0010: 00  d8 a8 10 48                                     ....H
- *  
+ *
  *
  * format   ddddd d
- * 
+ *
  * @version $Revision: 1.4.2.1.2.3 $ $Date: 2005/03/27 15:29:57 $
  */
 public class MagicSkillLaunched extends L2GameServerPacket
@@ -55,7 +55,7 @@ public class MagicSkillLaunched extends L2GameServerPacket
 	private int _singleTargetId;
     private int _flags;
 	
-	
+
 	public MagicSkillLaunched(L2Character cha, int skillId, int skillLevel, L2Object[] targets)
 	{
 		_charObjId = cha.getObjectId();
@@ -66,7 +66,7 @@ public class MagicSkillLaunched extends L2GameServerPacket
 		_singleTargetId = 0;
          _flags |= 0x20;
 	}
-	
+
 	public MagicSkillLaunched(L2Character cha, int skillId, int skillLevel)
 	{
 		_charObjId = cha.getObjectId();
@@ -76,7 +76,7 @@ public class MagicSkillLaunched extends L2GameServerPacket
 		_singleTargetId = cha.getTargetId();
         _flags |= 0x20;
 	}
-	
+
 	@Override
 	protected final void writeImpl()
 	{
@@ -85,24 +85,24 @@ public class MagicSkillLaunched extends L2GameServerPacket
 		writeD(_skillId);
 		writeD(_skillLevel);
 		writeD(_numberOfTargets); // also failed or not?
-		if (_singleTargetId != 0 || _numberOfTargets == 0) 
+		if (_singleTargetId != 0 || _numberOfTargets == 0)
 			writeD(_singleTargetId);
 		else for(L2Object target : _targets)
 		{
-			try 
-			{ 
+			try
+			{
 				writeD(target.getObjectId());
-			} 
-			catch (NullPointerException e) 
-			{ 
-				writeD(0); // untested 
+			}
+			catch (NullPointerException e)
+			{
+				writeD(0); // untested
 			}
 		}
         if (L2Skill.CRIT_ATTACK==1)
             writeC(_flags);
 
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see net.sf.l2j.gameserver.serverpackets.ServerBasePacket#getType()
 	 */

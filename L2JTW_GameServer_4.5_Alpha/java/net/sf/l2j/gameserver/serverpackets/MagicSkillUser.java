@@ -27,14 +27,14 @@ import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.skills.Formulas;
 
 /**
- * 
+ *
  * sample
- * 
+ *
  * 0000: 5a  d8 a8 10 48  d8 a8 10 48  10 04 00 00  01 00 00    Z...H...H.......
  * 0010: 00  f0 1a 00 00  68 28 00 00                         .....h(..
  *
  * format   dddddd dddh (h)
- * 
+ *
  * @version $Revision: 1.4.2.1.2.4 $ $Date: 2005/03/27 15:29:39 $
  */
 public class MagicSkillUser extends L2GameServerPacket
@@ -46,11 +46,9 @@ public class MagicSkillUser extends L2GameServerPacket
 	private int _hitTime;
 	private int _reuseDelay;
 	private int _charObjId, _x, _y, _z;
-    private int _flags;
-    
 
-    
-  
+    private int _flags;
+
 	public MagicSkillUser(L2Character cha, L2Character target, int skillId, int skillLevel, int hitTime, int reuseDelay)
 	{
 		_charObjId = cha.getObjectId();
@@ -58,7 +56,7 @@ public class MagicSkillUser extends L2GameServerPacket
 		_skillId = skillId;
 		_skillLevel = skillLevel;
 		_hitTime = hitTime;
-		_reuseDelay = reuseDelay; 
+		_reuseDelay = reuseDelay;
 		_x = cha.getX();
 		_y = cha.getY();
 		_z = cha.getZ();
@@ -66,7 +64,7 @@ public class MagicSkillUser extends L2GameServerPacket
 
         
 	}
-	
+
 	public MagicSkillUser(L2Character cha, int skillId, int skillLevel, int hitTime, int reuseDelay)
 	{
 		_charObjId = cha.getObjectId();
@@ -74,7 +72,7 @@ public class MagicSkillUser extends L2GameServerPacket
 		_skillId = skillId;
 		_skillLevel = skillLevel;
 		_hitTime = hitTime;
-		_reuseDelay = reuseDelay; 
+		_reuseDelay = reuseDelay;
 		_x = cha.getX();
 		_y = cha.getY();
 		_z = cha.getZ();
@@ -82,7 +80,7 @@ public class MagicSkillUser extends L2GameServerPacket
         
         
 	}
-	
+
 	@Override
 	protected final void writeImpl()
 	{
@@ -110,7 +108,6 @@ public class MagicSkillUser extends L2GameServerPacket
 
 		//}
 	}
-    
 	/* (non-Javadoc)
 	 * @see net.sf.l2j.gameserver.serverpackets.ServerBasePacket#getType()
 	 */

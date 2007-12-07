@@ -37,19 +37,19 @@ import java.util.logging.Logger;
 
 
 /**
- * This class manages all RaidBoss. 
- * 
+ * This class manages all RaidBoss.
+ *
  * @version $Revision: 1.0.0.0 $ $Date: 2006/06/16 $
  */
 public final class L2BossInstance extends L2MonsterInstance
 {
 	//protected static Logger _log = Logger.getLogger(L2BossInstance.class.getName());
 	private boolean _teleportedToNest;
-	
+
 	// Baium variables
     private int _BaiumTalk = 0;
     private int _BaiumStance = 0;
-    
+
     private int _BaiumStanceChange = 0;
     private int _BaiumMinionTick = 0;
     private int _BaiumConfuseTick = 0;
@@ -97,7 +97,7 @@ public final class L2BossInstance extends L2MonsterInstance
 
     @Override
 	protected int getMaintenanceInterval() { return BOSS_MAINTENANCE_INTERVAL; }
-	
+
 
     /**
      * Used by Orfen to set 'teleported' flag, when hp goes to <50%
@@ -107,17 +107,16 @@ public final class L2BossInstance extends L2MonsterInstance
     {
         _teleportedToNest = flag;
     }
-    
+
     public boolean getTeleported()
     {
         return _teleportedToNest;
     }
-    
+
     @Override
 	public void onSpawn()
     {
 
-    	
     	switch (getTemplate().npcId) {
         case 29020: // Baium does his animation
             setIsInvul(true);
@@ -135,18 +134,20 @@ public final class L2BossInstance extends L2MonsterInstance
             break;
         default:
             break;
+
     }
     	super.onSpawn(); // ????? 
 
     }
     
+
     
 
     
     
     /**
-     * Reduce the current HP of the L2Attackable, update its _aggroList and launch the doDie Task if necessary.<BR><BR> 
-     * 
+     * Reduce the current HP of the L2Attackable, update its _aggroList and launch the doDie Task if necessary.<BR><BR>
+     *
      */
     @Override
 	public void reduceCurrentHp(double damage, L2Character attacker, boolean awake)
@@ -167,7 +168,7 @@ public final class L2BossInstance extends L2MonsterInstance
 
         super.reduceCurrentHp(damage, attacker, awake);
     }
-    
+
     @Override
 	public boolean isRaid()
     {

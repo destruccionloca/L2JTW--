@@ -219,9 +219,9 @@ public class L2CharacterAI extends AbstractAI
 
             // Set the AI attack target
             setAttackTarget(target);
-            
+
             stopFollow();
-            
+
             // Launch the Think Event
             notifyEvent(CtrlEvent.EVT_THINK, null);
         }
@@ -267,7 +267,7 @@ public class L2CharacterAI extends AbstractAI
         setCastTarget((L2Character) target);
 
         // Stop actions client-side to cast the skill
-        if (skill.getSkillTime() > 50)
+        if (skill.getHitTime() > 50)
         {
             // Abort the attack of the L2Character and send Server->Client ActionFailed packet
             _actor.abortAttack();
@@ -385,7 +385,7 @@ public class L2CharacterAI extends AbstractAI
             clientActionFailed();
             return;
         }
-        
+
         if (_actor.isImobilised() || _actor.isRooted())
         {
             // Cancel action client side by sending Server->Client packet ActionFailed to the L2PcInstance actor
@@ -399,9 +399,9 @@ public class L2CharacterAI extends AbstractAI
         	clientActionFailed();
         	return;
         }
-        
+
         // do not follow yourself
-        if (_actor == target) 
+        if (_actor == target)
         {
         	clientActionFailed();
         	return;
@@ -545,7 +545,7 @@ public class L2CharacterAI extends AbstractAI
 
         // Stop Server AutoAttack also
         setAutoAttacking(false);
-        
+
         // Stop the actor movement server side AND client side by sending Server->Client packet StopMove/StopRotation (broadcast)
         clientStopMoving(null);
 
@@ -574,7 +574,7 @@ public class L2CharacterAI extends AbstractAI
 
         // stop Server AutoAttack also
         setAutoAttacking(false);
-        
+
         // Stop the actor movement server side AND client side by sending Server->Client packet StopMove/StopRotation (broadcast)
         clientStopMoving(null);
     }
@@ -679,12 +679,12 @@ public class L2CharacterAI extends AbstractAI
         	((L2PcInstance) _accessor.getActor()).revalidateZone(true);
         }
         else _accessor.getActor().revalidateZone();
-        
-    	if (_accessor.getActor().moveToNextRoutePoint()) 
+
+    	if (_accessor.getActor().moveToNextRoutePoint())
     		return;
-    	
+
     	clientStoppedMoving();
-    	
+
     	// If the Intention was AI_INTENTION_MOVE_TO, set the Intention to AI_INTENTION_ACTIVE
         if (getIntention() == AI_INTENTION_MOVE_TO) setIntention(AI_INTENTION_ACTIVE);
 
@@ -856,7 +856,7 @@ public class L2CharacterAI extends AbstractAI
         // Kill the actor client side by sending Server->Client packet AutoAttackStop, StopMove/StopRotation, Die (broadcast)
         clientNotifyDead();
 
-        if (!(_actor instanceof L2PcInstance)) 
+        if (!(_actor instanceof L2PcInstance))
             _actor.setWalking();
     }
 
@@ -918,11 +918,11 @@ public class L2CharacterAI extends AbstractAI
             return false;
         }
         if(offset < 0) return false; // skill radius -1
-        
+
         offset += _actor.getTemplate().collisionRadius;
-        if (target instanceof L2Character) 
+        if (target instanceof L2Character)
         	offset += ((L2Character)target).getTemplate().collisionRadius;
-        
+
         if (!_actor.isInsideRadius(target, offset, false, false))
         {
         	// Caller should be L2Playable and thinkAttack/thinkCast/thinkInteract/thinkPickUp
@@ -935,16 +935,16 @@ public class L2CharacterAI extends AbstractAI
         		setIntention(AI_INTENTION_IDLE);
         		return true;
         	}
-        	
-            if (getFollowTarget() != null) { 
+
+            if (getFollowTarget() != null) {
                 // prevent attack-follow into peace zones
             	if(getAttackTarget() != null && _actor instanceof L2PlayableInstance && target instanceof L2PlayableInstance)
                 {
-                    if(getAttackTarget() == getFollowTarget()) 
+                    if(getAttackTarget() == getFollowTarget())
                     {
                     	// allow GMs to keep following
                     	boolean isGM = (_actor instanceof L2PcInstance ? ((L2PcInstance)_actor).isGM() : false);
-                        if (((L2PlayableInstance)_actor).isInsidePeaceZone(_actor, target) && !isGM) 
+                        if (((L2PlayableInstance)_actor).isInsidePeaceZone(_actor, target) && !isGM)
                         {
                             stopFollow();
                             setIntention(AI_INTENTION_IDLE);
@@ -953,7 +953,7 @@ public class L2CharacterAI extends AbstractAI
                     }
                 }
             	// if the target is too far (maybe also teleported)
-            	if (!_actor.isInsideRadius(target, 2000, false, false)) 
+            	if (!_actor.isInsideRadius(target, 2000, false, false))
             	{
             		stopFollow();
             		setIntention(AI_INTENTION_IDLE);
@@ -964,7 +964,7 @@ public class L2CharacterAI extends AbstractAI
                 stopFollow();
                 return false;
             }
-            
+
             if (_actor.isMovementDisabled()) return true;
 
             // If not running, set the L2Character movement type to run and send Server->Client packet ChangeMoveType to all others L2PcInstance
@@ -1005,14 +1005,14 @@ public class L2CharacterAI extends AbstractAI
      *
      * @param target The targeted L2Object
      *
-     * @return True if the target is lost or dead (false if fakedeath) 
+     * @return True if the target is lost or dead (false if fakedeath)
      *
      */
     protected boolean checkTargetLostOrDead(L2Character target)
     {
         if (target == null || target.isAlikeDead())
         {
-            //check if player is fakedeath 
+            //check if player is fakedeath
             if (target != null && target.isFakeDeath())
             {
                 target.stopFakeDeath(null);
@@ -1044,10 +1044,10 @@ public class L2CharacterAI extends AbstractAI
      */
     protected boolean checkTargetLost(L2Object target)
     {
-        // check if player is fakedeath 
+        // check if player is fakedeath
         if (target instanceof L2PcInstance)
         {
-            L2PcInstance target2 = (L2PcInstance) target; //convert object to chara 
+            L2PcInstance target2 = (L2PcInstance) target; //convert object to chara
 
             if (target2.isFakeDeath())
             {

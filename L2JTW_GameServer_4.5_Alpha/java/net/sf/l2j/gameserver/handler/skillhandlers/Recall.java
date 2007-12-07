@@ -53,8 +53,8 @@ public class Recall implements ISkillHandler
                 return;
             }
         }
-        
-		try 
+
+		try
         {
 			for (int index = 0; index < targets.length; index++)
 			{
@@ -66,21 +66,21 @@ public class Recall implements ISkillHandler
                 if (target instanceof L2PcInstance)
                 {
                     L2PcInstance targetChar = (L2PcInstance)target;
-                    
+
 
                     // Check to see if the current player target is in a festival.
                     if (targetChar.isFestivalParticipant()) {
                         targetChar.sendPacket(SystemMessage.sendString("黑暗祭典中無法使用."));
                         continue;
                     }
-                    
+
                     // Check to see if player is in jail
                     if (targetChar.isInJail())
                     {
                         targetChar.sendPacket(SystemMessage.sendString("無法在GM詢問處使用"));
                         continue;
                     }
-                    
+
                     // Check to see if player is in a duel
                     if (targetChar.isInDuel())
                     {
@@ -88,7 +88,7 @@ public class Recall implements ISkillHandler
                         continue;
                     }
                 }
-                  
+
                  target.teleToLocation(MapRegionTable.TeleportWhereType.Town);
 			}
         } catch (Throwable e) {

@@ -41,7 +41,7 @@ import net.sf.l2j.gameserver.templates.L2WeaponType;
 
 /**
  * This class ...
- * 
+ *
  * @version $Revision: 1.11.2.4.2.4 $ $Date: 2005/03/27 15:29:30 $
  */
 public class MoveBackwardToLocation extends L2GameClientPacket
@@ -58,18 +58,18 @@ public class MoveBackwardToLocation extends L2GameClientPacket
 	@SuppressWarnings("unused")
     private int _originZ;
 	private       int _moveMovement;
-	
+
     //For geodata
     private       int _curX;
     private       int _curY;
     @SuppressWarnings("unused")
     private       int _curZ;
-	
+
 	public TaskPriority getPriority() { return TaskPriority.PR_HIGH; }
 
 	private static final String _C__01_MOVEBACKWARDTOLOC = "[C] 01 MoveBackwardToLoc";
-	private static Logger _log = Logger.getLogger(MoveBackwardToLocation.class.getName());
-	
+
+
 	@Override
 	protected void readImpl()
 	{
@@ -89,18 +89,18 @@ public class MoveBackwardToLocation extends L2GameClientPacket
 		}
 	}
 
-	
+
 	@Override
 	protected void runImpl()
 	{
 		L2PcInstance activeChar = getClient().getActiveChar();
 		if (activeChar == null)
 			return;
-        
+
 		_curX = activeChar.getX();
         _curY = activeChar.getY();
         _curZ = activeChar.getZ();
-        
+
 		if(activeChar.isInBoat())
 		{
 			activeChar.setInBoat(false);
@@ -113,18 +113,18 @@ public class MoveBackwardToLocation extends L2GameClientPacket
 			activeChar.teleToLocation(_targetX, _targetY, _targetZ, false);
 			return;
 		}
-		
-		if (_moveMovement == 0 && Config.GEODATA < 1) // cursor movement without geodata is disabled 
+
+		if (_moveMovement == 0 && Config.GEODATA < 1) // cursor movement without geodata is disabled
 		{
 			activeChar.sendPacket(new ActionFailed());
 		}
 		else if (activeChar.isAttackingNow() && activeChar.getActiveWeaponItem() != null && (activeChar.getActiveWeaponItem().getItemType() == L2WeaponType.BOW))
 		{
 			
-		     _log.warning("Actiion FAIL");
+		     
 			activeChar.sendPacket(new ActionFailed());
 		}
-		else 
+		else
 		{
 			double dx = _targetX-_curX;
 			double dy = _targetY-_curY;
@@ -137,12 +137,12 @@ public class MoveBackwardToLocation extends L2GameClientPacket
 			activeChar.getAI().setIntention(CtrlIntention.AI_INTENTION_MOVE_TO,
 					new L2CharPosition(_targetX, _targetY, _targetZ, 0));
 
-			// party move update probably not necessary here
-			/*
+
+
 			if(activeChar.getParty() != null)
 				activeChar.getParty().broadcastToPartyMembers(activeChar,new PartyMemberPosition(activeChar));
-			*/
-		}		
+
+		}
 	}
 
 	/* (non-Javadoc)

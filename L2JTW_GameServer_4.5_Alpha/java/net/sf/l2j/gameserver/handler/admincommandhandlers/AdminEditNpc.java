@@ -96,7 +96,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
 		{
 			try
 			{
-				String[] commandSplit = command.split(" "); 
+				String[] commandSplit = command.split(" ");
 				int npcId = Integer.valueOf(commandSplit[1]);
 				L2NpcTemplate npc = NpcTable.getInstance().getTemplate(npcId);
 				Show_Npc_Property(activeChar, npc);
@@ -156,7 +156,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
 			{
 				StringTokenizer st = new StringTokenizer(command.substring(16).trim());
 				if (st.countTokens() == 3)
-				{            
+				{
 					try
 					{
 						npcId = Integer.parseInt(st.nextToken());
@@ -202,7 +202,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
 			{
 				StringTokenizer st = new StringTokenizer(command.substring(15).trim());
 				if(st.countTokens() == 1)
-				{            
+				{
 					try
 					{
 						String[] input = command.substring(15).split(" ");
@@ -291,14 +291,14 @@ public class AdminEditNpc implements IAdminCommandHandler {
 				}
 				else
 				{
-					try 
+					try
 					{
 						String msg = "權限:";
 						for (Object p : box.getAccess())
 							msg += " "+(String)p;
 						activeChar.sendMessage(msg);
 					}
-					catch (Exception e) 
+					catch (Exception e)
 					{
 						_log.info("box_access: "+e);
 					}
@@ -354,7 +354,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
 		replyMSG.append("</center>");
 		replyMSG.append("</body></html>");
 
-		adminReply.setHtml(replyMSG.toString());        
+		adminReply.setHtml(replyMSG.toString());
 		activeChar.sendPacket(adminReply);
 	}
 
@@ -397,7 +397,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
 		replyMSG.append("</center>");
 		replyMSG.append("</body></html>");
 
-		adminReply.setHtml(replyMSG.toString());        
+		adminReply.setHtml(replyMSG.toString());
 		activeChar.sendPacket(adminReply);
 	}
 
@@ -450,7 +450,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
 		replyMSG.append("</center>");
 		replyMSG.append("</body></html>");
 
-		adminReply.setHtml(replyMSG.toString());        
+		adminReply.setHtml(replyMSG.toString());
 		activeChar.sendPacket(adminReply);
 	}
 
@@ -463,7 +463,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
 		NpcHtmlMessage adminReply = new NpcHtmlMessage(5);
 		TextBuilder html = itemListHtml(tradeList, page);
 
-		adminReply.setHtml(html.toString());        
+		adminReply.setHtml(html.toString());
 		activeChar.sendPacket(adminReply);
 
 	}
@@ -538,7 +538,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
 		replyMSG.append("<button value=\"關閉\" action=\"bypass -h admin_close_window\" width=100 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
 		replyMSG.append("</center></body></html>");
 
-		adminReply.setHtml(replyMSG.toString());        
+		adminReply.setHtml(replyMSG.toString());
 		activeChar.sendPacket(adminReply);
 	}
 
@@ -552,7 +552,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
 			stmt.execute();
 			stmt.close();
 		}
-		catch (SQLException esql) 
+		catch (SQLException esql)
 		{
 			esql.printStackTrace();
 		}
@@ -561,7 +561,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
 			try
 			{
 				con.close();
-			} 
+			}
 			catch (SQLException e)
 			{
 				e.printStackTrace();
@@ -587,7 +587,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
 			try
 			{
 				con.close();
-			} 
+			}
 			catch (SQLException e)
 			{
 				e.printStackTrace();
@@ -614,7 +614,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
 			try
 			{
 				con.close();
-			} 
+			}
 			catch (SQLException e)
 			{
 				e.printStackTrace();
@@ -643,12 +643,12 @@ public class AdminEditNpc implements IAdminCommandHandler {
 			esql.printStackTrace();
 		}
 		finally
-		{ 
-			try 
+		{
+			try
 			{
 				con.close();
 			}
-			catch (SQLException e) 
+			catch (SQLException e)
 			{
 				e.printStackTrace();
 			}
@@ -676,7 +676,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
 
 		for (String line : lines)
 		{
-			pos = line.indexOf(target); 
+			pos = line.indexOf(target);
 			if (pos >= 0)
 			{
 				int tradeListID = Integer.decode((line.substring(pos+target.length()+1)).split("\"")[0]);
@@ -695,7 +695,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
 
 	public String[] getAdminCommandList() {
 		return ADMIN_COMMANDS;
-	}	
+	}
 
 	private void Show_Npc_Property(L2PcInstance activeChar, L2NpcTemplate npc)
 	{
@@ -714,7 +714,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
 			adminReply.replace("%collisionRadius%", String.valueOf(npc.collisionRadius));
 			adminReply.replace("%collisionHeight%", String.valueOf(npc.collisionHeight));
 			adminReply.replace("%level%", String.valueOf(npc.level));
-			adminReply.replace("%sex%", String.valueOf(npc.sex));	        
+			adminReply.replace("%sex%", String.valueOf(npc.sex));
 			adminReply.replace("%type%", String.valueOf(npc.type));
 			adminReply.replace("%attackRange%", String.valueOf(npc.baseAtkRange));
 			adminReply.replace("%hp%", String.valueOf(npc.baseHpMax));
@@ -904,7 +904,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
 		replyMSG.append("<button value=\"關閉\" action=\"bypass -h admin_close_window\" width=100 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
 		replyMSG.append("</center></body></html>");
 
-		adminReply.setHtml(replyMSG.toString());	    
+		adminReply.setHtml(replyMSG.toString());
 		activeChar.sendPacket(adminReply);
 
 	}
@@ -957,7 +957,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
 	}
 
 	private void showAddDropData(L2PcInstance activeChar, L2NpcTemplate npcData)
-	{	    
+	{
 		NpcHtmlMessage adminReply = new NpcHtmlMessage(5);
 
 		TextBuilder replyMSG = new TextBuilder("<html><title>增加掉落資料 " + npcData.name + "(" + npcData.npcId + ")</title>");
@@ -1020,7 +1020,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
 				replyMSG.append("</body></html>");
 
 				adminReply.setHtml(replyMSG.toString());
-				activeChar.sendPacket(adminReply);	            
+				activeChar.sendPacket(adminReply);
 			}
 			else
 				activeChar.sendMessage("發生錯誤!");
@@ -1066,7 +1066,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
 		finally
 		{
 			try { con.close(); } catch (Exception e) {}
-		}	        
+		}
 	}
 
 	private void deleteDropData(L2PcInstance activeChar, int npcId, int itemId, int category)
@@ -1094,7 +1094,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
 				replyMSG.append("</body></html>");
 
 				adminReply.setHtml(replyMSG.toString());
-				activeChar.sendPacket(adminReply);	        		        
+				activeChar.sendPacket(adminReply);
 
 			}
 		}
@@ -1102,7 +1102,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
 		finally
 		{
 			try { con.close(); } catch (Exception e) {}
-		}	        
+		}
 
 	}
 
@@ -1119,10 +1119,10 @@ public class AdminEditNpc implements IAdminCommandHandler {
 		java.sql.Connection con = null;
 		try
 		{
-			con = L2DatabaseFactory.getInstance().getConnection();	    
+			con = L2DatabaseFactory.getInstance().getConnection();
 			L2DropData dropData = null;
 
-			npcData.getDropData().clear();	            
+			npcData.getDropData().clear();
 
 			PreparedStatement statement = con.prepareStatement("SELECT " + L2DatabaseFactory.getInstance().safetyString(new String[] {"mobId", "itemId", "min", "max", "category", "chance"}) + " FROM droplist WHERE mobId=?");
 			statement.setInt(1, npcId);
@@ -1147,6 +1147,6 @@ public class AdminEditNpc implements IAdminCommandHandler {
 		finally
 		{
 			try { con.close(); } catch (Exception e) {}
-		}	         
+		}
 	}
 }

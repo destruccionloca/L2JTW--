@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ import net.sf.l2j.gameserver.serverpackets.ShowTownMap;
 public class L2StaticObjectInstance extends L2Object
 {
 	private static Logger _log = Logger.getLogger(L2StaticObjectInstance.class.getName());
-    
+
     /** The interaction distance of the L2StaticObjectInstance */
     public static final int INTERACTION_DISTANCE = 150;
 
@@ -51,7 +51,7 @@ public class L2StaticObjectInstance extends L2Object
     private int _x;
     private int _y;
     private String _texture;
-    
+
     /**
      * @return Returns the StaticObjectId.
      */
@@ -73,12 +73,12 @@ public class L2StaticObjectInstance extends L2Object
         super(objectId);
         setKnownList(new NullKnownList(this));
     }
-    
+
     public int getType()
     {
         return _type;
     }
-    
+
     public void setType(int type)
     {
         _type = type;
@@ -100,7 +100,7 @@ public class L2StaticObjectInstance extends L2Object
     {
 	return _y;
     }
-    
+
 	public final double getDistance(int x, int y)
 	{
 		long dx = x-getX();
@@ -136,7 +136,7 @@ public class L2StaticObjectInstance extends L2Object
             {
                     // Notify the L2PcInstance AI with AI_INTENTION_INTERACT
                     player.getAI().setIntention(CtrlIntention.AI_INTENTION_INTERACT, this);
-                    
+
                     // Send a Server->Client packet ActionFailed (target is out of interaction range) to the L2PcInstance player
                     player.sendPacket(new ActionFailed());
             } else {
@@ -188,7 +188,7 @@ public class L2StaticObjectInstance extends L2Object
 	        }
     	}
     }
-    
+
     /* (non-Javadoc)
      * @see net.sf.l2j.gameserver.model.L2Object#isAttackable()
      */

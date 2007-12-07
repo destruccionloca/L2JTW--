@@ -22,15 +22,15 @@ import java.util.NoSuchElementException;
 
 /**
  * Enum of basic stats.
- * 
+ *
  * @author mkizub
  */
-public enum Stats 
+public enum Stats
 {
 	//
 	// Base stats, for each in Calculator a slot is allocated
 	//
-	
+
 	// HP & MP
 
 	MAX_HP 				("maxHp"),
@@ -41,7 +41,7 @@ public enum Stats
 	REGENERATE_MP_RATE	("regMp"),
     RECHARGE_MP_RATE	("gainMp"),
     HEAL_HP_RATE	 	("gainHp"),
-	
+
 	// Atk & Def
 	POWER_DEFENCE 		("pDef"),
 	MAGIC_DEFENCE		("mDef"),
@@ -55,7 +55,7 @@ public enum Stats
 	PVP_PHYSICAL_DMG    ("pvpPhysDmg"),
 	PVP_MAGICAL_DMG     ("pvpMagicalDmg"),
 	PVP_PHYS_SKILL_DMG  ("pvpPhysSkillsDmg"),
-	
+
 	// Atk & Def rates
 	EVASION_RATE 		("rEvas"),
 	SHIELD_RATE 		("rShld"),
@@ -65,7 +65,7 @@ public enum Stats
 	MCRITICAL_RATE 		("mCritRate"),
     EXPSP_RATE 			("rExp"),
 	ATTACK_CANCEL		("cancel"),
-	
+
 	// Accuracy and range
 	ACCURACY_COMBAT 	("accCombat"),
 	POWER_ATTACK_RANGE 	("pAtkRange"),
@@ -76,7 +76,7 @@ public enum Stats
 	// walk & escape speed are calculated proportionally,
 	// magic speed is a buff
 	RUN_SPEED 			("runSpd"),
-	
+
 	//
 	// Player-only stats
 	//
@@ -90,7 +90,7 @@ public enum Stats
 	//
 	// Special stats, share one slot in Calculator
 	//
-	
+
 	// stats of various abilities
 	BREATH 		("breath"),
 	//
@@ -115,10 +115,10 @@ public enum Stats
 	BLEED_VULN 		("bleedVuln"),
 	POISON_VULN		("poisonVuln"),
 	STUN_VULN 		("stunVuln"),
-	PARALYZE_VULN 	("paralyzeVuln"), 
+	PARALYZE_VULN 	("paralyzeVuln"),
 	ROOT_VULN 		("rootVuln"),
 	SLEEP_VULN 		("sleepVuln"),
-	CONFUSION_VULN 	("confusionVuln"), 
+	CONFUSION_VULN 	("confusionVuln"),
 	MOVEMENT_VULN 	("movementVuln"),
 	FIRE_VULN 		("fireVuln"),
 	WIND_VULN		("windVuln"),
@@ -130,7 +130,7 @@ public enum Stats
 	DERANGEMENT_VULN("derangementVuln"),
 	DEBUFF_VULN		("debuffVuln"),
 
-	
+
 
 	NONE_WPN_VULN 	("noneWpnVuln"), // Shields!!!
 	SWORD_WPN_VULN 	("swordWpnVuln"),
@@ -143,21 +143,18 @@ public enum Stats
 	DUAL_WPN_VULN 	("dualWpnVuln"),
 	DUALFIST_WPN_VULN("dualFistWpnVuln"),
 
-	
 	REFLECT_DAMAGE_PERCENT 	("reflectDam"),
 	REFLECT_SKILL_MAGIC     ("reflectSkillMagic"),
 	REFLECT_SKILL_PHYSIC    ("reflectSkillPhysic"),
 	ABSORB_DAMAGE_PERCENT 	("absorbDam"),
     TRANSFER_DAMAGE_PERCENT ("transDam"),
-    REFLECT_STANCE			("reflectStance"),
-    POLE_ATTACK_ANGLE		("poleAtkAngle"),
-    SHIELD_DEFENCE_ANGLE	("shieldDefAngle"),
-    MULTIFACE_ATTACK_ANGLE	("multifaceAtkAngle"),
 
 
-    
+
+
+
 	MAX_LOAD 		("maxLoad"),
-	
+
 	PATK_PLANTS 	("pAtk-plants"),
 	PATK_INSECTS	("pAtk-insects"),
 	PATK_ANIMALS 	("pAtk-animals"),
@@ -166,10 +163,10 @@ public enum Stats
 	PATK_UNDEAD 	("pAtk-undead"),
 
 	PDEF_UNDEAD 	("pDef-undead"),
-	
+
 
 	ATK_REUSE 		("atkReuse"),
-	
+
 	//ExSkill :)
 	INV_LIM 		("inventoryLimit"),
 	WH_LIM 			("whLimit"),
@@ -178,24 +175,31 @@ public enum Stats
 	P_BUY_LIM 		("PrivateBuyLimit"),
 	REC_D_LIM 		("DwarfRecipeLimit"),
 	REC_C_LIM 		("CommonRecipeLimit"),
-    
+
     //C4 Stats
 
     MP_CONSUME_RATE 	("MpConsumeRate"),
     HP_CONSUME_RATE		("HpConsumeRate"),
     MP_CONSUME 			("MpConsume"),
     SOULSHOT_COUNT 		("soulShotCount"),
+    
+    //Special Stats
+    REFLECT_STANCE			("reflectStance"),
+    POLE_ATTACK_ANGLE		("poleAtkAngle"),
+    SHIELD_DEFENCE_ANGLE	("shieldDefAngle"),
+    MULTIFACE_ATTACK_ANGLE	("multifaceAtkAngle"),
     CRIT_BONUS			("critbonus"),
     CRIT_PENALTY		("critpenalty"),
     CRIT_POWER_BONUS	("critpowerbonus"),
     CRIT_POWER_PENALTY	("critpowerpenalty");
+	
 
 	;
-	
-	public static final int NUM_STATS = values().length; 
-	
+
+	public static final int NUM_STATS = values().length;
+
 	private String _value;
-	
+
 	public String getValue()
 	{
 		return _value;
@@ -220,6 +224,7 @@ public enum Stats
         if (name == "critpowerpenalty"  ) return CRIT_POWER_PENALTY;
 		*/	
 		
+
 		throw new NoSuchElementException("Unknown name '"+name+"' for enum BaseStats");
 	}
 }

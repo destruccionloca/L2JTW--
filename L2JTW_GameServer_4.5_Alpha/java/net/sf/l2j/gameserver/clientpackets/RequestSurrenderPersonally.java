@@ -34,7 +34,7 @@ public final class RequestSurrenderPersonally extends L2GameClientPacket
     private String _pledgeName;
     private L2Clan _clan;
     private L2PcInstance _activeChar;
-    
+
     @Override
 	protected void readImpl()
     {
@@ -50,17 +50,18 @@ public final class RequestSurrenderPersonally extends L2GameClientPacket
         _log.info("RequestSurrenderPersonally by "+getClient().getActiveChar().getName()+" with "+_pledgeName);
         _clan = getClient().getActiveChar().getClan();
         L2Clan clan = ClanTable.getInstance().getClanByName(_pledgeName);
-        
+
         if(_clan == null)
             return;
-        
+
         if(clan == null)
         {
 
         	_activeChar.sendMessage("無此血盟");
         	_activeChar.sendPacket(new ActionFailed());
 
-            return;                        
+            return;
+
         }
 
         if(!_clan.isAtWarWith(clan.getClanId()) || _activeChar.getWantsPeace() == 1)
@@ -69,9 +70,10 @@ public final class RequestSurrenderPersonally extends L2GameClientPacket
         	_activeChar.sendMessage("並無與此血盟發生戰爭");
         	_activeChar.sendPacket(new ActionFailed());
 
-            return;            
+            return;
+
         }
-        
+
         _activeChar.setWantsPeace(1);
         _activeChar.deathPenalty(false);
         SystemMessage msg = new SystemMessage(SystemMessageId.YOU_HAVE_PERSONALLY_SURRENDERED_TO_THE_S1_CLAN);
@@ -80,7 +82,7 @@ public final class RequestSurrenderPersonally extends L2GameClientPacket
         msg = null;
         ClanTable.getInstance().checkSurrender(_clan, clan);
     }
-    
+
     @Override
 	public String getType()
     {

@@ -107,7 +107,7 @@ public class L2Fishing implements Runnable
 	{
 		_fishCurHp -= hp;
 		if (_fishCurHp < 0) _fishCurHp = 0;
-		
+
 		ExFishingHpRegen efhr = new ExFishingHpRegen(_fisher, _time, _fishCurHp, _mode, _goodUse, _anim, pen, _deceptiveMode);
 		_fisher.broadcastPacket(efhr);
 		_anim = 0;
@@ -127,22 +127,27 @@ public class L2Fishing implements Runnable
 	public void doDie(boolean win)
 	{
 		_fishAiTask = null;
-        
+
         if (_fisher == null || this == null) return;
         
-		if (win)
-		{
-			int check = Rnd.get(100);
-			if (check <= 5) {
-				PenaltyMonster();
-			}
-			else {
-				_fisher.sendPacket(new SystemMessage(SystemMessageId.YOU_CAUGHT_SOMETHING));
-				_fisher.addItem("Fishing", _fishId, 1, null, true);
-			}
-		}
-		_fisher.EndFishing(win);
-		_fisher = null;
+        try {
+        	if (win)
+        	{
+        		int check = Rnd.get(100);
+        		if (check <= 5) {
+        			PenaltyMonster();
+        		}
+        		else {
+        			_fisher.sendPacket(new SystemMessage(SystemMessageId.YOU_CAUGHT_SOMETHING));
+        			_fisher.addItem("Fishing", _fishId, 1, null, true);
+        		}
+        	}
+        	_fisher.EndFishing(win);
+        	_fisher = null;
+        } catch (NullPointerException e) 
+        {
+        	// fisher disconnected
+        }
 	}
 
 	protected void aiTask()
@@ -312,7 +317,7 @@ public class L2Fishing implements Runnable
 	{
 		int lvl = (int)Math.round(_fisher.getLevel()*0.1);
 		int npcid;
-		
+
 		_fisher.sendPacket(new SystemMessage(SystemMessageId.YOU_CAUGHT_SOMETHING_SMELLY_THROW_IT_BACK));
 		switch (lvl)
 		{

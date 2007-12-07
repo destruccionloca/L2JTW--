@@ -39,5 +39,5 @@ public class L2SkillDefault extends L2Skill {
 		sm.addString("技能類型尚未加入 技能編號: " + getId() + " " + getSkillType());
 		caster.sendPacket(sm);
 	}
-	
+
 }

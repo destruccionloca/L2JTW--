@@ -119,7 +119,7 @@ public final class RequestStartPledgeWar extends L2GameClientPacket
         //        {
         //            player.sendMessage("Clan leader isn't online.");
         //            player.sendPacket(new ActionFailed());
-        //            return;                        
+        //            return;
         //        }
 
         //        if (leader.isProcessingRequest())
@@ -128,7 +128,7 @@ public final class RequestStartPledgeWar extends L2GameClientPacket
         //            sm.addString(leader.getName());
         //            player.sendPacket(sm);
         //            return;
-        //        } 
+        //        }
 
         //        if (leader.isTransactionInProgress())
         //        {
@@ -136,7 +136,7 @@ public final class RequestStartPledgeWar extends L2GameClientPacket
         //            sm.addString(leader.getName());
         //            player.sendPacket(sm);
         //            return;
-        //        } 
+        //        }
 
         //        leader.setTransactionRequester(player);
         //        player.setTransactionRequester(leader);

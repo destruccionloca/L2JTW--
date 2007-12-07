@@ -34,12 +34,12 @@ import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.util.Broadcast;
 
 /**
- * 
+ *
  *
  */
 public class Escape implements IUserCommandHandler
 {
-    private static final int[] COMMAND_IDS = { 52 }; 
+    private static final int[] COMMAND_IDS = { 52 };
     private static final int REQUIRED_LEVEL = Config.GM_ESCAPE;
 
     /* (non-Javadoc)
@@ -57,27 +57,27 @@ public class Escape implements IUserCommandHandler
         if (activeChar.isCastingNow() || activeChar.isMovementDisabled() || activeChar.isMuted() || activeChar.isAlikeDead() ||
                 activeChar.isInOlympiadMode())
             return false;
-        
+
               int unstuckTimer = (activeChar.getAccessLevel() >=REQUIRED_LEVEL? 5000 : Config.UNSTUCK_INTERVAL*1000 );
-        
+
         // Check to see if the player is in a festival.
-        if (activeChar.isFestivalParticipant()) 
+        if (activeChar.isFestivalParticipant())
         {
             activeChar.sendPacket(SystemMessage.sendString("無法在黑暗祭典內使用."));
             return false;
         }
-        
+
         // Check to see if player is in jail
         if (activeChar.isInJail())
         {
             activeChar.sendMessage("You can not escape from jail.");
             return false;
         }
-        
+
         SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
         sm.addString("SYS");
         sm.addString("將在" + unstuckTimer/60000 + "分鐘後返回村莊");
-        
+
         activeChar.getAI().setIntention(CtrlIntention.AI_INTENTION_IDLE);
         //SoE Animation section
         activeChar.setTarget(activeChar);
@@ -93,35 +93,35 @@ public class Escape implements IUserCommandHandler
         // continue execution later
         activeChar.setSkillCast(ThreadPoolManager.getInstance().scheduleGeneral(ef, unstuckTimer));
         activeChar.setSkillCastEndTime(10+GameTimeController.getGameTicks()+unstuckTimer/GameTimeController.MILLIS_IN_TICK);
-        
+
         return true;
     }
 
     static class EscapeFinalizer implements Runnable
     {
         private L2PcInstance _activeChar;
-        
+
         EscapeFinalizer(L2PcInstance activeChar)
         {
             _activeChar = activeChar;
         }
-        
+
         public void run()
         {
-            if (_activeChar.isDead()) 
-                return; 
-            
+            if (_activeChar.isDead())
+                return;
+
             _activeChar.setIsIn7sDungeon(false);
-            
+
             _activeChar.enableAllSkills();
-            
-            try 
+
+            try
             {
                 _activeChar.teleToLocation(MapRegionTable.TeleportWhereType.Town);
             } catch (Throwable e) { if (Config.DEBUG) e.printStackTrace(); }
         }
     }
-    
+
     /* (non-Javadoc)
      * @see net.sf.l2j.gameserver.handler.IUserCommandHandler#getUserCommandList()
      */
