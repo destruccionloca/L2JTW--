@@ -55,7 +55,7 @@ public final class L2TeleporterInstance extends L2FolkInstance
     }
 
     @Override
-	public void onBypassFeedback(L2PcInstance player, String command)
+    public void onBypassFeedback(L2PcInstance player, String command)
     {
         player.sendPacket(new ActionFailed());
 
@@ -241,8 +241,8 @@ public final class L2TeleporterInstance extends L2FolkInstance
         if (CastleManager.getInstance().getCastleIndex(this) < 0) // Teleporter isn't on castle ground
         return COND_REGULAR; // Regular access
         else if (getCastle().getSiege().getIsInProgress()) // Teleporter is on castle ground and siege is in progress
-        return COND_BUSY_BECAUSE_OF_SIEGE; // Busy because of siege
-        else if (player.getClan() != null) // Teleporter is on castle ground and player is in a clan
+        return COND_BUSY_BECAUSE_OF_SIEGE;                 // Busy because of siege
+        else if (player.getClan() != null)                 // Teleporter is on castle ground and player is in a clan
         {
             if (getCastle().getOwnerId() == player.getClanId()) // Clan owns castle
                 return COND_OWNER; // Owner

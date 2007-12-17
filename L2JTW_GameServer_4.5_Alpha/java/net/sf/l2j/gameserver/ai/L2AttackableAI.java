@@ -275,8 +275,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         
         if(target instanceof L2Attackable)
         {
-        if((!me.isInsideRadius(target, me.getAggroRange(), false, false) 
-            || Math.abs(_actor.getZ() - target.getZ()) > 300) && ((L2Attackable)_actor).getEnemyRange() == 0 && ((L2Attackable)_actor).getEnemyClan() == null && ((L2Attackable)_actor).getIsChaos()==0) 
+        if(( Math.abs(_actor.getZ() - target.getZ()) > 300) && ((L2Attackable)_actor).getEnemyRange() == 0 && ((L2Attackable)_actor).getEnemyClan() == null && ((L2Attackable)_actor).getIsChaos()==0) 
             return false;
 
         }
@@ -378,6 +377,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
             // Check if the actor is Aggressive
 
          if(!(target instanceof L2PcInstance) && target instanceof L2Attackable)
+         {
             if (((L2Attackable)_actor).getEnemyClan() == ((L2Attackable) target).getFactionId() && ((L2Attackable)_actor).getEnemyClan() != null && ((L2Attackable) target).getFactionId() !=null)
             {
             	
@@ -386,7 +386,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
                 
                 
             }
-            if  (((L2Attackable)_actor).getIsChaos() != 0)
+            if  (((L2Attackable)_actor).getIsChaos() > 0 && me.isInsideRadius(target, ((L2Attackable)_actor).getIsChaos(), false, false) )
             {
             	if (((L2Attackable)_actor).getFactionId() == ((L2Attackable) target).getFactionId() && ((L2Attackable)_actor).getFactionId() != null)
             	{
@@ -395,7 +395,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
                 // Los Check
             	return GeoData.getInstance().canSeeTarget(me, target);
             }
-            
+         }
          if (target instanceof L2Attackable || target instanceof L2NpcInstance)
             return false;
          

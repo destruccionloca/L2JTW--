@@ -261,7 +261,7 @@ public class CharInfo extends L2GameServerPacket
 
 			if (gmSeeInvis)
 			{
-				writeS("Invisible");
+				writeS("Áô§Îª¬ºA");
 			}
 			else
 			{

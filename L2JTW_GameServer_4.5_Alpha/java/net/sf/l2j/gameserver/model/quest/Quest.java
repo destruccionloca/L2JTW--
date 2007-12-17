@@ -64,9 +64,11 @@ public abstract class Quest
 
 	private final int _questId;
 	private final String _name;
+	private final String _prefixPath;	// used only for admin_quest_reload
 	private final String _descr;
     private State _initialState;
     private Map<String, State> _states;
+    private FastList<Integer> _questItemIds;
 
 	/**
 	 * Return collection view of the values contains in the allEventS
@@ -88,6 +90,17 @@ public abstract class Quest
 		_name = name;
 		_descr = descr;
         _states = new FastMap<String, State>();
+        
+    	// Given the quest instance, create a string representing the path and questName 
+    	// like a simplified version of a canonical class name.  That is, if a script is in 
+    	// DATAPACK_PATH/jscript/quests/abc the result will be quests.abc
+    	// Similarly, for a script in DATAPACK_PATH/jscript/ai/individual/myClass.py
+    	// the result will be ai.individual.myClass
+    	// All quests are to be indexed, processed, and reloaded by this form of pathname.
+    	StringBuffer temp = new StringBuffer(getClass().getCanonicalName());
+    	temp.delete(0, temp.indexOf(".jscript.")+9);
+    	temp.delete(temp.indexOf(getClass().getSimpleName()), temp.length());
+    	_prefixPath = temp.toString();
 		if (questId != 0)
 		{
 			QuestManager.getInstance().addQuest(Quest.this);
@@ -184,6 +197,15 @@ public abstract class Quest
 	 */
 	public String getName() {
 		return _name;
+	}
+	
+	/**
+	 * Return name of the prefix path for the quest, down to the last "."
+	 * For example "quests." or "ai.individual."
+	 * @return String
+	 */
+	public String getPrefixPath() {
+		return _prefixPath;
 	}
 	
 	/**
@@ -609,7 +631,7 @@ public abstract class Quest
             PreparedStatement statement;
             statement = con.prepareStatement("INSERT INTO character_quests (char_id,name,var,value) VALUES (?,?,?,?)");
             statement.setInt   (1, qs.getPlayer().getObjectId());
-            statement.setString(2, qs.getQuest().getName());
+            statement.setString(2, qs.getQuestName());
             statement.setString(3, var);
             statement.setString(4, value);
 	    statement.executeUpdate();
@@ -644,7 +666,7 @@ public abstract class Quest
             statement = con.prepareStatement("UPDATE character_quests SET value=? WHERE char_id=? AND name=? AND var = ?");
             statement.setString(1, value);
             statement.setInt   (2, qs.getPlayer().getObjectId());
-            statement.setString(3, qs.getQuest().getName());
+            statement.setString(3, qs.getQuestName());
             statement.setString(4, var);
 			statement.executeUpdate();
             statement.close();
@@ -668,7 +690,7 @@ public abstract class Quest
             PreparedStatement statement;
             statement = con.prepareStatement("DELETE FROM character_quests WHERE char_id=? AND name=? AND var=?");
             statement.setInt   (1, qs.getPlayer().getObjectId());
-            statement.setString(2, qs.getQuest().getName());
+            statement.setString(2, qs.getQuestName());
             statement.setString(3, var);
 	    statement.executeUpdate();
             statement.close();
@@ -691,7 +713,7 @@ public abstract class Quest
             PreparedStatement statement;
             statement = con.prepareStatement("DELETE FROM character_quests WHERE char_id=? AND name=?");
             statement.setInt   (1, qs.getPlayer().getObjectId());
-            statement.setString(2, qs.getQuest().getName());
+            statement.setString(2, qs.getQuestName());
 			statement.executeUpdate();
             statement.close();
         } catch (Exception e) {
@@ -1066,5 +1088,17 @@ public abstract class Quest
         }
           
         return null;
+    }
+    
+    public void registerItem(int itemId)
+    {
+    	if (_questItemIds == null)
+    		_questItemIds = new FastList<Integer>();
+    	_questItemIds.add(itemId);
+    }
+    
+    public FastList<Integer> getRegisteredItemIds()
+    {
+    	return _questItemIds;
     }
 }

@@ -397,6 +397,9 @@ public abstract class L2Character extends L2Object
 
 	public void onTeleported()
 	{
+		if (!isTeleporting())
+			return;
+		
 		spawnMe(getPosition().getX(), getPosition().getY(), getPosition().getZ());
 
 		setIsTeleporting(false);
@@ -500,8 +503,8 @@ public abstract class L2Character extends L2Object
 	    {
 	    	if (currentHp == getMaxHp())
 	    	{
-	    		_hpUpdateIncCheck = getMaxHp();
-	    		_hpUpdateDecCheck = _hpUpdateIncCheck - _hpUpdateInterval;
+	    		_hpUpdateIncCheck = currentHp + 1;
+	    		_hpUpdateDecCheck = currentHp - _hpUpdateInterval;
 	    	}
 	    	else
 	    	{
@@ -821,6 +824,13 @@ public abstract class L2Character extends L2Object
         else
             wasSSCharged = (weaponInst != null && weaponInst.getChargedSoulshot() != L2ItemInstance.CHARGED_NONE);
 
+        if (this instanceof L2Attackable)
+        {
+        	if (((L2Attackable)this).getSoulShot() >0)
+        	{
+        		wasSSCharged = true;
+        	}
+        }
 		// Get the Attack Speed of the L2Character (delay (in milliseconds) before next attack)
 		int timeAtk = calculateTimeBetweenAttacks(target, weaponItem);
 		// the hit is calculated to happen halfway to the animation - might need further tuning e.g. in bow case
@@ -847,7 +857,6 @@ public abstract class L2Character extends L2Object
 
 		// Select the type of attack to start
 		
-		_isFirstAtk = true;
 
 		if (weaponItem == null)
 			hitted = doAttackHitSimple(attack, target, timeToHit);
@@ -950,7 +959,6 @@ public abstract class L2Character extends L2Object
 
 		// Consumme arrows
 		reduceArrowCount();
-
 		_move = null;
 
 		// Check if hit isn't missed
@@ -991,7 +999,17 @@ public abstract class L2Character extends L2Object
 			sendPacket(sg);
 		}
 
+		if (this instanceof L2Attackable)
+        {
+            if (((L2Attackable)this).getSoulShot() >0)
+            {
 		// Create a new hit task with Medium priority
+            	ThreadPoolManager.getInstance().scheduleAi(new HitTask(target, damage1, crit1, miss1, true, shld1), sAtk);
+            }
+            else
+            	ThreadPoolManager.getInstance().scheduleAi(new HitTask(target, damage1, crit1, miss1, attack.soulshot, shld1), sAtk);
+        }
+		else
 		ThreadPoolManager.getInstance().scheduleAi(new HitTask(target, damage1, crit1, miss1, attack.soulshot, shld1), sAtk);
 
 		// Calculate and set the disable delay of the bow in function of the Attack Speed
@@ -1093,12 +1111,34 @@ public abstract class L2Character extends L2Object
 
 			damage2 /= 2;
 		}
+		
+		if (this instanceof L2Attackable)
+        {
+            if (((L2Attackable)this).getSoulShot() >0)
+            {
 
 		// Create a new hit task with Medium priority for hit 1
-		ThreadPoolManager.getInstance().scheduleAi(new HitTask(target, damage1, crit1, miss1, attack.soulshot, shld1), sAtk/2);
+		ThreadPoolManager.getInstance().scheduleAi(new HitTask(target, damage1, crit1, miss1, true, shld1), sAtk/2);
 
 		// Create a new hit task with Medium priority for hit 2 with a higher delay
-		ThreadPoolManager.getInstance().scheduleAi(new HitTask(target, damage2, crit2, miss2, attack.soulshot, shld2), sAtk);
+		ThreadPoolManager.getInstance().scheduleAi(new HitTask(target, damage2, crit2, miss2, true, shld2), sAtk);
+            }
+            else
+            {
+    			ThreadPoolManager.getInstance().scheduleAi(new HitTask(target, damage1, crit1, miss1, attack.soulshot, shld1), sAtk/2);
+
+    			// Create a new hit task with Medium priority for hit 2 with a higher delay
+    			ThreadPoolManager.getInstance().scheduleAi(new HitTask(target, damage2, crit2, miss2, attack.soulshot, shld2), sAtk);
+            }
+        }
+		else
+		{
+			// Create a new hit task with Medium priority for hit 1
+			ThreadPoolManager.getInstance().scheduleAi(new HitTask(target, damage1, crit1, miss1, attack.soulshot, shld1), sAtk/2);
+
+			// Create a new hit task with Medium priority for hit 2 with a higher delay
+			ThreadPoolManager.getInstance().scheduleAi(new HitTask(target, damage2, crit2, miss2, attack.soulshot, shld2), sAtk);
+		}
 
 		// Add those hits to the Server-Client packet Attack
 		attack.addHit(target, damage1, miss1, crit1, shld1);
@@ -1295,14 +1335,18 @@ public abstract class L2Character extends L2Object
 
 		// Create a new hit task with Medium priority
 
-		if (_isFirstAtk)
-		{
-		ThreadPoolManager.getInstance().scheduleAi(new HitTask(target, damage1, crit1, miss1, attack.soulshot, shld1), (int)(sAtk/2));
-		_isFirstAtk=false;
-		}
+		if (this instanceof L2Attackable)
+        {
+            if (((L2Attackable)this).getSoulShot() >0)
+            {
+            	ThreadPoolManager.getInstance().scheduleAi(new HitTask(target, damage1, crit1, miss1, true, shld1), sAtk);
+            }
+            else
+            	ThreadPoolManager.getInstance().scheduleAi(new HitTask(target, damage1, crit1, miss1, attack.soulshot, shld1), sAtk);
+            	
+        }
 		else
 		ThreadPoolManager.getInstance().scheduleAi(new HitTask(target, damage1, crit1, miss1, attack.soulshot, shld1), sAtk);
-
 		// Add this hit to the Server-Client packet Attack
 		attack.addHit(target, damage1, miss1, crit1, shld1);
 
@@ -2200,7 +2244,7 @@ public abstract class L2Character extends L2Object
 	public static final int ABNORMAL_EFFECT_BIG_HEAD		= 0x002000;
 	public static final int ABNORMAL_EFFECT_FLAME			= 0x004000;
 	public static final int ABNORMAL_EFFECT_UNKNOWN_16		= 0x008000;
-	public static final int ABNORMAL_EFFECT_UNKNOWN_17		= 0x010000;
+	public static final int ABNORMAL_EFFECT_GROW			= 0x010000;
 	public static final int ABNORMAL_EFFECT_FLOATING_ROOT	= 0x020000;
 	public static final int ABNORMAL_EFFECT_DANCE_STUNNED	= 0x040000;
 	public static final int ABNORMAL_EFFECT_FIREROOT_STUN	= 0x080000;

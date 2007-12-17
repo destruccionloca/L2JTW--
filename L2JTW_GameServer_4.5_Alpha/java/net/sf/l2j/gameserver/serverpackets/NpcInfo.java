@@ -64,11 +64,11 @@ public class NpcInfo extends L2GameServerPacket
 		_activeChar = cha;
 		_idTemplate = cha.getTemplate().idTemplate;
 		_isAttackable = cha.isAutoAttackable(attacker);
-		_rhand = cha.getTemplate().rhand;
-		_lhand = cha.getTemplate().lhand;
+		_rhand = cha.getRightHandItem(); 
+		_lhand = cha.getLeftHandItem(); 
 		_isSummoned = false;
-        _collisionHeight = _activeChar.getTemplate().collisionHeight;
-        _collisionRadius = _activeChar.getTemplate().collisionRadius;
+        _collisionHeight = cha.getCollisionHeight();
+        _collisionRadius = cha.getCollisionRadius();
         if (_activeChar.getTemplate().basePAtkSpd>0 &&  _activeChar.getPAtkSpd()>0)
         _atkspdMul = _activeChar.getPAtkSpd()/_activeChar.getTemplate().basePAtkSpd;
         else _atkspdMul = 1;
@@ -98,7 +98,8 @@ public class NpcInfo extends L2GameServerPacket
 
         L2NpcCharData chardata = new L2NpcCharData();
         
-        if (chardata.getIsChar() > 0)
+        
+        if (((L2NpcInstance)_activeChar).getIsChar() > 0)
         {
         	
             IsChar = true;
@@ -175,7 +176,7 @@ public class NpcInfo extends L2GameServerPacket
         L2NpcCharData chardata = new L2NpcCharData();
         
 
-        if (chardata.getIsChar() > 0)
+        if (((L2NpcInstance)_activeChar).getIsChar() > 0)
         {
         	
             IsChar = true;
@@ -222,9 +223,12 @@ public class NpcInfo extends L2GameServerPacket
 	protected final void writeImpl()
 	{
         
-        if (IsChar)
+        if (((L2NpcInstance)_activeChar).getIsChar() > 0)
         {
-        	writeC(0x03);		
+  	
+        	
+        	
+        	writeC(0x03);
 			writeD(_x);
 			writeD(_y);
 			writeD(_z);
@@ -233,9 +237,10 @@ public class NpcInfo extends L2GameServerPacket
 			writeS(_activeChar.getName());
 			writeD(charrace);
 			writeD(charsex);
+
+
 			writeD(charclass);
 
-			
 			writeD(dhair);
 			writeD(head);
 			writeD(_rhand);
@@ -248,7 +253,7 @@ public class NpcInfo extends L2GameServerPacket
 			writeD(_lrhand);
 			writeD(hair);
 			writeD(face);
-			
+
 			// c6 new h's
 			writeH(0x00);
 			writeH(0x00);
@@ -267,7 +272,7 @@ public class NpcInfo extends L2GameServerPacket
 			writeH(0x00);
 			writeH(0x00);
 			writeH(0x00);
-			if(_lrhand>0)
+			if (_lrhand>0)
 			writeD(augmentation);
 			else
 			writeD(0x00);
@@ -275,16 +280,16 @@ public class NpcInfo extends L2GameServerPacket
 			writeH(0x00);
 			writeH(0x00);
 			writeH(0x00);
-			
+
 			writeD(0);
 			writeD(0);
-	
+
 			writeD(_mAtkSpd);
 			writeD(_pAtkSpd);
-			
+
 			writeD(0);
 			writeD(0);
-	
+
 			writeD(_runSpd);
 			writeD(_walkSpd);
 			writeD(_swimRunSpd/*0x32*/);  // swimspeed
@@ -297,64 +302,90 @@ public class NpcInfo extends L2GameServerPacket
 			writeF(_activeChar.getAttackSpeedMultiplier()); // _activeChar.getAttackSpeedMultiplier()
 			writeF(_collisionRadius);
 			writeF(_collisionHeight);
-	
+
 			writeD(charhair);
 			writeD(charcolor);
 			writeD(charface);
-			
+
 			writeS(_activeChar.getTitle());
-			writeD(0x00);
-			writeD(0x00);
-			writeD(0x00);
-			writeD(0x00);
-			writeD(0);	// new in rev 417   siege-flags
-			
+
+			writeD(0);
+			writeD(0);
+			writeD(0);
+			writeD(0);
+	        // In UserInfo leader rights and siege flags, but here found nothing??
+	        // Therefore RelationChanged packet with that info is required
+	        writeD(0);
+
 			writeC(1);	// standing = 1  sitting = 0
 			writeC(_activeChar.isRunning() ? 1 : 0);	// running = 1   walking = 0
 			writeC(_activeChar.isInCombat() ? 1 : 0);
 			writeC(_activeChar.isAlikeDead() ? 1 : 0);
-			
-			writeC(0);	// invisible = 1  visible =0
+
+			writeC(0);
+
+
 			writeC(0);	// 1 on strider   2 on wyvern   0 no mount
 			writeC(0);   //  1 - sellshop
-			
+
 			writeH(0);
-			writeH(0);
 			
+			//writeH(id);
+
 			writeC(0x00);	// find party members
+
 			
-	        writeD(_activeChar.getAbnormalEffect());
+			writeD(_activeChar.getAbnormalEffect());
+			
+
 			writeC(0);                       //Changed by Thorgrim
 			writeH(0); //Blue value for name (0 = white, 255 = pure blue)
 			writeD(charclass);
-			
+
 			writeD(0);
-			writeD((int) _activeChar.getCurrentCp());
+			writeD(0);
 	        writeC(enchlvl);
-			
+
         	writeC(0x00); //team circle around feet 1= Blue, 2 = red
-	        
-			writeD(0); 
-			writeC(0); // Symbol on char menu ctrl+I  
+
+			writeD(0);
+			writeC(0); // Symbol on char menu ctrl+I
 			writeC(charhero); // Hero Aura
-			
+
 			writeC(0); //0x01: Fishing Mode (Cant be undone by setting back to 0)
-			writeD(0);  
 			writeD(0);
 			writeD(0);
-			
+			writeD(0);
+
 	        writeD(0xFFFFFF);
-	        
+
+	        writeD(0x00); // isRunning() as in UserInfo?
+
+	        writeD(0);
 	        writeD(0x00); // ??
-	        
-	        writeD(0); 
-	        writeD(0x00); // ??
-	        
-	        writeD(0x00);
-	        
-	        writeD(0x00); // ??
-	        
-        	writeD(0x00);
+
+	        writeD(0xFFFFFF);
+
+	        //writeD(0x00); // ??
+
+
+	       	writeD(0x00);
+        	
+        	
+        	
+        	
+        	
+        	
+        	
+        	
+        	
+        	
+        	
+        	
+        	
+        	
+        	
+        	
         }
         else
         {
@@ -409,8 +440,8 @@ public class NpcInfo extends L2GameServerPacket
 		writeC(0000);  // C2
 
 		writeC(0x00);  // C3  team circle 1-blue, 2-red
-		writeF(0x00);  // C4 i think it is collisionRadius a second time
-		writeF(0x00);  // C4      "        collisionHeight     "
+		writeF(_collisionRadius);
+		writeF(_collisionHeight);
 		writeD(0x00);  // C4
 		writeD(0x00);  // C6
 

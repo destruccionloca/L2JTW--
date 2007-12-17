@@ -1169,19 +1169,6 @@ public final class L2PcInstance extends L2PlayableInstance
 	}
 
 	/**
-	 * Add Quest drops to the table containing all possible drops of a L2NpcInstance.<BR><BR>
-	 *
-	 * @param npc The L2NpcInstance killed by the L2PcInstance
-	 * @param drops The table containing all possible drops of the L2NpcInstance
-	 *
-	 */
-	public void fillQuestDrops(L2NpcInstance npc, List<L2DropData> drops)
-	{
-		for (QuestState qs : _quests.values())
-			qs.fillQuestDrops(npc, drops);
-	}
-
-	/**
 	 * Return the QuestState object corresponding to the quest name.<BR><BR>
 	 *
 	 * @param quest The name of the quest
@@ -1200,7 +1187,7 @@ public final class L2PcInstance extends L2PlayableInstance
 	 */
 	public void setQuestState(QuestState qs)
 	{
-		_quests.put(qs.getQuest().getName(), qs);
+		_quests.put(qs.getQuestName(), qs);
 	}
 
 
@@ -1979,7 +1966,7 @@ public final class L2PcInstance extends L2PlayableInstance
 		{
 			getSubClasses().get(_classIndex).setClassId(Id);
 		}
-
+		doCast(SkillTable.getInstance().getInfo(5103,1));
 		setClassTemplate(Id);
 	}
 
@@ -2188,6 +2175,10 @@ public final class L2PcInstance extends L2PlayableInstance
 					addSkill(sk, false);
 			}
 		}
+		
+		// Reload passive skills from armors / jewels / weapons
+		getInventory().reloadEquippedItems();
+		
 	}
 
 	/**
@@ -3502,8 +3493,8 @@ public final class L2PcInstance extends L2PlayableInstance
 	    {
 	    	if (currentCp == getMaxCp())
 	    	{
-	    		_cpUpdateIncCheck = getMaxCp();
-	    		_cpUpdateDecCheck = _cpUpdateIncCheck - _cpUpdateInterval;
+	    		_cpUpdateIncCheck = currentCp + 1;
+	    		_cpUpdateDecCheck = currentCp - _cpUpdateInterval;
 	    	}
 	    	else
 	    	{
@@ -3535,8 +3526,8 @@ public final class L2PcInstance extends L2PlayableInstance
 	    {
 	    	if (currentMp == getMaxMp())
 	    	{
-	    		_mpUpdateIncCheck = getMaxMp();
-	    		_mpUpdateDecCheck = _mpUpdateIncCheck - _mpUpdateInterval;
+	    		_mpUpdateIncCheck = currentMp + 1;
+	    		_mpUpdateDecCheck = currentMp - _mpUpdateInterval;
 	    	}
 	    	else
 	    	{

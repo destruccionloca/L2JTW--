@@ -39,6 +39,7 @@ import net.sf.l2j.gameserver.clientpackets.Say2;
 import net.sf.l2j.gameserver.datatables.ClanTable;
 import net.sf.l2j.gameserver.datatables.HelperBuffTable;
 import net.sf.l2j.gameserver.datatables.ItemTable;
+import net.sf.l2j.gameserver.datatables.NpcTable;
 import net.sf.l2j.gameserver.datatables.SkillTable;
 import net.sf.l2j.gameserver.datatables.SpawnTable;
 import net.sf.l2j.gameserver.idfactory.IdFactory;
@@ -141,7 +142,10 @@ public class L2NpcInstance extends L2Character
     private int _isSpoiledBy = 0;
 
     protected RandomAnimationTask _rAniTask = null;
-
+    private int _currentLHandId;  // normally this shouldn't change from the template, but there exist exceptions
+    private int _currentRHandId;  // normally this shouldn't change from the template, but there exist exceptions
+    private int _currentCollisionHeight; // used for npc grow effect skills
+    private int _currentCollisionRadius; // used for npc grow effect skills
     protected RandomPathTask _rPathTask = null;
     
     
@@ -310,7 +314,14 @@ public class L2NpcInstance extends L2Character
         getStat();                        // init stats
         getStatus();              // init status
         initCharStatusUpdateValues();
-
+        
+        // initialize the "current" equipment
+        _currentLHandId = getTemplate().lhand;
+        _currentRHandId = getTemplate().rhand;
+        // initialize the "current" collisions
+        _currentCollisionHeight = getTemplate().collisionHeight;
+        _currentCollisionRadius = getTemplate().collisionRadius;
+        
         if (template == null)
         {
             _log.severe("No template for Npc. Please check your datapack is setup correctly.");
@@ -427,58 +438,128 @@ public class L2NpcInstance extends L2Character
     
     public int getIsChar()
     {
-    	L2NpcCharData npcChar = new L2NpcCharData();
-        return npcChar.getIsChar();
+    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+    	for (L2NpcCharData npcChar: npcData.getCharData())
+    	{
+    		if (npcChar == null)
+    			return 0;
+    		else
+    		return npcChar.getIsChar();
+    	}
+    	return 0;
     }
     
     public int getCharClass()
     {
-    	L2NpcCharData npcChar = new L2NpcCharData();
-        return npcChar.getCharClass();
+    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+    	for (L2NpcCharData npcChar: npcData.getCharData())
+    	{
+    		if (npcChar == null)
+    			return 0;
+    		else
+    		return npcChar.getCharClass();
+    	}
+        return 0;
     }
     
     public int getCharRace()
     {
-    	L2NpcCharData npcChar = new L2NpcCharData();
-        return npcChar.getCharRace();
+    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+    	for (L2NpcCharData npcChar: npcData.getCharData())
+    	{
+    		if (npcChar == null)
+    			return 0;
+    		else
+    		return npcChar.getCharRace();
+    	}
+        return 0;
     }
     
     public int getLrHand()
     {
-    	L2NpcCharData npcChar = new L2NpcCharData();
-        return npcChar.getLrhand();
+    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+    	for (L2NpcCharData npcChar: npcData.getCharData())
+    	{
+    		if (npcChar == null)
+    			return 0;
+    		else
+    		return npcChar.getLrhand();
+    	}
+        return 0;
     }
     
     public int getEnchLvl()
     {
-    	L2NpcCharData npcChar = new L2NpcCharData();
-        return npcChar.getEnchLvl();
+    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+    	for (L2NpcCharData npcChar: npcData.getCharData())
+    	{
+    		if (npcChar == null)
+    			return 0;
+    		else
+    		return npcChar.getEnchLvl();
+    	}
+        return 0;
     }
     public int getCharFace()
     {
-    	L2NpcCharData npcChar = new L2NpcCharData();
-        return npcChar.getCharFace();
+    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+    	for (L2NpcCharData npcChar: npcData.getCharData())
+    	{
+    		if (npcChar == null)
+    			return 0;
+    		else
+    		return npcChar.getCharFace();
+    	}
+        return 0;
     }
     public int getCharHair()
     {
-    	L2NpcCharData npcChar = new L2NpcCharData();
-        return npcChar.getCharHair();
+    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+    	for (L2NpcCharData npcChar: npcData.getCharData())
+    	{
+    		if (npcChar == null)
+    			return 0;
+    		else
+    		return npcChar.getCharHair();
+    	}
+        return 0;
     }
     public int getCharColor()
     {
-    	L2NpcCharData npcChar = new L2NpcCharData();
-        return npcChar.getCharColor();
+    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+    	for (L2NpcCharData npcChar: npcData.getCharData())
+    	{
+    		if (npcChar == null)
+    			return 0;
+    		else
+    		return npcChar.getCharColor();
+    	}
+    	return 0;
     }
     public int getCharSex()
     {
-    	L2NpcCharData npcChar = new L2NpcCharData();
-        return npcChar.getCharSex();
+    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+    	for (L2NpcCharData npcChar: npcData.getCharData())
+    	{
+    		if (npcChar == null)
+    			return 0;
+    		else
+    		return npcChar.getCharSex();
+    	}
+        return 0;
     }
     
     public int getCharHero()
     {
-    	L2NpcCharData npcChar = new L2NpcCharData();
-        return npcChar.getCharColor();
+    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+    	for (L2NpcCharData npcChar: npcData.getCharData())
+    	{
+    		if (npcChar == null)
+    			return 0;
+    		else
+    		return npcChar.getCharHero();
+    	}
+        return 0;
     }
     
     
@@ -489,63 +570,121 @@ public class L2NpcInstance extends L2Character
     
     public int getSoulShot()
     {
-    	L2NpcAIData AI = new L2NpcAIData();
-        return AI.getSoulShot();
+    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+    	for (L2NpcAIData AI: npcData.getAIData())
+    	{
+    		_log.warning("SS:"+AI.getSoulShot());
+    		if (AI == null)
+    			return 0;
+    		else
+    		return AI.getSoulShot();
+    	}
+        return 0;
     }
     public int getSpiritShot()
     {
-    	L2NpcAIData AI = new L2NpcAIData();
-        return AI.getSpiritShot();
+    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+    	for (L2NpcAIData AI: npcData.getAIData())
+    	{
+    		if (AI == null)
+    			return 0;
+    		else
+    		return AI.getSpiritShot();
+    	}
+        return 0;
     }
     
     public int getEnemyRange()
     {
-    	L2NpcAIData AI = new L2NpcAIData();
-        return AI.getEnemyRange();
+    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+    	for (L2NpcAIData AI: npcData.getAIData())
+    	{
+    		if (AI == null)
+    			return 0;
+    		else
+    		return AI.getEnemyRange();
+    	}
+        return 0;
     }
     
     public String getEnemyClan()
     {
-    	L2NpcAIData AI = new L2NpcAIData();
-        return AI.getEnemyClan();
+    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+    	for (L2NpcAIData AI: npcData.getAIData())
+    	{
+    		if (AI == null)
+    			return null;
+    		else
+    		return AI.getEnemyClan();
+    	}
+        return null;
     }
     
  // GET THE PRIMARY ATTACk
     public int getPrimaryAttack()
     {
-    	L2NpcAIData AI = new L2NpcAIData();
-        return AI.getPrimaryAttack();
+    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+    	for (L2NpcAIData AI: npcData.getAIData())
+    	{
+    		if (AI == null)
+    			return 0;
+    		else
+    		return AI.getPrimaryAttack();
+    	}
+        return 0;
     }
     
     public int getSkillChance()
     {
-    	L2NpcAIData AI = new L2NpcAIData();
-    	if(AI.getSkillChance()==0)
+    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+    	for (L2NpcAIData AI: npcData.getAIData())
     	{
-    		return 20;
+    		if (AI == null)
+    			return 20;
+    		else
+    		return AI.getSkillChance();
     	}
-        return AI.getSkillChance();
+        return 20;
     }
     
     public int getCanMove()
     {
-    	L2NpcAIData AI = new L2NpcAIData();
-        return AI.getCanMove();
+    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+    	for (L2NpcAIData AI: npcData.getAIData())
+    	{
+    		if (AI == null)
+    			return 0;
+    		else
+    		return AI.getCanMove();
+    	}
+        return 0;
     }
     public int getIsChaos()
     {
     	
-    	L2NpcAIData AI = new L2NpcAIData();
-    	
-        return AI.getIsChaos();
+    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+    	for (L2NpcAIData AI: npcData.getAIData())
+    	{
+    		if (AI == null)
+    			return 0;
+    		else
+    		return AI.getIsChaos();
+    	}
+        return 0;
     }
     
     public int getCanDodge()
     {
     	
-    	L2NpcAIData AI = new L2NpcAIData();
-    	
-        return AI.getDodge();
+    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+    	for (L2NpcAIData AI: npcData.getAIData())
+    	{
+    		if (AI == null)
+    			return 0;
+    		else
+    		return AI.getDodge();
+    	}
+        return 0;
     }
     
     /**
@@ -642,7 +781,7 @@ public class L2NpcInstance extends L2Character
      */
     public int getLeftHandItem()
     {
-        return getTemplate().lhand;
+        return _currentLHandId;
     }
 
     /**
@@ -650,7 +789,7 @@ public class L2NpcInstance extends L2Character
      */
     public int getRightHandItem()
     {
-        return getTemplate().rhand;
+        return _currentRHandId;
     }
 
     /**
@@ -711,6 +850,31 @@ public class L2NpcInstance extends L2Character
         _busyMessage = message;
     }
 
+    protected boolean canTarget(L2PcInstance player)
+    {
+        if (player.isOutOfControl())
+        {
+            player.sendPacket(new ActionFailed());
+            return false;
+        }
+        // TODO: More checks...
+
+        return true;
+    }
+
+    protected boolean canInteract(L2PcInstance player)
+    {
+        // TODO: NPC busy check etc...
+        
+        //if (!canTarget(player))
+        //    return false;
+
+        if (!isInsideRadius(player, INTERACTION_DISTANCE, false, false))
+            return false;
+
+        return true;
+    }
+
     /**
      * Manage actions when a player click on the L2NpcInstance.<BR><BR>
      *
@@ -741,11 +905,8 @@ public class L2NpcInstance extends L2Character
     @Override
     public void onAction(L2PcInstance player)
     {
-        if (player.isOutOfControl())
-        {
-            player.sendPacket(new ActionFailed());
-            return;
-        }
+        if (!canTarget(player)) return;
+
         // Check if the L2PcInstance already target the L2NpcInstance
         if (this != player.getTarget())
         {
@@ -754,19 +915,25 @@ public class L2NpcInstance extends L2Character
             // Set the target of the L2PcInstance player
             player.setTarget(this);
 
-            // Send a Server->Client packet MyTargetSelected to the L2PcInstance player
-            // The player.getLevel() - getLevel() permit to display the correct color in the select window
-            MyTargetSelected my = new MyTargetSelected(getObjectId(), player.getLevel() - getLevel());
-            player.sendPacket(my);
-
             // Check if the player is attackable (without a forced attack)
             if (isAutoAttackable(player))
             {
+                // Send a Server->Client packet MyTargetSelected to the L2PcInstance player
+                // The player.getLevel() - getLevel() permit to display the correct color in the select window
+                MyTargetSelected my = new MyTargetSelected(getObjectId(), player.getLevel() - getLevel());
+                player.sendPacket(my);
+
                 // Send a Server->Client packet StatusUpdate of the L2NpcInstance to the L2PcInstance to update its HP bar
                 StatusUpdate su = new StatusUpdate(getObjectId());
                 su.addAttribute(StatusUpdate.CUR_HP, (int)getCurrentHp() );
                 su.addAttribute(StatusUpdate.MAX_HP, getMaxHp() );
                 player.sendPacket(su);
+            }
+            else
+            {
+                // Send a Server->Client packet MyTargetSelected to the L2PcInstance player
+                MyTargetSelected my = new MyTargetSelected(getObjectId(), 0);
+                player.sendPacket(my);
             }
 
             // Send a Server->Client packet ValidateLocation to correct the L2NpcInstance position and heading on the client
@@ -774,7 +941,7 @@ public class L2NpcInstance extends L2Character
         }
         else
         {
-        	player.sendPacket(new ValidateLocation(this));
+            player.sendPacket(new ValidateLocation(this));
             // Check if the player is attackable (without a forced attack) and isn't dead
             if (isAutoAttackable(player) && !isAlikeDead())
             {
@@ -787,7 +954,7 @@ public class L2NpcInstance extends L2Character
                 }
                 else
                 {
-                    // Send a Server->Client packet ActionFailed (target is out of attack range) to the L2PcInstance player
+                    // Send a Server->Client ActionFailed to the L2PcInstance in order to avoid that the client wait another packet
                     player.sendPacket(new ActionFailed());
                 }
             }
@@ -795,15 +962,10 @@ public class L2NpcInstance extends L2Character
             else if(!isAutoAttackable(player)) 
             {
                 // Calculate the distance between the L2PcInstance and the L2NpcInstance
-                if (!isInsideRadius(player, INTERACTION_DISTANCE, false, false))
+                if (!canInteract(player))
                 {
-                    // player.setCurrentState(L2Character.STATE_INTERACT);
-                    // player.setInteractTarget(this);
-                    // player.moveTo(this.getX(), this.getY(), this.getZ(), INTERACTION_DISTANCE);
-
                     // Notify the L2PcInstance AI with AI_INTENTION_INTERACT
                     player.getAI().setIntention(CtrlIntention.AI_INTENTION_INTERACT, this);
-
                 }
                 else
                 {
@@ -824,15 +986,15 @@ public class L2NpcInstance extends L2Character
                     {
                         Quest[] qlst = getTemplate().getEventQuests(Quest.QuestEventType.NPC_FIRST_TALK);
                         if ( (qlst != null) && qlst.length == 1)
-                        	qlst[0].notifyFirstTalk(this, player);
+                            qlst[0].notifyFirstTalk(this, player);
                         else
-                        	showChatWindow(player, 0);
+                            showChatWindow(player, 0);
                     }
 
                 }
             }
-			else
-				player.sendPacket(new ActionFailed());
+            else
+                player.sendPacket(new ActionFailed());
         }
     }
     
@@ -855,7 +1017,7 @@ public class L2NpcInstance extends L2Character
      * 
      */
     @Override
-	public void onActionShift(L2GameClient client)
+    public void onActionShift(L2GameClient client)
     {
         // Get the L2PcInstance corresponding to the thread
         L2PcInstance player = client.getActiveChar();
@@ -1056,13 +1218,7 @@ public class L2NpcInstance extends L2Character
      */
     public void onBypassFeedback(L2PcInstance player, String command)
     {
-        // Get the distance between the L2PcInstance and the L2NpcInstance
-        if (!isInsideRadius(player, INTERACTION_DISTANCE, false, false))
-        {
-            player.getAI().setIntention(CtrlIntention.AI_INTENTION_ATTACK, this);
-            // player.moveTo(this.getX(), this.getY(), this.getZ(), INTERACTION_DISTANCE);
-        }
-        else
+        //if (canInteract(player))
         {
             if (isBusy() && getBusyMessage().length()>0)
             {
@@ -1422,7 +1578,9 @@ public class L2NpcInstance extends L2Character
     {
         String content;
         
-        if (player.getWeightPenalty()>=3){	
+        Quest q = QuestManager.getInstance().getQuest(questId);
+
+        if (player.getWeightPenalty()>=3 && q.getQuestIntId() >= 1 && q.getQuestIntId() < 1000 ){	
 
             player.sendPacket(new SystemMessage(SystemMessageId.INVENTORY_LESS_THAN_80_PERCENT));
 
@@ -1442,7 +1600,6 @@ public class L2NpcInstance extends L2Character
         }
         else
         {
-            Quest q = QuestManager.getInstance().getQuest(questId);
             if (q != null) 
             {
                 // check for start point
@@ -2369,6 +2526,12 @@ public class L2NpcInstance extends L2Character
         if (!super.doDie(killer))
         	return false;
         
+        // normally this wouldn't really be needed, but for those few exceptions, 
+        // we do need to reset the weapons back to the initial templated weapon.
+        _currentLHandId = getTemplate().lhand;
+        _currentRHandId = getTemplate().rhand;
+        _currentCollisionHeight = getTemplate().collisionHeight;
+        _currentCollisionRadius = getTemplate().collisionRadius;
     	DecayTaskManager.getInstance().addDecayTask(this);
     	return true;
     }
@@ -2482,6 +2645,33 @@ public class L2NpcInstance extends L2Character
     public boolean isMob() // rather delete this check
     {
         return false; // This means we use MAX_NPC_ANIMATION instead of MAX_MONSTER_ANIMATION
+    }
+    
+    // Two functions to change the appearance of the equipped weapons on the NPC
+    // This is only useful for a few NPCs and is most likely going to be called from AI
+    public void setLHandId(int newWeaponId)
+    {
+        _currentLHandId = newWeaponId;
+    }
+    public void setRHandId(int newWeaponId)
+    {
+        _currentRHandId = newWeaponId;
+    }
+    public void setCollisionHeight(int height)
+    {
+        _currentCollisionHeight = height;
+    }
+    public void setCollisionRadius(int radius)
+    {
+    	_currentCollisionRadius = radius;
+    }
+    public int getCollisionHeight()
+    {
+    	return _currentCollisionHeight;
+    }
+    public int getCollisionRadius()
+    {
+    	return _currentCollisionRadius;
     }
 }
 

@@ -22,7 +22,6 @@
 package net.sf.l2j.gameserver.model.actor.instance;
 
 import javolution.text.TextBuilder;
-import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.datatables.HennaTreeTable;
 import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.L2HennaInstance;
@@ -37,47 +36,6 @@ import net.sf.l2j.gameserver.templates.L2NpcTemplate;
 public class L2SymbolMakerInstance extends L2FolkInstance
 {
 	//private static Logger _log = Logger.getLogger(L2SymbolMakerInstance.class.getName());
-
-	private double _collisionRadius;
-	private double _collisionHeight; // this is  positioning the model relative to the ground
-
-	/**
-	 * @return Returns the zOffset.
-	 */
-	public double getCollisionHeight()
-	{
-		return _collisionHeight;
-	}
-
-	/**
-	 * @param offset The zOffset to set.
-	 */
-	public void setCollisionHeight(double offset)
-	{
-		_collisionHeight = offset;
-	}
-
-
-
-	/**
-	 * @return Returns the collisionRadius.
-	 */
-	public double getCollisionRadius()
-	{
-		return _collisionRadius;
-	}
-
-	/**
-	 * @param collisionRadius The collisionRadius to set.
-	 */
-	public void setCollisionRadius(double collisionRadius)
-	{
-		_collisionRadius = collisionRadius;
-	}
-
-	/**
-	 * @return Returns the unknown1.
-	 */
 
 	@Override
 	public void onBypassFeedback(L2PcInstance player, String command)
@@ -103,26 +61,27 @@ public class L2SymbolMakerInstance extends L2FolkInstance
 		}
 	}
 
-	private void showRemoveChat(L2PcInstance player){
-        TextBuilder html1 = new TextBuilder("<html><body>");
-        html1.append("請選擇紋身移除:<br><br>");
-        boolean hasHennas = false;
 
-        for (int i=1;i<=3;i++)
-        {
-        	L2HennaInstance henna = player.getHenna(i);
+	private void showRemoveChat(L2PcInstance player)
+	{
+		TextBuilder html1 = new TextBuilder("<html><body>");
+		html1.append("請選擇紋身移除:<br><br>");
+		boolean hasHennas = false;
 
-        	if (henna != null)
-            {
-        		hasHennas = true;
-        		html1.append("<a action=\"bypass -h npc_%objectId%_Remove "+i+"\">"+henna.getName()+"</a><br>");
-        	}
-        }
+		for (int i=1;i<=3;i++)
+		{
+			L2HennaInstance henna = player.getHenna(i);
 
-        if (!hasHennas)
-        	html1.append("並沒有任何文身可以移除!");
 
-        html1.append("</body></html>");
+			if (henna != null)
+			{
+				hasHennas = true;
+				html1.append("<a action=\"bypass -h npc_%objectId%_Remove "+i+"\">"+henna.getName()+"</a><br>");
+			}
+		}
+		if (!hasHennas)
+			html1.append("並沒有任何文身可以移除!");
+		html1.append("</body></html>");
 
 		insertObjectIdAndShowChatWindow(player, html1.toString());
 	}
@@ -130,18 +89,6 @@ public class L2SymbolMakerInstance extends L2FolkInstance
 	public L2SymbolMakerInstance(int objectID, L2NpcTemplate template)
 	{
 		super(objectID, template);
-	}
-
-	/**
-	 * this is called when a player interacts with this NPC
-	 * @param player
-	 */
-	@Override
-	public void onAction(L2PcInstance player)
-	{
-		if (Config.DEBUG) _log.fine("Symbol Maker activated");
-		player.setLastFolkNPC(this);
-		super.onAction(player);
 	}
 
 	@Override
