@@ -96,36 +96,36 @@ public class NpcInfo extends L2GameServerPacket
 			_title = t;
 	    }
 
-        L2NpcCharData chardata = new L2NpcCharData();
+         
         
         
         if (((L2NpcInstance)_activeChar).getIsChar() > 0)
         {
         	
             IsChar = true;
-            armor = chardata.getArmor();
-            pant = chardata.getPant();
-            head = chardata.getHead();
-            boot = chardata.getBoot();
-            glove = chardata.getGlove();
-            face = chardata.getFace();
-            dhair = chardata.getDHair();
-            hair = chardata.getHair();
-            _lrhand = chardata.getLrhand();
-            charrace = chardata.getCharRace();
-            charclass = chardata.getCharClass();
-            charface = chardata.getCharFace();
-            charcolor = chardata.getCharColor();
-            charhair = chardata.getCharHair();
-            charhero = chardata.getCharHero();
-            charsex = chardata.getCharSex();
-            augmentation = chardata.getAugmentation();
+            armor = ((L2NpcInstance)_activeChar).getArmor();
+            pant = ((L2NpcInstance)_activeChar).getPant();
+            head = ((L2NpcInstance)_activeChar).getHead();
+            boot = ((L2NpcInstance)_activeChar).getBoot();
+            glove = ((L2NpcInstance)_activeChar).getGlove();
+            face = ((L2NpcInstance)_activeChar).getFace();
+            dhair = ((L2NpcInstance)_activeChar).getDHair();
+            hair = ((L2NpcInstance)_activeChar).getHair();
+            _lrhand = ((L2NpcInstance)_activeChar).getLrhand();
+            charrace = ((L2NpcInstance)_activeChar).getCharRace();
+            charclass = ((L2NpcInstance)_activeChar).getCharClass();
+            charface = ((L2NpcInstance)_activeChar).getCharFace();
+            charcolor = ((L2NpcInstance)_activeChar).getCharColor();
+            charhair = ((L2NpcInstance)_activeChar).getCharHair();
+            charhero = ((L2NpcInstance)_activeChar).getCharHero();
+            charsex = ((L2NpcInstance)_activeChar).getCharSex();
+            augmentation = ((L2NpcInstance)_activeChar).getAugmentation();
             
             
             
-            if (chardata.getEnchLvl()>0)
+            if (((L2NpcInstance)_activeChar).getEnchLvl()>0)
             {
-                enchlvl = Math.min(127, chardata.getEnchLvl());
+                enchlvl = Math.min(127, ((L2NpcInstance)_activeChar).getEnchLvl());
             }
             else enchlvl= 0; 
         }
@@ -173,33 +173,34 @@ public class NpcInfo extends L2GameServerPacket
         {
         	_title = "";
         }
-        L2NpcCharData chardata = new L2NpcCharData();
+
         
 
-        if (((L2NpcInstance)_activeChar).getIsChar() > 0)
+        if (((L2Summon)_activeChar).getIsChar() > 0)
         {
         	
             IsChar = true;
-            armor = chardata.getArmor();
-            pant = chardata.getPant();
-            head = chardata.getHead();
-            boot = chardata.getBoot();
-            glove = chardata.getGlove();
-            face = chardata.getFace();
-            dhair = chardata.getDHair();
-            hair = chardata.getHair();
-            _lrhand = chardata.getLrhand();
-            charrace = chardata.getCharRace();
-            charclass = chardata.getCharClass();
-            charface = chardata.getCharFace();
-            charcolor = chardata.getCharColor();
-            charhair = chardata.getCharHair();
-            charhero = chardata.getCharHero();
-            charsex = chardata.getCharSex();
+            armor = ((L2Summon)_activeChar).getArmor();
+            pant = ((L2Summon)_activeChar).getPant();
+            head = ((L2Summon)_activeChar).getHead();
+            boot = ((L2Summon)_activeChar).getBoot();
+            glove = ((L2Summon)_activeChar).getGlove();
+            face = ((L2Summon)_activeChar).getFace();
+            dhair = ((L2Summon)_activeChar).getDHair();
+            hair = ((L2Summon)_activeChar).getHair();
+            _lrhand = ((L2Summon)_activeChar).getLrhand();
+            charrace = ((L2Summon)_activeChar).getCharRace();
+            charclass = ((L2Summon)_activeChar).getCharClass();
+            charface = ((L2Summon)_activeChar).getCharFace();
+            charcolor = ((L2Summon)_activeChar).getCharColor();
+            charhair = ((L2Summon)_activeChar).getCharHair();
+            charhero = ((L2Summon)_activeChar).getCharHero();
+            charsex = ((L2Summon)_activeChar).getCharSex();
+            augmentation = ((L2Summon)_activeChar).getAugmentation();
 
-            if (chardata.getEnchLvl()>0)
+            if (((L2NpcInstance)_activeChar).getEnchLvl()>0)
             {
-                enchlvl = Math.min(127, chardata.getEnchLvl());
+                enchlvl = Math.min(127, ((L2Summon)_activeChar).getEnchLvl());
             }
             else enchlvl= 0; 
         }
@@ -223,7 +224,7 @@ public class NpcInfo extends L2GameServerPacket
 	protected final void writeImpl()
 	{
         
-        if (((L2NpcInstance)_activeChar).getIsChar() > 0)
+        if (IsChar)
         {
   	
         	
@@ -298,8 +299,8 @@ public class NpcInfo extends L2GameServerPacket
 			writeD(_flWalkSpd);
 			writeD(_flyRunSpd);
 			writeD(_flyWalkSpd);
-			writeF(_activeChar.getMovementSpeedMultiplier()); // _activeChar.getProperMultiplier()
-			writeF(_activeChar.getAttackSpeedMultiplier()); // _activeChar.getAttackSpeedMultiplier()
+			writeF(_runSpd * 1f / 120); // _activeChar.getProperMultiplier()
+			writeF(((1.1) * _pAtkSpd / 300)); // _activeChar.getAttackSpeedMultiplier()
 			writeF(_collisionRadius);
 			writeF(_collisionHeight);
 
