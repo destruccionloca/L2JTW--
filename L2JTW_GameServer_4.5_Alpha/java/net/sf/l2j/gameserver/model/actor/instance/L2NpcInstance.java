@@ -81,6 +81,7 @@ import net.sf.l2j.gameserver.serverpackets.CreatureSay;
 import net.sf.l2j.gameserver.serverpackets.ExShowVariationCancelWindow;
 import net.sf.l2j.gameserver.serverpackets.ExShowVariationMakeWindow;
 import net.sf.l2j.gameserver.serverpackets.InventoryUpdate;
+import net.sf.l2j.gameserver.serverpackets.MagicSkillUser;
 import net.sf.l2j.gameserver.serverpackets.MyTargetSelected;
 import net.sf.l2j.gameserver.serverpackets.NpcHtmlMessage;
 import net.sf.l2j.gameserver.serverpackets.NpcInfo;
@@ -95,6 +96,7 @@ import net.sf.l2j.gameserver.templates.L2HelperBuff;
 import net.sf.l2j.gameserver.templates.L2Item;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
 import net.sf.l2j.gameserver.templates.L2Weapon;
+import net.sf.l2j.gameserver.util.Broadcast;
 import net.sf.l2j.gameserver.serverpackets.ExQuestInfo; 
 import net.sf.l2j.gameserver.model.L2WorldRegion;
 
@@ -148,7 +150,12 @@ public class L2NpcInstance extends L2Character
     private int _currentCollisionRadius; // used for npc grow effect skills
     protected RandomPathTask _rPathTask = null;
     
-    
+    public boolean _soulshotcharged = false;
+    public boolean _spiritshotcharged = false;
+    private int _soulshotamount = 0;
+    private int _spiritshotamount = 0;
+    public boolean _ssrecharged = true;
+    public boolean _spsrecharged = true;
     
     
     
@@ -475,7 +482,7 @@ public class L2NpcInstance extends L2Character
         return 0;
     }
     
-    public int getLrHand()
+    public int getLrhand()
     {
     	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
     	for (L2NpcCharData npcChar: npcData.getCharData())
@@ -487,7 +494,114 @@ public class L2NpcInstance extends L2Character
     	}
         return 0;
     }
-    
+    public int getArmor()
+    {
+    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+    	for (L2NpcCharData npcChar: npcData.getCharData())
+    	{
+    		if (npcChar == null)
+    			return 0;
+    		else
+    		return npcChar.getArmor();
+    	}
+        return 0;
+    }
+    public int getPant()
+    {
+    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+    	for (L2NpcCharData npcChar: npcData.getCharData())
+    	{
+    		if (npcChar == null)
+    			return 0;
+    		else
+    		return npcChar.getPant();
+    	}
+        return 0;
+    }
+    public int getHead()
+    {
+    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+    	for (L2NpcCharData npcChar: npcData.getCharData())
+    	{
+    		if (npcChar == null)
+    			return 0;
+    		else
+    		return npcChar.getHead();
+    	}
+        return 0;
+    }
+    public int getGlove()
+    {
+    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+    	for (L2NpcCharData npcChar: npcData.getCharData())
+    	{
+    		if (npcChar == null)
+    			return 0;
+    		else
+    		return npcChar.getGlove();
+    	}
+        return 0;
+    }
+    public int getBoot()
+    {
+    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+    	for (L2NpcCharData npcChar: npcData.getCharData())
+    	{
+    		if (npcChar == null)
+    			return 0;
+    		else
+    		return npcChar.getBoot();
+    	}
+        return 0;
+    }
+    public int getDHair()
+    {
+    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+    	for (L2NpcCharData npcChar: npcData.getCharData())
+    	{
+    		if (npcChar == null)
+    			return 0;
+    		else
+    		return npcChar.getDHair();
+    	}
+        return 0;
+    }
+    public int getFace()
+    {
+    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+    	for (L2NpcCharData npcChar: npcData.getCharData())
+    	{
+    		if (npcChar == null)
+    			return 0;
+    		else
+    		return npcChar.getFace();
+    	}
+        return 0;
+    }
+    public int getHair()
+    {
+    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+    	for (L2NpcCharData npcChar: npcData.getCharData())
+    	{
+    		if (npcChar == null)
+    			return 0;
+    		else
+    		return npcChar.getHair();
+    	}
+        return 0;
+    }
+    public int getAugmentation()
+    {
+    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+    	for (L2NpcCharData npcChar: npcData.getCharData())
+    	{
+    		if (npcChar == null)
+    			return 0;
+    		else
+    		return npcChar.getAugmentation();
+    	}
+        return 0;
+    }
     public int getEnchLvl()
     {
     	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
@@ -573,7 +687,6 @@ public class L2NpcInstance extends L2Character
     	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
     	for (L2NpcAIData AI: npcData.getAIData())
     	{
-    		_log.warning("SS:"+AI.getSoulShot());
     		if (AI == null)
     			return 0;
     		else
@@ -593,7 +706,77 @@ public class L2NpcInstance extends L2Character
     	}
         return 0;
     }
+    public int getSoulShotChance()
+    {
+    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+    	for (L2NpcAIData AI: npcData.getAIData())
+    	{
+    		if (AI == null)
+    			return 0;
+    		else
+    		return AI.getSoulShotChance();
+    	}
+        return 0;
+    }
+
+    public int getSpiritShotChance()
+    {
+    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+    	for (L2NpcAIData AI: npcData.getAIData())
+    	{
+    		if (AI == null)
+    			return 0;
+    		else
+    		return AI.getSpiritShotChance();
+    	}
+        return 0;
+    }
     
+    public boolean useSoulShot()
+    {
+    	if(_soulshotcharged)
+    		return true;
+    	if(_ssrecharged)
+    	{
+    		_soulshotamount = getSoulShot();
+    		_ssrecharged = false;
+    	}
+    	else if (_soulshotamount>0)
+    	{
+    		_soulshotamount = _soulshotamount - 1;
+    	}
+    	else return false;
+    	//_soulshotcharged = false;
+    	if (Rnd.get(100) <= getSoulShotChance())
+    	{
+    		 Broadcast.toSelfAndKnownPlayersInRadius(this, new MagicSkillUser(this, this, 2154, 1, 0, 0), 360000);
+    		_soulshotcharged = true;
+    	}
+    	return _soulshotcharged;
+    }
+    public boolean useSpiritShot()
+    {
+    	
+    	if(_spiritshotcharged)
+    		return true;
+    	if(_spsrecharged)
+    	{
+    		_spiritshotamount = getSpiritShot();
+    		_spsrecharged = false;
+    	}
+    	else if (_spiritshotamount>0)
+    	{
+    		_spiritshotamount = _spiritshotamount - 1;
+    	}
+    	else return false;
+    	//_spiritshotcharged = false;
+    	if (Rnd.get(100) <= getSpiritShotChance())
+    	{
+			Broadcast.toSelfAndKnownPlayersInRadius(this, new MagicSkillUser(this, this, 2061, 1, 0, 0), 360000);
+    		_spiritshotcharged = true;
+    	}
+    	return _spiritshotcharged;
+    }
     public int getEnemyRange()
     {
     	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
@@ -607,20 +790,35 @@ public class L2NpcInstance extends L2Character
         return 0;
     }
     
+    
+    
     public String getEnemyClan()
     {
     	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
     	for (L2NpcAIData AI: npcData.getAIData())
     	{
-    		if (AI == null)
-    			return null;
-    		else
+    		//if (AI == null)
+    		//	return null;
+    		//else
     		return AI.getEnemyClan();
     	}
         return null;
     }
     
- // GET THE PRIMARY ATTACk
+    public String getClan()
+    {
+    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+    	for (L2NpcAIData AI: npcData.getAIData())
+    	{
+    		//if (AI == null)
+    		//	return null;
+    		//else
+    		return AI.getClan();
+    	}
+        return null;
+    }
+    
+ // GET THE PRIMARY ATTACK
     public int getPrimaryAttack()
     {
     	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
@@ -2512,6 +2710,8 @@ public class L2NpcInstance extends L2Character
     @Override
 	public boolean doDie(L2Character killer) 
     {
+    	((L2Attackable)this)._ssrecharged = true;
+    	((L2Attackable)this)._spsrecharged = true;
 
     	if(getNpcId() == 25050)
     	{
