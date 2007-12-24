@@ -39,19 +39,33 @@ import javolution.util.FastList;
 public class L2NpcAIData
 {
 	
-	
+	//Basic AI
     private int _primary_attack;
     private int _skill_chance;
     private int _canMove;
     private int _soulshot;
     private int _spiritshot;
+    private int _soulshotchance;
+    private int _spiritshotchance;
     private int _ischaos;
+    private String _clan;
     private String _enemyClan;
     private int _enemyRange;
     private int _baseShldRate;
     private int _baseShldDef;
     private int _dodge;
-
+    //Skill AI
+    private int _buffskill;
+    private int _debuffskill;
+    private int _atkskill;
+    private int _rootskill;
+    private int _sleepskill;
+    private int _effectskill;
+    private int _specialskill; // It will be use later on..
+    
+    private int _castchance;
+    private int _skillcondition; // use later on
+    
 
 	private FastList<L2NpcAIData> npcAIdata;
 	
@@ -61,7 +75,7 @@ public class L2NpcAIData
 		
 	}
 
-	public FastList<L2NpcAIData> getChatData()
+	public FastList<L2NpcAIData> getAIData()
 	{
 		return npcAIdata;
 	}	
@@ -117,9 +131,29 @@ public class L2NpcAIData
     	
     }
     
+    public void setSoulShotChance (int soulshotchance)
+    {
+    	
+    	_soulshotchance = soulshotchance;
+    	
+    }
+    
+    public void setSpiritShotChance (int spiritshotchance)
+    {
+    	
+    	_spiritshotchance = spiritshotchance;
+    	
+    }
+    
     public void setIsChaos (int ischaos)
     {
     	_ischaos = ischaos;
+    	
+    }
+    public void setClan (String clan)
+    {
+    	
+    	_clan = clan;
     	
     }
     
@@ -157,6 +191,39 @@ public class L2NpcAIData
     	
     }
     */
+    
+    public void setBuffSkill (int buff)
+    {
+    	_buffskill = buff;
+    }
+    public void setDebuffSkill (int debuff)
+    {
+    	_debuffskill = debuff;
+    }
+    public void setEffectSkill (int effect)
+    {
+    	_effectskill = effect;
+    }
+    public void setRootSkill (int root)
+    {
+    	_rootskill = root;
+    }
+    public void setSleepSkill (int sleep)
+    {
+    	_sleepskill = sleep;
+    }
+    public void setAtkSkill (int atk)
+    {
+    	_atkskill = atk;
+    }
+    public void setSpecialSkill(int special)
+    {
+    	_specialskill = special;
+    }
+    public void setCastChance(int chance)
+    {
+    	_castchance = chance;
+    }
     
     //--------------------------------------------------------------------------------------------------------------
     //Data Recall....
@@ -196,12 +263,30 @@ public class L2NpcAIData
     	
     }
     
+    public int getSoulShotChance()
+    {
+    	
+    	return _soulshotchance;
+    	
+    }
+    
+    public int getSpiritShotChance()
+    {
+    	
+    	return _spiritshotchance;
+    	
+    }
     public int getIsChaos ()
     {
     	return _ischaos;
     	
     }
-    
+    public String getClan()
+    {
+    	
+    	return _clan;
+    	
+    }
     public String getEnemyClan ()
     {
     	
@@ -241,7 +326,38 @@ public class L2NpcAIData
     */
     
     
-	
+    public int getBuffSkill ()
+    {
+    	return _buffskill;
+    }
+    public int getDebuffSkill ()
+    {
+    	return _debuffskill;
+    }
+    public int getEffectSkill ()
+    {
+    	return _effectskill;
+    }
+    public int getRootSkill ()
+    {
+    	return _rootskill;
+    }
+    public int getSleepSkill ()
+    {
+    	return _sleepskill;
+    }
+    public int getAtkSkill ()
+    {
+    	return _atkskill;
+    }
+    public int getSpecialSkill()
+    {
+    	return _specialskill;
+    }
+    public int getCastChance()
+    {
+    	return _castchance;
+    }
 	
 
 }

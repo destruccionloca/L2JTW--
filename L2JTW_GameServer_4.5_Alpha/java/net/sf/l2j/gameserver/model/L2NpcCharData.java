@@ -68,7 +68,7 @@ public class L2NpcCharData
 		npcCharData = new FastList<L2NpcCharData>(0);
 	}
 
-	public FastList<L2NpcCharData> getChatData()
+	public FastList<L2NpcCharData> getCharData()
 	{
 		return npcCharData;
 	}	
