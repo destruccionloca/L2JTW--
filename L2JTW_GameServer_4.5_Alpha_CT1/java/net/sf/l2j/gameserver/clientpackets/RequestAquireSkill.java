@@ -153,7 +153,7 @@ public class RequestAquireSkill extends L2GameClientPacket
 						}
 
 						// ok
-						player.destroyItem("Consume", spb, trainer, true);
+						player.destroyItem("Consume", spb.getObjectId(), 1, trainer, true);
 					}
 				}
 			} else

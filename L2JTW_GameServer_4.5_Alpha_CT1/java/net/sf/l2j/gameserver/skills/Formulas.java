@@ -280,11 +280,12 @@ public final class Formulas
 			if (env.player instanceof L2PcInstance)
             {
                 L2PcInstance p = (L2PcInstance) env.player;
+                boolean hasMagePDef = (p.getClassId().isMage() || p.getClassId().getId() == 0x31); // orc mystics are a special case
     			if (p.getInventory().getPaperdollItem(Inventory.PAPERDOLL_HEAD) != null) env.value -= 12;
     			if (p.getInventory().getPaperdollItem(Inventory.PAPERDOLL_CHEST) != null)
-    				env.value -= ((p.getClassId().isMage()) ? 15 : 31);
+    				env.value -= hasMagePDef ? 15 : 31;
     			if (p.getInventory().getPaperdollItem(Inventory.PAPERDOLL_LEGS) != null)
-    				env.value -= ((p.getClassId().isMage()) ? 8 : 18);
+    				env.value -= hasMagePDef ? 8 : 18;
     			if (p.getInventory().getPaperdollItem(Inventory.PAPERDOLL_GLOVES) != null) env.value -= 8;
     			if (p.getInventory().getPaperdollItem(Inventory.PAPERDOLL_FEET) != null) env.value -= 7;
             }
@@ -310,10 +311,37 @@ public final class Formulas
 		@Override
 		public void calc(Env env)
 		{
-			if (!cond.test(env)) return;
-			env.value += 450;
+			if (!cond.test(env)) 
+                return;
+            // default is 40 and with bow should be 500
+			env.value += 460;
 		}
 	}
+    
+    static class FuncCrossBowAtkRange extends Func
+    {
+        private static final FuncCrossBowAtkRange _fcb_instance = new FuncCrossBowAtkRange();
+
+        static Func getInstance()
+        {
+            return _fcb_instance;
+        }
+
+        private FuncCrossBowAtkRange()
+        {
+            super(Stats.POWER_ATTACK_RANGE, 0x10, null);
+            setCondition(new ConditionUsingItemType(L2WeaponType.CROSSBOW.mask()));
+        }
+
+        @Override
+        public void calc(Env env)
+        {
+            if (!cond.test(env)) 
+                return;
+            // default is 40 and with crossbow should be 200
+            env.value += 160;
+        }
+    }
 
 	static class FuncAtkAccuracy extends Func
 	{
@@ -815,6 +843,7 @@ public final class Formulas
 			//cha.addStatFunc(FuncMultRegenResting.getInstance(Stats.REGENERATE_CP_RATE));
 			//cha.addStatFunc(FuncMultRegenResting.getInstance(Stats.REGENERATE_MP_RATE));
 			cha.addStatFunc(FuncBowAtkRange.getInstance());
+            cha.addStatFunc(FuncCrossBowAtkRange.getInstance());
 			//cha.addStatFunc(FuncMultLevelMod.getInstance(Stats.POWER_ATTACK));
 			//cha.addStatFunc(FuncMultLevelMod.getInstance(Stats.POWER_DEFENCE));
 			//cha.addStatFunc(FuncMultLevelMod.getInstance(Stats.MAGIC_DEFENCE));

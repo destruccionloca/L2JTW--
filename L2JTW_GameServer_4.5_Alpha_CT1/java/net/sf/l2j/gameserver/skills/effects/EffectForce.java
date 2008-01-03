@@ -17,13 +17,13 @@
  */
 package net.sf.l2j.gameserver.skills.effects;
 
+import java.util.logging.Logger;
+
 import net.sf.l2j.gameserver.datatables.SkillTable;
 import net.sf.l2j.gameserver.model.L2Effect;
 import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.skills.Env;
 import net.sf.l2j.gameserver.util.Util;
-
-import java.util.logging.Logger; 
 
 /**
  * @author kombat
