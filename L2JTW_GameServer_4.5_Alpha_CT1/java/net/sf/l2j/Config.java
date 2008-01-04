@@ -1270,8 +1270,7 @@ public final class Config
     //public static int NURSEANT_RESPAWN_DELAY;
     /** Config for Custom Community Board **/
     //public static boolean CUSTOM_COMMUNITY_BOARD;
-    /** Time limit of invade to lair of bosses after server restarted **/
-    //public static int TIMELIMITOFINVADE;
+
     
     /***************************************************************************
      * JP Custom CONFIG END                                                    *
@@ -1335,6 +1334,8 @@ public final class Config
     public static int FWV_ACTIVITYTIMEOFVALAKAS;
     public static int FWV_CAPACITYOFLAIR;
     public static boolean FWV_MOVEATRANDOM;
+    /** Time limit of invade to lair of bosses after server restarted **/
+    public static int TIMELIMITOFINVADE;
     /***************************************************************************
      * JP fight with Valakas Custom CONFIG END                                 *
      **************************************************************************/
@@ -1409,7 +1410,7 @@ public final class Config
                 else if (NURSEANT_RESPAWN_DELAY > 120) NURSEANT_RESPAWN_DELAY = 120;
                 NURSEANT_RESPAWN_DELAY = NURSEANT_RESPAWN_DELAY * 1000;
                 CUSTOM_COMMUNITY_BOARD = Boolean.parseBoolean(Settings.getProperty("CustomCommunityBoard", "true"));
-                TIMELIMITOFINVADE = Integer.parseInt(Settings.getProperty("TimeLimitOfInvade", "1800000"));
+                
            }
             catch (Exception e)
             {
@@ -1538,6 +1539,7 @@ public final class Config
                 FWV_ACTIVITYTIMEOFVALAKAS = FWV_ACTIVITYTIMEOFVALAKAS * 60000;
                 FWV_CAPACITYOFLAIR = Integer.parseInt(Settings.getProperty("CapacityOfLairOfValakas", "200"));
                 FWV_MOVEATRANDOM = Boolean.parseBoolean(Settings.getProperty("MoveAtRandom", "True"));
+                TIMELIMITOFINVADE = Integer.parseInt(Settings.getProperty("TimeLimitOfInvade", "1800000"));
             }
             catch (Exception e)
             {
@@ -2910,6 +2912,7 @@ public final class Config
         
         
         // JP Custom Setting
+        /*
         else if (pName.equalsIgnoreCase("FaildFakeDeath")) FAILD_FAKEDEATH = Boolean.valueOf(pValue);
         else if (pName.equalsIgnoreCase("AltWyvernMakeALanding")) ALT_WYVERN_MAKEALANDING = Boolean.valueOf(pValue);
         else if (pName.equalsIgnoreCase("AltDismountWyvernInNoLanding")) ALT_DISMOUNT_WYVERN_IN_NOLANDING = Boolean.valueOf(pValue);
@@ -2923,7 +2926,8 @@ public final class Config
         else if (pName.equalsIgnoreCase("TimeOfOpeningADoor")) TIME_OF_OPENING_A_DOOR = Integer.parseInt(pValue);
         else if (pName.equalsIgnoreCase("NurseAntRespawnDelay")) NURSEANT_RESPAWN_DELAY = Integer.parseInt(pValue);
         else if (pName.equalsIgnoreCase("CustomCommunityBoard")) CUSTOM_COMMUNITY_BOARD = Boolean.valueOf(pValue);
-        else if (pName.equalsIgnoreCase("TimeLimitOfInvade")) TIMELIMITOFINVADE = Integer.parseInt(pValue);
+        
+        */
         // JP Four-Sepulchers Custom Setting
         else if (pName.equalsIgnoreCase("TimeOfAttack")) FS_TIME_ATTACK = Integer.parseInt(pValue);
         else if (pName.equalsIgnoreCase("TimeOfCoolDown")) FS_TIME_COOLDOWN = Integer.parseInt(pValue);
@@ -2958,6 +2962,7 @@ public final class Config
         else if (pName.equalsIgnoreCase("ActivityTimeOfValakas")) FWV_ACTIVITYTIMEOFVALAKAS = Integer.parseInt(pValue);
         else if (pName.equalsIgnoreCase("CapacityOfLairOfValakas")) FWV_CAPACITYOFLAIR = Integer.parseInt(pValue);
         else if (pName.equalsIgnoreCase("MoveAtRandom")) FWV_MOVEATRANDOM = Boolean.parseBoolean(pValue);
+        else if (pName.equalsIgnoreCase("TimeLimitOfInvade")) TIMELIMITOFINVADE = Integer.parseInt(pValue);
         // JP fight with Baium Custom Setting
         else if (pName.equalsIgnoreCase("FixIntervalOfBaium")) FWB_FIXINTERVALOFBAIUM = Integer.parseInt(pValue);
         else if (pName.equalsIgnoreCase("RandomIntervalOfBaium")) FWB_RANDOMINTERVALOFBAIUM = Integer.parseInt(pValue);
