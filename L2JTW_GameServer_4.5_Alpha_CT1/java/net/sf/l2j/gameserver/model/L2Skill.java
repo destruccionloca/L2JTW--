@@ -173,6 +173,7 @@ public abstract class L2Skill
     	MUTE,
     	PARALYZE,
     	WEAKNESS,
+        DISARM,
 
     	// hp, mp, cp
         BALANCE,
@@ -345,6 +346,7 @@ public abstract class L2Skill
     public final static int STAT_SHIELDDEF = 335; // sDef
     public final static int STAT_MP_CONSUME_RATE = 336; // Rate of mp consume per skill use
     public final static int STAT_HP_CONSUME_RATE = 337; // Rate of hp consume per skill use
+    public final static int STAT_MCRITRATE = 338; // Magic Crit Rate
 
     //COMBAT DAMAGE MODIFIER SKILLS...DETECT WEAKNESS AND WEAKNESS/STRENGTH
     public final static int COMBAT_MOD_ANIMAL = 200;
@@ -1116,6 +1118,7 @@ public abstract class L2Skill
             case MAGE_BANE:
             case WARRIOR_BANE:
             case BETRAY:
+            case DISARM:
                 return true;
             default:
                 return false;
@@ -1267,6 +1270,7 @@ public abstract class L2Skill
             case DELUXE_KEY_UNLOCK:
             case SOW:
             case HARVEST:
+            case DISARM:
                 return true;
             default:
                 return false;

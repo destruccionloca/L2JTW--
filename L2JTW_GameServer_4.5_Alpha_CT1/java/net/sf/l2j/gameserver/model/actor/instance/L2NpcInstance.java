@@ -73,6 +73,7 @@ import net.sf.l2j.gameserver.model.entity.L2Event;
 import net.sf.l2j.gameserver.model.entity.CTF;
 import net.sf.l2j.gameserver.model.quest.Quest;
 import net.sf.l2j.gameserver.model.quest.QuestState;
+import net.sf.l2j.gameserver.model.quest.State;
 import net.sf.l2j.gameserver.model.zone.type.L2TownZone;
 import net.sf.l2j.gameserver.network.L2GameClient;
 import net.sf.l2j.gameserver.network.SystemMessageId;
@@ -1833,7 +1834,7 @@ public class L2NpcInstance extends L2Character
         else 
         {
             questId = qs.getQuest().getName();
-            String stateId = qs.getStateId();
+            String stateId = State.getStateName(qs.getState());
             String path = "data/jscripts/quests/"+questId+"/"+stateId+".htm";
             content = HtmCache.getInstance().getHtm(path); //TODO path for quests html
             

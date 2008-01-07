@@ -53,6 +53,7 @@ public class L2CharTemplate
 	public final int baseAtkRange;
 	public final int baseShldRate;
 	public final int baseCritRate;
+    public final int baseMCritRate;
 	public final int baseWalkSpd;
 	public final int baseRunSpd;
 
@@ -95,13 +96,6 @@ public class L2CharTemplate
 
 	public final int collisionRadius;
 	public final int collisionHeight;
-    //T1 stats
-    private int attributeFire;
-    private int attributeWater;
-    private int attributeWind;
-    private int attributeEarth;
-    private int attributeHoly;
-    private int attributeUnholy;
 
 	public L2CharTemplate(StatsSet set)
 	{
@@ -128,6 +122,7 @@ public class L2CharTemplate
 		baseAtkRange       = set.getInteger("baseAtkRange");
 		baseShldRate       = set.getInteger("baseShldRate");
 		baseCritRate       = set.getInteger("baseCritRate");
+        baseMCritRate      = set.getInteger("baseMCritRate" , 8);
 		baseWalkSpd 	   = set.getInteger("baseWalkSpd");
 		baseRunSpd         = set.getInteger("baseRunSpd");
 		
@@ -171,79 +166,5 @@ public class L2CharTemplate
 		// Geometry
 		collisionRadius    = set.getInteger("collision_radius");
 		collisionHeight    = set.getInteger("collision_height");
-        
-        //T1 stats
-        attributeFire       = set.getInteger("attributeFire", 0);
-        attributeWater      = set.getInteger("attributeWater", 0);
-        attributeEarth      = set.getInteger("attributeEarth", 0);
-        attributeWind       = set.getInteger("attributeWind", 0);
-        attributeHoly       = set.getInteger("attributeHoly", 0);
-        attributeUnholy     = set.getInteger("attributeUnholy", 0);
 	}
-
-   public int getAttributeFire()
-   {
-       return attributeFire;
-   }
-
-   public void setAttributeFire(@SuppressWarnings("hiding")
-int attributeFire)
-   {
-       this.attributeFire = attributeFire;
-   }
-
-   public int getAttributeWater()
-   {
-       return attributeWater;
-   }
-
-   public void setAttributeWater(@SuppressWarnings("hiding")
-int attributeWater)
-   {
-       this.attributeWater = attributeWater;
-   }
-
-   public int getAttributeEarth()
-   {
-       return attributeEarth;
-   }
-
-   public void setAttributeEarth(@SuppressWarnings("hiding")
-int attributeEarth)
-   {
-       this.attributeEarth = attributeEarth;
-   }
-
-   public int getAttributeWind()
-   {
-       return attributeWind;
-   }
-
-   public void setAttributeWind(@SuppressWarnings("hiding")
-int attributeWind)
-   {
-       this.attributeWind = attributeWind;
-   }
-
-   public int getAttributeHoly()
-   {
-       return attributeHoly;
-   }
-
-   public void setAttributeHoly(@SuppressWarnings("hiding")
-int attributeHoly)
-   {
-       this.attributeHoly = attributeHoly;
-   }
-
-   public int getAttributeUnholy()
-   {
-       return attributeUnholy;
-   }
-
-   public void setAttributeUnholy(@SuppressWarnings("hiding")
-int attributeUnholy)
-   {
-       this.attributeUnholy = attributeUnholy;
-   }
 }

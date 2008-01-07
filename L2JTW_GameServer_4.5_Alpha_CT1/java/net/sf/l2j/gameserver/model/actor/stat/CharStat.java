@@ -100,8 +100,7 @@ public class CharStat
 
 		// Launch the calculation
 		c.calc(env);
-		// avoid some troubles with negative stats (some stats should never be
-		// negative)
+		// avoid some troubles with negative stats (some stats should never be negative)
 		if (env.value <= 0
 				&& ((stat == Stats.MAX_HP) || (stat == Stats.MAX_MP) || (stat == Stats.MAX_CP) || (stat == Stats.MAGIC_DEFENCE)
 						|| (stat == Stats.POWER_DEFENCE) || (stat == Stats.POWER_ATTACK) || (stat == Stats.MAGIC_ATTACK) || (stat == Stats.POWER_ATTACK_SPEED)
@@ -366,7 +365,10 @@ public class CharStat
 	/** Return the Magic Critical Hit rate (base+modifier) of the L2Character. */
 	public final int getMCriticalHit(L2Character target, L2Skill skill)
 	{
-		double mrate = calcStat(Stats.MCRITICAL_RATE, 5, target, skill);
+		if (_activeChar == null)
+			return 1;
+		
+		double mrate = calcStat(Stats.MCRITICAL_RATE, _activeChar.getTemplate().baseMCritRate, target, skill);
 		return (int) mrate;
 	}
 
@@ -643,32 +645,32 @@ public class CharStat
 
     public double getElementAttributeFire()
     {
-        return calcStat(Stats.defenceAttrFire, _activeChar.getTemplate().getAttributeFire(), null, null);
+        return (int) (100 - 100 * calcStat(Stats.FIRE_VULN, _activeChar.getTemplate().baseFireVuln, null, null));
     }
 
     public double getElementAttributeWater()
     {
-        return calcStat(Stats.defenceAttrWater, _activeChar.getTemplate().getAttributeWater(), null, null);
+        return (int) (100 - 100 * calcStat(Stats.WATER_VULN, _activeChar.getTemplate().baseWaterVuln, null, null));
     }
 
     public double getElementAttributeEarth()
     {
-        return calcStat(Stats.defenceAttrEarth, _activeChar.getTemplate().getAttributeEarth(), null, null);
+        return (int) (100 - 100 * calcStat(Stats.EARTH_VULN, _activeChar.getTemplate().baseEarthVuln, null, null));
     }
 
     public double getElementAttributeWind()
     {
-        return calcStat(Stats.defenceAttrWind, _activeChar.getTemplate().getAttributeWind(), null, null);
+        return (int) (100 - 100 * calcStat(Stats.WIND_VULN, _activeChar.getTemplate().baseWindVuln, null, null));
     }
 
     public double getElementAttributeHoly()
     {
-        return calcStat(Stats.defenceAttrHoly, _activeChar.getTemplate().getAttributeHoly(), null, null);
+        return (int) (100 - 100 * calcStat(Stats.HOLY_VULN, _activeChar.getTemplate().baseHolyVuln, null, null));
     }
 
     public double getElementAttributeUnholy()
     {
-        return calcStat(Stats.defenceAttrUnholy, _activeChar.getTemplate().getAttributeUnholy(), null, null);
+        return (int) (100 - 100 * calcStat(Stats.DARK_VULN, _activeChar.getTemplate().baseDarkVuln, null, null));
     }
 
     public int getAttackElement()
@@ -678,6 +680,6 @@ public class CharStat
 
     public double getAttackElementValue()
     {
-        return 0.0D;
+        return 0.0;
     }
 }

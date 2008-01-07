@@ -29,7 +29,6 @@ import net.sf.l2j.Config;
 import net.sf.l2j.L2DatabaseFactory;
 import net.sf.l2j.gameserver.Announcements;
 import net.sf.l2j.gameserver.GmListTable;
-import net.sf.l2j.gameserver.LoginServerThread;
 import net.sf.l2j.gameserver.Olympiad;
 import net.sf.l2j.gameserver.SevenSigns;
 import net.sf.l2j.gameserver.TaskPriority;

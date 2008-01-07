@@ -138,6 +138,7 @@ public enum Stats
 	BLUNT_WPN_VULN 	("bluntWpnVuln"),
 	DAGGER_WPN_VULN	("daggerWpnVuln"),
 	BOW_WPN_VULN 	("bowWpnVuln"),
+	CROSSBOW_WPN_VULN ("crossbowWpnVuln"),
 	POLE_WPN_VULN 	("poleWpnVuln"),
 	ETC_WPN_VULN 	("etcWpnVuln"),
 	FIST_WPN_VULN 	("fistWpnVuln"),
@@ -183,16 +184,7 @@ public enum Stats
     HP_CONSUME_RATE		("HpConsumeRate"),
     MP_CONSUME 			("MpConsume"),
     SOULSHOT_COUNT 		("soulShotCount"),
-    
-    //T1 stats 
- 	defenceAttrFire     ("defenceAttrFire"), 
- 	defenceAttrWater    ("defenceAttrWater"), 
- 	defenceAttrEarth    ("defenceAttrEarth"), 
- 	defenceAttrWind     ("defenceAttrWind"), 
- 	defenceAttrHoly     ("defenceAttrHoly"), 
- 	defenceAttrUnholy   ("defenceAttrUnholy"), 
- 	transformId ("transformId") ,
-	
+    	
     //Special Stats
     REFLECT_STANCE			("reflectStance"),
     POLE_ATTACK_ANGLE		("poleAtkAngle"),
@@ -201,9 +193,19 @@ public enum Stats
     CRIT_BONUS			("critbonus"),
     CRIT_PENALTY		("critpenalty"),
     CRIT_POWER_BONUS	("critpowerbonus"),
-    CRIT_POWER_PENALTY	("critpowerpenalty");
-	
+    CRIT_POWER_PENALTY	("critpowerpenalty"),
+    
+    //T1 stats 
+    defenceAttrFire     ("defenceAttrFire"), 
+    defenceAttrWater    ("defenceAttrWater"), 
+    defenceAttrEarth    ("defenceAttrEarth"), 
+    defenceAttrWind     ("defenceAttrWind"), 
+    defenceAttrHoly     ("defenceAttrHoly"), 
+    defenceAttrUnholy   ("defenceAttrUnholy"), 
+    transformId ("transformId") 
 
+
+    
 	;
 
 	public static final int NUM_STATS = values().length;

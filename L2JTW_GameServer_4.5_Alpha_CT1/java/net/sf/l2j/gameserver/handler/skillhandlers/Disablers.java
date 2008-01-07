@@ -60,7 +60,8 @@ public class Disablers implements ISkillHandler
                                        L2Skill.SkillType.MUTE, L2Skill.SkillType.FAKE_DEATH,
                                        L2Skill.SkillType.CONFUSE_MOB_ONLY, L2Skill.SkillType.NEGATE,
                                        L2Skill.SkillType.CANCEL, L2Skill.SkillType.PARALYZE, L2Skill.SkillType.ERASE,
-                                       L2Skill.SkillType.MAGE_BANE, L2Skill.SkillType.WARRIOR_BANE, L2Skill.SkillType.BETRAY};
+                                       L2Skill.SkillType.MAGE_BANE, L2Skill.SkillType.WARRIOR_BANE, L2Skill.SkillType.BETRAY,
+                                       L2Skill.SkillType.DISARM};
 
     protected static final Logger _log = Logger.getLogger(L2Skill.class.getName());
     private  String[] _negateStats=null;
@@ -167,6 +168,7 @@ public class Disablers implements ISkillHandler
                     break;
                 }
                 case ROOT:
+                case DISARM:
                 case STUN:
                 {
 
@@ -727,6 +729,10 @@ public class Disablers implements ISkillHandler
                 }// end case
             }//end switch
 
+            
+            //Possibility of a lethal strike
+            Formulas.getInstance().calcLethalHit(activeChar, target, skill);
+            
         }//end for
 
 

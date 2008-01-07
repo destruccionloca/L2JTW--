@@ -4221,6 +4221,12 @@ public enum SystemMessageId
      * Message: $s2 was dropped in the $s1 region.
      */
     S2_WAS_DROPPED_IN_THE_S1_REGION(1815),
+    
+    /**
+     * ID: 2085<br>
+     * Message: Shout and trade chatting cannot be used while possessing a cursed weapon.
+     */
+    SHOUT_AND_TRADE_CHAT_CANNOT_BE_USED_WHILE_POSSESSING_CURSED_WEAPON(2085),
 
     /**
      * ID: 1816<br>
@@ -4806,7 +4812,25 @@ public enum SystemMessageId
     * ID: 2195<br>
     * Message: There is not enough soul.
     */
-   THERE_IS_NOT_ENOUGH_SOUL(2195);
+   THERE_IS_NOT_ENOUGH_SOUL(2195),
+   
+   /**
+    * ID: 1587<br>
+    * Message: $c1's party has left the Command Channel.
+    */
+   S1_PARTY_LEFT_COMMAND_CHANNEL(1587),
+   
+   /**
+    * ID: 1581<br>
+    * Message: The Command Channel has been disbanded.
+    */
+   COMMAND_CHANNEL_DISBANDED(1581),
+	
+	/**
+	 * ID: 2229<br>
+	 * Message: There is no instance zone under a time limit
+	 */
+	NO_INSTANCEZONE_TIME_LIMIT(2229);
    
     private int _id;
 
