@@ -107,7 +107,7 @@ public class CharInfo extends L2GameServerPacket
 
 			if (template != null)
 			{
-				writeC(0x31);
+				writeC(0x16);
 				writeD(_activeChar.getObjectId());
 				writeD(_activeChar.getPoly().getPolyId()+1000000);  // npctype id
 				writeD(_activeChar.getKarma() > 0 ? 1 : 0);
@@ -151,7 +151,7 @@ public class CharInfo extends L2GameServerPacket
 
 				if (gmSeeInvis)
 				{
-					writeS("Invisible");
+					writeS("Áô§Îª¬ºA");
 				}
 				else
 				{
@@ -183,7 +183,7 @@ public class CharInfo extends L2GameServerPacket
 		}
 		else
 		{
-			writeC(0x03);
+			writeC(0x31);
 			writeD(_x);
 			writeD(_y);
 			writeD(_z);

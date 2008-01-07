@@ -229,7 +229,7 @@ public final class NpcInfo extends L2GameServerPacket
   	
         	
         	
-        	writeC(0x03);
+        	writeC(0x31);
 			writeD(_x);
 			writeD(_y);
 			writeD(_z);
