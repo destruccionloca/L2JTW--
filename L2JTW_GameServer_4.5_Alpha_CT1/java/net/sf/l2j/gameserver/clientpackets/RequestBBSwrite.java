@@ -18,7 +18,7 @@
  */
 package net.sf.l2j.gameserver.clientpackets;
 
-import net.sf.l2j.gameserver.CommunityBoard;
+import net.sf.l2j.gameserver.communitybbs.CommunityBoard;
 /**
  * Format SSSSSS
  * @author -Wooden-
@@ -52,7 +52,7 @@ public class RequestBBSwrite extends L2GameClientPacket
 	protected
 	void runImpl()
 	{
-		//CommunityBoard.getInstance().handleWriteCommands(getClient(),_url,_arg1,_arg2, _arg3, _arg4, _arg5);
+		CommunityBoard.getInstance().handleWriteCommands(getClient(),_url,_arg1,_arg2, _arg3, _arg4, _arg5);
 	}
 
 	/* (non-Javadoc)

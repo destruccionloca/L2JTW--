@@ -19,7 +19,7 @@
 package net.sf.l2j.gameserver.clientpackets;
 
 import net.sf.l2j.Config;
-import net.sf.l2j.gameserver.CommunityBoard;
+import net.sf.l2j.gameserver.communitybbs.CommunityBoard;
 
 /**
  * This class ...

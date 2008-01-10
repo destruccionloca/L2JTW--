@@ -1826,10 +1826,7 @@ public class L2NpcInstance extends L2Character
         if (qs == null) 
         {
             // no quests found
-
             content = "<html><body>並無任何任務可以接受.</body></html>";
-
-
         } 
         else 
         {

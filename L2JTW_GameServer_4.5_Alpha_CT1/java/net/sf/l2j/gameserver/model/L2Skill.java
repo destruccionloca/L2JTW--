@@ -58,6 +58,7 @@ import net.sf.l2j.gameserver.skills.effects.EffectCharge;
 import net.sf.l2j.gameserver.skills.effects.EffectTemplate;
 import net.sf.l2j.gameserver.skills.funcs.Func;
 import net.sf.l2j.gameserver.skills.funcs.FuncTemplate;
+import net.sf.l2j.gameserver.skills.l2skills.L2SkillChangeWeapon;
 import net.sf.l2j.gameserver.skills.l2skills.L2SkillCharge;
 import net.sf.l2j.gameserver.skills.l2skills.L2SkillChargeAtk;
 import net.sf.l2j.gameserver.skills.l2skills.L2SkillChargeDmg;
@@ -90,6 +91,7 @@ public abstract class L2Skill
     public static final int SKILL_CREATE_COMMON = 1320;
     public static final int SKILL_CREATE_DWARVEN = 172;
     public static final int SKILL_CRYSTALLIZE = 248;
+    public static final int SKILL_DIVINE_INSPIRATION = 1405;
 
     public static final int SKILL_FAKE_INT = 9001;
     public static final int SKILL_FAKE_WIT = 9002;
@@ -259,6 +261,9 @@ public abstract class L2Skill
     	SEED (L2SkillSeed.class),
     	BEAST_FEED,
     	FORCE_BUFF,
+        
+        // Kamael WeaponChange
+        CHANGEWEAPON (L2SkillChangeWeapon.class),
 
         // unimplemented
         NOTDONE;

@@ -207,7 +207,8 @@ import net.sf.l2j.gameserver.util.Broadcast;
 import net.sf.l2j.gameserver.util.FloodProtector;
 import net.sf.l2j.util.Point3D;
 import net.sf.l2j.util.Rnd;
-
+import net.sf.l2j.gameserver.communitybbs.BB.Forum;
+import net.sf.l2j.gameserver.communitybbs.Manager.ForumsBBSManager;
 
 /**
  * This class represents all player characters in the world.
@@ -653,8 +654,8 @@ public final class L2PcInstance extends L2PlayableInstance
 	private List<String> _validBypass2 = new FastList<String>();
 
 
-	//private Forum _forumMail;
-	//private Forum _forumMemo;
+	private Forum _forumMail;
+	private Forum _forumMemo;
 
     /** Current skill in use */
     private SkillDat _currentSkill;
@@ -1234,10 +1235,8 @@ public final class L2PcInstance extends L2PlayableInstance
 
 		for (QuestState qs : _quests.values())
 		{
-			if (qs.getQuest().getQuestIntId()>=1999)
-				continue;
-
-			if (qs.isCompleted() && !Config.DEVELOPER)
+		    int questId = qs.getQuest().getQuestIntId();
+			if ((questId>999) || (questId<1))
 				continue;
 
 			if (!qs.isStarted() && !Config.DEVELOPER)
@@ -2212,7 +2211,7 @@ public final class L2PcInstance extends L2PlayableInstance
 			{
 				L2SkillLearn s = skills[i];
 				L2Skill sk = SkillTable.getInstance().getInfo(s.getId(), s.getLevel());
-				if (sk == null || !sk.getCanLearn(getClassId()))
+				if (sk == null || !sk.getCanLearn(getClassId()) || (sk.getId() == L2Skill.SKILL_DIVINE_INSPIRATION && !Config.AUTO_LEARN_DIVINE_INSPIRATION))
 				{
 					unLearnable++;
 					continue;
@@ -2718,15 +2717,16 @@ public final class L2PcInstance extends L2PlayableInstance
 			su.addAttribute(StatusUpdate.CUR_LOAD, getCurrentLoad());
 			sendPacket(su);
 
+            // If over capacity, drop the item
+            if (!isGM() && !_inventory.validateCapacity(0))
+                dropItem("InvDrop", newitem, null, true);
+
 			// Cursed Weapon
-			if(CursedWeaponsManager.getInstance().isCursed(newitem.getItemId()))
+            else if(CursedWeaponsManager.getInstance().isCursed(newitem.getItemId()))
 			{
 				CursedWeaponsManager.getInstance().activate(this, newitem);
 			}
 
-	    	// If over capacity, trop the item
-	    	if (!isGM() && !_inventory.validateCapacity(0))
-                dropItem("InvDrop", newitem, null, true);
 		}
 	}
 
@@ -2817,13 +2817,14 @@ public final class L2PcInstance extends L2PlayableInstance
 				su.addAttribute(StatusUpdate.CUR_LOAD, getCurrentLoad());
 				sendPacket(su);
 
+                // If over capacity, drop the item
+                if (!isGM() && !_inventory.validateCapacity(0))
+                    dropItem("InvDrop", item, null, true);
+                
 				// Cursed Weapon
-				if(CursedWeaponsManager.getInstance().isCursed(item.getItemId()))
+                else if(CursedWeaponsManager.getInstance().isCursed(item.getItemId()))
 					CursedWeaponsManager.getInstance().activate(this, item);
-
-		    	// If over capacity, drop the item
-		    	if (!isGM() && !_inventory.validateCapacity(0))
-		    		dropItem("InvDrop", item, null, true);
+		    
             }
 		}
 	}
@@ -3353,7 +3354,7 @@ public final class L2PcInstance extends L2PlayableInstance
 	public void setProtection(boolean protect)
 	{
 		if (Config.DEVELOPER && (protect || _protectEndTime > 0))
-            System.out.println(getName() + ": Protection " + (protect?"ON " + (GameTimeController.getGameTicks() + Config.PLAYER_SPAWN_PROTECTION * GameTimeController.TICKS_PER_SECOND) :"OFF") + " (currently " + GameTimeController.getGameTicks() + ")");
+            _log.warning(getName() + ": Protection " + (protect?"ON " + (GameTimeController.getGameTicks() + Config.PLAYER_SPAWN_PROTECTION * GameTimeController.TICKS_PER_SECOND) :"OFF") + " (currently " + GameTimeController.getGameTicks() + ")");
 
 		_protectEndTime = protect ? GameTimeController.getGameTicks() + Config.PLAYER_SPAWN_PROTECTION * GameTimeController.TICKS_PER_SECOND : 0;
 	}
@@ -6122,7 +6123,7 @@ public final class L2PcInstance extends L2PlayableInstance
 	/**
 	 * @return
 	 */
-	/*
+	
 	public Forum getMail()
 	{
 		if (_forumMail == null)
@@ -6138,24 +6139,24 @@ public final class L2PcInstance extends L2PlayableInstance
 
 		return _forumMail;
 	}
-	*/
+	
 
 
 	/**
 	 * @param forum
 	 */
-	/*
+	
 	public void setMail(Forum forum)
 	{
 		_forumMail = forum;
 	}
-	*/
+	
 
 
 	/**
 	 * @return
 	 */
-	/*
+	
 	public Forum getMemo()
 	{
 		if (_forumMemo == null)
@@ -6171,16 +6172,16 @@ public final class L2PcInstance extends L2PlayableInstance
 
 		return _forumMemo;
 	}
-	*/
+	
 	/**
 	 * @param forum
 	 */
-	/*
+	
 	public void setMemo(Forum forum)
 	{
 		_forumMemo = forum;
 	}
-	*/
+	
     /**
      * Restores sub-class data for the L2PcInstance, used to check the current
      * class index for the character.
@@ -9483,7 +9484,7 @@ public final class L2PcInstance extends L2PlayableInstance
 		double dz = m._zDestination - getZ();
 		int distPassed = (int)getStat().getMoveSpeed() * (gameTicks - m._moveTimestamp) / GameTimeController.TICKS_PER_SECOND;
 		double distFraction = (distPassed) / Math.sqrt(dx*dx + dy*dy + dz*dz);
-//		if (Config.DEVELOPER) System.out.println("Move Ticks:" + (gameTicks - m._moveTimestamp) + ", distPassed:" + distPassed + ", distFraction:" + distFraction);
+//		if (Config.DEVELOPER) _log.warning("Move Ticks:" + (gameTicks - m._moveTimestamp) + ", distPassed:" + distPassed + ", distFraction:" + distFraction);
 		
 		if (distFraction > 1)
 		{

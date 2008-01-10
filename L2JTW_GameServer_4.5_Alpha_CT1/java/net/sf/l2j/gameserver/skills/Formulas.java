@@ -1335,6 +1335,9 @@ public final class Formulas
 				case BUG:
 					damage *= attacker.getPAtkInsects(target);
 					break;
+               case GIANT:
+                   damage *= attacker.getPAtkGiants(target);
+                   break;					
 				default:
 					// nothing
 					break;
@@ -2004,7 +2007,7 @@ public final class Formulas
 		}
 
 		if (Config.DEVELOPER)
-			System.out.println(skill.getName()
+			_log.info(skill.getName()
 				+ ": "
 				+ value
 				+ ", "

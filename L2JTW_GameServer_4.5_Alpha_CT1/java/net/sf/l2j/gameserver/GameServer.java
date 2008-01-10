@@ -725,7 +725,7 @@ public class GameServer
 		    _statusServer.start();
 		}
 		else {
-		    System.out.println("Telnet server is currently disabled.");
+		    _log.info("Telnet server is currently disabled.");
 		}
     }
 }

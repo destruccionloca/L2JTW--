@@ -142,6 +142,9 @@ public final class Config
     /** Config for Auto Learn Skills - For Retarded Lame People....*/
     public static boolean AUTO_LEARN_SKILLS;
 
+    /** Alternative auto skill learning for divine inspiration (+4 max buff count) */
+    public static boolean AUTO_LEARN_DIVINE_INSPIRATION;
+
     /** Cancel attack bow by hit */
     public static boolean ALT_GAME_CANCEL_BOW;
     /** Cancel cast by hit */
@@ -2074,6 +2077,8 @@ public final class Config
 
                 AUTO_LEARN_SKILLS       = Boolean.parseBoolean(altSettings.getProperty("AutoLearnSkills", "false"));
 
+                AUTO_LEARN_DIVINE_INSPIRATION       = Boolean.parseBoolean(altSettings.getProperty("AutoLearnDivineInspiration", "false"));
+
                 ALT_GAME_CANCEL_BOW     = altSettings.getProperty("AltGameCancelByHit", "Cast").equalsIgnoreCase("bow") || altSettings.getProperty("AltGameCancelByHit", "Cast").equalsIgnoreCase("all");
                 ALT_GAME_CANCEL_CAST    = altSettings.getProperty("AltGameCancelByHit", "Cast").equalsIgnoreCase("cast") || altSettings.getProperty("AltGameCancelByHit", "Cast").equalsIgnoreCase("all");
                 ALT_GAME_SHIELD_BLOCKS  = Boolean.parseBoolean(altSettings.getProperty("AltShieldBlocks", "false"));
@@ -2329,7 +2334,7 @@ public final class Config
                 if (TVT_EVENT_PARTICIPATION_NPC_ID == 0)
                 {
                     TVT_EVENT_ENABLED = false;
-                    System.out.println("TvTEventEngine[Config.load()]: invalid config property -> TvTEventParticipationNpcId");
+                    _log.warning("TvTEventEngine[Config.load()]: invalid config property -> TvTEventParticipationNpcId");
                 }
                 else
                 {
@@ -2338,7 +2343,7 @@ public final class Config
                     if (propertySplit.length < 3)
                     {
                         TVT_EVENT_ENABLED = false;
-                        System.out.println("TvTEventEngine[Config.load()]: invalid config property -> TvTEventParticipationNpcCoordinates");
+                        _log.warning("TvTEventEngine[Config.load()]: invalid config property -> TvTEventParticipationNpcCoordinates");
                     }
                     else
                     {
@@ -2359,7 +2364,7 @@ public final class Config
                         if (propertySplit.length < 3)
                         {
                             TVT_EVENT_ENABLED = false;
-                            System.out.println("TvTEventEngine[Config.load()]: invalid config property -> TvTEventTeam1Coordinates");
+                            _log.warning("TvTEventEngine[Config.load()]: invalid config property -> TvTEventTeam1Coordinates");
                         }
                         else
                         {
@@ -2373,7 +2378,7 @@ public final class Config
                             if (propertySplit.length < 3)
                             {
                                 TVT_EVENT_ENABLED= false;
-                                System.out.println("TvTEventEngine[Config.load()]: invalid config property -> TvTEventTeam2Coordinates");
+                                _log.warning("TvTEventEngine[Config.load()]: invalid config property -> TvTEventTeam2Coordinates");
                             }
                             else
                             {
@@ -2387,7 +2392,7 @@ public final class Config
                                 	String[] rewardSplit = reward.split(",");
 
                                 	if (rewardSplit.length != 2)
-                                		System.out.println("TvTEventEngine[Config.load()]: invalid config property -> TvTEventReward \"" + reward + "\"");
+                                	    _log.warning("TvTEventEngine[Config.load()]: invalid config property -> TvTEventReward \"" + reward + "\"");
                                 	else
                                 	{
                                 		try
@@ -2397,7 +2402,7 @@ public final class Config
                                 		catch (NumberFormatException nfe)
                                 		{
                                 			if (!reward.equals(""))
-                                				System.out.println("TvTEventEngine[Config.load()]: invalid config property -> TvTEventReward \"" + reward + "\"");
+                                			    _log.warning("TvTEventEngine[Config.load()]: invalid config property -> TvTEventReward \"" + reward + "\"");
                                 		}
                                 	}
                                 }
@@ -2416,7 +2421,7 @@ public final class Config
                         			catch (NumberFormatException nfe)
                         			{
                         				if (!door.equals(""))
-                        					System.out.println("TvTEventEngine[Config.load()]: invalid config property -> TvTEventDoorsCloseOpenOnStartEnd \"" + door + "\"");
+                        				    _log.warning("TvTEventEngine[Config.load()]: invalid config property -> TvTEventDoorsCloseOpenOnStartEnd \"" + door + "\"");
                         			}
                         		}
                             }
@@ -2450,7 +2455,7 @@ public final class Config
                 KARMA_PK_LIMIT                      = Integer.parseInt(pvpSettings.getProperty("MinimumPKRequiredToDrop", "5"));
 
                 KARMA_NONDROPPABLE_PET_ITEMS    = pvpSettings.getProperty("ListOfPetItems", "2375,3500,3501,3502,4422,4423,4424,4425,6648,6649,6650");
-                KARMA_NONDROPPABLE_ITEMS        = pvpSettings.getProperty("ListOfNonDroppableItems", "57,1147,425,1146,461,10,2368,7,6,2370,2369,6842,6611,6612,6613,6614,6615,6616,6617,6618,6619,6620,6621");
+                KARMA_NONDROPPABLE_ITEMS        = pvpSettings.getProperty("ListOfNonDroppableItems", "57,1147,425,1146,461,10,2368,7,6,2370,2369,6842,6611,6612,6613,6614,6615,6616,6617,6618,6619,6620,6621,7694,8181,5575,7694,9388,9389,9390");
 
                 KARMA_LIST_NONDROPPABLE_PET_ITEMS = new FastList<Integer>();
                 for (String id : KARMA_NONDROPPABLE_PET_ITEMS.split(",")) {

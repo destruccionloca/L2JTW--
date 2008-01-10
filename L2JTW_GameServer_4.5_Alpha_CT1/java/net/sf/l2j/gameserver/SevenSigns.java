@@ -765,7 +765,7 @@ public class SevenSigns
 		PreparedStatement statement = null;
 
         if (Config.DEBUG)
-            System.out.println("SevenSigns: Saving data to disk.");
+            _log.info("SevenSigns: Saving data to disk.");
 
 		try
 		{

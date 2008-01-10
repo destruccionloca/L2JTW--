@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 
 import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.ai.CtrlIntention;
-import net.sf.l2j.gameserver.CommunityBoard;
+import net.sf.l2j.gameserver.communitybbs.CommunityBoard;
 import net.sf.l2j.gameserver.handler.AdminCommandHandler;
 import net.sf.l2j.gameserver.handler.IAdminCommandHandler;
 import net.sf.l2j.gameserver.model.L2CharPosition;

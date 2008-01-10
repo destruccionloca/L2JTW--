@@ -460,7 +460,16 @@ public class L2Clan
 		case 1002:
 		case 2001:
 		case 2002:
-			limit   = 10;
+			switch (getLevel())
+			{
+				case 9:
+				case 10:
+					limit	= 25;
+					break;
+				default:
+					limit   = 10;
+					break;
+			}
 			break;
 		default:
 			break;
@@ -2006,7 +2015,7 @@ public class L2Clan
         {
             case 0:
             {
-                // upgrade to 1
+                // Upgrade to 1
                 if (player.getSp() >= 35000 && player.getAdena() >= 650000)
                 {
                     if (player.reduceAdena("ClanLvl", 650000, player.getTarget(), true))
@@ -2023,7 +2032,7 @@ public class L2Clan
             }
             case 1:
             {
-                // upgrade to 2
+                // Upgrade to 2
                 if (player.getSp() >= 150000 && player.getAdena() >= 2500000)
                 {
                     if (player.reduceAdena("ClanLvl", 2500000, player.getTarget(), true))
@@ -2040,10 +2049,10 @@ public class L2Clan
             }
             case 2:
             {
-                // upgrade to 3
+                // Upgrade to 3
                 if (player.getSp() >= 500000 && player.getInventory().getItemByItemId(1419) != null)
                 {
-                    // itemid 1419 == proof of blood
+                    // itemId 1419 == Blood Mark
                     if (player.destroyItemByItemId("ClanLvl", 1419, 1, player.getTarget(), false))
                     {
 	                    player.setSp(player.getSp() - 500000);
@@ -2063,10 +2072,10 @@ public class L2Clan
             }
             case 3:
             {
-                // upgrade to 4
+                // Upgrade to 4
                 if (player.getSp() >= 1400000 && player.getInventory().getItemByItemId(3874) != null)
                 {
-                    // itemid 3874 == proof of alliance
+                    // itemId 3874 == Alliance Manifesto
                 	if (player.destroyItemByItemId("ClanLvl", 3874, 1, player.getTarget(), false))
                 	{
 	                    player.setSp(player.getSp() - 1400000);
@@ -2086,10 +2095,10 @@ public class L2Clan
             }
             case 4:
             {
-                // upgrade to 5
+                // Upgrade to 5
                 if (player.getSp() >= 3500000 && player.getInventory().getItemByItemId(3870) != null)
                 {
-                    // itemid 3870 == proof of aspiration
+                    // itemId 3870 == Seal of Aspiration
                 	if (player.destroyItemByItemId("ClanLvl", 3870, 1, player.getTarget(), false))
                 	{
                 		player.setSp(player.getSp() - 3500000);
@@ -2109,6 +2118,7 @@ public class L2Clan
                 break;
             }
             case 5:
+            	// Upgrade to 6
                 if(getReputationScore() >= 10000 && getMembersCount() >= 30)
                 {
                     setReputationScore(getReputationScore() - 10000, true);
@@ -2121,6 +2131,7 @@ public class L2Clan
                 break;
 
             case 6:
+            	// Upgrade to 7
                 if(getReputationScore() >= 20000 && getMembersCount() >= 80)
                 {
                     setReputationScore(getReputationScore() - 20000, true);
@@ -2134,6 +2145,7 @@ public class L2Clan
                 }
                 break;
             case 7:
+            	// Upgrade to 8
                 if(getReputationScore() >= 40000 && getMembersCount() >= 120)
                 {
                     setReputationScore(getReputationScore() - 40000, true);
@@ -2144,6 +2156,46 @@ public class L2Clan
                     cr = null;
 
                     increaseClanLevel = true;
+                }
+                break;
+            case 8:
+            	// Upgrade to 9
+                if(getReputationScore() >= 40000 && player.getInventory().getItemByItemId(9910) != null && getMembersCount() >= 140)
+                {
+                	// itemId 9910 == Blood Oath
+                	if (player.destroyItemByItemId("ClanLvl", 9910, 150, player.getTarget(), false))
+                	{
+                		setReputationScore(getReputationScore() - 40000, true);
+                		SystemMessage cr = new SystemMessage(SystemMessageId.S1_DEDUCTED_FROM_CLAN_REP);
+                		cr.addNumber(40000);
+                		player.sendPacket(cr);
+                		cr = null;
+                		SystemMessage sm = new SystemMessage(SystemMessageId.DISSAPEARED_ITEM);
+                        sm.addItemName(9910);
+                        sm.addNumber(150);
+                        player.sendPacket(sm);
+                		increaseClanLevel = true;
+                	}
+                }
+                break;
+            case 9:
+            	// Upgrade to 10
+                if(getReputationScore() >= 40000 && player.getInventory().getItemByItemId(9911) != null && getMembersCount() >= 140)
+                {
+                	// itemId 9911 == Blood Alliance
+                	if (player.destroyItemByItemId("ClanLvl", 9911, 5, player.getTarget(), false))
+                	{
+                		setReputationScore(getReputationScore() - 40000, true);
+                		SystemMessage cr = new SystemMessage(SystemMessageId.S1_DEDUCTED_FROM_CLAN_REP);
+                		cr.addNumber(40000);
+                		player.sendPacket(cr);
+                		cr = null;
+                		SystemMessage sm = new SystemMessage(SystemMessageId.DISSAPEARED_ITEM);
+                        sm.addItemName(9911);
+                        sm.addNumber(5);
+                        player.sendPacket(sm);
+                		increaseClanLevel = true;
+                	}
                 }
                 break;
             default:
