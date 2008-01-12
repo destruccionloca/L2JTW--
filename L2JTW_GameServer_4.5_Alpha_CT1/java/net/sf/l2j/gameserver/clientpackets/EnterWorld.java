@@ -33,7 +33,7 @@ import net.sf.l2j.gameserver.Olympiad;
 import net.sf.l2j.gameserver.SevenSigns;
 import net.sf.l2j.gameserver.TaskPriority;
 import net.sf.l2j.gameserver.cache.HtmCache;
-//import net.sf.l2j.gameserver.communitybbs.Manager.RegionBBSManager;
+import net.sf.l2j.gameserver.communitybbs.Manager.RegionBBSManager;
 import net.sf.l2j.gameserver.datatables.MapRegionTable;
 import net.sf.l2j.gameserver.handler.AdminCommandHandler;
 import net.sf.l2j.gameserver.instancemanager.ClanHallManager;
@@ -239,12 +239,12 @@ public class EnterWorld extends L2GameClientPacket
         SystemMessage sm = new SystemMessage(SystemMessageId.WELCOME_TO_LINEAGE);
         sendPacket(sm);
 
-
-        sm = new SystemMessage(614);
-        sm.addString(getText("QnVpbGQ="));
+        /*
+        sm = new SystemMessage(SystemMessageId.S1_S2);
         sm.addString(getText("TDJKVFcgQWxwaGEgNC41IEthbWVs"));check =1;
-		sendPacket(sm);
-            
+        sendPacket(sm);
+		*/
+
         Welcome_Path = "data/html/welcome/welcome.htm";
         File mainText = new File(Config.DATAPACK_ROOT, Welcome_Path);        // Return the pathfile of the HTML file
         if (mainText.exists())
@@ -263,6 +263,11 @@ public class EnterWorld extends L2GameClientPacket
 		Quest.playerEnter(activeChar);
 
 		activeChar.sendPacket(new QuestList());
+
+
+		sm = new SystemMessage(SystemMessageId.S1_S2);
+        sm.addString(getText("TDJKVFcgNC41IEFscGhhIC0gQ29kZW5hbWU6IEthbWVs"));
+        sendPacket(sm);
 
 
 		/*
@@ -363,7 +368,7 @@ public class EnterWorld extends L2GameClientPacket
             activeChar.sendMessage("因為在攻城戰區域內,將傳送至最近的村莊.");
 		}
 
-		//RegionBBSManager.getInstance().changeCommunityBoard();
+		RegionBBSManager.getInstance().changeCommunityBoard();
 
 
 
@@ -416,7 +421,7 @@ public class EnterWorld extends L2GameClientPacket
 
             if (partner != null)
             {
-                partner.sendMessage("Your Partner has logged in");
+                partner.sendMessage("您的同伴以登入.");
             }
 
             partner = null;

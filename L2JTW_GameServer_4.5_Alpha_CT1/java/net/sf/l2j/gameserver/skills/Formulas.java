@@ -2027,7 +2027,6 @@ public final class Formulas
 	{
 		double lvlDifference = (target.getLevel() - (skill.getMagicLevel() > 0 ? skill.getMagicLevel() : attacker.getLevel()));
 		int rate = Math.round((float)(Math.pow(1.3, lvlDifference) * 100));
-
 		return (Rnd.get(10000) > rate);
 	}
 

@@ -52,7 +52,6 @@ public final class RequestRestartPoint extends L2GameClientPacket
 
 	@Override
 	protected void readImpl()
-
 	{
 		_requestedPointType = readD();
 	}
@@ -73,7 +72,7 @@ public final class RequestRestartPoint extends L2GameClientPacket
 				Castle castle=null;
 
 				if (activeChar.isInJail()) _requestedPointType = 27;
-				else if (activeChar.isFestivalParticipant()) _requestedPointType = 4;
+				else if (activeChar.isFestivalParticipant()) _requestedPointType = 5;
 
 				switch (_requestedPointType)
 				{
@@ -130,7 +129,7 @@ public final class RequestRestartPoint extends L2GameClientPacket
 						loc = MapRegionTable.getInstance().getTeleToLocation(activeChar, MapRegionTable.TeleportWhereType.SiegeFlag);
 						break;
 
-					case 4: // Fixed or Player is a festival participant
+					case 5: // Fixed or Player is a festival participant
 						if (!activeChar.isGM() && !activeChar.isFestivalParticipant())
 						{
 							//cheater

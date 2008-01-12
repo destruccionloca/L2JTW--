@@ -27,7 +27,7 @@ import java.util.StringTokenizer;
 import net.sf.l2j.Config;
 import net.sf.l2j.L2DatabaseFactory;
 import net.sf.l2j.gameserver.LoginServerThread;
-//import net.sf.l2j.gameserver.communitybbs.Manager.RegionBBSManager;
+import net.sf.l2j.gameserver.communitybbs.Manager.RegionBBSManager;
 import net.sf.l2j.gameserver.handler.IAdminCommandHandler;
 import net.sf.l2j.gameserver.model.GMAudit;
 import net.sf.l2j.gameserver.model.L2Object;
@@ -86,7 +86,7 @@ public class AdminBan implements IAdminCommandHandler {
 			{
 				plyr.setAccountAccesslevel(-100);
 				account_name = plyr.getAccountName();
-				//RegionBBSManager.getInstance().changeCommunityBoard();
+				RegionBBSManager.getInstance().changeCommunityBoard();
 				plyr.logout();
 				activeChar.sendMessage("±b¸¹ "+account_name+" «ÊÂê.");
 			}

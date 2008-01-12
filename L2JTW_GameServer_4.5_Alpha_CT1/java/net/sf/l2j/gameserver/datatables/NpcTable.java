@@ -54,6 +54,7 @@ public class NpcTable
 
 	private Map<Integer, L2NpcTemplate> _npcs;
 	private boolean _initialized = false;
+	private int counter = 0;
 
 	public static NpcTable getInstance()
 	{
@@ -118,35 +119,40 @@ public class NpcTable
 					}
 					
 					npcSkill = SkillTable.getInstance().getInfo(skillId, level);
-/*
-					if(npcSkill.isPassive())
-					{
-						if (npcSkill.getSkillType() == L2Skill.SkillType.BUFF)
-						{
-							
-						}
-						if (npcSkill.getSkillType() == L2Skill.SkillType.DEBUFF
-								||npcSkill.getSkillType() == L2Skill.SkillType.WEAKNESS)
-						{
-							
-						}
-						if (npcSkill.getSkillType() == L2Skill.SkillType.MDAM
-								||npcSkill.getSkillType() == L2Skill.SkillType.MDAM
-								||npcSkill.getSkillType() == L2Skill.SkillType.DRAIN
-								||npcSkill.getSkillType() == L2Skill.SkillType.CHARGEDAM
-								||npcSkill.getSkillType() == L2Skill.SkillType.DEATHLINK
-								||npcSkill.getSkillType() == L2Skill.SkillType.BLOW
-								||npcSkill.getSkillType() == L2Skill.SkillType.DEATHLINK_PDAM)
-						{
-							
-						}
-						
-					}
-					*/
+
+
+					
 					
 					if (npcSkill == null)
 						continue;
-
+					
+					//-------------------------------------------------------------------------
+					//Skill AI Data
+                    if(npcSkill.isPassive())
+                    {
+                        if (npcSkill.getSkillType() == L2Skill.SkillType.BUFF)
+                        {
+                            
+                        }
+                        if (npcSkill.getSkillType() == L2Skill.SkillType.DEBUFF
+                                ||npcSkill.getSkillType() == L2Skill.SkillType.WEAKNESS)
+                        {
+                            
+                        }
+                        if (npcSkill.getSkillType() == L2Skill.SkillType.MDAM
+                                ||npcSkill.getSkillType() == L2Skill.SkillType.MDAM
+                                ||npcSkill.getSkillType() == L2Skill.SkillType.DRAIN
+                                ||npcSkill.getSkillType() == L2Skill.SkillType.CHARGEDAM
+                                ||npcSkill.getSkillType() == L2Skill.SkillType.DEATHLINK
+                                ||npcSkill.getSkillType() == L2Skill.SkillType.BLOW
+                                ||npcSkill.getSkillType() == L2Skill.SkillType.DEATHLINK_PDAM)
+                        {
+                            
+                        }
+                        
+                    }
+                    //-------------------------------------------------------------------------
+                    
 					npcDat.addSkill(npcSkill);
 				}
 

@@ -54,12 +54,16 @@ public class L2NpcAIData
     private int _baseShldRate;
     private int _baseShldDef;
     private int _dodge;
+    private int minrangeskill;
+    private int maxrangeskill;
+    
     //Skill AI
     private int _buffskill;
     private int _debuffskill;
     private int _atkskill;
     private int _rootskill;
     private int _sleepskill;
+    private int _silentskill;
     private int _effectskill;
     private int _specialskill; // It will be use later on..
     
@@ -223,6 +227,11 @@ public class L2NpcAIData
     public void setCastChance(int chance)
     {
     	_castchance = chance;
+    }
+    
+    public void setSkillCount(int count)
+    {
+        
     }
     
     //--------------------------------------------------------------------------------------------------------------

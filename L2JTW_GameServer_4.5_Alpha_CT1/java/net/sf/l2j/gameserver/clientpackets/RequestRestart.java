@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.Olympiad;
 import net.sf.l2j.gameserver.SevenSignsFestival;
-//import net.sf.l2j.gameserver.communitybbs.Manager.RegionBBSManager;
+import net.sf.l2j.gameserver.communitybbs.Manager.RegionBBSManager;
 import net.sf.l2j.gameserver.datatables.SkillTable;
 import net.sf.l2j.gameserver.model.L2Party;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
@@ -66,7 +66,7 @@ public final class RequestRestart extends L2GameClientPacket
 
         if (player.isInOlympiadMode() || Olympiad.getInstance().isRegistered(player))
         {
-            player.sendMessage("You cant logout in olympiad mode");
+            player.sendMessage("奧林匹亞期間無法登出");
             return;
         }
 
@@ -74,7 +74,7 @@ public final class RequestRestart extends L2GameClientPacket
 
         if (player.getPrivateStoreType() != 0)
         {
-            player.sendMessage("Cannot restart while trading");
+            player.sendMessage("交易時無法登出");
             return;
         }
 
@@ -101,7 +101,7 @@ public final class RequestRestart extends L2GameClientPacket
         {
             if (SevenSignsFestival.getInstance().isFestivalInitialized())
             {
-                player.sendPacket(SystemMessage.sendString("You cannot restart while you are a participant in a festival."));
+                player.sendPacket(SystemMessage.sendString("無法在黑暗祭典進行時登出."));
                 player.sendPacket(new ActionFailed());
                 return;
             }
@@ -110,7 +110,7 @@ public final class RequestRestart extends L2GameClientPacket
             if (playerParty != null)
                 player.getParty().broadcastToPartyMembers(
                                                           SystemMessage.sendString(player.getName()
-                                                              + " has been removed from the upcoming festival."));
+                                                              + " 在下一場的黑暗祭典被移除."));
         }
         if (player.isFlying())
         {
@@ -123,7 +123,7 @@ public final class RequestRestart extends L2GameClientPacket
         player.setClient(null);
 
         TvTEvent.onLogout(player);
-        //RegionBBSManager.getInstance().changeCommunityBoard();
+        RegionBBSManager.getInstance().changeCommunityBoard();
 
         // removing player from the world
         player.deleteMe();

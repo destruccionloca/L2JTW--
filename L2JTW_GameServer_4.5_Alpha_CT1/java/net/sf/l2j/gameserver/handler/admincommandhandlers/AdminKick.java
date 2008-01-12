@@ -21,7 +21,7 @@ package net.sf.l2j.gameserver.handler.admincommandhandlers;
 import java.util.StringTokenizer;
 
 import net.sf.l2j.Config;
-//import net.sf.l2j.gameserver.communitybbs.Manager.RegionBBSManager;
+import net.sf.l2j.gameserver.communitybbs.Manager.RegionBBSManager;
 import net.sf.l2j.gameserver.handler.IAdminCommandHandler;
 import net.sf.l2j.gameserver.model.GMAudit;
 import net.sf.l2j.gameserver.model.L2World;
@@ -53,7 +53,7 @@ public class AdminKick implements IAdminCommandHandler {
                 {
                     plyr.logout();
     				activeChar.sendMessage("You kicked " + plyr.getName() + " from the game.");
-    				//RegionBBSManager.getInstance().changeCommunityBoard();
+    				RegionBBSManager.getInstance().changeCommunityBoard();
                 }
 
             }
@@ -68,7 +68,7 @@ public class AdminKick implements IAdminCommandHandler {
         			counter++;
         			player.sendPacket(new LeaveWorld());
         			player.logout();
-        			//RegionBBSManager.getInstance().changeCommunityBoard();
+        			RegionBBSManager.getInstance().changeCommunityBoard();
         		}
             }
         	activeChar.sendMessage("½ð°£ "+counter+" ª±®a");

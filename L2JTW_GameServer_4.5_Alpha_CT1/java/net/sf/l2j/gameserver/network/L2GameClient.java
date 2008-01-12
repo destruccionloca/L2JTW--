@@ -33,7 +33,7 @@ import net.sf.l2j.L2DatabaseFactory;
 import net.sf.l2j.gameserver.LoginServerThread;
 import net.sf.l2j.gameserver.ThreadPoolManager;
 import net.sf.l2j.gameserver.LoginServerThread.SessionKey;
-//import net.sf.l2j.gameserver.communitybbs.Manager.RegionBBSManager;
+import net.sf.l2j.gameserver.communitybbs.Manager.RegionBBSManager;
 import net.sf.l2j.gameserver.datatables.SkillTable;
 import net.sf.l2j.gameserver.model.CharSelectInfoPackage;
 import net.sf.l2j.gameserver.model.L2World;
@@ -536,7 +536,7 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>>
 				// Update BBS
 				try
 				{
-					//RegionBBSManager.getInstance().changeCommunityBoard();
+					RegionBBSManager.getInstance().changeCommunityBoard();
 				}
 				catch (Exception e)
 				{

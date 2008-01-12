@@ -16,7 +16,6 @@
  *
  * http://www.gnu.org/copyleft/gpl.html
  */
-/*
 package net.sf.l2j.gameserver.handler.admincommandhandlers;
 
 //import java.util.logging.Logger;
@@ -25,8 +24,7 @@ import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.communitybbs.Manager.AdminBBSManager;
 import net.sf.l2j.gameserver.handler.IAdminCommandHandler;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
-*/
-/*
+
 public class AdminBBS implements IAdminCommandHandler
 {
 	//private static Logger _log = Logger.getLogger(AdminKick.class.getName());
@@ -36,7 +34,6 @@ public class AdminBBS implements IAdminCommandHandler
 	/* (non-Javadoc)
 	 * @see net.sf.l2j.gameserver.handler.IAdminCommandHandler#useAdminCommand(java.lang.String, net.sf.l2j.gameserver.model.actor.instance.L2PcInstance)
 	 */
-/*
 	public boolean useAdminCommand(String command, L2PcInstance activeChar)
 	{
 		 if (!Config.ALT_PRIVILEGES_ADMIN)
@@ -54,7 +51,6 @@ public class AdminBBS implements IAdminCommandHandler
 	/* (non-Javadoc)
 	 * @see net.sf.l2j.gameserver.handler.IAdminCommandHandler#getAdminCommandList()
 	 */
-/*
 	public String[] getAdminCommandList() {
         return ADMIN_COMMANDS;
     }
@@ -63,4 +59,3 @@ public class AdminBBS implements IAdminCommandHandler
         return (level >= REQUIRED_LEVEL);
     }
 }
-*/

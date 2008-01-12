@@ -18,6 +18,7 @@
  */
 package net.sf.l2j.gameserver.handler.skillhandlers;
 
+import java.util.logging.Logger;
 import net.sf.l2j.gameserver.ai.CtrlEvent;
 import net.sf.l2j.gameserver.handler.ISkillHandler;
 import net.sf.l2j.gameserver.model.L2Character;
@@ -41,25 +42,29 @@ public class Spoil implements ISkillHandler
 {
     //private static Logger _log = Logger.getLogger(Spoil.class.getName());
     private static final SkillType[] SKILL_IDS = {SkillType.SPOIL,SkillType.SPOILATK};
-
+    protected static final Logger _log = Logger.getLogger(L2Character.class.getName());
+    
     public void useSkill(L2Character activeChar, L2Skill skill, @SuppressWarnings("unused") L2Object[] targets)
     {
         if (!(activeChar instanceof L2PcInstance))
             return;
 
-        L2Object[] targetList = skill.getTargetList(activeChar);
+        //L2Object[] targetList = skill.getTargetList(activeChar);
 
-        if (targetList == null)
+
+        if (targets == null)
         {
+
             return;
         }
 
-        for (int index = 0; index < targetList.length; index++)
+        for (int index = 0; index < targets.length; index++)
         {
-            if (!(targetList[index] instanceof L2MonsterInstance))
+            if (!(targets[index] instanceof L2MonsterInstance))
                 continue;
 
-            L2MonsterInstance target = (L2MonsterInstance) targetList[index];
+            L2MonsterInstance target = (L2MonsterInstance) targets[index];
+
 
             if (target.isSpoil()) {
                 activeChar.sendPacket(new SystemMessage(SystemMessageId.ALREDAY_SPOILED));
@@ -70,9 +75,10 @@ public class Spoil implements ISkillHandler
             // NEW SPOIL TYPE by ShanSoft
             boolean spoil = false;
             int damage;
-            if ( target.isDead() == false ) 
+            if (!target.isDead()) 
             {
-                spoil = Formulas.getInstance().calcMagicSuccess(activeChar, (L2Character)targetList[index], skill);
+
+                spoil = Formulas.getInstance().calcMagicSuccess(activeChar, (L2Character)targets[index], skill);
                 if (skill.getSkillType()== SkillType.SPOILATK)
                 {
                 Formulas f = Formulas.getInstance();
