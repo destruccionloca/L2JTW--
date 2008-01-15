@@ -1,20 +1,16 @@
 /*
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.
- *
- * http://www.gnu.org/copyleft/gpl.html
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package net.sf.l2j.gameserver.model.actor.instance;
 
@@ -550,6 +546,11 @@ public final class L2PcInstance extends L2PlayableInstance
 	
 	//Absorbed Souls 
  	private int _absorbedSouls = 0; 
+
+
+	// Absorbed Souls
+    private int _souls = 0;
+    private ScheduledFuture<?> _soulTask = null;
 
 	//GM related variables
 	private boolean _isGm;
@@ -4278,37 +4279,58 @@ public final class L2PcInstance extends L2PlayableInstance
 
 	public boolean isWearingHeavyArmor()
 	{
-		L2ItemInstance armor = getChestArmorInstance();
-        L2ItemInstance legs = getLegsArmorInstance();
-
-		if (((L2ArmorType)armor.getItemType() == L2ArmorType.HEAVY) && ((L2ArmorType)legs.getItemType() == L2ArmorType.HEAVY)
-                ||(getInventory().getPaperdollItem(Inventory.PAPERDOLL_CHEST).getItem().getBodyPart() == L2Item.SLOT_FULL_ARMOR)&&(L2ArmorType)armor.getItemType() == L2ArmorType.HEAVY)
-			return true;
-
+        if ((getChestArmorInstance() != null) && getLegsArmorInstance() != null)
+        {
+            L2ItemInstance legs = getLegsArmorInstance();
+            L2ItemInstance armor = getChestArmorInstance();
+            if ((L2ArmorType)legs.getItemType() == L2ArmorType.HEAVY && ((L2ArmorType)armor.getItemType() == L2ArmorType.HEAVY))
+            return true;
+        }
+	    if (getChestArmorInstance() != null)
+	    {
+	        L2ItemInstance armor = getChestArmorInstance();
+	        
+	        if ((getInventory().getPaperdollItem(Inventory.PAPERDOLL_CHEST).getItem().getBodyPart() == L2Item.SLOT_FULL_ARMOR && (L2ArmorType)armor.getItemType() == L2ArmorType.HEAVY))
+	        return true;
+	    }
 		return false;
 	}
 
 	public boolean isWearingLightArmor()
 	{
-        L2ItemInstance armor = getChestArmorInstance();
-        L2ItemInstance legs = getLegsArmorInstance();
-
-        if (((L2ArmorType)armor.getItemType() == L2ArmorType.LIGHT) && ((L2ArmorType)legs.getItemType() == L2ArmorType.LIGHT)
-                ||(getInventory().getPaperdollItem(Inventory.PAPERDOLL_CHEST).getItem().getBodyPart() == L2Item.SLOT_FULL_ARMOR)&&(L2ArmorType)armor.getItemType() == L2ArmorType.LIGHT)
-			return true;
-
+        if ((getChestArmorInstance() != null) && getLegsArmorInstance() != null)
+        {
+            L2ItemInstance legs = getLegsArmorInstance();
+            L2ItemInstance armor = getChestArmorInstance();
+            if ((L2ArmorType)legs.getItemType() == L2ArmorType.LIGHT && ((L2ArmorType)armor.getItemType() == L2ArmorType.LIGHT))
+            return true;
+        }
+        if (getChestArmorInstance() != null)
+        {
+            L2ItemInstance armor = getChestArmorInstance();
+            
+            if ((getInventory().getPaperdollItem(Inventory.PAPERDOLL_CHEST).getItem().getBodyPart() == L2Item.SLOT_FULL_ARMOR && (L2ArmorType)armor.getItemType() == L2ArmorType.LIGHT))
+            return true;
+        }
 		return false;
 	}
 
 	public boolean isWearingMagicArmor()
 	{
-        L2ItemInstance armor = getChestArmorInstance();
-        L2ItemInstance legs = getLegsArmorInstance();
-
-        if (((L2ArmorType)armor.getItemType() == L2ArmorType.MAGIC) && ((L2ArmorType)legs.getItemType() == L2ArmorType.MAGIC)
-                ||(getInventory().getPaperdollItem(Inventory.PAPERDOLL_CHEST).getItem().getBodyPart() == L2Item.SLOT_FULL_ARMOR)&&(L2ArmorType)armor.getItemType() == L2ArmorType.MAGIC)
-			return true;
-
+        if ((getChestArmorInstance() != null) && getLegsArmorInstance() != null)
+        {
+            L2ItemInstance legs = getLegsArmorInstance();
+            L2ItemInstance armor = getChestArmorInstance();
+            if ((L2ArmorType)legs.getItemType() == L2ArmorType.MAGIC && ((L2ArmorType)armor.getItemType() == L2ArmorType.MAGIC))
+            return true;
+        }
+        if (getChestArmorInstance() != null)
+        {
+            L2ItemInstance armor = getChestArmorInstance();
+            
+            if ((getInventory().getPaperdollItem(Inventory.PAPERDOLL_CHEST).getItem().getBodyPart() == L2Item.SLOT_FULL_ARMOR && (L2ArmorType)armor.getItemType() == L2ArmorType.MAGIC))
+            return true;
+        }
 		return false;
 	}
 
@@ -5056,7 +5078,8 @@ public final class L2PcInstance extends L2PlayableInstance
 		stopWaterTask();
 		stopRentPet();
 		stopPvpRegTask();
-        stopJailTask(true);
+		stopJailTask(true);
+		stopSoulTask();
 	}
 
 	/**
@@ -7534,15 +7557,16 @@ public final class L2PcInstance extends L2PlayableInstance
             }
         }
 
-     // Check if spell consumes a Soul 
-     	if (skill.getSoulConsumeCount() > 0) 
-     	{ 
-     	    if (getAbsorbedSouls() < skill.getSoulConsumeCount()) 
-     	    { 
-     	        sendPacket(new SystemMessage(SystemMessageId.THERE_IS_NOT_ENOUGH_SOUL)); 
-     	        return; 
-     	    } 
-     	} 
+
+        // Check if spell consumes a Soul
+        if (skill.getSoulConsumeCount() > 0)
+        {
+            if (getSouls() < skill.getSoulConsumeCount())
+            {
+                sendPacket(new SystemMessage(SystemMessageId.THERE_IS_NOT_ENOUGH_SOUL));
+                return;
+            }
+        }
         //************************************* Check Casting Conditions *******************************************
 
         // Check if the caster own the weapon needed
@@ -10520,38 +10544,130 @@ public final class L2PcInstance extends L2PlayableInstance
 		_charmOfCourage = val;
 		sendPacket(new EtcStatusUpdate(this));
 	}
-	public int getAbsorbedSouls()
-	{
-        return _absorbedSouls;
-    }
-    
-    public void absorbSoul(L2Skill skill, L2NpcInstance target)
+    /**
+     * Returns the Number of Souls this L2PcInstance got.
+     * @return
+     */
+    public int getSouls()
     {
-        if (_absorbedSouls >= skill.getNumSouls())
+        return _souls;
+    }
+
+    /**
+     * Absorbs a Soul from a Npc.
+     * @param skill
+     * @param target
+     */
+    public void absorbSoul(L2Skill skill, L2NpcInstance npc)
+    {
+        if (_souls >= skill.getNumSouls())
         {
             SystemMessage sm = new SystemMessage(SystemMessageId.SOUL_CANNOT_BE_INCREASED_ANYMORE);
             sendPacket(sm);
             return;
         }
-        
-        _absorbedSouls++;
-        
-        sendPacket(new ExSpawnEmitter(getObjectId(),target.getObjectId()));
-        sendPacket(new EtcStatusUpdate(this));
-        SystemMessage sm = new SystemMessage(SystemMessageId.YOUR_SOUL_HAS_INCREASED_BY_S1_SO_IT_IS_NOW_AT_S2);
-        sm.addNumber(1);
-        sm.addNumber(_absorbedSouls);
-        sendPacket(sm);
-    }
 
-    public void decreaseAbsorbedSouls(int count)
+        increaseSouls(1);
+
+        if (npc != null)
+            sendPacket(new ExSpawnEmitter(this, npc));
+    }
+    
+    /**
+     * Increase Souls
+     * @param count
+     */
+    public void increaseSouls(int count)
     {
-        if (getAbsorbedSouls() <= 0 || (getAbsorbedSouls() - count) < 0)
+        if (count < 0 || count > 45)
             return;
 
-        _absorbedSouls -= count;
+        _souls += count;
+
+        if (getSouls() > 45)
+            _souls = 45;
+
+        SystemMessage sm = new SystemMessage(SystemMessageId.YOUR_SOUL_HAS_INCREASED_BY_S1_SO_IT_IS_NOW_AT_S2);
+        sm.addNumber(count);
+        sm.addNumber(_souls);
+        sendPacket(sm);
+
+        restartSoulTask();
+
         sendPacket(new EtcStatusUpdate(this));
     }
+
+    /**
+     * Decreases existing Souls.
+     * @param count
+     */
+    public void decreaseSouls(int count)
+    {
+        if (getSouls() <= 0)
+            return;
+
+        _souls -= count;
+
+        if (getSouls() < 0)
+            _souls = 0;
+
+        if (getSouls() == 0)
+            stopSoulTask();
+        else
+            restartSoulTask();
+
+        sendPacket(new EtcStatusUpdate(this));
+    }
+    /**
+     * Clear out all Souls from this L2PcInstance
+     */
+    public void clearSouls()
+    {
+        _souls = 0;
+        stopSoulTask();
+        sendPacket(new EtcStatusUpdate(this));
+    }
+
+    /**
+     * Starts/Restarts the SoulTask to Clear Souls after 10 Mins.
+     */
+    private void restartSoulTask()
+    {
+        if (_soulTask != null)
+        {
+            _soulTask.cancel(false);
+            _soulTask = null;
+        }
+        _soulTask = ThreadPoolManager.getInstance().scheduleGeneral(new SoulTask(this), 600000);
+    }
+
+    /**
+     * Stops the Clearing Task.
+     */
+    public void stopSoulTask()
+    {
+        if (_soulTask != null)
+        {
+            _soulTask.cancel(false);
+            _soulTask = null;
+        }
+    }
+
+    private class SoulTask implements Runnable
+    {
+        L2PcInstance _player;
+        
+        protected SoulTask(L2PcInstance player)
+        {
+            _player = player;
+        }
+        
+        public void run()
+        {
+            _player.clearSouls();
+        }
+    }
+
     public int getDeathPenaltyBuffLevel()
     {
     	  return _deathPenaltyBuffLevel;

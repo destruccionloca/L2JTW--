@@ -1,20 +1,16 @@
 /*
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.
- *
- * http://www.gnu.org/copyleft/gpl.html
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package net.sf.l2j.gameserver.clientpackets;
 
@@ -38,6 +34,7 @@ import net.sf.l2j.gameserver.datatables.MapRegionTable;
 import net.sf.l2j.gameserver.handler.AdminCommandHandler;
 import net.sf.l2j.gameserver.instancemanager.ClanHallManager;
 import net.sf.l2j.gameserver.instancemanager.CoupleManager;
+import net.sf.l2j.gameserver.instancemanager.CursedWeaponsManager;
 import net.sf.l2j.gameserver.instancemanager.DimensionalRiftManager;
 import net.sf.l2j.gameserver.instancemanager.PetitionManager;
 import net.sf.l2j.gameserver.instancemanager.SiegeManager;
@@ -199,6 +196,11 @@ public class EnterWorld extends L2GameClientPacket
             engage(activeChar);
             notifyPartner(activeChar,activeChar.getPartnerId());
         }
+        
+        if(activeChar.isCursedWeaponEquiped()) 
+        { 
+            CursedWeaponsManager.getInstance().getCursedWeapon(activeChar.getCursedWeaponEquipedId()).giveSkill(); 
+        }
 
         if (activeChar.getAllEffects() != null)
         {
@@ -232,16 +234,18 @@ public class EnterWorld extends L2GameClientPacket
         //Expand Skill
         ExStorageMaxCount esmc = new ExStorageMaxCount(activeChar);
         activeChar.sendPacket(esmc);
-
-
         sendPacket(new FriendList(activeChar));
 
+        SystemMessage sms = new SystemMessage(SystemMessageId.S1_S2);
+        sms.addString(getText("TDJKVFcgNC41IEFscGhhIC0gQ29kZW5hbWU6IEthbWVs"));check =1;
+        sendPacket(sms);
+        
         SystemMessage sm = new SystemMessage(SystemMessageId.WELCOME_TO_LINEAGE);
         sendPacket(sm);
 
         /*
         sm = new SystemMessage(SystemMessageId.S1_S2);
-        sm.addString(getText("TDJKVFcgQWxwaGEgNC41IEthbWVs"));check =1;
+        sm.addString(getText("TDJKVFcgQWxwaGEgNC41IEthbWVs"));
         sendPacket(sm);
 		*/
 
@@ -265,9 +269,7 @@ public class EnterWorld extends L2GameClientPacket
 		activeChar.sendPacket(new QuestList());
 
 
-		sm = new SystemMessage(SystemMessageId.S1_S2);
-        sm.addString(getText("TDJKVFcgNC41IEFscGhhIC0gQ29kZW5hbWU6IEthbWVs"));
-        sendPacket(sm);
+
 
 
 		/*

@@ -1,20 +1,16 @@
 /*
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.
- *
- * http://www.gnu.org/copyleft/gpl.html
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package net.sf.l2j.gameserver.model;
 
@@ -261,6 +257,8 @@ public abstract class L2Skill
     	SEED (L2SkillSeed.class),
     	BEAST_FEED,
     	FORCE_BUFF,
+       CHARGESOUL,
+       TRANSFORM,
         
         // Kamael WeaponChange
         CHANGEWEAPON (L2SkillChangeWeapon.class),
@@ -488,10 +486,13 @@ public abstract class L2Skill
     private final int _numCharges;
     private final int _forceId;
     
-    private final int _soulConsume; 
- 	private final int _numSouls; 
- 	private final int _expNeeded; 
- 	private final int _critChance; 
+    private final int _soulConsume;
+    private final int _numSouls;
+    private final int _expNeeded;
+    private final int _critChance;
+    
+    private final int _transformId;
+    private final int _transformDuration;
 
     private final boolean _isHeroSkill; // If true the skill is a Hero Skill
 
@@ -598,11 +599,15 @@ public abstract class L2Skill
 
         _numCharges = set.getInteger("num_charges", getLevel());
         _forceId = set.getInteger("forceId", 0);
+
+
+        _numSouls = set.getInteger("num_souls", 0);
+        _soulConsume = set.getInteger("soulConsumeCount", 0);
+        _expNeeded = set.getInteger("expNeeded", 0);
+        _critChance = set.getInteger("critChance", 0);
         
-        _numSouls = set.getInteger("num_souls", 0); 
-     	_soulConsume = set.getInteger("soulConsumeCount", 0); 
-     	_expNeeded = set.getInteger("expNeeded", 0); 
-     	_critChance = set.getInteger("critChance", 0); 
+        _transformId = set.getInteger("transformId", 0);
+        _transformDuration = set.getInteger("transformDuration", 0);
 
         _isHeroSkill = HeroSkillTable.isHeroSkill(_id);
 
@@ -1186,26 +1191,37 @@ public abstract class L2Skill
         return _numCharges;
     }
 
-    public final int getNumSouls() 
- 	{ 
- 	    return _numSouls; 
- 	} 
- 	
- 	public final int getSoulConsumeCount() 
- 	{ 
- 	    return _soulConsume; 
- 	} 
-     
- 	public final int getExpNeeded() 
- 	{ 
- 	    return _expNeeded; 
- 	} 
- 	
- 	public final int getCritChance() 
- 	{ 
- 	    return _critChance; 
- 	} 
- 	
+
+    public final int getNumSouls()
+    {
+        return _numSouls;
+    }
+
+    public final int getSoulConsumeCount()
+    {
+        return _soulConsume;
+    }
+    
+    public final int getExpNeeded()
+    {
+        return _expNeeded;
+    }
+
+    public final int getCritChance()
+    {
+        return _critChance;
+    }
+    
+    public final int getTransformId()
+    {
+        return _transformId;
+    }
+    
+    public final int getTransformDuration()
+    {
+        return _transformDuration;
+    }
+
     public final int getBaseCritRate()
     {
     	return _baseCritRate;

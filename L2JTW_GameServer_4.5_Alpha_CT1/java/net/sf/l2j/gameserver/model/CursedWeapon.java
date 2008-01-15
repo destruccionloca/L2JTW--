@@ -1,19 +1,16 @@
-/* This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.
- *
- * http://www.gnu.org/copyleft/gpl.html
+/*
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package net.sf.l2j.gameserver.model;
 
@@ -28,6 +25,7 @@ import net.sf.l2j.L2DatabaseFactory;
 import net.sf.l2j.gameserver.ThreadPoolManager;
 import net.sf.l2j.gameserver.datatables.SkillTable;
 import net.sf.l2j.gameserver.instancemanager.CursedWeaponsManager;
+import net.sf.l2j.gameserver.instancemanager.TransformationManager;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.Earthquake;
@@ -45,8 +43,11 @@ public class CursedWeapon
 {
 	private static final Logger _log = Logger.getLogger(CursedWeaponsManager.class.getName());
 
+	// _name is the name of the cursed weapon associated with its ID.
 	private final String _name;
+	// _itemId is the Item ID of the cursed weapon.
 	private final int _itemId;
+	// _skillId is the skills ID.
 	private final int _skillId;
 	private final int _skillMaxLevel;
 	private int _dropRate;
@@ -55,8 +56,9 @@ public class CursedWeapon
 	private int _disapearChance;
 	private int _stageKills;
 
-
+	// this should be false unless if the cursed weapon is dropped, in that case it would be true.
 	private boolean _isDropped = false;
+	// this sets the cursed weapon status to true only if a player has the cursed weapon, otherwise this should be false.
 	private boolean _isActivated = false;
 	private ScheduledFuture _removeTask;
 
@@ -64,10 +66,11 @@ public class CursedWeapon
 	private long _endTime = 0;
 
 	private int _playerId = 0;
-	private L2PcInstance _player = null;
+	protected L2PcInstance _player = null;
 	private L2ItemInstance _item = null;
 	private int _playerKarma = 0;
 	private int _playerPkKills = 0;
+    	protected int transformationId = 0;
 
 	// =========================================================
 	// Constructor
@@ -267,7 +270,7 @@ public class CursedWeapon
 			//_player.getInventory().dropItem("DieDrop", item, _player, null);
 			//_player.getInventory().getItemByItemId(_itemId).dropMe(_player, _player.getX(), _player.getY(), _player.getZ());
 		}
-
+        _item = null;
 		_isDropped = true;
 		SystemMessage sm = new SystemMessage(SystemMessageId.S2_WAS_DROPPED_IN_THE_S1_REGION);
 		if (player != null)
@@ -305,6 +308,30 @@ public class CursedWeapon
 		if (Config.DEBUG)
 			_log.info("Player "+_player.getName() +" has been awarded with skill "+skill);
 		_player.sendSkillList();
+        
+        if (_itemId == 8689)
+        {
+            transformationId = 302;
+        }
+        else if (_itemId == 8190)
+        {
+            transformationId = 301;
+        }
+        
+        if (_player.isTransformed())
+        {
+            _player.untransform();
+            
+            ThreadPoolManager.getInstance().scheduleGeneral(new Runnable()
+            {
+                public void run()
+                {
+                    TransformationManager.getInstance().transformPlayer(transformationId, _player, Long.MAX_VALUE);
+                }
+            }, 500);
+        }
+        else
+            TransformationManager.getInstance().transformPlayer(transformationId, _player, Long.MAX_VALUE);
 	}
 
 	public void removeSkill()
@@ -313,6 +340,7 @@ public class CursedWeapon
 		_player.removeSkill(SkillTable.getInstance().getInfo(3630, 1), false);
 		_player.removeSkill(SkillTable.getInstance().getInfo(3631, 1), false);
 		_player.sendSkillList();
+		_player.untransform();
 	}
 
 
@@ -364,7 +392,7 @@ public class CursedWeapon
 				return;
 			}
 		}
-			
+        
 		_isActivated = true;
 
 		// Player holding it data
@@ -406,7 +434,7 @@ public class CursedWeapon
 			_player.sendPacket(iu);
 		}
 		else _player.sendPacket(new ItemList(_player, false));
-
+        
 		// Refresh player stats
 		_player.broadcastUserInfo();
 

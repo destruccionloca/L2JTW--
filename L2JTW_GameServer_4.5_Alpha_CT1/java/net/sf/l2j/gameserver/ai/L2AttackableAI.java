@@ -1,20 +1,16 @@
 /*
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.
- *
- * http://www.gnu.org/copyleft/gpl.html
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package net.sf.l2j.gameserver.ai;
 
@@ -23,7 +19,8 @@ import static net.sf.l2j.gameserver.ai.CtrlIntention.AI_INTENTION_ATTACK;
 import static net.sf.l2j.gameserver.ai.CtrlIntention.AI_INTENTION_IDLE;
 
 import java.util.concurrent.Future;
-
+import javolution.util.FastMap;
+import java.util.Map;
 import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.GameTimeController;
 import net.sf.l2j.gameserver.GeoData;
@@ -1167,6 +1164,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
             	}
             	else
             	{
+            	    
             		for (L2Skill sk : skills)
 
                     {
@@ -1499,6 +1497,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         L2Character MostHate = ((L2Attackable) _actor).getMostHated();
         
         
+        
         try
         {
             skills = caster.getAllSkills();
@@ -1514,13 +1513,29 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
     	//-----------------------------------------------------------------
         //Skill List Activate
        // _log.warning("AttackableAI: onSkillCast");
-        if (skills != null)
-    	for (L2Skill sk : skills)
+        
+        Map<Integer, L2Skill> _skills = new FastMap<Integer, L2Skill>();
+        int rndskillindex = 0,size = 0;
+        for (L2Skill sk : skills)//載入所有技能
         {
+            if (!sk.isSkillTypeOffensive() && !sk.isActive())
+                continue;
+             _skills.put(size++,sk);
+        }
+        rndskillindex = Rnd.nextInt(size);
+        
+        if (skills != null)
+    	//for (L2Skill sk : skills)
+        {
+            L2Skill sk = null;
+            
+    	    sk = _skills.get(rndskillindex);
+    	    
     		//_log.warning("AttackableAI: CheckSkill");
     		// If the skill is magic.. and caster is muted...then search for next skill...
     		if (sk.isMagic()&& _actor.isMuted())
-    			continue;
+    			//continue;
+    		    return;
     		//_log.warning("AttackableAI: MuteCheck");
     		// If skill is not prepare..which is not enough mp nor Skill cannot reuse...
 
@@ -1531,7 +1546,8 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         		//_log.warning(""+_actor.isSkillDisabled(sk.getId()));
         		//_log.warning(""+_actor.getCurrentMp()+" "+_actor.getStat().getMpConsume(sk));
         		//_log.warning(""+sk.isPassive());
-    			continue;
+                //continue;
+                return;
     		}
     		if (sk.getCastRange()>=distTarget)
     		{
@@ -1594,7 +1610,8 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
                  }
                  }
                                     
-                 continue;
+                 //continue;
+                 return;
                  
                  
              }
@@ -1663,7 +1680,8 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
                      return;
                  }
                  
-                 continue;
+                 //continue;
+                 return;
              
              }
              
@@ -1754,7 +1772,8 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
                      }
                  }
                  if (!cancast)
-                 	continue;
+                     //continue;
+                     return;
                   clientStopMoving(null);
                  _actor.setTarget(_actor);
                  _accessor.doCast(sk);
@@ -1790,7 +1809,8 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
                  _accessor.doCast(sk);
                  return;
                  }
-                 else continue;
+                 else  //continue;
+                     return;
              }
     	
          //--------------------------------------------------------------------------------
@@ -1835,9 +1855,8 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
             		 
             		 
                  }
-            	 continue;
-            	 
-            	 
+                 //continue;
+                 return;
             	 
             	 
             	 
@@ -1908,8 +1927,8 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
                  
             	 
             	
-            	 continue;
-            	 
+                 //continue;
+                 return;
             	 
             	 
             	 
@@ -2045,6 +2064,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 		 }
 		 if(obj instanceof L2Attackable)
 		 {
+		     if(((L2Attackable)_actor).getEnemyClan()!=null)
 			 if((((L2Attackable)_actor).getEnemyClan().equals(((L2Attackable)obj).getClan())) &&((L2Attackable)_actor).getEnemyClan() != null)
 			 {
 				 ((L2Attackable)_actor).addDamageHate(((L2Attackable)obj), 1000,1000);

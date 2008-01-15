@@ -1,20 +1,16 @@
 /*
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.
- *
- * http://www.gnu.org/copyleft/gpl.html
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package net.sf.l2j.gameserver.serverpackets;
 
@@ -25,6 +21,7 @@ import net.sf.l2j.gameserver.datatables.NpcTable;
 import net.sf.l2j.gameserver.instancemanager.CursedWeaponsManager;
 import net.sf.l2j.gameserver.model.Inventory;
 import net.sf.l2j.gameserver.model.L2Character;
+import net.sf.l2j.gameserver.model.actor.appearance.PcAppearance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
 import net.sf.l2j.gameserver.model.L2Summon; 
@@ -59,6 +56,7 @@ public class CharInfo extends L2GameServerPacket
 
 	private static final String _S__03_CHARINFO = "[S] 31 CharInfo";
 	private L2PcInstance _activeChar;
+	private PcAppearance _appearance;
 	private Inventory _inv;
 	private int _x, _y, _z, _heading;
 	private int _mAtkSpd, _pAtkSpd;
@@ -85,6 +83,10 @@ public class CharInfo extends L2GameServerPacket
     	_walkSpd        = (int)(_activeChar.getWalkSpeed()/_moveMultiplier);  
     	_flRunSpd = _flyRunSpd = _runSpd = _flWalkSpd = _flyWalkSpd = _walkSpd; 
     	_maxCp = _activeChar.getMaxCp();
+    }
+    public CharInfo(PcAppearance appearance)
+    {
+        _appearance = appearance;
     }
 
 	@Override
@@ -147,7 +149,7 @@ public class CharInfo extends L2GameServerPacket
 					writeC(_activeChar.getAppearance().getInvisible()? 1 : 0); // invisible ?? 0=false  1=true   2=summoned (only works if model has a summon animation)
 				}
 
-				writeS(_activeChar.getName());
+				writeS(_appearance.getVisibleName());
 
 				if (gmSeeInvis)
 				{
@@ -155,7 +157,7 @@ public class CharInfo extends L2GameServerPacket
 				}
 				else
 				{
-					writeS(_activeChar.getTitle());
+					writeS(_appearance.getVisibleTitle());
 				}
 
 				writeD(0);
