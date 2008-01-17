@@ -143,7 +143,7 @@ public class L2OlympiadManagerInstance extends L2FolkInstance
                     }
                     else
                     {
-                        player.sendMessage("沒足夠的分數或者並非有效期間.");
+                        player.sendMessage("沒足夠的分數或者並非有效期間。");
                         //TODO Send HTML packet "Saying not enough olympiad points.
                     }
                     break;
@@ -169,12 +169,12 @@ public class L2OlympiadManagerInstance extends L2FolkInstance
                     String[] matches = Olympiad.getInstance().getMatchList();
 
                     replyMSG.append("奧林匹亞簡介<br><br>" +
-                            "警告: 請先閱讀說明, 如果你想觀賞奧林匹亞比賽, 所有召喚或者寵物將會被移除. 請小心! " +
+                            "警告︰請先閱讀說明，如果你想觀賞奧林匹亞比賽，所有召喚或者寵物將會被解除。請小心！" +
                             "" +
                             "<br>");
 
                     if (matches == null)
-                        replyMSG.append("<br>目前沒有任何競賽.");
+                        replyMSG.append("<br>目前沒有任何競賽。");
                     else
                     {
                         for (int i = 0; i < matches.length; i++)

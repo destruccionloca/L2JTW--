@@ -20,7 +20,7 @@
 package net.sf.l2j.gameserver.instancemanager;
 
 import java.util.logging.Logger;
-import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledFuture;
 import java.util.Date;
 import java.util.List;
 import javolution.util.FastList;
@@ -45,7 +45,6 @@ import net.sf.l2j.gameserver.ai.CtrlIntention;
 /**
  * 
  * This class ...
- *
  * @version $Revision: $ $Date: $
  * @author  L2J_JP SANDMAN
  */
@@ -54,7 +53,6 @@ public class SailrenManager
     protected static Logger _log = Logger.getLogger(SailrenManager.class.getName());
     private static SailrenManager _instance = new SailrenManager();
 
-
     private final int _SailrenCubeLocation[][] =
     	{
     		{27734,-6838,-1982,0}
@@ -62,30 +60,25 @@ public class SailrenManager
     protected List<L2Spawn> _SailrenCubeSpawn = new FastList<L2Spawn>();
     protected List<L2NpcInstance> _SailrenCube = new FastList<L2NpcInstance>();
 
-
     protected List<L2PcInstance> _PlayersInSailrenLair = new FastList<L2PcInstance>();
 
-
     protected L2Spawn _VelociraptorSpawn;
-    protected L2Spawn _PterosaurSpawn;	
+    protected L2Spawn _PterosaurSpawn;
     protected L2Spawn _TyrannoSpawn;
     protected L2Spawn _SailrenSapwn;
 
-
     protected L2NpcInstance _Velociraptor;
-    protected L2NpcInstance _Pterosaur;		
-    protected L2NpcInstance _Tyranno;	
-    protected L2NpcInstance _Sailren;	
+    protected L2NpcInstance _Pterosaur;
+    protected L2NpcInstance _Tyranno;
+    protected L2NpcInstance _Sailren;
     
-
-    protected Future _CubeSpawnTask = null;
-    protected Future _SailrenSpawnTask = null;
-    protected Future _IntervalEndTask = null;
-    protected Future _ActivityTimeEndTask = null;
-    protected Future _OnPartyAnnihilatedTask = null;
-    protected Future _SocialTask = null;
+    protected ScheduledFuture _CubeSpawnTask = null;
+    protected ScheduledFuture _SailrenSpawnTask = null;
+    protected ScheduledFuture _IntervalEndTask = null;
+    protected ScheduledFuture _ActivityTimeEndTask = null;
+    protected ScheduledFuture _OnPartyAnnihilatedTask = null;
+    protected ScheduledFuture _SocialTask = null;
     
-
     protected GrandBossState _State = new GrandBossState(29065);
     protected boolean _IsAlreadyEnteredOtherParty = false;
     
@@ -100,19 +93,15 @@ public class SailrenManager
         return _instance;
     }
 
-
     public void init()
     {
-
     	_PlayersInSailrenLair.clear();
     	_IsAlreadyEnteredOtherParty = false;
     	
-        // É{ÉXÇÃèoåªÉfÅ[É^Çê›íËÇ∑ÇÈ
         try
         {
             L2NpcTemplate template1;
             
-
             template1 = NpcTable.getInstance().getTemplate(22218); //Velociraptor
             _VelociraptorSpawn = new L2Spawn(template1);
             _VelociraptorSpawn.setLocx(27852);
@@ -123,7 +112,6 @@ public class SailrenManager
             _VelociraptorSpawn.setRespawnDelay(Config.FWS_ACTIVITYTIMEOFMOBS * 2);
             SpawnTable.getInstance().addNewSpawn(_VelociraptorSpawn, false);
             
-
             template1 = NpcTable.getInstance().getTemplate(22199); //Pterosaur
             _PterosaurSpawn = new L2Spawn(template1);
             _PterosaurSpawn.setLocx(27852);
@@ -134,7 +122,6 @@ public class SailrenManager
             _PterosaurSpawn.setRespawnDelay(Config.FWS_ACTIVITYTIMEOFMOBS * 2);
             SpawnTable.getInstance().addNewSpawn(_PterosaurSpawn, false);
             
-
             template1 = NpcTable.getInstance().getTemplate(22217); //Tyrannosaurus
             _TyrannoSpawn = new L2Spawn(template1);
             _TyrannoSpawn.setLocx(27852);
@@ -145,7 +132,6 @@ public class SailrenManager
             _TyrannoSpawn.setRespawnDelay(Config.FWS_ACTIVITYTIMEOFMOBS * 2);
             SpawnTable.getInstance().addNewSpawn(_TyrannoSpawn, false);
             
-
             template1 = NpcTable.getInstance().getTemplate(29065); //Sailren
             _SailrenSapwn = new L2Spawn(template1);
             _SailrenSapwn.setLocx(27810);
@@ -161,7 +147,6 @@ public class SailrenManager
         {
             _log.warning(e.getMessage());
         }
-
 
         try
         {
@@ -196,19 +181,17 @@ public class SailrenManager
         _log.info("SailrenManager : Init SailrenManager.");
     }
 
-
+    // return Sailren state.
     public GrandBossState.StateEnum getState()
     {
     	return _State.getState();
     }
-
 
     public List<L2PcInstance> getPlayersInLair()
 	{
 		return _PlayersInSailrenLair;
 	}
     
-
     public int canIntoSailrenLair(L2PcInstance pc)
     {
     	if ((Config.FWS_ENABLESINGLEPLAYER == false) && (pc.getParty() == null)) return 4;
@@ -219,24 +202,21 @@ public class SailrenManager
     	else return 0;
     }
     
-
     public void setSailrenSpawnTask(int NpcId)
     {
     	if ((NpcId == 22218) && (_PlayersInSailrenLair.size() >= 1)) return;
 
     	if (_SailrenSpawnTask == null)
         {
-        	_SailrenSpawnTask = ThreadPoolManager.getInstance().scheduleEffect(
+        	_SailrenSpawnTask = ThreadPoolManager.getInstance().scheduleGeneral(
             		new SailrenSpawn(NpcId),Config.FWS_INTERVALOFNEXTMONSTER);
         }
     }
-
 
     public void addPlayerToSailrenLair(L2PcInstance pc)
     {
         if (!_PlayersInSailrenLair.contains(pc)) _PlayersInSailrenLair.add(pc);
     }
-
 
     public void entryToSailrenLair(L2PcInstance pc)
     {
@@ -246,7 +226,7 @@ public class SailrenManager
 		if(canIntoSailrenLair(pc) != 0)
 		{
 			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-			sm.addString("©|•ºπF®Ï©“ª›≠n™∫±¯•Û");
+			sm.addString("§J≥ı©“ª›±¯•Û§£®¨°C");
 			pc.sendPacket(sm);
 			_IsAlreadyEnteredOtherParty = false;
 			return;
@@ -264,7 +244,6 @@ public class SailrenManager
 			List<L2PcInstance> members = new FastList<L2PcInstance>();
 			for (L2PcInstance mem : pc.getParty().getPartyMembers())
 			{
-				
 				if (!mem.isDead() && Util.checkIfInRange(700, pc, mem, true))
 				{
 					members.add(mem);
@@ -281,18 +260,15 @@ public class SailrenManager
 		_IsAlreadyEnteredOtherParty = true;
     }
     
-
     public void checkAnnihilated(L2PcInstance pc)
     {
-
     	if(isPartyAnnihilated(pc))
     	{
     		_OnPartyAnnihilatedTask =
-				ThreadPoolManager.getInstance().scheduleEffect(new OnPartyAnnihilatedTask(pc),5000);    			
+				ThreadPoolManager.getInstance().scheduleGeneral(new OnPartyAnnihilatedTask(pc),5000);
     	}
     }
 
-    // ÉpÅ[ÉeÉBÇ™ëSñ≈ÇµÇΩÇ©ÇämîF
     public synchronized boolean isPartyAnnihilated(L2PcInstance pc)
     {
 		if(pc.getParty() != null)
@@ -312,7 +288,6 @@ public class SailrenManager
 		}
     }
 
-
     public void banishesPlayers()
     {
     	for(L2PcInstance pc : _PlayersInSailrenLair)
@@ -329,21 +304,17 @@ public class SailrenManager
     	_IsAlreadyEnteredOtherParty = false;
     }
     
-
     public void setUnspawn()
 	{
-
     	banishesPlayers();
     	
-
-		for (L2NpcInstance cube : _SailrenCube)
+ 		for (L2NpcInstance cube : _SailrenCube)
 		{
 			cube.getSpawn().stopRespawn();
 			cube.deleteMe();
 		}
 		_SailrenCube.clear();
 		
-
 		if(_CubeSpawnTask != null)
 		{
 			_CubeSpawnTask.cancel(true);
@@ -365,16 +336,13 @@ public class SailrenManager
 			_ActivityTimeEndTask = null;
 		}
 
-
 		_Velociraptor = null;
 		_Pterosaur = null;
 		_Tyranno = null;
 		_Sailren = null;
 
-
 		setInetrvalEndTask();
 	}
-
 
     public void spawnCube()
     {
@@ -384,16 +352,14 @@ public class SailrenManager
 		}
     }
     
-
     public void setCubeSpawn()
     {
     	_State.setState(GrandBossState.StateEnum.DEAD);
     	_State.update();
 
-    	_CubeSpawnTask = ThreadPoolManager.getInstance().scheduleEffect(new CubeSpawn(),10000);
+    	_CubeSpawnTask = ThreadPoolManager.getInstance().scheduleGeneral(new CubeSpawn(),10000);
     }
     
-
     public void setInetrvalEndTask()
     {
     	if (!_State.getState().equals(GrandBossState.StateEnum.INTERVAL))
@@ -403,7 +369,7 @@ public class SailrenManager
         	_State.update();
     	}
     	
-    	_IntervalEndTask = ThreadPoolManager.getInstance().scheduleEffect(new IntervalEnd(),_State.getInterval());
+    	_IntervalEndTask = ThreadPoolManager.getInstance().scheduleGeneral(new IntervalEnd(),_State.getInterval());
     }
     
     // update knownlist.
@@ -416,7 +382,6 @@ public class SailrenManager
 		}
     }
     
-
     private class SailrenSpawn implements Runnable
     {
     	int _NpcId;
@@ -430,7 +395,7 @@ public class SailrenManager
         {
         	switch (_NpcId)
             {
-            	case 22218:		
+            	case 22218:
             		_Velociraptor = _VelociraptorSpawn.doSpawn();
             		_Velociraptor.getAI().setIntention(CtrlIntention.AI_INTENTION_MOVE_TO,_pos);
             		if(_SocialTask != null)
@@ -439,7 +404,7 @@ public class SailrenManager
             			_SocialTask = null;
             		}
             		_SocialTask = 
-                        ThreadPoolManager.getInstance().scheduleEffect(
+                        ThreadPoolManager.getInstance().scheduleGeneral(
                         		new Social(_Velociraptor,2),6000);
             		if(_ActivityTimeEndTask != null)
             		{
@@ -447,10 +412,10 @@ public class SailrenManager
             			_ActivityTimeEndTask = null;
             		}
             		_ActivityTimeEndTask = 
-                        ThreadPoolManager.getInstance().scheduleEffect(
+                        ThreadPoolManager.getInstance().scheduleGeneral(
                         		new ActivityTimeEnd(_Velociraptor),Config.FWS_ACTIVITYTIMEOFMOBS);
             		break;
-            	case 22199:	
+            	case 22199:
             		_VelociraptorSpawn.stopRespawn();
             		_Pterosaur = _PterosaurSpawn.doSpawn();
             		_Pterosaur.getAI().setIntention(CtrlIntention.AI_INTENTION_MOVE_TO,_pos);
@@ -460,7 +425,7 @@ public class SailrenManager
             			_SocialTask = null;
             		}
             		_SocialTask = 
-                        ThreadPoolManager.getInstance().scheduleEffect(
+                        ThreadPoolManager.getInstance().scheduleGeneral(
                         		new Social(_Pterosaur,2),6000);
             		if(_ActivityTimeEndTask != null)
             		{
@@ -468,7 +433,7 @@ public class SailrenManager
             			_ActivityTimeEndTask = null;
             		}
             		_ActivityTimeEndTask = 
-                        ThreadPoolManager.getInstance().scheduleEffect(
+                        ThreadPoolManager.getInstance().scheduleGeneral(
                         		new ActivityTimeEnd(_Pterosaur),Config.FWS_ACTIVITYTIMEOFMOBS);
             		break;
             	case 22217:
@@ -481,7 +446,7 @@ public class SailrenManager
             			_SocialTask = null;
             		}
             		_SocialTask = 
-                        ThreadPoolManager.getInstance().scheduleEffect(
+                        ThreadPoolManager.getInstance().scheduleGeneral(
                         		new Social(_Tyranno,2),6000);
             		if(_ActivityTimeEndTask != null)
             		{
@@ -489,7 +454,7 @@ public class SailrenManager
             			_ActivityTimeEndTask = null;
             		}
             		_ActivityTimeEndTask = 
-                        ThreadPoolManager.getInstance().scheduleEffect(
+                        ThreadPoolManager.getInstance().scheduleGeneral(
                         		new ActivityTimeEnd(_Tyranno),Config.FWS_ACTIVITYTIMEOFMOBS);
             		break;
             	case 29065:
@@ -507,7 +472,7 @@ public class SailrenManager
             			_SocialTask = null;
             		}
             		_SocialTask = 
-                        ThreadPoolManager.getInstance().scheduleEffect(
+                        ThreadPoolManager.getInstance().scheduleGeneral(
                         		new Social(_Sailren,2),6000);
             		if(_ActivityTimeEndTask != null)
             		{
@@ -515,7 +480,7 @@ public class SailrenManager
             			_ActivityTimeEndTask = null;
             		}
             		_ActivityTimeEndTask = 
-                        ThreadPoolManager.getInstance().scheduleEffect(
+                        ThreadPoolManager.getInstance().scheduleGeneral(
                         		new ActivityTimeEnd(_Sailren),Config.FWS_ACTIVITYTIMEOFMOBS);
             		break;
             	default:
@@ -530,7 +495,6 @@ public class SailrenManager
         }
     }
 
-
     private class CubeSpawn implements Runnable
     {
     	public CubeSpawn()
@@ -543,7 +507,6 @@ public class SailrenManager
         }
     }
     
-
     private class ActivityTimeEnd implements Runnable
     {
     	L2NpcInstance _Mob;
@@ -560,12 +523,10 @@ public class SailrenManager
     			_Mob.getSpawn().stopRespawn();
     			_Mob = null;
     		}
-
     		setUnspawn();
     	}
     }
     
-
     private class IntervalEnd implements Runnable
     {
     	public IntervalEnd()
@@ -577,16 +538,9 @@ public class SailrenManager
     		_PlayersInSailrenLair.clear();
     		_State.setState(GrandBossState.StateEnum.NOTSPAWN);
     		_State.update();
-
-    		if(_IntervalEndTask != null)
-    		{
-    			_IntervalEndTask.cancel(true);
-    			_IntervalEndTask = null;
-    		}
     	}
     }
     
-
 	private class OnPartyAnnihilatedTask implements Runnable
 	{
 		L2PcInstance _player;
@@ -599,17 +553,8 @@ public class SailrenManager
 		public void run()
 		{
 			setUnspawn();
-			
-
-            if(_OnPartyAnnihilatedTask != null)
-            {
-            	_OnPartyAnnihilatedTask.cancel(true);
-            	_OnPartyAnnihilatedTask = null;
-            }
-			
 		}
 	}
-
 
     private class Social implements Runnable
     {
@@ -629,12 +574,6 @@ public class SailrenManager
         	
     		SocialAction sa = new SocialAction(_npc.getObjectId(), _action);
             _npc.broadcastPacket(sa);
-
-            if(_SocialTask != null)
-    		{
-    			_SocialTask.cancel(true);
-    			_SocialTask = null;
-    		}
         }
     }
 }

@@ -53,13 +53,35 @@ import javolution.text.TextBuilder;
 public class AdminAdmin implements IAdminCommandHandler {
 
 
- private static final String[] ADMIN_COMMANDS = {"admin_admin","admin_play_sounds","admin_play_sound",
-                                           "admin_gmliston","admin_gmlistoff","admin_silence",
-                                           "admin_atmosphere","admin_diet","admin_tradeoff",
-
-                                           "admin_config_option", "admin_config_altsetting", "admin_config_other", "admin_config_rate",
-                                           "admin_reload", "admin_set", "admin_admin2","admin_admin3", "admin_admin4", "admin_admin5", "admin_cache", "admin_saveolymp", "admin_manualhero","admin_eventmenu"
-                                           ,"admin_set_mod", "admin_set", "admin_set_menu"};
+	 private static final String[] ADMIN_COMMANDS = {
+		 "admin_admin",
+		 "admin_admin1",
+		 "admin_admin2",
+		 "admin_admin3",
+		 "admin_admin4",
+		 "admin_admin5",
+		 "admin_play_sounds",
+		 "admin_play_sound",
+		 "admin_gmliston",
+		 "admin_gmlistoff",
+		 "admin_silence",
+		 "admin_atmosphere",
+		 "admin_diet",
+		 "admin_tradeoff",
+		 "admin_config_option", 
+		 "admin_config_altsetting",
+		 "admin_config_other",
+		 "admin_config_rate","admin_reload", 
+		 "admin_set",
+		 "admin_cache",
+		 "admin_saveolymp",
+		 "admin_manualhero",
+		 "admin_eventmenu",
+		 "admin_manualhero",
+		 "admin_set_mod",
+		 "admin_set",
+		 "admin_set_menu",
+		 };
 
 
 
@@ -96,12 +118,12 @@ public class AdminAdmin implements IAdminCommandHandler {
 		else if(command.startsWith("admin_gmliston"))
 		{
 			GmListTable.getInstance().showGm(activeChar);
-            activeChar.sendMessage("註冊GM列表");
+            activeChar.sendMessage("註冊 GM 列表。");
 		}
 		else if(command.startsWith("admin_gmlistoff"))
 		{
 			GmListTable.getInstance().hideGm(activeChar);
-			activeChar.sendMessage("移除GM列表");
+			activeChar.sendMessage("移除 GM 列表。");
 		}
 		else if(command.startsWith("admin_silence"))
 		{
@@ -126,7 +148,7 @@ public class AdminAdmin implements IAdminCommandHandler {
             }
             catch(Exception e){e.printStackTrace();}
             
-            activeChar.sendMessage("奧林匹亞資料儲存");
+            activeChar.sendMessage("奧林匹亞資料儲存。");
             
         }
         
@@ -138,7 +160,7 @@ public class AdminAdmin implements IAdminCommandHandler {
             }
             catch(Exception e){e.printStackTrace();}
             
-            activeChar.sendMessage("設置英雄");
+            activeChar.sendMessage("設置英雄。");
             
         }
         else if(command.startsWith("admin_diet"))
@@ -151,20 +173,20 @@ public class AdminAdmin implements IAdminCommandHandler {
                 {
                     activeChar.setDietMode(true);
                     activeChar.refreshOverloaded();
-                    activeChar.sendMessage("無重量開始");
+                    activeChar.sendMessage("無重量模式啟動。");
                 }
                 else if(st.nextToken().equalsIgnoreCase("off"))
                 {
                     activeChar.setDietMode(false);
-                    activeChar.sendMessage("無重量關閉");
+                    activeChar.sendMessage("無重量模式關閉。");
                 }
             }
             catch(Exception ex)
             {
                 if(activeChar.getDietMode())
-                    activeChar.sendMessage("無重量目前啟動");
+                    activeChar.sendMessage("無重量目前啟動。");
                 else
-                    activeChar.sendMessage("無重量目前關閉");
+                    activeChar.sendMessage("無重量目前關閉。");
             }            
         }
         else if(command.startsWith("admin_tradeoff"))
@@ -175,20 +197,20 @@ public class AdminAdmin implements IAdminCommandHandler {
                 if (mode.equalsIgnoreCase("on"))
                 {
                     activeChar.setTradeRefusal(true);
-                    activeChar.sendMessage("交易關閉啟動");
+                    activeChar.sendMessage("禁止交易啟動。");
                 }
                 else if (mode.equalsIgnoreCase("off"))
                 {
                     activeChar.setTradeRefusal(false);
-                    activeChar.sendMessage("交易關閉取消");
+                    activeChar.sendMessage("禁止交易取消。");
                 }
             }
             catch(Exception ex)
             {
                 if(activeChar.getTradeRefusal())
-                    activeChar.sendMessage("交易關閉目前為啟動");
+                    activeChar.sendMessage("禁止交易目前為啟動。");
                 else
-                    activeChar.sendMessage("交易關閉目前為取消");
+                    activeChar.sendMessage("禁止交易目前為取消。");
             }            
         }
 
@@ -203,37 +225,37 @@ public class AdminAdmin implements IAdminCommandHandler {
 				if(type.equals("multisell"))
 				{
 					L2Multisell.getInstance().reload();
-					activeChar.sendMessage("multisell 資料重新讀取");
+					activeChar.sendMessage("multisell 資料重新載入。");
 				}
 				else if(type.startsWith("teleport"))
 				{
 					TeleportLocationTable.getInstance().reloadAll();
-					activeChar.sendMessage("teleport 資料重新讀取");
+					activeChar.sendMessage("teleport 資料重新載入。");
 				}
 				else if(type.startsWith("skill"))
 				{
 					SkillTable.getInstance().reload();
-					activeChar.sendMessage("skills 資料重新讀取");
+					activeChar.sendMessage("skills 資料重新載入。");
 				}
 				else if(type.equals("npc"))
 				{
 					NpcTable.getInstance().reloadAllNpc();
-					activeChar.sendMessage("npcs 資料重新讀取");
+					activeChar.sendMessage("npcs 資料重新載入。");
 				}
 				else if(type.startsWith("htm"))
 				{
 					HtmCache.getInstance().reload();
-					activeChar.sendMessage("Cache[HTML]: " + HtmCache.getInstance().getMemoryUsage()  + " megabytes 在 " + HtmCache.getInstance().getLoadedFiles() + " 個檔案讀取");
+					activeChar.sendMessage("Cache[HTML]: " + HtmCache.getInstance().getMemoryUsage()  + " MB 在 " + HtmCache.getInstance().getLoadedFiles() + " 個檔案讀取。");
 				}
 				else if(type.startsWith("item"))
 				{
 					ItemTable.getInstance().reload();
-					activeChar.sendMessage("Item 資料重新讀取");
+					activeChar.sendMessage("Item 資料重新載入。");
 				}
 				else if(type.startsWith("instancemanager"))
 				{
 					Manager.reloadAll();
-					activeChar.sendMessage("所有Instance重新讀取");
+					activeChar.sendMessage("所有 Instance 重新載入。");
 				}
 				else if(type.startsWith("npcwalkers"))
 				{
@@ -245,7 +267,7 @@ public class AdminAdmin implements IAdminCommandHandler {
 			}
 			catch(Exception e)
 			{
-				activeChar.sendMessage("使用方法:  //reload <multisell|skill|npc|htm|item|instancemanager>");
+				activeChar.sendMessage("使用方法: //reload <multisell|skill|npc|htm|item|instancemanager>");
 			}
 		}
 
@@ -262,7 +284,7 @@ public class AdminAdmin implements IAdminCommandHandler {
 				if (Config.setParameterValue(pName, pValue))
 					activeChar.sendMessage("數值 "+pName+" 成功設定為 "+pValue);
 				else
-					activeChar.sendMessage("錯誤設定值");
+					activeChar.sendMessage("設定值錯誤。");
 				
 				 if (command.equals("admin_config_option"))      showOptionConfigPage(activeChar);
 			        if (command.equals("admin_config_altsetting"))  showAltsetConfigPage(activeChar);
@@ -273,7 +295,7 @@ public class AdminAdmin implements IAdminCommandHandler {
 			{
 
 				if (cmd.length==2)
-					activeChar.sendMessage("使用方法:  //set 函數 數值");
+					activeChar.sendMessage("使用方法: //set 函數 數值");
 			}
 			finally
 			{
@@ -506,9 +528,9 @@ public class AdminAdmin implements IAdminCommandHandler {
 	        replyMSG.append("</td></tr></table></center>");
 	        replyMSG.append("<center><table width=200><tr><td>");
 	        replyMSG.append("<br><center>");
-	        replyMSG.append("<button value=\"重制HTML\" action=\"bypass -h admin_cache_htm_rebuild\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+	        replyMSG.append("<button value=\"重置HTML\" action=\"bypass -h admin_cache_htm_rebuild\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
 	        replyMSG.append("<button value=\"讀取HTML\" action=\"bypass -h admin_cache_htm_reload\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
-	        replyMSG.append("<button value=\"重制盟徽\" action=\"bypass -h admin_cache_crest_rebuild\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+	        replyMSG.append("<button value=\"重置盟徽\" action=\"bypass -h admin_cache_crest_rebuild\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
 	        replyMSG.append("<button value=\"修正盟徽\" action=\"bypass -h admin_cache_crest_fix\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
 	        replyMSG.append("<button value=\"讀取Skill\" action=\"bypass -h admin_reload skill\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
 	        replyMSG.append("<button value=\"讀取Items\" action=\"bypass -h admin_reload item\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");

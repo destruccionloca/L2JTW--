@@ -80,7 +80,7 @@ public class Recipes implements IItemHandler
         			activeChar.registerDwarvenRecipeList(rp);
         			activeChar.destroyItem("Consume", item.getObjectId(), 1, null, false);
         			sm.addString("SYS"); 
-        			sm.addString("增加 \"" + rp.getRecipeName() + "\" 製作資料到製作書內"); 
+        			sm.addString("登記 \"" + rp.getRecipeName() + "\" 為製作卷軸。"); 
         			activeChar.sendPacket(sm);
 
 			    }
@@ -114,7 +114,7 @@ public class Recipes implements IItemHandler
         			activeChar.destroyItem("Consume", item.getObjectId(), 1, null, false); 
         			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2); 
         			sm.addString("SYS"); 
-        			sm.addString("增加 \"" + rp.getRecipeName() + "\" 製作資料到製作書內"); 
+        			sm.addString("登記 \"" + rp.getRecipeName() + "\" 為製作卷軸。"); 
         			activeChar.sendPacket(sm); 
 			    }
         		}

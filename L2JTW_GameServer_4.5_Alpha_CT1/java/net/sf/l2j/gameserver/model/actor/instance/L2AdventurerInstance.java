@@ -52,7 +52,7 @@ public class L2AdventurerInstance extends L2FolkInstance
                                                            spawn.getLocz()));
                         break;
                     case UNDEFINED:
-                        player.sendMessage("狩獵首領沒有出現在遊戲中。");
+                        player.sendMessage("目標不在遊戲內。");
                         break;
                 }
             }

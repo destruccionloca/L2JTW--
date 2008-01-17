@@ -68,7 +68,7 @@ public class AdminBan implements IAdminCommandHandler {
 				if (target!=null && target instanceof L2PcInstance)
 					plyr = (L2PcInstance)target;
 				else
-					activeChar.sendMessage("用法: //ban [帳號名稱] (如果是空的將會鎖定目標人物)");
+					activeChar.sendMessage("使用方法︰//ban [帳號名稱] (如果是空的將會鎖定目標角色)");
 			}
 			if (plyr != null && plyr.equals(activeChar))
 				plyr.sendPacket(new SystemMessage(SystemMessageId.CANNOT_USE_ON_YOURSELF));
@@ -76,7 +76,7 @@ public class AdminBan implements IAdminCommandHandler {
 			{
 				account_name=player;
 				LoginServerThread.getInstance().sendAccessLevel(account_name, 0);
-				activeChar.sendMessage("錯誤資料 "+account_name+". 請查詢 //ban_menu");
+				activeChar.sendMessage("錯誤資料 "+account_name+"。請查詢 //ban_menu");
 			}
 			else
 			{
@@ -84,7 +84,7 @@ public class AdminBan implements IAdminCommandHandler {
 				account_name = plyr.getAccountName();
 				RegionBBSManager.getInstance().changeCommunityBoard();
 				plyr.logout();
-				activeChar.sendMessage("帳號 "+account_name+" 封鎖.");
+				activeChar.sendMessage("帳號 "+account_name+" 封鎖。");
 			}
 		}
 		else if (command.startsWith("admin_unban"))
@@ -93,11 +93,11 @@ public class AdminBan implements IAdminCommandHandler {
 			{
 				account_name = st.nextToken();
 				LoginServerThread.getInstance().sendAccessLevel(account_name, 0);
-				activeChar.sendMessage("解除封鎖 "+account_name+". 請查詢 //unban_menu");
+				activeChar.sendMessage("解除封鎖 "+account_name+"。請查詢 //unban_menu");
 			}
 			catch(Exception e)
 			{
-				activeChar.sendMessage("使用方法: //unban <帳號名稱>");
+				activeChar.sendMessage("使用方法︰//unban <帳號名稱>");
 				if (Config.DEBUG)
 					e.printStackTrace();
 			}
@@ -114,21 +114,21 @@ public class AdminBan implements IAdminCommandHandler {
 				}
 				catch (NumberFormatException nfe)
 				{
-					activeChar.sendMessage("使用方法: //jail <人物名稱> [逞罰時間]");
+					activeChar.sendMessage("使用方法︰//jail <角色名稱> [逞罰時間]");
 				}
 				catch (NoSuchElementException nsee) {}
 				L2PcInstance playerObj = L2World.getInstance().getPlayer(player);
 				if (playerObj != null)
 				{
 					playerObj.setInJail(true, delay);
-					activeChar.sendMessage("人物 "+player+" 被鎖定 "+(delay>0 ? delay+" 分鐘." : "永遠!"));
+					activeChar.sendMessage("角色 "+player+" 被鎖定 "+(delay>0 ? delay+" 分鐘。" : "永遠！"));
 				}
 				else
 					jailOfflinePlayer(activeChar, player, delay);
 			}
 			catch (NoSuchElementException nsee)
 			{
-				activeChar.sendMessage("使用方法: //jail <人物名稱> [逞罰時間]");
+				activeChar.sendMessage("使用方法︰//jail <角色名稱> [逞罰時間]");
 			}
 			catch(Exception e)
 			{
@@ -146,14 +146,14 @@ public class AdminBan implements IAdminCommandHandler {
 				if (playerObj != null)
 				{
 					playerObj.setInJail(false, 0);
-					activeChar.sendMessage("人物 "+player+" 解除鎖定");
+					activeChar.sendMessage("角色 "+player+" 解除鎖定。");
 				}
 				else
 					unjailOfflinePlayer(activeChar, player);
 			}
 			catch (NoSuchElementException nsee)
 			{
-				activeChar.sendMessage("請輸入人物名稱.");
+				activeChar.sendMessage("請輸入角色名稱。");
 			}
 			catch(Exception e)
 			{
@@ -185,9 +185,9 @@ public class AdminBan implements IAdminCommandHandler {
 			statement.close();
 
 			if (count == 0)
-				activeChar.sendMessage("人物無法查詢!");
+				activeChar.sendMessage("角色無法查詢！");
 			else
-				activeChar.sendMessage("人物 "+name+" 鎖定為 "+(delay>0 ? delay+" 分鐘." : "永遠!"));
+				activeChar.sendMessage("角色 "+name+" 鎖定為 "+(delay>0 ? delay+" 分鐘。" : "永遠！"));
 		} catch (SQLException se)
 		{
 			activeChar.sendMessage("SQLException");
@@ -219,9 +219,9 @@ public class AdminBan implements IAdminCommandHandler {
 			int count = statement.getUpdateCount();
 			statement.close();
 			if (count == 0)
-				activeChar.sendMessage("無法查詢到人誤!");
+				activeChar.sendMessage("無法查詢！");
 			else
-				activeChar.sendMessage("人物 "+name+" 解除");
+				activeChar.sendMessage("角色 "+name+" 解除。");
 		} catch (SQLException se)
 		{
 			activeChar.sendMessage("SQLException");

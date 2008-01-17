@@ -45,7 +45,7 @@ public class ClanWarsList implements IUserCommandHandler
 
 		if (clan == null)
 		{
-			activeChar.sendMessage("並沒有加入任何血盟");
+			activeChar.sendMessage("並未加入血盟。");
 			return false;
 		}
 

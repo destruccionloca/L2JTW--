@@ -88,7 +88,13 @@ public class L2Spawn
 	private Constructor<?> _constructor;
 
 	/** If True a L2NpcInstance is respawned each time that another is killed */
-    private boolean _doRespawn;
+    // [L2J_JP DELETE]private boolean _doRespawn;
+    protected boolean _doRespawn;
+    // [L2J_JP ADD SANDMAN]
+    public boolean IsRespawnable()
+    {
+        return _doRespawn;
+    }
 
     private L2NpcInstance _lastSpawn;
     private static List<SpawnListener> _spawnListeners = new FastList<SpawnListener>();
@@ -110,8 +116,9 @@ public class L2Spawn
 		{
 			try
 			{
-				//doSpawn();
-                respawnNpc(_oldNpc);
+                //doSpawn();
+                // [L2J_JP EDIT SANDMAN]
+                if(_doRespawn) respawnNpc(_oldNpc);
 			}
 			catch (Exception e)
 			{
@@ -259,7 +266,10 @@ public class L2Spawn
 	 */
 	public void setAmount(int amount)
 	{
-		_maximumCount = amount;
+        // [L2J_JP EDIT SANDMAN]
+		//_maximumCount = amount;
+        if(amount < 1) amount = 1;
+        _maximumCount = amount;
 	}
 
 	/**

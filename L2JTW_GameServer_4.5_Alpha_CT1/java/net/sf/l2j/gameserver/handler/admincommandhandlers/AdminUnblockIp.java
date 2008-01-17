@@ -56,8 +56,7 @@ public class AdminUnblockIp implements IAdminCommandHandler
                 if (unblockIp(ipAddress, activeChar))
                 {
                     SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-                    sm.addString("SYS");
-                    sm.addString("移除IP " + ipAddress + " 從封鎖名單內");
+                    sm.addString("從封鎖名單內移除IP " + ipAddress + "。");
                     activeChar.sendPacket(sm);
                 }
             }
@@ -65,8 +64,7 @@ public class AdminUnblockIp implements IAdminCommandHandler
             {
                 // Send syntax to the user
                 SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-                sm.addString("SYS");
-                sm.addString("格式 //unblockip <ip>");
+                sm.addString("使用方法: //unblockip <ip>");
                 activeChar.sendPacket(sm);
             }
         }

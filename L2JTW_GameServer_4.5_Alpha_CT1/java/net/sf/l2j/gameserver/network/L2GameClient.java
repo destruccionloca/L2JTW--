@@ -32,6 +32,7 @@ import net.sf.l2j.gameserver.ThreadPoolManager;
 import net.sf.l2j.gameserver.LoginServerThread.SessionKey;
 import net.sf.l2j.gameserver.communitybbs.Manager.RegionBBSManager;
 import net.sf.l2j.gameserver.datatables.SkillTable;
+import net.sf.l2j.gameserver.instancemanager.CleanUpManager;
 import net.sf.l2j.gameserver.model.CharSelectInfoPackage;
 import net.sf.l2j.gameserver.model.L2World;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
@@ -245,7 +246,8 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>>
 		if (character.getClanId() != 0)
 			return character;
 
-		deleteCharByObjId(objid);
+		// [L2J_JP EDIT - TSL] deleteCharByObjId(objid);
+		CleanUpManager.getInstance().deleteCharByObjId(objid);
 		return null;
 	}
 

@@ -81,11 +81,11 @@ public class AdminPledge implements IAdminCommandHandler
 				player.setClanCreateExpiryTime(0);
 				L2Clan clan = ClanTable.getInstance().createClan(player, parameter);
 				if (clan != null)
-					activeChar.sendMessage("血盟 " + parameter + " 創立. 盟主: " + player.getName());
+					activeChar.sendMessage("血盟" + parameter + "創立。盟主︰" + player.getName());
 				else
 				{
 					player.setClanCreateExpiryTime(cet);
-					activeChar.sendMessage("創造血盟出錯.");
+					activeChar.sendMessage("創造血盟錯誤。");
 				}
 			}
 			else if (!player.isClanLeader())
@@ -99,9 +99,9 @@ public class AdminPledge implements IAdminCommandHandler
 				ClanTable.getInstance().destroyClan(player.getClanId());
 				L2Clan clan = player.getClan();
 				if (clan==null)
-					activeChar.sendMessage("血盟解散.");
+					activeChar.sendMessage("血盟解散。");
 				else
-					activeChar.sendMessage("血盟解散出問題.");
+					activeChar.sendMessage("血盟解散錯誤。");
 			}
 			else if (action.equals("info"))
 			{
@@ -115,10 +115,10 @@ public class AdminPledge implements IAdminCommandHandler
 				if (level>=0 && level <11)
 				{
 					player.getClan().changeLevel(level);
-					activeChar.sendMessage("血盟等級設為 " + level + ". 血盟 " + player.getClan().getName());
+					activeChar.sendMessage("血盟 " + player.getClan().getName() + "等級設為 " + level + "。");
 				}
 				else
-					activeChar.sendMessage("等級錯誤");
+					activeChar.sendMessage("等級錯誤。");
 			}
 			else if (action.startsWith("rep"))
 			{
@@ -128,7 +128,7 @@ public class AdminPledge implements IAdminCommandHandler
 					L2Clan clan = player.getClan();
 					if (clan.getLevel() < 5)
 					{
-						activeChar.sendMessage("只有等級5以上可以取得.");
+						activeChar.sendMessage("只有等級5以上可以取得。");
 						showMainPage(activeChar);
 						return false;
 					}
@@ -138,7 +138,7 @@ public class AdminPledge implements IAdminCommandHandler
 
 				catch (Exception e)
 				{
-					activeChar.sendMessage("用法: //pledge <rep> <number>");
+					activeChar.sendMessage("使用方法︰//pledge <rep> <number>");
 				}
 			}
 		}

@@ -339,7 +339,7 @@ public class Olympiad
                 sm.addNumber(_currentCycle);
 
                 Announcements.getInstance().announceToAll(sm);
-                Announcements.getInstance().announceToAll("奧林匹亞有效時期開始");
+                Announcements.getInstance().announceToAll("奧林匹亞賽程開始。");
 
     			_isOlympiadEnd = true;
                 if (_scheduledManagerTask != null)
@@ -370,7 +370,7 @@ public class Olympiad
                 _scheduledValdationTask  = ThreadPoolManager.getInstance().scheduleGeneral(new Runnable() {
                     public void run()
                     {
-                        Announcements.getInstance().announceToAll("奧林匹亞有效時期結束");
+                        Announcements.getInstance().announceToAll("奧林匹亞賽程結束。");
                         _period = 0;
                         _currentCycle++;
                         deleteNobles();
@@ -391,7 +391,7 @@ public class Olympiad
 
         if (_compStarted)
         {
-            noble.sendMessage("無法在競爭期間註冊");
+            noble.sendMessage("無法在競賽期間登記。");
             return false;
         }
 
@@ -641,7 +641,7 @@ public class Olympiad
         sm.addNumber(_currentCycle);
 
         Announcements.getInstance().announceToAll(sm);
-        Announcements.getInstance().announceToAll("奧林匹亞有效時期開始");
+        Announcements.getInstance().announceToAll("奧林匹亞賽程開始。");
 
         _isOlympiadEnd = true;
         if (_scheduledManagerTask != null)
@@ -674,7 +674,7 @@ public class Olympiad
         _scheduledValdationTask  = ThreadPoolManager.getInstance().scheduleGeneral(new Runnable() {
             public void run()
             {
-                Announcements.getInstance().announceToAll("奧林匹亞有效時期結束");
+                Announcements.getInstance().announceToAll("奧林匹亞賽程結束。");
                 _period = 0;
                 _currentCycle++;
                 deleteNobles();

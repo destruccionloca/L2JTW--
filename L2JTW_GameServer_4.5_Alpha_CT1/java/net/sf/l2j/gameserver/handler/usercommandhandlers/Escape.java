@@ -60,7 +60,7 @@ public class Escape implements IUserCommandHandler
         // Check to see if the player is in a festival.
         if (activeChar.isFestivalParticipant())
         {
-            activeChar.sendPacket(SystemMessage.sendString("無法在黑暗祭典內使用."));
+            activeChar.sendPacket(SystemMessage.sendString("無法在黑暗的祭典內使用。"));
             return false;
         }
 
@@ -80,7 +80,7 @@ public class Escape implements IUserCommandHandler
 
         SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
         sm.addString("SYS");
-        sm.addString("將在" + unstuckTimer/60000 + "分鐘後返回村莊");
+        sm.addString("將在" + unstuckTimer/60000 + "分鐘後返回村莊。");
 
         activeChar.getAI().setIntention(CtrlIntention.AI_INTENTION_IDLE);
         //SoE Animation section

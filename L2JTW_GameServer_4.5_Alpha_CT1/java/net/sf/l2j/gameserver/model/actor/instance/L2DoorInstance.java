@@ -438,15 +438,15 @@ public class L2DoorInstance extends L2Character
 
             NpcHtmlMessage html = new NpcHtmlMessage(getObjectId());
             TextBuilder html1 = new TextBuilder("<html><body><table border=0>");
-            html1.append("<tr><td>狀態:</td></tr>");
+            html1.append("<tr><td>狀態：</td></tr>");
             html1.append("<tr><td>目前HP "+getCurrentHp()+ "</td></tr>");
             html1.append("<tr><td>最大HP "+getMaxHp()+"</td></tr>");
 
-            html1.append("<tr><td>物件ID: " + getObjectId() + "</td></tr>");
-            html1.append("<tr><td>門的ID:<br>"+getDoorId()+"</td></tr>");
+            html1.append("<tr><td>物件ID： " + getObjectId() + "</td></tr>");
+            html1.append("<tr><td>門的ID：<br>"+getDoorId()+"</td></tr>");
             html1.append("<tr><td><br></td></tr>");
 
-            html1.append("<tr><td>類型: " + getClass().getName() + "</td></tr>");
+            html1.append("<tr><td>類型： " + getClass().getName() + "</td></tr>");
             html1.append("<tr><td><br></td></tr>");
             html1.append("</table>");
 

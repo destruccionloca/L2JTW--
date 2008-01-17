@@ -32,6 +32,7 @@ import javolution.util.FastMap;
 import net.sf.l2j.Config;
 import net.sf.l2j.L2DatabaseFactory;
 import net.sf.l2j.gameserver.Announcements;
+import net.sf.l2j.gameserver.GameServer;
 import net.sf.l2j.gameserver.GameTimeController;
 import net.sf.l2j.gameserver.GeoData;
 import net.sf.l2j.gameserver.GmListTable;
@@ -48,6 +49,8 @@ import net.sf.l2j.gameserver.ai.L2CharacterAI;
 import net.sf.l2j.gameserver.ai.L2PlayerAI;
 import net.sf.l2j.gameserver.cache.HtmCache;
 import net.sf.l2j.gameserver.cache.WarehouseCacheManager;
+import net.sf.l2j.gameserver.communitybbs.BB.Forum;
+import net.sf.l2j.gameserver.communitybbs.Manager.ForumsBBSManager;
 import net.sf.l2j.gameserver.datatables.CharTemplateTable;
 import net.sf.l2j.gameserver.datatables.ClanTable;
 import net.sf.l2j.gameserver.datatables.FishTable;
@@ -66,14 +69,21 @@ import net.sf.l2j.gameserver.handler.SkillHandler;
 import net.sf.l2j.gameserver.handler.skillhandlers.SiegeFlag;
 import net.sf.l2j.gameserver.handler.skillhandlers.StrSiegeAssault;
 import net.sf.l2j.gameserver.handler.skillhandlers.TakeCastle;
+import net.sf.l2j.gameserver.instancemanager.AntharasManager;
+import net.sf.l2j.gameserver.instancemanager.BaiumManager;
 import net.sf.l2j.gameserver.instancemanager.CastleManager;
 import net.sf.l2j.gameserver.instancemanager.CoupleManager;
 import net.sf.l2j.gameserver.instancemanager.CursedWeaponsManager;
+import net.sf.l2j.gameserver.instancemanager.CustomZoneManager;
 import net.sf.l2j.gameserver.instancemanager.DimensionalRiftManager;
 import net.sf.l2j.gameserver.instancemanager.DuelManager;
+import net.sf.l2j.gameserver.instancemanager.FourSepulchersManager;
 import net.sf.l2j.gameserver.instancemanager.ItemsOnGroundManager;
 import net.sf.l2j.gameserver.instancemanager.QuestManager;
+import net.sf.l2j.gameserver.instancemanager.SailrenManager;
 import net.sf.l2j.gameserver.instancemanager.SiegeManager;
+import net.sf.l2j.gameserver.instancemanager.ValakasManager;
+import net.sf.l2j.gameserver.instancemanager.VanHalterManager;
 import net.sf.l2j.gameserver.model.BlockList;
 import net.sf.l2j.gameserver.model.FishData;
 import net.sf.l2j.gameserver.model.ForceBuff;
@@ -124,6 +134,7 @@ import net.sf.l2j.gameserver.model.entity.Castle;
 import net.sf.l2j.gameserver.model.entity.CTF;
 import net.sf.l2j.gameserver.model.entity.ClanHall;
 import net.sf.l2j.gameserver.model.entity.Duel;
+import net.sf.l2j.gameserver.model.entity.GrandBossState;
 import net.sf.l2j.gameserver.model.entity.L2Event;
 import net.sf.l2j.gameserver.model.entity.Siege;
 import net.sf.l2j.gameserver.model.entity.TvTEvent;
@@ -203,8 +214,7 @@ import net.sf.l2j.gameserver.util.Broadcast;
 import net.sf.l2j.gameserver.util.FloodProtector;
 import net.sf.l2j.util.Point3D;
 import net.sf.l2j.util.Rnd;
-import net.sf.l2j.gameserver.communitybbs.BB.Forum;
-import net.sf.l2j.gameserver.communitybbs.Manager.ForumsBBSManager;
+
 
 /**
  * This class represents all player characters in the world.
@@ -654,7 +664,6 @@ public final class L2PcInstance extends L2PlayableInstance
 	private List<String> _validBypass = new FastList<String>();
 	private List<String> _validBypass2 = new FastList<String>();
 
-
 	private Forum _forumMail;
 	private Forum _forumMemo;
 
@@ -663,8 +672,6 @@ public final class L2PcInstance extends L2PlayableInstance
 
     /** Skills queued because a skill is already in progress */
     private SkillDat _queuedSkill;
-
-
 
     /* Flag to disable equipment/skills while wearing formal wear **/
     private boolean _IsWearingFormalWear = false;
@@ -1390,7 +1397,7 @@ public final class L2PcInstance extends L2PlayableInstance
 
 	private void showQuestWindow(String questId, String stateId)
 	{
-		String path = "data/jscripts/quests/"+questId+"/"+stateId+".htm";
+		String path = "data/scripts/quests/"+questId+"/"+stateId+".htm";
 		String content = HtmCache.getInstance().getHtm(path);  //TODO path for quests html
 
 		if (content != null)
@@ -1884,7 +1891,7 @@ public final class L2PcInstance extends L2PlayableInstance
                 // Check to rest to assure current effect meets weapon requirements.
             	if (!effectSkill.getWeaponDependancy(this))
                 {
-                    sendMessage(effectSkill.getName() + "無法使用於此武器.");
+                    sendMessage(effectSkill.getName() + "無法使用於此武器。");
 
                     if (Config.DEBUG)
                         _log.info("   | Skill "+effectSkill.getName()+" has been disabled for ("+getName()+"); Reason: Incompatible Weapon Type.");
@@ -2228,7 +2235,7 @@ public final class L2PcInstance extends L2PlayableInstance
 			skills = SkillTreeTable.getInstance().getAvailableSkills(this, getClassId());
 		}
 
-		sendMessage("習得 " + skillCounter + " 種技能.");
+		sendMessage("已學習" + skillCounter + "種技能。");
 	}
 
 	/** Set the Experience value of the L2PcInstance. */
@@ -2423,7 +2430,7 @@ public final class L2PcInstance extends L2PlayableInstance
 	{
 		if (L2Event.active && eventSitForced)
 		{
-			sendMessage("一個黑暗的力量遠超越生物能想像的將你的發抖..");
+			sendMessage("一個黑暗的力量遠超越生物能想像的程度令你顫抖...");
 		}
 		else if (_waitTypeSitting && !isInStoreMode() && !isAlikeDead())
 		{
@@ -2821,11 +2828,11 @@ public final class L2PcInstance extends L2PlayableInstance
                 // If over capacity, drop the item
                 if (!isGM() && !_inventory.validateCapacity(0))
                     dropItem("InvDrop", item, null, true);
-                
+
 				// Cursed Weapon
                 else if(CursedWeaponsManager.getInstance().isCursed(item.getItemId()))
 					CursedWeaponsManager.getInstance().activate(this, item);
-		    
+
             }
 		}
 	}
@@ -4503,7 +4510,7 @@ public final class L2PcInstance extends L2PlayableInstance
 				{
 					if (CTF._teleport || CTF._started)
 					{
-						sendMessage("20秒後將復活並且傳送至各隊伍陣旗!");
+						sendMessage("20秒後將復活並且傳送至各隊伍陣旗！");
 						
 						if (_haveFlagCTF)
 						{
@@ -4601,6 +4608,28 @@ public final class L2PcInstance extends L2PlayableInstance
 
 		stopRentPet();
 		stopWaterTask();
+    	// When the player has been annihilated, the player is banished from the Four Sepulcher.
+    	if (CustomZoneManager.getInstance().checkIfInZone("FourSepulcher", this))
+       	{
+    		FourSepulchersManager.getInstance().checkAnnihilated(this);
+   		}
+    	// When the player has been annihilated, the player is banished from the lair.
+    	if (CustomZoneManager.getInstance().checkIfInZone("LairofSailren", this))
+    	{
+    		SailrenManager.getInstance().checkAnnihilated(this);
+    	}
+    	if (CustomZoneManager.getInstance().checkIfInZone("LairofAntharas", this))
+    	{
+    		AntharasManager.getInstance().checkAnnihilated();
+    	}
+    	if (CustomZoneManager.getInstance().checkIfInZone("LairofValakas", this))
+    	{
+    		ValakasManager.getInstance().checkAnnihilated();
+    	}
+    	if (CustomZoneManager.getInstance().checkIfInZone("LairofBaium", this))
+    	{
+    		BaiumManager.getInstance().checkAnnihilated();
+    	}
 		return true;
 	}
 
@@ -6167,7 +6196,7 @@ public final class L2PcInstance extends L2PlayableInstance
 	/**
 	 * @return
 	 */
-	
+
 	public Forum getMail()
 	{
 		if (_forumMail == null)
@@ -6183,24 +6212,22 @@ public final class L2PcInstance extends L2PlayableInstance
 
 		return _forumMail;
 	}
-	
 
 
 	/**
 	 * @param forum
 	 */
-	
+
 	public void setMail(Forum forum)
 	{
 		_forumMail = forum;
 	}
-	
 
 
 	/**
 	 * @return
 	 */
-	
+
 	public Forum getMemo()
 	{
 		if (_forumMemo == null)
@@ -6216,16 +6243,16 @@ public final class L2PcInstance extends L2PlayableInstance
 
 		return _forumMemo;
 	}
-	
+
 	/**
 	 * @param forum
 	 */
-	
+
 	public void setMemo(Forum forum)
 	{
 		_forumMemo = forum;
 	}
-	
+
     /**
      * Restores sub-class data for the L2PcInstance, used to check the current
      * class index for the character.
@@ -7067,7 +7094,7 @@ public final class L2PcInstance extends L2PlayableInstance
 		if (getHennaEmptySlots()==0)
 		{
 
-			sendMessage("紋身無法裝備超過三個以上.");
+			sendMessage("紋身無法裝備超過三個以上。");
 			return false;
 		}
 
@@ -7463,7 +7490,7 @@ public final class L2PcInstance extends L2PlayableInstance
         {
         	if ( !(target instanceof L2PcInstance && ((L2PcInstance)target).getDuelId() == getDuelId()) )
         	{
-        		sendMessage("無法在決鬥的時候使用");
+        		sendMessage("無法在決鬥時使用。");
         		sendPacket(new ActionFailed());
         		return;
         	}
@@ -9259,7 +9286,7 @@ public final class L2PcInstance extends L2PlayableInstance
                 teleToLocation(MapRegionTable.TeleportWhereType.Town);
 
                 setIsIn7sDungeon(false);
-                sendMessage("目前為封印有效期限剛開始，將傳送至各村莊.");
+                sendMessage("目前為封印有效期間，將傳送至各村莊。");
             }
         }
         else
@@ -9269,7 +9296,7 @@ public final class L2PcInstance extends L2PlayableInstance
                 teleToLocation(MapRegionTable.TeleportWhereType.Town);
 
                 setIsIn7sDungeon(false);
-                sendMessage("並無參加任何七封印,將傳送至各村莊.");
+                sendMessage("並無參加任何七個封印陣營，將傳送至各村莊。");
             }
         }
 
@@ -9277,15 +9304,124 @@ public final class L2PcInstance extends L2PlayableInstance
         updateJailState();
 
         if (_isInvul)
-        	sendMessage("無敵模式啟動.");
+        	sendMessage("無敵模式啟動。");
         if (getAppearance().getInvisible())
-            sendMessage("隱形模式啟動");
+            sendMessage("隱形模式啟動。");
         if (getMessageRefusal())
-            sendMessage("密語頻道關閉");
+            sendMessage("密語頻道關閉。");
 
 		revalidateZone(true);
-	}
+		// [L2J_JP ADD SANDMAN] Check of a restart prohibition area.
+		if(CustomZoneManager.getInstance().getZone(this) != null && !isGM())
+		{
+	    	String zn = CustomZoneManager.getInstance().getZone(this).getZoneName();
 
+	    	// Four-Sepulcher,It is less than 5 minutes.
+	    	if (zn.equalsIgnoreCase("FourSepulcher") &&
+	   			(System.currentTimeMillis() - getLastAccess() >= 300000))
+	    	{
+	    		int driftX = Rnd.get(-80,80);
+	    		int driftY = Rnd.get(-80,80);
+	    		teleToLocation(178293 + driftX,-84607 + driftY,-7216);
+	    	}
+	    	
+	    	// It is less than a time limit from player restarting.
+    		// TODO write code for restart fight against bosses.
+	    	// Lair of bosses,It is less than 30 minutes from server starting.
+    		// It is only for Antharas and Valakas that I know it now.
+    		// Thanks a lot Serafiel of L2J_JP.
+	    	//
+	    	// 10 minutes
+    		// Antharas
+	    	else if (zn.equalsIgnoreCase("LairofAntharas"))
+    		{
+    	    	// Lair of bosses,It is less than 30 minutes from server starting.
+	    		// Player can restart inside lair, but Antharas do not respawn.
+    	    	if(System.currentTimeMillis() - GameServer.dateTimeServerStarted.getTimeInMillis() <= Config.TIMELIMITOFINVADE)
+    	    	{
+	        		if (getQuestState("antharas") != null) getQuestState("antharas").exitQuest(true);
+    	    	}
+        		else if (System.currentTimeMillis() - getLastAccess() >= 600000)
+				{
+	        		if (getQuestState("antharas") != null) getQuestState("antharas").exitQuest(true);
+	    			teleToLocation(MapRegionTable.TeleportWhereType.Town);
+				}
+				else
+	        		AntharasManager.getInstance().addPlayerToLair(this);
+    		}
+    		
+    		// Baium
+	    	else if (zn.equalsIgnoreCase("LairofBaium"))
+    		{
+				if (System.currentTimeMillis() - getLastAccess() >= 600000)
+				{
+	        		if (getQuestState("baium") != null) getQuestState("baium").exitQuest(true);
+	    			teleToLocation(MapRegionTable.TeleportWhereType.Town);
+				}
+				else
+				{
+					// Player can restart inside lair, but can not awake Baium.
+	        		if (getQuestState("baium") != null) getQuestState("baium").exitQuest(true);
+	        		BaiumManager.getInstance().addPlayerToLair(this);
+				}
+    		}
+
+    		// Lilith
+	    	else if (zn.equalsIgnoreCase("LairofLilith"))
+    		{
+				if (System.currentTimeMillis() - getLastAccess() >= 600000)
+	    			teleToLocation(MapRegionTable.TeleportWhereType.Town);
+    		}
+    		
+    		// Anakim
+	    	else if (zn.equalsIgnoreCase("LairofAnakim"))
+    		{
+				if (System.currentTimeMillis() - getLastAccess() >= 600000)
+	    			teleToLocation(MapRegionTable.TeleportWhereType.Town);
+    		}
+    		
+    		// Zaken
+	    	else if (zn.equalsIgnoreCase("LairofZaken"))
+    		{
+				if (System.currentTimeMillis() - getLastAccess() >= 600000)
+	    			teleToLocation(MapRegionTable.TeleportWhereType.Town);
+    		}
+
+    		// High Priestess van Halter
+	    	else if (zn.equalsIgnoreCase("AltarofSacrifice"))
+			{
+				if(System.currentTimeMillis() - getLastAccess() >= 600000)
+	    			teleToLocation(MapRegionTable.TeleportWhereType.Town);
+	        	else
+	        		VanHalterManager.getInstance().intruderDetection(this);
+			}
+    	
+    		// 0 minutes
+    		// Valakas
+	    	else if (zn.equalsIgnoreCase("LairofValakas"))
+    		{
+    	    	// Lair of bosses,It is less than 30 minutes from server starting.
+	    		// Player can restart inside lair, and begin fight against Valakas 30min later.
+    	    	if(System.currentTimeMillis() - GameServer.dateTimeServerStarted.getTimeInMillis() <= Config.TIMELIMITOFINVADE &&
+    	    			ValakasManager.getInstance().getState().equals(GrandBossState.StateEnum.ALIVE))
+    			{
+	    			ValakasManager.getInstance().addPlayerToLair(this);
+    			}
+    	    	else
+    	    	{
+    	    		if (getQuestState("valakas") != null) getQuestState("valakas").exitQuest(true);
+    				teleToLocation(MapRegionTable.TeleportWhereType.Town);
+    	    	}
+    		}
+
+    		// Sailren
+	    	else if (zn.equalsIgnoreCase("LairofSailren"))
+    		{
+        		if (getQuestState("sailren") != null) getQuestState("sailren").exitQuest(true);
+    			teleToLocation(MapRegionTable.TeleportWhereType.Town);
+    		}
+		}
+	}
 	public long getLastAccess()
 	{
 		return _lastAccess;
@@ -9358,7 +9494,6 @@ public final class L2PcInstance extends L2PlayableInstance
 		_lastRecomUpdate = update.getTimeInMillis();
 	}
 
-	
 	@Override
 	public void doRevive()
 	{
@@ -9932,7 +10067,7 @@ public final class L2PcInstance extends L2PlayableInstance
 		List<FishData> fishs = FishTable.getInstance().getfish(lvl, type, group);
 		if (fishs == null || fishs.size() == 0)
 		{
-			sendMessage("系統出錯");
+			sendMessage("系統錯誤。");
 			EndFishing(false);
 			return;
 		}
@@ -10409,7 +10544,7 @@ public final class L2PcInstance extends L2PlayableInstance
 
                 // start the countdown
                 _jailTask = ThreadPoolManager.getInstance().scheduleGeneral(new JailTask(this), _jailTimer);
-                sendMessage("監獄時間為 "+delayInMinutes+" 分鐘.");
+                sendMessage("監禁時間為 "+delayInMinutes+" 分鐘。");
             }
 
             // Open a Html message to inform the player
@@ -10418,7 +10553,7 @@ public final class L2PcInstance extends L2PlayableInstance
             if (jailInfos != null)
                 htmlMsg.setHtml(jailInfos);
             else
-                htmlMsg.setHtml("<html><body>進入監獄</body></html>");
+                htmlMsg.setHtml("<html><body>你已被管理者監禁。</body></html>");
             sendPacket(htmlMsg);
 
             teleToLocation(-114356, -249645, -2984, true);  // Jail
@@ -10430,7 +10565,7 @@ public final class L2PcInstance extends L2PlayableInstance
             if (jailInfos != null)
                 htmlMsg.setHtml(jailInfos);
             else
-                htmlMsg.setHtml("<html><body>監獄時間以到,請多尊重伺服器.</body></html>");
+                htmlMsg.setHtml("<html><body>你目前已獲得釋放，請遵守遊戲規則。</body></html>");
             sendPacket(htmlMsg);
 
             teleToLocation(17836, 170178, -3507, true);  // Floran
@@ -10459,7 +10594,7 @@ public final class L2PcInstance extends L2PlayableInstance
             {
                 // restart the countdown
                 _jailTask = ThreadPoolManager.getInstance().scheduleGeneral(new JailTask(this), _jailTimer);
-                sendMessage("目前監獄時間為 "+Math.round(_jailTimer/60000)+" 分.");
+                sendMessage("目前監禁時間為 "+Math.round(_jailTimer/60000)+" 分。");
             }
 
             // If player escaped, put him back in jail

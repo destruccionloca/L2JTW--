@@ -154,16 +154,16 @@ public class L2CastleChamberlainInstance extends L2MerchantInstance
                         switch (currentPeriod)
                         {
                         case SevenSigns.PERIOD_COMP_RECRUITING:
-                            html.replace("%ss_event%", "任務活動初始化");
+                            html.replace("%ss_event%", "預備期間");
                             break;
                         case SevenSigns.PERIOD_COMPETITION:
-                            html.replace("%ss_event%", "競爭 (任務活動)");
+                            html.replace("%ss_event%", "競爭期間");
                             break;
                         case SevenSigns.PERIOD_COMP_RESULTS:
-                            html.replace("%ss_event%", "任務活動結果");
+                            html.replace("%ss_event%", "計算總分");
                             break;
                         case SevenSigns.PERIOD_SEAL_VALIDATION:
-                            html.replace("%ss_event%", "封印確認");
+                            html.replace("%ss_event%", "有效期間");
                             break;
                         }
                     }{
@@ -171,13 +171,13 @@ public class L2CastleChamberlainInstance extends L2MerchantInstance
                         switch (sealOwner1)
                         {
                         case SevenSigns.CABAL_NULL:
-                            html.replace("%ss_avarice%", "無任何一方");
+                            html.replace("%ss_avarice%", "不歸屬任何陣營");
                             break;
                         case SevenSigns.CABAL_DAWN:
-                            html.replace("%ss_avarice%", "黃昏的君主");
+                            html.replace("%ss_avarice%", "黎民的君主們");
                             break;
                         case SevenSigns.CABAL_DUSK:
-                            html.replace("%ss_avarice%", "黎民的革命軍");
+                            html.replace("%ss_avarice%", "黃昏的革命軍");
                             break;
                         }
                     }{
@@ -185,13 +185,13 @@ public class L2CastleChamberlainInstance extends L2MerchantInstance
                         switch (sealOwner2)
                         {
                         case SevenSigns.CABAL_NULL:
-                            html.replace("%ss_gnosis%", "無任何一方");
+                            html.replace("%ss_gnosis%", "不歸屬任何陣營");
                             break;
                         case SevenSigns.CABAL_DAWN:
-                            html.replace("%ss_gnosis%", "黃昏的君主");
+                            html.replace("%ss_gnosis%", "黎民的君主們");
                             break;
                         case SevenSigns.CABAL_DUSK:
-                            html.replace("%ss_gnosis%", "黎民的革命軍");
+                            html.replace("%ss_gnosis%", "黃昏的革命軍");
                             break;
                         }
                     }
@@ -200,13 +200,13 @@ public class L2CastleChamberlainInstance extends L2MerchantInstance
                         switch (sealOwner3)
                         {
                         case SevenSigns.CABAL_NULL:
-                            html.replace("%ss_strife%", "無任何一方");
+                            html.replace("%ss_strife%", "不歸屬任何陣營");
                             break;
                         case SevenSigns.CABAL_DAWN:
-                            html.replace("%ss_strife%", "黃昏的君主");
+                            html.replace("%ss_strife%", "黎民的君主們");
                             break;
                         case SevenSigns.CABAL_DUSK:
-                            html.replace("%ss_strife%", "黎民的革命軍");
+                            html.replace("%ss_strife%", "黃昏的革命軍");
                             break;
                         }
                     }
@@ -437,10 +437,10 @@ public class L2CastleChamberlainInstance extends L2MerchantInstance
 
                     TextBuilder msg = new TextBuilder("<html><body>");
                     msg.append(getName() + ":<br>");
-                    msg.append("目前稅率: " + getCastle().getTaxPercent() + "%<br>");
+                    msg.append("目前稅率 " + getCastle().getTaxPercent() + "%<br>");
                     msg.append("<table>");
                     msg.append("<tr>");
-                    msg.append("<td>稅率更改為:</td>");
+                    msg.append("<td>調整稅率</td>");
                     msg.append("<td><edit var=\"稅率\" width=40><br>");
                     msg.append("<button value=\"調整\" action=\"bypass -h npc_%objectId%_tax_set $value\" width=80 height=15></td>");
                     msg.append("</tr>");

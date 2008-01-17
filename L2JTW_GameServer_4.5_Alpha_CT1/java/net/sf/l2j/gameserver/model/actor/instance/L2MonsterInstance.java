@@ -30,7 +30,6 @@ import net.sf.l2j.gameserver.util.MinionList;
 import net.sf.l2j.util.Rnd;
 import net.sf.l2j.gameserver.model.L2Spawn;
 
-
 /**
  * This class manages all Monsters.
  *
@@ -42,7 +41,7 @@ import net.sf.l2j.gameserver.model.L2Spawn;
  */
 public class L2MonsterInstance extends L2Attackable
 {
-    //private static Logger _log = Logger.getLogger(L2MonsterInstance.class.getName());
+	//private static Logger _log = Logger.getLogger(L2MonsterInstance.class.getName());
 
     protected final MinionList _minionList;
 
@@ -51,7 +50,9 @@ public class L2MonsterInstance extends L2Attackable
 
     private static final int MONSTER_MAINTENANCE_INTERVAL = 1000;
 
-
+    // [L2J_JP ADD SANDMAN]
+    private ScheduledFuture hideTask;
+	
 	/**
 	 * Constructor of L2MonsterInstance (use L2Character and L2NpcInstance constructor).<BR><BR>
 	 *
@@ -66,10 +67,14 @@ public class L2MonsterInstance extends L2Attackable
 	public L2MonsterInstance(int objectId, L2NpcTemplate template)
 	{
 		super(objectId, template);
-
 		getKnownList();	// init knownlist
         _minionList  = new MinionList(this);
-
+        
+        // [L2J_JP ADD]
+        if (this.getNpcId() == 29002)   // Queen Ant Larva is invulnerable.
+        {
+            this.setIsInvul(true);
+        }
 	}
 
     @Override
@@ -86,14 +91,12 @@ public class L2MonsterInstance extends L2Attackable
 	//@Override
 	public boolean isAutoAttackable(L2Character attacker)
 	{
-
 		if (attacker instanceof L2MonsterInstance)
 			return false;
 
 		return !isEventMob;
 	}
 
-	
 	/**
 	 * Return True if the L2MonsterInstance is Agressive (aggroRange > 0).<BR><BR>
 	 */
@@ -103,13 +106,26 @@ public class L2MonsterInstance extends L2Attackable
 		return (getTemplate().aggroRange > 0) && !isEventMob;
 	}
 
-
     @Override
 	public void onSpawn()
     {
         super.onSpawn();
+        
+        // [L2J_JP ADD SANDMAN]
+        // in Restless Forest
+        // They are repeat themselves it visible or invisible.
+        switch (this.getNpcId())
+        {
+            case 21548:
+            case 21551:
+            case 21552:
+                hideTask = ThreadPoolManager.getInstance().scheduleEffect(new doHide(this), (this.getSpawn().getRespawnDelay()));
+                break;
 
-        if (getTemplate().getMinionData() != null)
+        }
+
+        // [L2J_JP EDIT SANDMAN]
+        if (getTemplate().getMinionData().size() > 0)
         {
             try
             {
@@ -121,25 +137,14 @@ public class L2MonsterInstance extends L2Attackable
                 }
                 _minionList.clearRespawnList();
 
-
                 manageMinions();
-
             }
-
-    		catch ( NullPointerException e )
-    		{
-    		}
-            if (getTemplate().npcId == 29025) { // Baium statue acts like a statue
-                startAbnormalEffect((short)0x0400);
-                setIsParalyzed(true); 
-                StopMove sm = new StopMove(this);
-                sendPacket(sm);
-                broadcastPacket(sm);
-                
+            catch ( NullPointerException e )
+            {
+                // [L2J_JP ADD SANDMAN]
+                e.printStackTrace();
             }
-
         }
-
     }
 
     protected int getMaintenanceInterval() { return MONSTER_MAINTENANCE_INTERVAL; }
@@ -228,35 +233,9 @@ public class L2MonsterInstance extends L2Attackable
     	if (_minionMaintainTask != null)
             _minionMaintainTask.cancel(true); // doesn't do it?
 
-        if (getTemplate().npcId == 29025) 
-        {
-            try {
-                L2NpcTemplate BaiumSpawn = NpcTable.getInstance().getTemplate(29020);
-                L2Spawn Baium = new L2Spawn(BaiumSpawn);
-                
-                Baium.setAmount(1);
-                //Baium.setRespawnDelay(604800);
-                Baium.setRespawnDelay(1);
-                Baium.setLocx(getX());
-                Baium.setLocy(getY());
-                Baium.setLocz(getZ());
-                Baium.setHeading(getHeading());
-                Baium.doSpawn();
-                Baium.stopRespawn();
-
-            }
-            catch (Exception e) 
-            {
-                _log.warning("RaidBoss: Error while spawning Baium: " + e);
-            }
-            deleteMe();
-            return true;
-        }
-
         if (this instanceof L2RaidBossInstance)
         	deleteSpawnedMinions();
         return true;
-
     }
 
     public List<L2MinionInstance> getSpawnedMinions()
@@ -301,6 +280,10 @@ public class L2MonsterInstance extends L2Attackable
     @Override
 	public void deleteMe()
     {
+        // [L2J_JP ADD SANDMAN]
+        if(hideTask != null)
+            hideTask.cancel(true);
+
         if (hasMinions())
         {
             if (_minionMaintainTask != null)
@@ -322,5 +305,56 @@ public class L2MonsterInstance extends L2Attackable
         	getSpawnedMinions().remove(minion);
         }
     	_minionList.clearRespawnList();
+    }
+
+    // [L2J_JP ADD SANDMAN START]
+    public void hideMe()
+    {
+        if(hasMinions())
+        {
+            if (_minionMaintainTask != null)
+            	_minionMaintainTask.cancel(true);
+
+            deleteSpawnedMinions();
+        }
+        super.deleteMe();
+    }
+    
+    public void shownMe()
+    {
+        if(!(this.isDead()))
+            this.spawnMe();
+    }
+    
+    private class doHide implements Runnable
+    {
+        private L2MonsterInstance _me;
+        
+        public doHide(L2MonsterInstance actor)
+        {
+            _me = actor;
+        }
+        
+        public void run()
+        {
+            _me.hideMe();
+            ThreadPoolManager.getInstance().scheduleGeneral(new doShown(_me),_me.getSpawn().getRespawnDelay());
+        }
+    }
+    
+    private class doShown implements Runnable
+    {
+        private L2MonsterInstance _me;
+        
+        public doShown(L2MonsterInstance actor)
+        {
+            _me = actor;
+        }
+        
+        public void run()
+        {
+            if(_me.getSpawn().IsRespawnable())
+                _me.shownMe();
+        }
     }
 }

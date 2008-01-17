@@ -2259,7 +2259,7 @@ public abstract class L2Skill
                                     if (targetPet.getOwner() != player)
                                     {
                                         condGood = false;
-                                        player.sendMessage("並非此寵物的主人");
+                                        player.sendMessage("你不是寵物的主人。");
                                     }
                                 }
                             }
@@ -2420,7 +2420,7 @@ public abstract class L2Skill
 
                 SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);          
                 sm.addString("SYS");
-                sm.addString("此技能尚未支援");
+                sm.addString("此技能尚未支援。");
 
                 activeChar.sendPacket(sm);
                 return null;
@@ -2508,7 +2508,7 @@ public abstract class L2Skill
             {
                 SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
                 sm.addString("SYS");
-                sm.addString("此技能尚未支援");
+                sm.addString("此技能尚未支援。");
                 activeChar.sendPacket(sm);
                 return null;
             }

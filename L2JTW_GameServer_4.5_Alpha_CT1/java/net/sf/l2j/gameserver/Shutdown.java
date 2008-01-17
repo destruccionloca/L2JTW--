@@ -77,12 +77,12 @@ public class Shutdown extends Thread
         if(_shutdownMode > 0)
         {
 
-            _an.announceToAll("所有玩家請注意!");
-            _an.announceToAll("伺服器即將進行" + MODE_TEXT[_shutdownMode] + ",將在"+seconds+ "秒後執行!");
+            _an.announceToAll("所有玩家請注意！");
+            _an.announceToAll("伺服器即將進行" + MODE_TEXT[_shutdownMode] + "，將在"+seconds+ "秒後執行！");
             if(_shutdownMode == 1 || _shutdownMode == 2)
 
             {
-                _an.announceToAll("請玩家暫時避免使用傳送師以及任務進行.");
+                _an.announceToAll("請玩家暫時避免使用傳送以及任務進行。");
             }
         }
 
@@ -102,7 +102,7 @@ public class Shutdown extends Thread
         Announcements _an = Announcements.getInstance();
 
         _log.warning("IP: " + IP + " issued shutdown ABORT. " + MODE_TEXT[_shutdownMode] + " has been stopped!");
-        _an.announceToAll("伺服器取消 " + MODE_TEXT[_shutdownMode] + " 將會繼續進行正常運作!");
+        _an.announceToAll("伺服器取消 " + MODE_TEXT[_shutdownMode] + " 將會繼續進行正常運作！");
 
         if (_counterInstance != null) {
             _counterInstance._abort();
@@ -288,13 +288,13 @@ public class Shutdown extends Thread
         if(_shutdownMode > 0)
         {
 
-        	_an.announceToAll("所有玩家請注意!");
-            _an.announceToAll("伺服器即將進行" + MODE_TEXT[_shutdownMode] + ",將在"+seconds+ "秒後執行!");
+        	_an.announceToAll("所有玩家請注意！");
+            _an.announceToAll("伺服器即將進行" + MODE_TEXT[_shutdownMode] + "，將在"+seconds+ "秒後執行！");
             if(_shutdownMode == 1 || _shutdownMode == 2)
 
             {
 
-            	_an.announceToAll("請玩家暫時避免使用傳送師以及任務進行.");
+            	_an.announceToAll("請玩家暫時避免使用傳送以及任務進行。");
 
             }
         }
@@ -317,7 +317,7 @@ public class Shutdown extends Thread
 		Announcements _an = Announcements.getInstance();
 
 		_log.warning("GM: "+activeChar.getName()+"("+activeChar.getObjectId()+") issued shutdown ABORT. " + MODE_TEXT[_shutdownMode] + " has been stopped!");
-        _an.announceToAll("伺服器取消 " + MODE_TEXT[_shutdownMode] + " 將會繼續進行正常運作!");
+        _an.announceToAll("伺服器取消 " + MODE_TEXT[_shutdownMode] + " 將會繼續進行正常運作！");
 
 
 		if (_counterInstance != null) {
@@ -352,30 +352,30 @@ public class Shutdown extends Thread
 			while (_secondsShut > 0) {
 
 				switch (_secondsShut)
-				{
+                {
 
-					case 540:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 9 分鐘後執行.");break;
-                    case 480:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 8 分鐘後執行.");break;
-                    case 420:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 7 分鐘後執行.");break;
-                    case 360:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 6 分鐘後執行.");break;
-                    case 300:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 5 分鐘後執行.");break;
-                    case 240:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 4 分鐘後執行.");break;
-                    case 180:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 3 分鐘後執行.");break;
-                    case 120:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 2 分鐘後執行.");break;
-                    case 60:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 1 分鐘後執行.");
+					case 540:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在[9]分鐘後執行 ！");break;
+                    case 480:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在[8]分鐘後執行 ！");break;
+                    case 420:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在[7]分鐘後執行 ！");break;
+                    case 360:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在[6]分鐘後執行 ！");break;
+                    case 300:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在[5]分鐘後執行 ！");break;
+                    case 240:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在[4]分鐘後執行 ！");break;
+                    case 180:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在[3]分鐘後執行 ！");break;
+                    case 120:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在[2]分鐘後執行 ！");break;
+                    case 60:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在[1]分鐘後執行 ！");
                     	LoginServerThread.getInstance().setServerStatus(ServerStatus.STATUS_DOWN);break; //avoids new players from logging in
-                    case 30:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 30 秒後執行, 請馬上離線, 以免造成損失.");break;
-                    case 10:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 10 秒後執行, 請馬上離開遊戲, 以免造成損失 !");break;
-                    case 9:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 9 秒後執行!");break;
-                    case 8:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 8 秒後執行!");break;
-                    case 7:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 7 秒後執行!");break;
-                    case 6:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 6 秒後執行!");break;
-                    case 5:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 5 秒後執行!");break;
-                    case 4:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 4 秒後執行!");break;
-                    case 3:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 3 秒後執行!");break;
-                    case 2:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 2 秒後執行!");break;
-                    case 1:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在 1 秒後執行!");break;
-										}
+                    case 30:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在[30]秒後執行！");break;
+                    case 10:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在[10]秒後執行！");break;
+                    case 9:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在[9]秒後執行 ！");break;
+                    case 8:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在[8]秒後執行 ！");break;
+                    case 7:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在[7]秒後執行 ！");break;
+                    case 6:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在[6]秒後執行 ！");break;
+                    case 5:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在[5]秒後執行 ！");break;
+                    case 4:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在[4]秒後執行 ！");break;
+                    case 3:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在[3]秒後執行 ！");break;
+                    case 2:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在[2]秒後執行 ！");break;
+                    case 1:_an.announceToAll("伺服器即將 " + MODE_TEXT[_shutdownMode] + " 將在[1]秒後執行 ！");break;
+                }
 
 
 				_secondsShut--;
@@ -448,7 +448,7 @@ public class Shutdown extends Thread
         
         // Save all global (non-player specific) Quest data that needs to persist after reboot
         QuestManager.getInstance().save();
-        
+
         //Save items on ground before closing
         if(Config.SAVE_DROPPED_ITEM){
         ItemsOnGroundManager.getInstance().saveInDb();        

@@ -51,13 +51,13 @@ public class AdminLogin implements IAdminCommandHandler
 		if(command.equals("admin_server_gm_only"))
 		{
 			gmOnly();
-			activeChar.sendMessage("伺服器目前為GM專屬");
+			activeChar.sendMessage("伺服器目前為GM專屬。");
 			showMainPage(activeChar);
 		}
 		else if(command.equals("admin_server_all"))
 		{
 			allowToAll();
-			activeChar.sendMessage("伺服器目前為開放");
+			activeChar.sendMessage("伺服器目前為開放。");
 			showMainPage(activeChar);
 		}
 		else if(command.startsWith("admin_server_max_player"))
@@ -76,13 +76,13 @@ public class AdminLogin implements IAdminCommandHandler
 				}
 				catch(NumberFormatException e)
 				{
-					activeChar.sendMessage("格式錯誤.");
+					activeChar.sendMessage("格式錯誤。");
 				}
 			}
 
 			else
 			{
-				activeChar.sendMessage("格式為 //server_max_player <max>");
+				activeChar.sendMessage("使用方法: //server_max_player <max>");
 			}
 		}
 		else if(command.startsWith("admin_server_list_clock"))
@@ -95,7 +95,7 @@ public class AdminLogin implements IAdminCommandHandler
 				if(mode.equals("on"))
 				{
 					LoginServerThread.getInstance().sendServerStatus(ServerStatus.SERVER_LIST_CLOCK,ServerStatus.ON);
-					activeChar.sendMessage("在登入伺服器時將會看到時鐘");
+					activeChar.sendMessage("在登入伺服器時將會看到時鐘。");
 					Config.SERVER_LIST_CLOCK = true;
 					showMainPage(activeChar);
 				}
@@ -103,17 +103,17 @@ public class AdminLogin implements IAdminCommandHandler
 				{
 					LoginServerThread.getInstance().sendServerStatus(ServerStatus.SERVER_LIST_CLOCK,ServerStatus.OFF);
 					Config.SERVER_LIST_CLOCK = false;
-					activeChar.sendMessage("時鐘顯示關閉");
+					activeChar.sendMessage("時鐘顯示關閉。");
 					showMainPage(activeChar);
 				}
 				else
 				{
-					activeChar.sendMessage("格式為 //server_list_clock <on/off>");
+					activeChar.sendMessage("使用方式: //server_list_clock <on/off>");
 				}
 			}
 			else
 			{
-				activeChar.sendMessage("格式為 //server_list_clock <on/off>");
+				activeChar.sendMessage("使用方式: //server_list_clock <on/off>");
 			}
 		}
 		else if(command.equals("admin_server_login"))

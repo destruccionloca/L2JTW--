@@ -75,7 +75,7 @@ class EffectRelax extends L2Effect
 			{
 				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 				sm.addString("SYS");
-				sm.addString("完整回覆，技能解除.");
+				sm.addString("完全回復，技能解除。");
 				getEffected().sendPacket(sm);
 				//if (getEffected() instanceof L2PcInstance)
 					//((L2PcInstance)getEffected()).standUp();

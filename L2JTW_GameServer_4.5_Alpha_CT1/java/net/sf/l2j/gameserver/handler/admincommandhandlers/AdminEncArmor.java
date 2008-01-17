@@ -72,10 +72,7 @@ public class AdminEncArmor implements IAdminCommandHandler {
             catch (StringIndexOutOfBoundsException e)
             {
                 if ( Config.DEVELOPER ) System.out.println("Set helmet enchant error: "+e);
-                SystemMessage sm = new SystemMessage(614);
-                sm.addString("SYS");
-                sm.addString("請輸入強化數值");
-                activeChar.sendPacket(sm);
+                activeChar.sendMessage("請重新指定強化數值。");
             }
         }   
         else if (command.equals("admin_enchant"))
@@ -93,10 +90,7 @@ public class AdminEncArmor implements IAdminCommandHandler {
             catch (StringIndexOutOfBoundsException e)
             {
                 if ( Config.DEVELOPER ) System.out.println("Set chest armor enchant error: "+e);
-                SystemMessage sm = new SystemMessage(614);
-                sm.addString("SYS");
-                sm.addString("請輸入強化數值");
-                activeChar.sendPacket(sm);
+                activeChar.sendMessage("請重新指定強化數值。");
             }
         }   
         else if (command.startsWith("admin_seteg"))
@@ -110,10 +104,7 @@ public class AdminEncArmor implements IAdminCommandHandler {
             catch (StringIndexOutOfBoundsException e)
             {
                 if ( Config.DEVELOPER ) System.out.println("Set gloves enchant error: "+e);
-                SystemMessage sm = new SystemMessage(614);
-                sm.addString("SYS");
-                sm.addString("請輸入欲精鍊的值");
-                activeChar.sendPacket(sm);
+                activeChar.sendMessage("請重新指定強化數值。");
             }
             }
         else if (command.startsWith("admin_seteb"))
@@ -127,10 +118,7 @@ public class AdminEncArmor implements IAdminCommandHandler {
             catch (StringIndexOutOfBoundsException e)
             {
                 if ( Config.DEVELOPER ) System.out.println("Set boots enchant error: "+e);
-                SystemMessage sm = new SystemMessage(614);
-                sm.addString("SYS");
-                sm.addString("請輸入強化數值");
-                activeChar.sendPacket(sm);
+                activeChar.sendMessage("請重新指定強化數值。");
             }
         }
         else if (command.startsWith("admin_setel"))
@@ -144,10 +132,7 @@ public class AdminEncArmor implements IAdminCommandHandler {
             catch (StringIndexOutOfBoundsException e)
             {
                 if ( Config.DEVELOPER ) System.out.println("Set leggings enchant error: "+e);
-                SystemMessage sm = new SystemMessage(614);
-                sm.addString("SYS");
-                sm.addString("請輸入強化數值");
-                activeChar.sendPacket(sm);
+                activeChar.sendMessage("請重新指定強化數值。");
             }
         }
         else if (command.startsWith("admin_setes"))
@@ -161,10 +146,7 @@ public class AdminEncArmor implements IAdminCommandHandler {
             catch (StringIndexOutOfBoundsException e)
             {
                 if ( Config.DEVELOPER ) System.out.println("Set shield enchant error: "+e);
-                SystemMessage sm = new SystemMessage(614);
-                sm.addString("SYS");
-                sm.addString("請輸入強化數值");
-                activeChar.sendPacket(sm);
+                activeChar.sendMessage("請重新指定強化數值。");
             }
         }
         else if (command.startsWith("admin_setle"))
@@ -178,10 +160,7 @@ public class AdminEncArmor implements IAdminCommandHandler {
             catch (StringIndexOutOfBoundsException e)
             {
                 if ( Config.DEVELOPER ) System.out.println("Set Left Earring enchant error: "+e);
-                SystemMessage sm = new SystemMessage(614);
-                sm.addString("SYS");
-                sm.addString("請輸入強化數值");
-                activeChar.sendPacket(sm);
+                activeChar.sendMessage("請重新指定強化數值。");
             }
         }
         else if (command.startsWith("admin_setre"))
@@ -195,10 +174,7 @@ public class AdminEncArmor implements IAdminCommandHandler {
             catch (StringIndexOutOfBoundsException e)
             {
                 if ( Config.DEVELOPER ) System.out.println("Set Right Earring enchant error: "+e);
-                SystemMessage sm = new SystemMessage(614);
-                sm.addString("SYS");
-                sm.addString("請輸入強化數值");
-                activeChar.sendPacket(sm);
+                activeChar.sendMessage("請重新指定強化數值。");
             }
         }
         else if (command.startsWith("admin_setlf"))
@@ -212,10 +188,7 @@ public class AdminEncArmor implements IAdminCommandHandler {
             catch (StringIndexOutOfBoundsException e)
             {
                 if ( Config.DEVELOPER ) System.out.println("Set Left Ring enchant error: "+e);
-                SystemMessage sm = new SystemMessage(614);
-                sm.addString("SYS");
-                sm.addString("請輸入強化數值");
-                activeChar.sendPacket(sm);
+                activeChar.sendMessage("請重新指定強化數值。");
             }
         }
         else if (command.startsWith("admin_setrf"))
@@ -229,10 +202,7 @@ public class AdminEncArmor implements IAdminCommandHandler {
             catch (StringIndexOutOfBoundsException e)
             {
                 if ( Config.DEVELOPER ) System.out.println("Set Right Ring enchant error: "+e);
-                SystemMessage sm = new SystemMessage(614);
-                sm.addString("SYS");
-                sm.addString("請輸入強化數值");
-                activeChar.sendPacket(sm);
+                activeChar.sendMessage("請重新指定強化數值。");
             }
         }
         else if (command.startsWith("admin_seten"))
@@ -246,10 +216,7 @@ public class AdminEncArmor implements IAdminCommandHandler {
             catch (StringIndexOutOfBoundsException e)
             {
                 if ( Config.DEVELOPER ) System.out.println("Set Necklace enchant error: "+e);
-                SystemMessage sm = new SystemMessage(614);
-                sm.addString("SYS");
-                sm.addString("請輸入強化數值");
-                activeChar.sendPacket(sm);
+                activeChar.sendMessage("請重新指定強化數值。");
             }
         }
         else if (command.startsWith("admin_setun"))
@@ -263,10 +230,7 @@ public class AdminEncArmor implements IAdminCommandHandler {
             catch (StringIndexOutOfBoundsException e)
             {
                 if ( Config.DEVELOPER ) System.out.println("Set Underwear enchant error: "+e);
-                SystemMessage sm = new SystemMessage(614);
-                sm.addString("SYS");
-                sm.addString("請輸入強化數值");
-                activeChar.sendPacket(sm);
+                activeChar.sendMessage("請重新指定強化數值。");
             }
         }
         else if (command.startsWith("admin_setba"))
@@ -280,10 +244,7 @@ public class AdminEncArmor implements IAdminCommandHandler {
             catch (StringIndexOutOfBoundsException e)
             {
                 if ( Config.DEVELOPER ) System.out.println("Set Cloak enchant error: "+e);
-                SystemMessage sm = new SystemMessage(614);
-                sm.addString("SYS");
-                sm.addString("請輸入強化數值");
-                activeChar.sendPacket(sm);
+                activeChar.sendMessage("請重新指定強化數值。");
             }
         }
         return true;
@@ -302,7 +263,8 @@ public class AdminEncArmor implements IAdminCommandHandler {
             return;
         }
         
-        // 判定輸入的精煉值範圍
+        SystemMessage systemMessage = new SystemMessage(614);
+		// 判定輸入的精煉值範圍
         if ( ench >= 0 && ench <= 65535 ) {
             // now we need to find the equipped weapon of the targeted character...
             int curEnchant = 0; // display purposes only
@@ -338,25 +300,14 @@ public class AdminEncArmor implements IAdminCommandHandler {
                 player.broadcastPacket(info1);
                 UserInfo info2 = new UserInfo(player);
                 player.sendPacket(info2);
-                
-                // 管理員訊息
-                SystemMessage smA = new SystemMessage(614);
-                smA.addString("改變裝備");
-                smA.addString("("+armorToEnchant.getItem().getName()+") 從 +"+curEnchant+" 到 +"+ench+".");       
-                activeChar.sendPacket(smA);
-                
+
                 // 玩家訊息
-                SystemMessage sm = new SystemMessage(614);
-                sm.addString("GM");
-                sm.addString("強化你的裝備 ("+armorToEnchant.getItem().getName()+") 從 +"+curEnchant+" 到 +"+ench+".");
-                player.sendPacket(sm);
+                activeChar.sendMessage("強化你的裝備 ("+armorToEnchant.getItem().getName()+") 從 +"+curEnchant+" 到 +"+ench+".");
             }
         }
         else {
             // inform our gm of their mistake
-            SystemMessage smA = new SystemMessage(614);
-            smA.addString("範圍為 0-65535.");     
-            activeChar.sendPacket(smA);         
+        	activeChar.sendMessage("強化等級範圍只限於 0-65535 之間。");
         }
     }
     
@@ -366,7 +317,7 @@ public class AdminEncArmor implements IAdminCommandHandler {
 
         StringBuffer replyMSG = new StringBuffer("<html><body>");
         replyMSG.append("<center><table width=260><tr><td width=40>");
-        replyMSG.append("<button value=\"主頁\" action=\"bypass -h admin_admin\" width=45 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+        replyMSG.append("<button value=\"首頁\" action=\"bypass -h admin_admin\" width=45 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
         replyMSG.append("</td><td width=180>");
         replyMSG.append("<center>精練裝備</center>");
         replyMSG.append("</td><td width=40>");

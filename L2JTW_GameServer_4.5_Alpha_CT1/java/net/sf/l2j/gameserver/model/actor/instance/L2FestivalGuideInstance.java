@@ -161,7 +161,7 @@ public final class L2FestivalGuideInstance extends L2FolkInstance
                     // Check if a festival is in progress, then don't allow registration yet.
                     if (SevenSignsFestival.getInstance().isFestivalInitialized())
                     {
-                        player.sendMessage("目前黑暗祭典進行中,無法申請.");
+                        player.sendMessage("黑暗的祭典進行中，無法參加申請。");
                         return;
                     }
 
@@ -241,7 +241,7 @@ public final class L2FestivalGuideInstance extends L2FolkInstance
                     // Check if a festival is in progress, if it is don't register the score.
                     if (SevenSignsFestival.getInstance().isFestivalInProgress())
                     {
-                        player.sendMessage("無法在黑暗祭典進行中的同時註冊分數");
+                        player.sendMessage("黑暗的祭典進行中，無法登記分數。");
                         return;
                     }
 
@@ -274,8 +274,7 @@ public final class L2FestivalGuideInstance extends L2FolkInstance
 
                     // Check if the player collected any blood offerings during the festival.
                     if (bloodOfferings == null) {
-                        player.sendMessage("你並無任何貢獻");                       
-
+                        player.sendMessage("並無任何貢獻。");                       
                         return;
                     }
 
@@ -316,27 +315,27 @@ public final class L2FestivalGuideInstance extends L2FolkInstance
                     strBuffer.append(SevenSignsFestival.getFestivalName(_festivalType) + " festival.<br>");
 
                     if (dawnScore > 0)
-                        strBuffer.append("黎民: " + calculateDate(dawnData.getString("date")) + ". 分數 " + dawnScore + "<br>" + dawnData.getString("members") + "<br>");
+                        strBuffer.append("黎民：" + calculateDate(dawnData.getString("date")) + "。分數 " + dawnScore + "<br>" + dawnData.getString("members") + "<br>");
                     else
-                        strBuffer.append("黎民: 並無分數存在,分數為0.<br>");
+                        strBuffer.append("黎明：無。分數 0<br>");
 
                     if (duskScore > 0)
-                        strBuffer.append("黃昏: " + calculateDate(duskData.getString("date")) + ". 分數 " + duskScore + "<br>" + duskData.getString("members") + "<br>");
+                        strBuffer.append("黃昏：" + calculateDate(duskData.getString("date")) + "。分數 " + duskScore + "<br>" + duskData.getString("members") + "<br>");
                     else
-                        strBuffer.append("黃昏: 並無分數存在,分數為0.<br>");
+                        strBuffer.append("黃昏：無。分數 0<br>");
 
                     if (overallScore > 0) {
-                        String cabalStr = "黃昏的子民";
+                        String cabalStr = "黃昏的革命軍";
 
                         if (overallData.getString("cabal").equals("dawn"))
-                            cabalStr = "黎民的子民";
+                            cabalStr = "黎民的君主們";
 
-                        strBuffer.append("連續最高分: " + calculateDate(overallData.getString("date")) + ". 分數 " + overallScore + "<br>相關: " + cabalStr + "<br>" + overallData.getString("members") + "<br>");
+                        strBuffer.append("<FONT color=LEVEL>歷代最高紀錄</FONT>：" + calculateDate(overallData.getString("date")) + "。分數" + overallScore + "<br>所屬陣營：" + cabalStr + "<br>" + overallData.getString("members") + "<br>");
                     }
                     else
-                        strBuffer.append("連續最高分: 並無分數存在,分數為0.<br>");
+                        strBuffer.append("<FONT color=LEVEL>歷代最高紀錄</FONT>：無。分數 0<br>");
 
-                    strBuffer.append("<a action=\"bypass -h npc_" + getObjectId() + "_Chat 0\">返回.</a></body></html>");
+                    strBuffer.append("<a action=\"bypass -h npc_" + getObjectId() + "_Chat 0\">返回</a></body></html>");
 
                     NpcHtmlMessage html = new NpcHtmlMessage(getObjectId());
                     html.setHtml(strBuffer.toString());
@@ -381,7 +380,7 @@ public final class L2FestivalGuideInstance extends L2FolkInstance
                 case 0: // Distribute Accumulated Bonus
                     if (!SevenSigns.getInstance().isSealValidationPeriod())
                     {
-                        player.sendMessage("在競爭期間無法給出.");
+                        player.sendMessage("七個封印競爭期間，無法結算報酬。");
                         return;
                     }
 

@@ -57,14 +57,12 @@ public class AdminTarget implements IAdminCommandHandler {
 				obj.onAction(activeChar);
 			} else {
 				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-				sm.addString("SYS");
-				sm.addString("人物 "+targetName+" 無法尋找");
+				sm.addString("目標 "+targetName+" 不在遊戲。");
 				activeChar.sendPacket(sm);
 			}
 		} catch (IndexOutOfBoundsException e) {
 			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-			sm.addString("SYS");
-			sm.addString("請確認名稱");
+			sm.addString("請確認角色名稱。");
 			activeChar.sendPacket(sm);
 		}
 	}

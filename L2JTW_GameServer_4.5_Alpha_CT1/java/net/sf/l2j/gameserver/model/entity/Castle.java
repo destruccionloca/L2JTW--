@@ -117,10 +117,10 @@ public class Castle
 				setOwner(clan);
 			}
 			else
-				getSiege().announceToPlayer("" + clan.getName() + " 血盟成功的擊退城主.", true);
+				getSiege().announceToPlayer(clan.getName() + " 血盟成功的擊退城主。", true);
 		}
 		else
-			getSiege().announceToPlayer("" + clan.getName() + " 血盟成功的擊退城主.", true);
+			getSiege().announceToPlayer(clan.getName() + " 血盟成功的擊退城主。", true);
 	}
 
 	// This method add to the treasury
@@ -276,7 +276,7 @@ public class Castle
 					}
 				}
 				oldOwner.setHasCastle(0);												// Unset has castle flag for old owner
-        		new Announcements().announceToAll(oldOwner.getName() + " 血盟失去了 " + getName() + " 城堡!");
+        		new Announcements().announceToAll(oldOwner.getName() + " 血盟失去了 " + getName() + " 城堡！");
 			}
 	    }
 
@@ -298,7 +298,7 @@ public class Castle
 				CastleManager.getInstance().removeCirclet(_formerOwner,getCastleId());
 			}
 			clan.setHasCastle(0);
-			new Announcements().announceToAll(clan.getName() + " 血盟失去了 " +getName() + " 城堡");
+			new Announcements().announceToAll(clan.getName() + " 血盟失去了 " +getName() + " 城堡！");
 			clan.broadcastToOnlineMembers(new PledgeShowInfoUpdate(clan));
 		}
 
@@ -327,12 +327,12 @@ public class Castle
 
         if (taxPercent < 0 || taxPercent > maxTax)
         {
-            activeChar.sendMessage("稅率調整為 "+maxTax+".");
+            activeChar.sendMessage("稅率只能在 0 至 "+maxTax+" 之間。");
             return;
         }
 
         setTaxPercent(taxPercent);
-        activeChar.sendMessage(getName() + " 城堡稅率調整為 " + taxPercent + "%.");
+        activeChar.sendMessage(getName() + " 城堡稅率改為 " + taxPercent + "%。");
     }
 
     public void setTaxPercent(int taxPercent)

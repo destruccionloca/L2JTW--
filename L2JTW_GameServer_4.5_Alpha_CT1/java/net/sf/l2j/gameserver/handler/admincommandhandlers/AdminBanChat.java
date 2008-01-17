@@ -84,7 +84,7 @@ public class AdminBanChat implements IAdminCommandHandler {
 
 		if (targetPlayer == null)
 		{
-			activeChar.sendMessage("指令方案錯誤");
+			activeChar.sendMessage("指令方案錯誤。");
 			return false;
 		}
 

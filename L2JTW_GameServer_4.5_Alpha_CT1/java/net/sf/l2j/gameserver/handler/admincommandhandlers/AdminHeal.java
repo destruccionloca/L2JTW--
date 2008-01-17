@@ -57,7 +57,7 @@ public class AdminHeal implements IAdminCommandHandler {
 				if (Config.DEVELOPER)
 					_log.warning("Heal error: "+e);
 				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-				sm.addString("錯誤半徑或目標.");
+				sm.addString("錯誤半徑或目標。");
 				activeChar.sendPacket(sm);
 			}
 		}
@@ -100,7 +100,7 @@ public class AdminHeal implements IAdminCommandHandler {
 							if ( object instanceof L2PcInstance ) character.setCurrentCp(character.getMaxCp());
 						}
 					}
-					activeChar.sendMessage("恢復 " + radius + " 半徑內所有物件.");
+					activeChar.sendMessage("恢復 " + radius + " 半徑內所有物件。");
 					return;
 				}
 				catch (NumberFormatException nbe) {}

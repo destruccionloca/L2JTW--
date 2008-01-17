@@ -148,7 +148,7 @@ public class AdminMobGroup implements IAdminCommandHandler
 
         catch (Exception e) 
         {
-            activeChar.sendMessage("«ü¥O¿ù»~");
+            activeChar.sendMessage("«ü¥O¿ù»~¡C");
 
 			return;
 		}
@@ -170,7 +170,7 @@ public class AdminMobGroup implements IAdminCommandHandler
 		}
 
         catch (Exception e) {
-            activeChar.sendMessage("«ü¥O¿ù»~");
+            activeChar.sendMessage("«ü¥O¿ù»~¡C");
 
 			return;
 		}
@@ -192,7 +192,7 @@ public class AdminMobGroup implements IAdminCommandHandler
 		} 
 
         catch (Exception e) {
-            activeChar.sendMessage("«ü¥O¿ù»~");
+            activeChar.sendMessage("«ü¥O¿ù»~¡C");
 
 
 			return;
@@ -200,7 +200,7 @@ public class AdminMobGroup implements IAdminCommandHandler
 		MobGroup group = MobGroupTable.getInstance().getGroup(groupId);
 		if (group == null)
 		{
-			activeChar.sendMessage("«ü¥O¿ù»~");
+			activeChar.sendMessage("«ü¥O¿ù»~¡C");
 			return;
 		}
 		group.setAttackTarget(target);
@@ -215,7 +215,7 @@ public class AdminMobGroup implements IAdminCommandHandler
 		} 
 
         catch (Exception e) {
-            activeChar.sendMessage("«ü¥O¿ù»~");
+            activeChar.sendMessage("«ü¥O¿ù»~¡C");
 
 
 			return;
@@ -223,7 +223,7 @@ public class AdminMobGroup implements IAdminCommandHandler
 		MobGroup group = MobGroupTable.getInstance().getGroup(groupId);
 		if (group == null)
 		{
-			activeChar.sendMessage("«ü¥O¿ù»~");
+			activeChar.sendMessage("«ü¥O¿ù»~¡C");
 			return;
 		}
 		group.setFollowMode(target);
@@ -251,7 +251,7 @@ public class AdminMobGroup implements IAdminCommandHandler
 
 		if (MobGroupTable.getInstance().getGroup(groupId) != null)
 		{
-			activeChar.sendMessage("¸s²Õ½s¸¹ " + groupId + " ¤w¦s¦b.");
+			activeChar.sendMessage("¸s²Õ½s¸¹ " + groupId + " ¤w¦s¦b¡C");
 			return;
 		}
 
@@ -259,14 +259,14 @@ public class AdminMobGroup implements IAdminCommandHandler
 
 		if (template == null)
 		{
-			activeChar.sendMessage("NPC½s¸¹¿ù»~.");
+			activeChar.sendMessage("NPC ½s¸¹¿ù»~¡C");
 			return;
 		}
 
 		MobGroup group = new MobGroup(groupId, template, mobCount);
 		MobGroupTable.getInstance().addGroup(groupId, group);
 
-		activeChar.sendMessage("¸s²Õ " + groupId + " ³Ð¥ß¦¨¥\.");
+		activeChar.sendMessage("¸s²Õ " + groupId + " «Ø¥ß¦¨¥\¡C");
 	}
 
 
@@ -287,7 +287,7 @@ public class AdminMobGroup implements IAdminCommandHandler
 
 		if (group == null)
 		{
-			activeChar.sendMessage("«ü¥O¿ù»~");
+			activeChar.sendMessage("«ü¥O¿ù»~¡C");
 			return;
 		}
 
@@ -295,7 +295,7 @@ public class AdminMobGroup implements IAdminCommandHandler
 		group.unspawnGroup();
 
 		if (MobGroupTable.getInstance().removeGroup(groupId))
-			activeChar.sendMessage("¸s²Õ " + groupId + " ²¾°£.");
+			activeChar.sendMessage("¸s²Õ " + groupId + " ²¾°£¡C");
 	}
 
 	private void spawnGroup(String command, L2PcInstance activeChar)
@@ -359,14 +359,14 @@ public class AdminMobGroup implements IAdminCommandHandler
 
 		if (group == null)
 		{
-			activeChar.sendMessage("«ü¥O¿ù»~");
+			activeChar.sendMessage("«ü¥O¿ù»~¡C");
 			return;
 		}
 
 		doAnimation(activeChar);
 		group.unspawnGroup();
 
-		activeChar.sendMessage("¸s²Õ " + groupId + " ²¾°£");
+		activeChar.sendMessage("¸s²Õ " + groupId + " ²¾°£¡C");
 	}
 
 	private void killGroup(String command, L2PcInstance activeChar)
@@ -385,7 +385,7 @@ public class AdminMobGroup implements IAdminCommandHandler
 
 		if (group == null)
 		{
-			activeChar.sendMessage("«ü¥O¿ù»~");
+			activeChar.sendMessage("«ü¥O¿ù»~¡C");
 			return;
 		}
 
@@ -410,7 +410,7 @@ public class AdminMobGroup implements IAdminCommandHandler
 
 		if (group == null)
 		{
-			activeChar.sendMessage("«ü¥O¿ù»~");
+			activeChar.sendMessage("«ü¥O¿ù»~¡C");
 			return;
 		}
 
@@ -437,7 +437,7 @@ public class AdminMobGroup implements IAdminCommandHandler
 
 		if (group == null)
 		{
-			activeChar.sendMessage("«ü¥O¿ù»~");
+			activeChar.sendMessage("«ü¥O¿ù»~¡C");
 			return;
 		}
 
@@ -447,7 +447,7 @@ public class AdminMobGroup implements IAdminCommandHandler
 			group.setNoMoveMode(false);
 		else
 
-			activeChar.sendMessage("«ü¥O¿ù»~");
+			activeChar.sendMessage("«ü¥O¿ù»~¡C");
 
 	}
 
@@ -479,7 +479,7 @@ public class AdminMobGroup implements IAdminCommandHandler
 
 		if (group == null)
         {
-            activeChar.sendMessage("¿ù»~¸s²Õ");
+            activeChar.sendMessage("¸s²Õ¿ù»~¡C");
 
 			return;
 		}
@@ -488,7 +488,7 @@ public class AdminMobGroup implements IAdminCommandHandler
 
 		if (othGroup == null)
         {
-            activeChar.sendMessage("¿ù»~¸s²Õ");
+            activeChar.sendMessage("¸s²Õ¿ù»~¡C");
 			return;
 		}
 
@@ -513,7 +513,7 @@ public class AdminMobGroup implements IAdminCommandHandler
 
 		if (group == null)
         {
-            activeChar.sendMessage("¿ù»~¸s²Õ");
+            activeChar.sendMessage("¸s²Õ¿ù»~¡C");
 			return;
 		}
 
@@ -522,7 +522,7 @@ public class AdminMobGroup implements IAdminCommandHandler
 		else if (enabled.equalsIgnoreCase("off") || enabled.equalsIgnoreCase("false"))
 			group.setInvul(false);
 		else
-            activeChar.sendMessage("«ü¥O¿ù»~");
+            activeChar.sendMessage("«ü¥O¿ù»~¡C");
 	}
 
 	private void teleportGroup(String command, L2PcInstance activeChar)
@@ -551,7 +551,7 @@ public class AdminMobGroup implements IAdminCommandHandler
 
 		if (group == null)
 		{
-			activeChar.sendMessage("«ü¥O¿ù»~");
+			activeChar.sendMessage("«ü¥O¿ù»~¡C");
 			return;
 		}
 
@@ -565,8 +565,8 @@ public class AdminMobGroup implements IAdminCommandHandler
 		activeChar.sendMessage("======= <©Çª«¸s²Õ> =======");
 
 		for (MobGroup mobGroup : mobGroupList)
-			activeChar.sendMessage(mobGroup.getGroupId() + ": " + mobGroup.getActiveMobCount() + " ¥Í¦s,³Ì¤j­È¬° " +  mobGroup.getMaxMobCount() + 
-					". ½s¸¹¬° " + mobGroup.getTemplate().npcId + " (" + mobGroup.getStatus() + ")");
+			activeChar.sendMessage(mobGroup.getGroupId() + ": " + mobGroup.getActiveMobCount() + " ¥Í¦s¡A³Ì¤j­È¬° " +  mobGroup.getMaxMobCount() + 
+					"¡C½s¸¹¬° " + mobGroup.getTemplate().npcId + " (" + mobGroup.getStatus() + ")");
 
 
 		activeChar.sendPacket(new SystemMessage(SystemMessageId.FRIEND_LIST_FOOT));

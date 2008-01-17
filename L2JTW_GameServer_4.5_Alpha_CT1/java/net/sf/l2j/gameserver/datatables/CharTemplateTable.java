@@ -42,11 +42,9 @@ public class CharTemplateTable
                                                 "人類戰士", "鬥士", "劍鬥士", "傭兵", "騎士", "聖騎士", "闇騎士", "盜賊", "寶藏獵人", "鷹眼", "法師", "巫師", "術士", "死靈法師", "法魔", "牧師", "主教", "先知",
                                                 "精靈戰士", "精靈騎士", "聖殿騎士", "劍術詩人", "巡守", "大地行者", "銀月遊俠", "精靈法師", "精靈巫師", "咒術詩人", "元素使", "神使", "長老",
                                                 "黑暗精靈戰士", "沼澤騎士", "席琳騎士", "劍刃舞者", "暗殺者", "深淵行者", "闇影遊俠", "黑暗精靈法師", "黑暗精靈巫師", "狂咒術士", "暗影召喚師", "席琳神使", "席琳長老",
-                                                "半獸人戰士", "襲擊者", "破壞者", "武者", "暴君", "半獸人法師", "半獸人巫醫", "霸主", "戰狂",
+                                                "半獸人戰士", "襲擊者", "破壞者", "半獸人武者", "半獸人暴君", "半獸人法師", "半獸人巫醫", "霸主", "戰狂",
                                                 "矮人戰士", "收集者", "賞金獵人", "工匠", "戰爭工匠",
-
                                                 "dummyEntry1", "dummyEntry2", "dummyEntry3", "dummyEntry4", "dummyEntry5", "dummyEntry6", "dummyEntry7", "dummyEntry8", "dummyEntry9", "dummyEntry10", "dummyEntry11", "dummyEntry12", "dummyEntry13", "dummyEntry14", "dummyEntry15",
-
                                                 "dummyEntry16", "dummyEntry17", "dummyEntry18", "dummyEntry19", "dummyEntry20", "dummyEntry21", "dummyEntry22", "dummyEntry23", "dummyEntry24", "dummyEntry25", "dummyEntry26", "dummyEntry27", "dummyEntry28", "dummyEntry29", "dummyEntry30", 
                                                 "決鬥者", "猛將", "聖凰騎士", "煉獄騎士", "人馬", "冒險英豪", 
                                                 "大魔導士", "魂狩術士", "祕儀召主", "樞機主教", "昭聖者", 

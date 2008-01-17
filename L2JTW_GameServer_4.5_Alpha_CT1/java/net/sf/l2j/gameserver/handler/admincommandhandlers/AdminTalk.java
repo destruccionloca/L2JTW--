@@ -38,18 +38,18 @@ public class AdminTalk implements IAdminCommandHandler {
     {
         if (!(checkLevel(activeChar.getAccessLevel())))
         {
-            System.out.println("無需權限");
+            System.out.println("無需權限。");
             return false;
         }
         if (command.startsWith("admin_talk on"))
 	{
 	    _canTalk = true;
-	    activeChar.sendMessage("GM交談起動.");
+	    activeChar.sendMessage("GM交談啟動。");
             //System.out.println("ADMIN TALKON");
         } else if (command.startsWith("admin_talk off"))
 	{
 	    _canTalk = false;
-	    activeChar.sendMessage("GM交談關閉.");
+	    activeChar.sendMessage("GM交談關閉。");
                 //System.out.println("ADMIN TALKOFF");
         }
 	return true;

@@ -100,11 +100,11 @@ public class SiegeManager
         Castle castle = CastleManager.getInstance().getCastle(player);
 
         if (castle == null || castle.getCastleId() <= 0)
-            sm.addString("只能在城堡範圍內召喚.");
+            sm.addString("必須在城堡領地上召喚。");
         else if (!castle.getSiege().getIsInProgress())
-            sm.addString("只能在攻城戰時期召喚.");
+            sm.addString("必須在攻城戰期間使用。");
         else if (player.getClanId() != 0 && castle.getSiege().getAttackerClan(player.getClanId()) == null)
-            sm.addString("只有攻城方能召喚.");
+            sm.addString("必須為攻城方才可召喚。");
         else
             return true;
 

@@ -123,7 +123,7 @@ public final class L2TeleporterInstance extends L2FolkInstance
                 }
                 if (10 >= minPrivilegeLevel) // NOTE: Replace 10 with privilege level of player
                 doTeleport(player, whereTo);
-                else player.sendMessage("權限不足");
+                else player.sendMessage("權限不足。");
 
                 return;
             }

@@ -65,10 +65,11 @@ import net.sf.l2j.gameserver.handler.UserCommandHandler;
 import net.sf.l2j.gameserver.handler.VoicedCommandHandler;
 import net.sf.l2j.gameserver.handler.admincommandhandlers.AdminAdmin;
 import net.sf.l2j.gameserver.handler.admincommandhandlers.AdminAnnouncements;
-//import net.sf.l2j.gameserver.handler.admincommandhandlers.AdminBBS;
+import net.sf.l2j.gameserver.handler.admincommandhandlers.AdminBBS;
 import net.sf.l2j.gameserver.handler.admincommandhandlers.AdminBan;
 import net.sf.l2j.gameserver.handler.admincommandhandlers.AdminBanChat;
 import net.sf.l2j.gameserver.handler.admincommandhandlers.AdminCache;
+import net.sf.l2j.gameserver.handler.admincommandhandlers.AdminCamera;
 import net.sf.l2j.gameserver.handler.admincommandhandlers.AdminChangeAccessLevel;
 import net.sf.l2j.gameserver.handler.admincommandhandlers.AdminCreateItem;
 import net.sf.l2j.gameserver.handler.admincommandhandlers.AdminCursedWeapons;
@@ -86,7 +87,6 @@ import net.sf.l2j.gameserver.handler.admincommandhandlers.AdminGeoEditor;
 import net.sf.l2j.gameserver.handler.admincommandhandlers.AdminGeodata;
 import net.sf.l2j.gameserver.handler.admincommandhandlers.AdminGm;
 import net.sf.l2j.gameserver.handler.admincommandhandlers.AdminGmChat;
-import net.sf.l2j.gameserver.handler.admincommandhandlers.AdminGeodata;
 import net.sf.l2j.gameserver.handler.admincommandhandlers.AdminHeal;
 import net.sf.l2j.gameserver.handler.admincommandhandlers.AdminHelpPage;
 import net.sf.l2j.gameserver.handler.admincommandhandlers.AdminInvul;
@@ -203,22 +203,29 @@ import net.sf.l2j.gameserver.handler.usercommandhandlers.Time;
 import net.sf.l2j.gameserver.handler.voicedcommandhandlers.Wedding;
 import net.sf.l2j.gameserver.handler.voicedcommandhandlers.stats;
 import net.sf.l2j.gameserver.idfactory.IdFactory;
+import net.sf.l2j.gameserver.instancemanager.AntharasManager;
 import net.sf.l2j.gameserver.instancemanager.AuctionManager;
+import net.sf.l2j.gameserver.instancemanager.BaiumManager;
 import net.sf.l2j.gameserver.instancemanager.BoatManager;
 import net.sf.l2j.gameserver.instancemanager.CastleManager;
 import net.sf.l2j.gameserver.instancemanager.CastleManorManager;
 import net.sf.l2j.gameserver.instancemanager.ClanHallManager;
+//import net.sf.l2j.gameserver.instancemanager.CleanUpManager;
 import net.sf.l2j.gameserver.instancemanager.CoupleManager;
 import net.sf.l2j.gameserver.instancemanager.CursedWeaponsManager;
 import net.sf.l2j.gameserver.instancemanager.DayNightSpawnManager;
 import net.sf.l2j.gameserver.instancemanager.DimensionalRiftManager;
+import net.sf.l2j.gameserver.instancemanager.FourSepulchersManager;
 import net.sf.l2j.gameserver.instancemanager.ItemsOnGroundManager;
 import net.sf.l2j.gameserver.instancemanager.MercTicketManager;
 import net.sf.l2j.gameserver.instancemanager.PetitionManager;
 import net.sf.l2j.gameserver.instancemanager.QuestManager;
 import net.sf.l2j.gameserver.instancemanager.RaidBossSpawnManager;
+import net.sf.l2j.gameserver.instancemanager.SailrenManager;
 import net.sf.l2j.gameserver.instancemanager.SiegeManager;
 import net.sf.l2j.gameserver.instancemanager.TransformationManager; 
+import net.sf.l2j.gameserver.instancemanager.ValakasManager;
+import net.sf.l2j.gameserver.instancemanager.VanHalterManager;
 
 import net.sf.l2j.gameserver.model.AutoChatHandler;
 import net.sf.l2j.gameserver.model.AutoSpawnHandler;
@@ -464,6 +471,14 @@ public class GameServer
         // Init of a cursed weapon manager
         CursedWeaponsManager.getInstance();
 
+        // [L2J_JP ADD - SANDMAN]
+		FourSepulchersManager.getInstance().init();
+		SailrenManager.getInstance().init();
+		AntharasManager.getInstance().init();
+		ValakasManager.getInstance().init();
+		BaiumManager.getInstance().init();
+		VanHalterManager.getInstance().init();
+
 		_log.config("AutoChatHandler: Loaded " + _autoChatHandler.size() + " handlers in total.");
 		_log.config("AutoSpawnHandler: Loaded " + _autoSpawnHandler.size() + " handlers in total.");
 
@@ -577,7 +592,7 @@ public class GameServer
         _adminCommandHandler.registerAdminCommandHandler(new AdminPathNode());
         _adminCommandHandler.registerAdminCommandHandler(new AdminPetition());
         _adminCommandHandler.registerAdminCommandHandler(new AdminPForge());
-        //_adminCommandHandler.registerAdminCommandHandler(new AdminBBS());
+        _adminCommandHandler.registerAdminCommandHandler(new AdminBBS());
         _adminCommandHandler.registerAdminCommandHandler(new AdminEffects());
         _adminCommandHandler.registerAdminCommandHandler(new AdminDoorControl());
         _adminCommandHandler.registerAdminCommandHandler(new AdminTest());
@@ -590,6 +605,7 @@ public class GameServer
         _adminCommandHandler.registerAdminCommandHandler(new AdminRideWyvern());
         _adminCommandHandler.registerAdminCommandHandler(new AdminLogin());
         _adminCommandHandler.registerAdminCommandHandler(new AdminCache());
+        _adminCommandHandler.registerAdminCommandHandler(new AdminCamera());
         _adminCommandHandler.registerAdminCommandHandler(new AdminLevel());
         _adminCommandHandler.registerAdminCommandHandler(new AdminQuest());
         _adminCommandHandler.registerAdminCommandHandler(new AdminZone());

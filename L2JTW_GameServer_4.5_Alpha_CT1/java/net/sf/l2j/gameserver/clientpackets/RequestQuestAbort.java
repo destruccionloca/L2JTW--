@@ -21,9 +21,9 @@ import net.sf.l2j.gameserver.instancemanager.QuestManager;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.quest.Quest;
 import net.sf.l2j.gameserver.model.quest.QuestState;
-import net.sf.l2j.gameserver.network.SystemMessageId;
+//import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.QuestList;
-import net.sf.l2j.gameserver.serverpackets.SystemMessage;
+//import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
 /**
  * This class ...
@@ -58,11 +58,11 @@ public final class RequestQuestAbort extends L2GameClientPacket
             if(qs != null)
             {
         		qs.exitQuest(true);
-        		SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-                sm.addString("SYS");
-                sm.addString("任務取消");
-                activeChar.sendPacket(sm);
-                sm = null;
+        		//SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
+                //sm.addString("SYS");
+                //sm.addString("任務取消");
+                //activeChar.sendPacket(sm);
+                //sm = null;
         		QuestList ql = new QuestList();
                 activeChar.sendPacket(ql);
             } else

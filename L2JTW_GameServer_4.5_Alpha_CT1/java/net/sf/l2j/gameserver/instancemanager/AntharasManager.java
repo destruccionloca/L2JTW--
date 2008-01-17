@@ -20,7 +20,7 @@
 package net.sf.l2j.gameserver.instancemanager;
 
 import java.util.logging.Logger;
-import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledFuture;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +48,7 @@ import net.sf.l2j.gameserver.model.entity.GrandBossState;
 /**
  * 
  * This class ...
- * control for sequence of figth with Antharas.
+ * control for sequence of fight against Antharas.
  * @version $Revision: $ $Date: $
  * @author  L2J_JP SANDMAN
  */
@@ -76,18 +76,18 @@ public class AntharasManager
     protected List<L2NpcInstance> _Monsters = new FastList<L2NpcInstance>();
     
     // tasks.
-    protected Future _CubeSpawnTask = null;
-    protected Future _MonsterSpawnTask = null;
-    protected Future _IntervalEndTask = null;
-    protected Future _ActivityTimeEndTask = null;
-    protected Future _OnPlayersAnnihilatedTask = null;
-    protected Future _SocialTask = null;
-    protected Future _MobiliseTask = null;
-    protected Future _BehemothSpawnTask = null;
-    protected Future _BomberSpawnTask = null;
-    protected Future _SelfDestructionTask = null;
-    protected Future _MoveAtRandomTask = null;
-    protected Future _MovieTsak = null;
+    protected ScheduledFuture _CubeSpawnTask = null;
+    protected ScheduledFuture _MonsterSpawnTask = null;
+    protected ScheduledFuture _IntervalEndTask = null;
+    protected ScheduledFuture _ActivityTimeEndTask = null;
+    protected ScheduledFuture _OnPlayersAnnihilatedTask = null;
+    protected ScheduledFuture _SocialTask = null;
+    protected ScheduledFuture _MobiliseTask = null;
+    protected ScheduledFuture _BehemothSpawnTask = null;
+    protected ScheduledFuture _BomberSpawnTask = null;
+    protected ScheduledFuture _SelfDestructionTask = null;
+    protected ScheduledFuture _MoveAtRandomTask = null;
+    protected ScheduledFuture _MovieTsak = null;
     
     // status in lair.
     protected GrandBossState _State = new GrandBossState(29019);
@@ -308,7 +308,7 @@ public class AntharasManager
     	if(isPlayersAnnihilated())
     	{
     		_OnPlayersAnnihilatedTask =
-				ThreadPoolManager.getInstance().scheduleEffect(new OnPlayersAnnihilatedTask(),5000);    			
+				ThreadPoolManager.getInstance().scheduleGeneral(new OnPlayersAnnihilatedTask(),5000);    			
     	}
     }
 
@@ -323,13 +323,6 @@ public class AntharasManager
 		{
 		    // banishes players from lair.
 			banishesPlayers();
-			
-            // clean up task.
-            if(_OnPlayersAnnihilatedTask != null)
-            {
-            	_OnPlayersAnnihilatedTask.cancel(true);
-            	_OnPlayersAnnihilatedTask = null;
-            }
 		}
 	}
 
@@ -341,7 +334,7 @@ public class AntharasManager
 
     	if (_MonsterSpawnTask == null)
         {
-   			_MonsterSpawnTask = ThreadPoolManager.getInstance().scheduleEffect(new AntharasSpawn(1,null),Config.FWA_APPTIMEOFANTHARAS);
+   			_MonsterSpawnTask = ThreadPoolManager.getInstance().scheduleGeneral(new AntharasSpawn(1,null),Config.FWA_APPTIMEOFANTHARAS);
         }
     }
     
@@ -418,10 +411,10 @@ public class AntharasManager
 						}
 	
 						// spawn Behemoth.
-						_BehemothSpawnTask = ThreadPoolManager.getInstance().scheduleEffect(new BehemothSpawn(intervalOfBehemoth),30000);
+						_BehemothSpawnTask = ThreadPoolManager.getInstance().scheduleGeneral(new BehemothSpawn(intervalOfBehemoth),30000);
 	
 						// spawn Bomber.
-						_BomberSpawnTask = ThreadPoolManager.getInstance().scheduleEffect(new BomberSpawn(intervalOfBomber),30000);
+						_BomberSpawnTask = ThreadPoolManager.getInstance().scheduleGeneral(new BomberSpawn(intervalOfBomber),30000);
 					}
 	
 					// set next task.
@@ -430,7 +423,7 @@ public class AntharasManager
 		            	_SocialTask.cancel(true);
 		            	_SocialTask = null;
 		            }
-					_SocialTask = ThreadPoolManager.getInstance().scheduleEffect(new AntharasSpawn(2,_antharas), 16);
+					_SocialTask = ThreadPoolManager.getInstance().scheduleGeneral(new AntharasSpawn(2,_antharas), 16);
 	
 					break;
 	
@@ -454,7 +447,7 @@ public class AntharasManager
 		            	_SocialTask.cancel(true);
 		            	_SocialTask = null;
 		            }
-					_SocialTask = ThreadPoolManager.getInstance().scheduleEffect(new AntharasSpawn(3,_antharas), 3000);
+					_SocialTask = ThreadPoolManager.getInstance().scheduleGeneral(new AntharasSpawn(3,_antharas), 3000);
 	
 					break;
 	
@@ -482,7 +475,7 @@ public class AntharasManager
 		            	_SocialTask.cancel(true);
 		            	_SocialTask = null;
 		            }
-					_SocialTask = ThreadPoolManager.getInstance().scheduleEffect(new AntharasSpawn(4,_antharas), 10000);
+					_SocialTask = ThreadPoolManager.getInstance().scheduleGeneral(new AntharasSpawn(4,_antharas), 10000);
 	
 					break;
 	
@@ -506,7 +499,7 @@ public class AntharasManager
 		            	_SocialTask.cancel(true);
 		            	_SocialTask = null;
 		            }
-					_SocialTask = ThreadPoolManager.getInstance().scheduleEffect(new AntharasSpawn(5,_antharas), 200);
+					_SocialTask = ThreadPoolManager.getInstance().scheduleGeneral(new AntharasSpawn(5,_antharas), 200);
 	
 					break;
 	
@@ -534,7 +527,7 @@ public class AntharasManager
 		            	_SocialTask.cancel(true);
 		            	_SocialTask = null;
 		            }
-					_SocialTask = ThreadPoolManager.getInstance().scheduleEffect(new AntharasSpawn(6,_antharas), 10800);
+					_SocialTask = ThreadPoolManager.getInstance().scheduleGeneral(new AntharasSpawn(6,_antharas), 10800);
 	
 					break;
 	
@@ -558,7 +551,7 @@ public class AntharasManager
 		            	_SocialTask.cancel(true);
 		            	_SocialTask = null;
 		            }
-					_SocialTask = ThreadPoolManager.getInstance().scheduleEffect(new AntharasSpawn(7,_antharas), 1900);
+					_SocialTask = ThreadPoolManager.getInstance().scheduleGeneral(new AntharasSpawn(7,_antharas), 1900);
 	
 					break;
 	
@@ -570,18 +563,18 @@ public class AntharasManager
 						pc.leaveMovieMode();
 					}
 
-					_MobiliseTask = ThreadPoolManager.getInstance().scheduleEffect(new SetMobilised(_antharas), 16);
+					_MobiliseTask = ThreadPoolManager.getInstance().scheduleGeneral(new SetMobilised(_antharas), 16);
 	
 					// move at random.
 					if (Config.FWA_MOVEATRANDOM)
 					{
 						L2CharPosition pos = new L2CharPosition(Rnd.get(175000,	178500), Rnd.get(112400, 116000), -7707, 0);
-						_MoveAtRandomTask = ThreadPoolManager.getInstance().scheduleEffect(new MoveAtRandom(_antharas, pos),
+						_MoveAtRandomTask = ThreadPoolManager.getInstance().scheduleGeneral(new MoveAtRandom(_antharas, pos),
 										32);
 					}
 	
 					// set delete task.
-					_ActivityTimeEndTask = ThreadPoolManager.getInstance().scheduleEffect(new ActivityTimeEnd(),Config.FWA_ACTIVITYTIMEOFANTHARAS);
+					_ActivityTimeEndTask = ThreadPoolManager.getInstance().scheduleGeneral(new ActivityTimeEnd(),Config.FWA_ACTIVITYTIMEOFANTHARAS);
 	
 		            if(_SocialTask != null)
 		            {
@@ -638,7 +631,7 @@ public class AntharasManager
             }
             
             // repeat.
-        	_BehemothSpawnTask = ThreadPoolManager.getInstance().scheduleEffect(
+        	_BehemothSpawnTask = ThreadPoolManager.getInstance().scheduleGeneral(
             		new BehemothSpawn(_interval),_interval);
 
     	}
@@ -688,7 +681,7 @@ public class AntharasManager
             // set self destruction.
             if(bomber != null)
             {
-                _SelfDestructionTask = ThreadPoolManager.getInstance().scheduleEffect(
+                _SelfDestructionTask = ThreadPoolManager.getInstance().scheduleGeneral(
                 		new SelfDestructionOfBomber(bomber),1000);
             }
             
@@ -699,7 +692,7 @@ public class AntharasManager
             }
 
             // repeat.
-            _BomberSpawnTask = ThreadPoolManager.getInstance().scheduleEffect(
+            _BomberSpawnTask = ThreadPoolManager.getInstance().scheduleGeneral(
             		new BomberSpawn(_interval),_interval);
 
     	}
@@ -735,12 +728,6 @@ public class AntharasManager
 			}
     		
     		_bomber.doCast(skill);
-
-    		if(_SelfDestructionTask != null)
-            {
-    			_SelfDestructionTask.cancel(true);
-    			_SelfDestructionTask = null;
-            }
     	}
     }
     
@@ -754,12 +741,6 @@ public class AntharasManager
     	public void run()
     	{
     		setUnspawn();
-    		
-    		if(_ActivityTimeEndTask != null)
-    		{
-    			_ActivityTimeEndTask.cancel(true);
-    			_ActivityTimeEndTask = null;
-    		}
     	}
     }
     
@@ -857,7 +838,7 @@ public class AntharasManager
     		_State.update();
     	}
 		
-    	_IntervalEndTask = ThreadPoolManager.getInstance().scheduleEffect(
+    	_IntervalEndTask = ThreadPoolManager.getInstance().scheduleGeneral(
             	new IntervalEnd(),_State.getInterval());
     }
 
@@ -873,11 +854,6 @@ public class AntharasManager
     		_PlayersInLair.clear();
     		_State.setState(GrandBossState.StateEnum.NOTSPAWN);
     		_State.update();
-    		if(_IntervalEndTask != null)
-    		{
-    			_IntervalEndTask.cancel(true);
-    			_IntervalEndTask = null;
-    		}
     	}
     }
     
@@ -887,7 +863,7 @@ public class AntharasManager
     	_State.setState(GrandBossState.StateEnum.DEAD);
     	_State.update();
 
-    	_CubeSpawnTask = ThreadPoolManager.getInstance().scheduleEffect(new CubeSpawn(),10000);
+    	_CubeSpawnTask = ThreadPoolManager.getInstance().scheduleGeneral(new CubeSpawn(),10000);
     }
     
     // update knownlist.

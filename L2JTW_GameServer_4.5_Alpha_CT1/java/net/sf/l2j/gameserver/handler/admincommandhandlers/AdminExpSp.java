@@ -52,11 +52,11 @@ public class AdminExpSp implements IAdminCommandHandler {
 			{
 				String val = command.substring(16);
 				if (!adminAddExpSp(activeChar, val))
-					activeChar.sendMessage("使用方法: //add_exp_sp exp sp");
+					GMAudit.auditGMAction(activeChar.getName(), command,  val, "");
 			}
 			catch (StringIndexOutOfBoundsException e)
 			{	//Case of missing parameter
-				activeChar.sendMessage("使用方法: //add_exp_sp exp sp");
+				activeChar.sendMessage("請輸入要增加的數值。");
 			}
 		}
 		else if(command.startsWith("admin_remove_exp_sp"))
@@ -65,11 +65,11 @@ public class AdminExpSp implements IAdminCommandHandler {
 			{
 				String val = command.substring(19);
 				if (!adminRemoveExpSP(activeChar, val))
-					activeChar.sendMessage("使用方法: //remove_exp_sp exp sp");
+	                GMAudit.auditGMAction(activeChar.getName(), command,  val, "");
 			}
 			catch (StringIndexOutOfBoundsException e)
 			{   //Case of missing parameter
-				activeChar.sendMessage("使用方法: //remove_exp_sp exp sp");
+				activeChar.sendMessage("請輸入要減少的數值。");
 			}
 		}
 		addExpSp(activeChar);
@@ -141,10 +141,10 @@ public class AdminExpSp implements IAdminCommandHandler {
 			if(expval != 0 || spval != 0)
 			{
 				//Common character information
-				player.sendMessage("管理員增加 "+expval+" EXP 和 "+spval+" SP.");
+				//player.sendMessage("管理員增加 "+expval+" EXP 和 "+spval+" SP.");
 				player.addExpAndSp(expval,spval);
 				//Admin information
-				activeChar.sendMessage("增加 "+expval+" EXP 和 "+spval+" SP 至 "+player.getName()+".");
+				//activeChar.sendMessage("增加 "+expval+" EXP 和 "+spval+" SP 至 "+player.getName()+".");
 				if (Config.DEBUG)
 					_log.fine("GM: "+activeChar.getName()+"("+activeChar.getObjectId()+") added "+expval+
 							" xp and "+spval+" sp to "+player.getObjectId()+".");
@@ -188,10 +188,10 @@ public class AdminExpSp implements IAdminCommandHandler {
 			{
 				//Common character information
 
-				player.sendMessage("管理員增加 "+expval+" EXP 和 "+spval+" SP.");
+				//player.sendMessage("管理員增加 "+expval+" EXP 和 "+spval+" SP.");
 				player.addExpAndSp(expval,spval);
 				//Admin information	
-				activeChar.sendMessage("增加 "+expval+" EXP 和 "+spval+" SP 至 "+player.getName()+".");
+				//activeChar.sendMessage("增加 "+expval+" EXP 和 "+spval+" SP 至 "+player.getName()+".");
 
 				if (Config.DEBUG)
 					_log.fine("GM: "+activeChar.getName()+"("+activeChar.getObjectId()+") removed "+expval+

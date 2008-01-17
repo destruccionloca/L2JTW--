@@ -131,9 +131,7 @@ public class L2FishermanInstance extends L2MerchantInstance
             else
             {
                 TextBuilder sb = new TextBuilder();
-                sb.append("<html><head><body>");
-                sb.append("You've learned all skills.<br>");
-                sb.append("</body></html>");
+                sb.append("<html><body>你已學習所有技能。<br></body></html>");
                 html.setHtml(sb.toString());
                 player.sendPacket(html);
 		    }

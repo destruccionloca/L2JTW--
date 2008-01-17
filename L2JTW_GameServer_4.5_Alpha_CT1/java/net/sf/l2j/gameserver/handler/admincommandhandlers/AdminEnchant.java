@@ -111,7 +111,7 @@ public class AdminEnchant implements IAdminCommandHandler
 
                     // check value
                     if (ench < 0 || ench > 65535)
-                        activeChar.sendMessage("範圍為 0-65535.");
+                        activeChar.sendMessage("強化等級範圍只限於 0-65535 之間。");
                     else
                         setEnchant(activeChar, ench, armorType);
                 }
@@ -119,13 +119,13 @@ public class AdminEnchant implements IAdminCommandHandler
                 {
                     if (Config.DEVELOPER) 
                         _log.warning("Set enchant error: " + e);
-                    activeChar.sendMessage("請輸入強化數值.");
+                        activeChar.sendMessage("請重新指定強化數值。");
                 }
                 catch (NumberFormatException e)
                 {
                     if (Config.DEVELOPER) 
                         _log.warning("Set enchant error: " + e);
-                    activeChar.sendMessage("請輸入新的數值.");
+                        activeChar.sendMessage("請重新指定強化數值。");
                 }
             }
 
@@ -185,18 +185,7 @@ public class AdminEnchant implements IAdminCommandHandler
             player.broadcastPacket(new CharInfo(player));
             player.sendPacket(new UserInfo(player));
 
-
-            // 管理員訊息
-            SystemMessage smA = new SystemMessage(614);
-            smA.addString("改變裝備");
-            smA.addString("("+itemInstance.getItem().getName()+") 從 +"+curEnchant+" 到 +"+ench+".");       
-            activeChar.sendPacket(smA);
-
-            // 玩家訊息
-            SystemMessage sm = new SystemMessage(614);
-            sm.addString("GM");
-            sm.addString("強化你的裝備 ("+itemInstance.getItem().getName()+") 從 +"+curEnchant+" 到 +"+ench+".");
-            player.sendPacket(sm);
+            activeChar.sendMessage("強化裝備"+itemInstance.getItem().getName()+"從 +"+curEnchant+"到 +"+ench+"。");
             // log
             GMAudit.auditGMAction(activeChar.getName(), "enchant", player.getName(), itemInstance.getItem().getName() + " from " + curEnchant + " to " + ench);
         }
@@ -204,7 +193,7 @@ public class AdminEnchant implements IAdminCommandHandler
 
     private void showMainPage(L2PcInstance activeChar)
     {
-
+/*
         NpcHtmlMessage adminReply = new NpcHtmlMessage(5);
 
         TextBuilder replyMSG = new TextBuilder("<html><body>");
@@ -239,9 +228,8 @@ public class AdminEnchant implements IAdminCommandHandler
 
         adminReply.setHtml(replyMSG.toString());
         activeChar.sendPacket(adminReply);
-
-    	//AdminHelpPage.showHelpPage(activeChar, "enchant.htm");
-
+*/
+    	AdminHelpPage.showHelpPage(activeChar, "enchant.htm");
     }
 
     public String[] getAdminCommandList()

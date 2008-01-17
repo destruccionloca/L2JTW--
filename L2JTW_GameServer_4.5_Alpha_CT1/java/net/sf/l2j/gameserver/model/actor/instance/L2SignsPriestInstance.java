@@ -67,8 +67,8 @@ public class L2SignsPriestInstance extends L2FolkInstance
             String path;
             int cabal = SevenSigns.CABAL_NULL;
             int stoneType = 0;
-            L2ItemInstance ancientAdena = player.getInventory().getItemByItemId(
-                                                                                SevenSigns.ANCIENT_ADENA_ID);
+            L2ItemInstance ancientAdena = player.getInventory().getItemByItemId(SevenSigns.ANCIENT_ADENA_ID);
+
             int ancientAdenaAmount = ancientAdena == null ? 0 : ancientAdena.getCount();
             int val = Integer.parseInt(command.substring(11, 12).trim());
 
@@ -107,6 +107,7 @@ public class L2SignsPriestInstance extends L2FolkInstance
 
             switch (val)
             {
+// =================================================================================================================
                 case 2: // Purchase Record of the Seven Signs
                     if (!player.getInventory().validateCapacity(1))
                     {
@@ -120,11 +121,7 @@ public class L2SignsPriestInstance extends L2FolkInstance
                         player.sendPacket(new SystemMessage(SystemMessageId.YOU_NOT_ENOUGH_ADENA));
                         break;
                     }
-                   /* L2ItemInstance recordSevenSigns = player.getInventory().addItem(
-                                                                                    "SevenSigns",
-                                                                                    SevenSigns.RECORD_SEVEN_SIGNS_ID,
-                                                                                    1, player, this);
-				   */
+                   // L2ItemInstance recordSevenSigns = player.getInventory().addItem("SevenSigns", SevenSigns.RECORD_SEVEN_SIGNS_ID, 1, player, this);
                     
                     L2ItemInstance item = new L2ItemInstance(IdFactory.getInstance().getNextId(), SevenSigns.RECORD_SEVEN_SIGNS_ID);
                     if (item == null) return;
@@ -149,25 +146,28 @@ public class L2SignsPriestInstance extends L2FolkInstance
                     sm.addItemName(SevenSigns.RECORD_SEVEN_SIGNS_ID);
                     player.sendPacket(sm);
                     break;
+// =================================================================================================================
                 case 3: // Join Cabal Intro 1
+// =================================================================================================================
                 case 8: // Festival of Darkness Intro - SevenSigns x [0]1
+// =================================================================================================================
                 case 10: // Teleport Locations List
                     showChatWindow(player, val, SevenSigns.getCabalShortName(cabal), false);
                     break;
+// =================================================================================================================
                 case 4: // Join a Cabal - SevenSigns 4 [0]1 x
                     int newSeal = Integer.parseInt(command.substring(15));
                     int oldCabal = SevenSigns.getInstance().getPlayerCabal(player);
 
                     if (oldCabal != SevenSigns.CABAL_NULL)
                     {
-                        player.sendMessage("已經加入 "
-                            + SevenSigns.getCabalName(cabal) + ".");
+                        player.sendMessage("你已經是"+ SevenSigns.getCabalName(cabal) + "之成員！");
                         return;
                     }
 
                     if (player.getClassId().level() == 0)
                     {
-                        player.sendMessage("必須先完成第一次職業轉換.");
+                        player.sendMessage("必須完成第一次轉職後才可申請參加。");
                         break;
                     }
                     else if (player.getClassId().level() >= 2)
@@ -178,7 +178,7 @@ public class L2SignsPriestInstance extends L2FolkInstance
                             {
                                 if (cabal == SevenSigns.CABAL_DUSK)
                                 {
-                                    player.sendMessage("血盟相關擁有城堡無法加入.");
+                                    player.sendMessage("加入有統治城堡的血盟或同盟，就不得加入黃昏的革命軍。");
                                     return;
                                 }
                             }
@@ -190,7 +190,7 @@ public class L2SignsPriestInstance extends L2FolkInstance
                             		return;
                             	}
                             }
-*/
+                            */
                             else
                             {
                                 /*
@@ -203,10 +203,7 @@ public class L2SignsPriestInstance extends L2FolkInstance
                                 {
                                     boolean allowJoinDawn = false;
 
-                                    if (player.destroyItemByItemId(
-                                                                   "SevenSigns",
-                                                                   SevenSigns.CERTIFICATE_OF_APPROVAL_ID,
-                                                                   1, this, false))
+                                    if (player.destroyItemByItemId("SevenSigns", SevenSigns.CERTIFICATE_OF_APPROVAL_ID, 1, this, false))
                                     {
                                         sm = new SystemMessage(SystemMessageId.DISSAPEARED_ITEM);
                                         sm.addNumber(1);
@@ -214,9 +211,7 @@ public class L2SignsPriestInstance extends L2FolkInstance
                                         player.sendPacket(sm);
                                         allowJoinDawn = true;
                                     }
-                                    else if (player.reduceAdena("SevenSigns",
-                                                                SevenSigns.ADENA_JOIN_DAWN_COST, this,
-                                                                false))
+                                    else if (player.reduceAdena("SevenSigns", SevenSigns.ADENA_JOIN_DAWN_COST, this, false))
                                     {
                                         sm = new SystemMessage(SystemMessageId.DISSAPEARED_ADENA);
                                         sm.addNumber(SevenSigns.ADENA_JOIN_DAWN_COST);
@@ -226,7 +221,7 @@ public class L2SignsPriestInstance extends L2FolkInstance
 
                                     if (!allowJoinDawn)
                                     {
-                                        player.sendMessage("血盟相關沒有擁有城堡必須付出50000金幣來加入.");
+                                        player.sendMessage("若不屬於統治城堡的血盟或同盟，需支付參加費5萬金幣或是攜帶領主的認可才能參加黎明的君主們。");
                                         return;
                                     }
                                 }
@@ -256,6 +251,7 @@ public class L2SignsPriestInstance extends L2FolkInstance
 
                     showChatWindow(player, 4, SevenSigns.getCabalShortName(cabal), false);
                     break;
+// =================================================================================================================
                 case 6: // Contribute Seal Stones - SevenSigns 6 x
                     stoneType = Integer.parseInt(command.substring(13));
                     L2ItemInstance redStones = player.getInventory().getItemByItemId(
@@ -338,7 +334,7 @@ public class L2SignsPriestInstance extends L2FolkInstance
 
                         if (!stonesFound)
                         {
-                            player.sendMessage("沒有任何一種需要的封印石");
+                            player.sendMessage("沒有任何封印石或奉獻封印石已達上限。");
                             break;
                         }
                         else contribScore = SevenSigns.getInstance().addPlayerStoneContrib(
@@ -354,6 +350,7 @@ public class L2SignsPriestInstance extends L2FolkInstance
                         showChatWindow(player, 6, null, false);
                     }
                     break;
+// =================================================================================================================
                 case 7: // Exchange Ancient Adena for Adena - SevenSigns 7 xxxxxxx
                     int ancientAdenaConvert = 0;
 
@@ -363,12 +360,12 @@ public class L2SignsPriestInstance extends L2FolkInstance
                     }
                     catch (NumberFormatException e)
                     {
-                        player.sendMessage("請輸入整數");
+                        player.sendMessage("請輸入正確的數值。");
                         break;
                     }
                     catch (StringIndexOutOfBoundsException e)
                     {
-                        player.sendMessage("請輸入數量");
+                        player.sendMessage("請輸入正確的數值。");
                         break;
                     }
 
@@ -386,6 +383,7 @@ public class L2SignsPriestInstance extends L2FolkInstance
                     iu.addModifiedItem(player.getInventory().getAdenaInstance());
                     player.sendPacket(iu);
                     break;
+// =================================================================================================================
                 case 9: // Receive Contribution Rewards
                     int playerCabal = SevenSigns.getInstance().getPlayerCabal(player);
                     int winningCabal = SevenSigns.getInstance().getCabalHighestScore();
@@ -416,6 +414,7 @@ public class L2SignsPriestInstance extends L2FolkInstance
                         showChatWindow(player, 9, "a", false);
                     }
                     break;
+// =================================================================================================================
                 case 11: // Teleport to Hunting Grounds
                     try
                     {
@@ -440,6 +439,7 @@ public class L2SignsPriestInstance extends L2FolkInstance
                         _log.warning("SevenSigns: Error occurred while teleporting player: " + e);
                     }
                     break;
+// =================================================================================================================
                 case 17: // Exchange Seal Stones for Ancient Adena (Type Choice) - SevenSigns 17 x
                     stoneType = Integer.parseInt(command.substring(14));
                     int stoneId = 0;
@@ -452,17 +452,17 @@ public class L2SignsPriestInstance extends L2FolkInstance
                     switch (stoneType)
                     {
                         case 1:
-                            stoneColor = "blue";
+                            stoneColor = "藍色";
                             stoneId = SevenSigns.SEAL_STONE_BLUE_ID;
                             stoneValue = SevenSigns.SEAL_STONE_BLUE_VALUE;
                             break;
                         case 2:
-                            stoneColor = "green";
+                            stoneColor = "綠色";
                             stoneId = SevenSigns.SEAL_STONE_GREEN_ID;
                             stoneValue = SevenSigns.SEAL_STONE_GREEN_VALUE;
                             break;
                         case 3:
-                            stoneColor = "red";
+                            stoneColor = "紅色";
                             stoneId = SevenSigns.SEAL_STONE_RED_ID;
                             stoneValue = SevenSigns.SEAL_STONE_RED_VALUE;
                             break;
@@ -493,6 +493,7 @@ public class L2SignsPriestInstance extends L2FolkInstance
                             + "signs_17.htm: " + path);
                     }
                     break;
+// =================================================================================================================
                 case 18: // Exchange Seal Stones for Ancient Adena - SevenSigns 18 xxxx xxxxxx
                     int convertStoneId = Integer.parseInt(command.substring(14, 18));
                     int convertCount = 0;
@@ -503,7 +504,7 @@ public class L2SignsPriestInstance extends L2FolkInstance
                     }
                     catch (Exception NumberFormatException)
                     {
-                        player.sendMessage("請輸入整數");
+                        player.sendMessage("請輸入正確的數值。");
                         break;
                     }
 
@@ -511,7 +512,7 @@ public class L2SignsPriestInstance extends L2FolkInstance
 
                     if (convertItem == null)
                     {
-                        player.sendMessage("沒有任何所需要的封印石");
+                        player.sendMessage("你沒有任何封印石！");
                         break;
                     }
 
@@ -559,16 +560,18 @@ public class L2SignsPriestInstance extends L2FolkInstance
                     }
                     else
                     {
-                        player.sendMessage("所需要的封印石不足");
+                        player.sendMessage("擁有的數量低於輸入的數量。請重新輸入數量。");
                     }
                     break;
+// =================================================================================================================
                 case 19: // Seal Information (for when joining a cabal)
                     int chosenSeal = Integer.parseInt(command.substring(16));
-                    String fileSuffix = SevenSigns.getSealFileName(chosenSeal, true) + "_"
+                    String fileSuffix = SevenSigns.getSealName(chosenSeal, true) + "_"
                         + SevenSigns.getCabalShortName(cabal);
 
                     showChatWindow(player, val, fileSuffix, false);
                     break;
+// =================================================================================================================
                 case 20: // Seal Status (for when joining a cabal)
 
                     TextBuilder contentBuffer = new TextBuilder("<html><body><font color=\"LEVEL\">[ 封印狀態 ]</font><br>");
@@ -586,7 +589,7 @@ public class L2SignsPriestInstance extends L2FolkInstance
                     }
 
                     contentBuffer.append("<a action=\"bypass -h npc_" + getObjectId() + "_SevenSigns 3 "
-                        + cabal + "\">返回.</a></body></html>");
+                        + cabal + "\">返回</a></body></html>");
 
                     NpcHtmlMessage html = new NpcHtmlMessage(getObjectId());
                     html.setHtml(contentBuffer.toString());
@@ -607,8 +610,7 @@ public class L2SignsPriestInstance extends L2FolkInstance
             super.onBypassFeedback(player, command);
         }
     }
-
-
+// =================================================================================================================
     private final boolean getPlayerAllyHasCastle(L2PcInstance player)
     {
         L2Clan playerClan = player.getClan();
@@ -637,6 +639,7 @@ public class L2SignsPriestInstance extends L2FolkInstance
         return (playerClan.getHasCastle() > 0);
     }
 
+// =================================================================================================================
     private void showChatWindow(L2PcInstance player, int val, String suffix, boolean isDescription)
     {
         String filename = SevenSigns.SEVEN_SIGNS_HTML_PATH;

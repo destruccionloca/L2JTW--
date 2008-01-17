@@ -143,7 +143,7 @@ public class AdminEditChar implements IAdminCommandHandler
 			catch (StringIndexOutOfBoundsException e)
 			{	//Case of empty character name
 
-				activeChar.sendMessage("用法: //find_character <character_name>");
+				activeChar.sendMessage("使用方法: //find_character <character_name>");
 
 				listCharacters(activeChar, 0);
 			}
@@ -157,7 +157,7 @@ public class AdminEditChar implements IAdminCommandHandler
 			}
 			catch (Exception e)
 			{	//Case of empty or malformed IP number
-				activeChar.sendMessage("用法: //find_ip <www.xxx.yyy.zzz>");
+				activeChar.sendMessage("使用方法: //find_ip <www.xxx.yyy.zzz>");
 				listCharacters(activeChar, 0);
 			}
 		}
@@ -170,7 +170,7 @@ public class AdminEditChar implements IAdminCommandHandler
 			}
 			catch (Exception e)
 			{	//Case of empty or malformed player name
-				activeChar.sendMessage("用法: //find_account <player_name>");
+				activeChar.sendMessage("使用方法: //find_account <player_name>");
 				listCharacters(activeChar, 0);
 			}
 		}
@@ -194,7 +194,7 @@ public class AdminEditChar implements IAdminCommandHandler
 
 				if (Config.DEVELOPER )
 					_log.warning("Set karma error: "+e);
-				activeChar.sendMessage("用法: //setkarma <new_karma_value>");
+				activeChar.sendMessage("使用方法: //setkarma <new_karma_value>");
 
 			}
 		}
@@ -211,7 +211,7 @@ public class AdminEditChar implements IAdminCommandHandler
 			catch (StringIndexOutOfBoundsException e)
 			{	//Case of empty character name
 
-				activeChar.sendMessage("修改出錯");
+				activeChar.sendMessage("修改錯誤。");
 				listCharacters(activeChar, 0);
 			}
 		}
@@ -231,7 +231,7 @@ public class AdminEditChar implements IAdminCommandHandler
 					return false;
 				}
 				player.setRecomHave(recVal);
-				player.sendMessage("被管理者推薦");
+				player.sendMessage("被管理者推薦。");
 				player.broadcastUserInfo();
 			} catch (Exception e)
 			{
@@ -263,11 +263,11 @@ public class AdminEditChar implements IAdminCommandHandler
 						player.setBaseClass(classidval);
 					String newclass = player.getTemplate().className;
 					player.store();
-					player.sendMessage("職業改變為 "+newclass);
+					player.sendMessage("職業已變更為"+newclass+"。");
 					player.broadcastUserInfo();
-					activeChar.sendMessage(player.getName()+" is a "+newclass);
+					//activeChar.sendMessage(player.getName()+" is a "+newclass);
 				}
-				activeChar.sendMessage("使用方法: //setclass <valid_new_classid>");
+				//activeChar.sendMessage("使用方法: //setclass <valid_new_classid>");
 			}
 			catch (StringIndexOutOfBoundsException e)
 			{
@@ -289,12 +289,12 @@ public class AdminEditChar implements IAdminCommandHandler
 					return false;
 				}
 				player.setTitle(val);
-				player.sendMessage("被管理者更改稱號");
+				player.sendMessage("被管理者更改稱號。");
 				player.broadcastTitleInfo();
 			}
 			catch (StringIndexOutOfBoundsException e)
 			{   //Case of empty character title
-				activeChar.sendMessage("請輸入正確稱號");
+				activeChar.sendMessage("請輸入正確稱號。");
 			}
 		}
 		else if (command.startsWith("admin_setname"))
@@ -312,7 +312,7 @@ public class AdminEditChar implements IAdminCommandHandler
 					return false;
 				}
 				player.setName(val);
-				player.sendMessage("被管理者修改名稱");
+				player.sendMessage("被管理者修改名稱。");
 				player.broadcastUserInfo();
 				player.store();
 			}
@@ -333,7 +333,7 @@ public class AdminEditChar implements IAdminCommandHandler
 				return false;
 			}
 			player.getAppearance().setSex(player.getAppearance().getSex()? false : true);
-			player.sendMessage("被管理者更改性別");
+			player.sendMessage("被管理者更改性別。");
 			player.broadcastUserInfo();
 			player.decayMe();
 			player.spawnMe(player.getX(),player.getY(),player.getZ());
@@ -353,13 +353,13 @@ public class AdminEditChar implements IAdminCommandHandler
 					return false;
 				}
 				player.getAppearance().setNameColor(Integer.decode("0x"+val));
-				player.sendMessage("被管理者更改名稱顏色");
+				player.sendMessage("被管理者更改名稱顏色。");
 
 				player.broadcastUserInfo();
 			}
 			catch (StringIndexOutOfBoundsException e)
 			{   //Case of empty color
-				activeChar.sendMessage("請指定新的顏色.");
+				activeChar.sendMessage("請指定新的顏色。");
 			}
 		}
 		else if (command.startsWith("admin_fullfood"))
@@ -419,7 +419,7 @@ public class AdminEditChar implements IAdminCommandHandler
 		for (int x=0; x<MaxPages; x++)
 		{
 			int pagenr = x + 1;
-			replyMSG.append("<center><a action=\"bypass -h admin_show_characters " + x + "\">頁 " + pagenr + "</a></center>");	
+			replyMSG.append("<center><a action=\"bypass -h admin_show_characters " + x + "\">第" + pagenr + "頁</a></center>");	
 
 		}
 		adminReply.replace("%pages%", replyMSG.toString());
@@ -531,7 +531,7 @@ public class AdminEditChar implements IAdminCommandHandler
 
 			player.sendPacket( new SystemMessage(SystemMessageId.YOUR_KARMA_HAS_BEEN_CHANGED_TO).addString(String.valueOf(newKarma)));
 			//Admin information
-			activeChar.sendMessage("修改 "+player.getName()+" 的性向從 (" + oldKarma + ") 至 (" + newKarma + ").");
+			//activeChar.sendMessage("修改 "+player.getName()+" 的性向從 (" + oldKarma + ") 至 (" + newKarma + ").");
 
 			if (Config.DEBUG)
 				_log.fine("[SET KARMA] [GM]"+activeChar.getName()+" Changed karma for "+player.getName()+" from (" + oldKarma + ") to (" + newKarma + ").");
@@ -539,7 +539,7 @@ public class AdminEditChar implements IAdminCommandHandler
 		else
 		{
 			// tell admin of mistake
-			activeChar.sendMessage("請輸入正確數值");
+			activeChar.sendMessage("請輸入正確數值。");
 			if (Config.DEBUG)
 				_log.fine("[SET KARMA] ERROR: [GM]"+activeChar.getName()+" entered an incorrect value for new karma: " + newKarma + " for "+player.getName()+".");
 		}
@@ -581,10 +581,10 @@ public class AdminEditChar implements IAdminCommandHandler
 	    int classidval = Integer.parseInt(classid);
 		 
 		//Common character information
-		player.sendMessage("管理員修改狀態為." +
-				"  HP: " + hpval + "  MP: " + mpval + "  CP: " + cpval +
-				"  PvP Flag: " + pvpflagval + " PvP/PK " + pvpkillsval + "/" + pkkillsval);
-
+		//player.sendMessage("管理員修改狀態為." +
+                //"  HP: " + hpval + "  MP: " + mpval + "  CP: " + cpval + 
+                //"  Karma: " + karmaval + "  PvP Flag: " + pvpflagval + " PvP/PK " + pvpkillsval + "/" + pkkillsval + 
+                //"  ClassID: " + ClassId.values()[classidval] + " (" + classidval + ")");
 		player.setCurrentHp(hpval);
 		player.setCurrentMp(mpval);
 		player.setCurrentCp(cpval);
@@ -605,11 +605,11 @@ public class AdminEditChar implements IAdminCommandHandler
 		su.addAttribute(StatusUpdate.MAX_CP, player.getMaxCp());
 		player.sendPacket(su);
 
-		//Admin information
-		player.sendMessage("更改為 " + player.getName() + "." +
-				"  HP: " + hpval + "  MP: " + mpval + "  CP: " + cpval +
-				"  PvP: " + pvpflagval + " / " + pvpkillsval );
-
+		//Admin information	
+		 //player.sendMessage("更改為 " + player.getName() + "." +
+                 //"  HP: " + hpval + "  MP: " + mpval + "  CP: " + cpval + 
+                 //"  Karma: " + karmaval + "  PvP: " + pvpflagval + " / " + pvpkillsval + 
+                 //"  ClassID: " + ClassId.values()[classidval] + " (" + classidval + ")");
 
 		if (Config.DEBUG)
 			_log.fine("[GM]"+activeChar.getName()+" changed stats of "+player.getName()+". " +
@@ -667,11 +667,11 @@ public class AdminEditChar implements IAdminCommandHandler
 		adminReply.replace("%results%", replyMSG.toString());
 		replyMSG.clear();
 		if (CharactersFound==0)
-			replyMSG.append(". 請重新嘗試.");
+			replyMSG.append("。請重新嘗試。");
 		else if (CharactersFound > 20)
 		{
 			adminReply.replace("%number%", " 大於 20");
-			replyMSG.append(".<br>請翻閱資料方便查詢所需的資訊.");
+			replyMSG.append(".<br>請翻閱資料方便查詢所需的資訊。");
 
 		}
 		else if (CharactersFound==1)
@@ -723,7 +723,7 @@ public class AdminEditChar implements IAdminCommandHandler
 		else if (CharactersFound > 20)
 		{
 			adminReply.replace("%number%", " 大於 "+String.valueOf(CharactersFound));
-			replyMSG.append(".<br> 為了防止客戶端出錯 <br1>顯示的資料將限制為20.");
+			replyMSG.append(".<br> 為了防止客戶端出錯 <br1>顯示的資料將限制為20。");
 		}
 		else if (CharactersFound==1)
 			replyMSG.append(".");

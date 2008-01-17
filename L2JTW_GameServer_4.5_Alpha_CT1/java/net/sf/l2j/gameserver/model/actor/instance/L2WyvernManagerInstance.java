@@ -49,7 +49,7 @@ public class L2WyvernManagerInstance extends L2CastleChamberlainInstance
         		{
         			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
                     sm.addString("SYS");
-                    sm.addString("已經有使魔召喚.");
+                    sm.addString("已召喚使魔。");
 
         			player.sendPacket(sm);
         			return;
@@ -59,7 +59,7 @@ public class L2WyvernManagerInstance extends L2CastleChamberlainInstance
         			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 
                     sm.addString("SYS");
-                    sm.addString("請招喚座龍.");
+                    sm.addString("請先招喚座龍。");
 
         			player.sendPacket(sm);
         			return;
@@ -73,7 +73,7 @@ public class L2WyvernManagerInstance extends L2CastleChamberlainInstance
         			{
         				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
                         sm.addString("SYS");
-                        sm.addString("座龍尚未達到需求的等級");
+                        sm.addString("座龍尚未達到需求的等級。");
 
                 		player.sendPacket(sm);
                 		return;
@@ -90,7 +90,7 @@ public class L2WyvernManagerInstance extends L2CastleChamberlainInstance
         				player.addSkill(SkillTable.getInstance().getInfo(4289, 1));
         				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
                         sm.addString("SYS");
-                        sm.addString("使魔召喚.");
+                        sm.addString("使魔召喚。");
                 		player.sendPacket(sm);
                 		return;
         			}
@@ -99,7 +99,7 @@ public class L2WyvernManagerInstance extends L2CastleChamberlainInstance
         		{
         			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
                     sm.addString("SYS");
-                    sm.addString("需要10個B級-結晶");
+                    sm.addString("召喚飛龍，須要結晶-B級10個。");
             		player.sendPacket(sm);
             		return;
         		}
@@ -109,7 +109,7 @@ public class L2WyvernManagerInstance extends L2CastleChamberlainInstance
         	{
         		SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
                 sm.addString("SYS");
-                sm.addString("使魔反召喚.");
+                sm.addString("使魔反召喚。");
         		player.sendPacket(sm);
         		return;
         	}

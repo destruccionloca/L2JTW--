@@ -33,7 +33,7 @@ public class L2SkillDefault extends L2Skill {
 		caster.sendPacket(new ActionFailed());
 		SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 		sm.addString("SYS");
-		sm.addString("技能類型尚未加入 技能編號: " + getId() + " " + getSkillType());
+		sm.addString("技能類型尚未加入技能ID︰ " + getId() + " " + getSkillType());
 		caster.sendPacket(sm);
 	}
 

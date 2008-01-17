@@ -77,11 +77,11 @@ public class AdminCreateItem implements IAdminCommandHandler
 			}
 			catch (StringIndexOutOfBoundsException e)
 			{
-				activeChar.sendMessage("使用方法: //itemcreate <itemId> [amount]");
+				activeChar.sendMessage("使用方法︰//itemcreate <itemId> [amount]");
 			}
 			catch (NumberFormatException nfe)
 			{
-				activeChar.sendMessage("請輸入正確數值");
+				activeChar.sendMessage("請輸入正確數值。");
 			}
 			AdminHelpPage.showHelpPage(activeChar, "itemcreation.htm");
 		}
@@ -120,6 +120,6 @@ public class AdminCreateItem implements IAdminCommandHandler
 		ItemList il = new ItemList(activeChar, true);
 		activeChar.sendPacket(il);
 
-		activeChar.sendMessage("創造 " + num + " 個物品為 " + id + " 在物品欄內");
+		activeChar.sendMessage("已創造 " + num + " 個物品 " + id + " 在道具欄內。");
 	}
 }

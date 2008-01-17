@@ -125,7 +125,7 @@ public class AdminSiege implements IAdminCommandHandler
 			}
 			else if (command.equalsIgnoreCase("admin_move_defenders"))
 			{
-				activeChar.sendPacket(SystemMessage.sendString("尚未處理好"));
+				activeChar.sendPacket(SystemMessage.sendString("尚未處理完成。"));
 			}
 			else if (command.equalsIgnoreCase("admin_setcastle"))
 			{
@@ -140,14 +140,14 @@ public class AdminSiege implements IAdminCommandHandler
 				if (clan != null)
 					castle.removeOwner(clan);
 				else
-					activeChar.sendMessage("無法移除城堡");
+					activeChar.sendMessage("無法移除城堡。");
 			}
 			else if (command.equalsIgnoreCase("admin_clanhallset"))
 			{
 				if (player == null || player.getClan() == null)
 					activeChar.sendPacket(new SystemMessage(SystemMessageId.TARGET_IS_INCORRECT));
 				else if(!ClanHallManager.getInstance().isFree(clanhall.getId()))
-					activeChar.sendMessage("此血盟小屋並非免費");
+					activeChar.sendMessage("此根據地並非免費。");
 				else if(player.getClan().getHasHideout() == 0)
 				{
 					ClanHallManager.getInstance().setOwner(clanhall.getId(), player.getClan());
@@ -155,7 +155,7 @@ public class AdminSiege implements IAdminCommandHandler
 						AuctionManager.getInstance().getAuction(clanhall.getId()).deleteAuctionFromDB();
 				}
 				else
-					activeChar.sendMessage("已有血盟小屋");
+					activeChar.sendMessage("已有根據地。");
 			}
 			else if (command.equalsIgnoreCase("admin_clanhalldel"))
 			{
@@ -163,7 +163,7 @@ public class AdminSiege implements IAdminCommandHandler
 					ClanHallManager.getInstance().setFree(clanhall.getId());
 					AuctionManager.getInstance().initNPC(clanhall.getId());
 				}else
-					activeChar.sendMessage("此血盟小屋已是免費");
+					activeChar.sendMessage("此根據地已是免費。");
 			}
 			else if (command.equalsIgnoreCase("admin_clanhallopendoors"))
 			{

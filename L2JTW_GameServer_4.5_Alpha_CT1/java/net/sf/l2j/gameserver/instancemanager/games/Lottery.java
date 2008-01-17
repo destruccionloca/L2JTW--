@@ -199,7 +199,7 @@ public class Lottery
             _isSellingTickets = true;
             _isStarted = true;
 
-            Announcements.getInstance().announceToAll("彩卷局數為 #" + getId() + "局.");
+            //Announcements.getInstance().announceToAll("彩卷局數為 #" + getId() + "局.");
 
 
             Calendar finishtime = Calendar.getInstance();

@@ -70,18 +70,18 @@ public class AdminCursedWeapons implements IAdminCommandHandler {
 						L2PcInstance pl = cw.getPlayer();
 		        		activeChar.sendMessage("擁有人物: "+pl.getName());
 		        		activeChar.sendMessage("性向指數: "+cw.getPlayerKarma());
-		        		activeChar.sendMessage("時間剩下: "+(cw.getTimeLeft()/60000)+" min.");
+		        		activeChar.sendMessage("時間剩下: "+(cw.getTimeLeft()/60000)+" 分鐘。");
 		        		activeChar.sendMessage("殺人數量: "+cw.getNbKills());
 					}
 					else if (cw.isDropped())
 					{
 						activeChar.sendMessage("掉落地面");
-		        		activeChar.sendMessage("時間剩下: "+(cw.getTimeLeft()/60000)+" min.");
+		        		activeChar.sendMessage("時間剩下: "+(cw.getTimeLeft()/60000)+" 分鍾。");
 		        		activeChar.sendMessage("殺人數量: "+cw.getNbKills());
 					}
 					else
 					{
-						activeChar.sendMessage("並未出現.");
+						activeChar.sendMessage("並未出現。");
 					}
 					activeChar.sendPacket(new SystemMessage(SystemMessageId.FRIEND_LIST_FOOT));
 				}
@@ -118,7 +118,7 @@ public class AdminCursedWeapons implements IAdminCommandHandler {
 					}
 					else
 					{
-						replyMSG.append("<tr><td>Position:</td><td>並不存在.</td></tr>");
+						replyMSG.append("<tr><td>Position:</td><td>並不存在。</td></tr>");
 						replyMSG.append("<tr><td><button value=\"交給對方\" action=\"bypass -h admin_cw_add "+String.valueOf(itemId)+"\" width=99 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td><td></td></tr>");
 					}
 					replyMSG.append("</table>");
@@ -156,7 +156,7 @@ public class AdminCursedWeapons implements IAdminCommandHandler {
 				cw = cwm.getCursedWeapon(id);
 				if (cw==null)
 				{
-					activeChar.sendMessage("受詛咒的武器ID不明.");
+					activeChar.sendMessage("未知的受詛咒的武器ID。");
 					return false;
 				}
 			}
@@ -181,7 +181,7 @@ public class AdminCursedWeapons implements IAdminCommandHandler {
 					return false;
 				}
 				else if (cw.isActive())
-					activeChar.sendMessage("此受詛咒的武器已正在使用.");
+					activeChar.sendMessage("受詛咒的武器已正在使用。");
 				else
 				{
 					L2Object target = activeChar.getTarget();
@@ -193,7 +193,7 @@ public class AdminCursedWeapons implements IAdminCommandHandler {
 			}
 			else
 			{
-				activeChar.sendMessage("指令不明.");
+				activeChar.sendMessage("未知的指令。");
 			}
 		}
 		return true;

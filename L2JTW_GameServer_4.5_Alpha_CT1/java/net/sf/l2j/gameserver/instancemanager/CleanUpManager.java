@@ -52,15 +52,103 @@ public class CleanUpManager
 	}
 	
     public void doCleanupCharacter(){
-       
+        /*
+        java.sql.Connection con = null;
+        try
+        {
+            con = L2DatabaseFactory.getInstance().getConnection();
+            PreparedStatement statement;
+            ResultSet result;
+            
+            statement = con.prepareStatement("SELECT obj_id, account_name, char_name, lastaccess"
+	            							 + " FROM characters"
+											 + " WHERE lastaccess < (UNIX_TIMESTAMP()*1000 - 86400000*90)"
+											 + " AND clanid = 0 AND accesslevel <= 0"
+											 + " ORDER BY account_name, lastaccess");
+			result = statement.executeQuery();
+			while(result.next())
+			{
+				_log.info("[CHECK CHARADATA] DELETE CHARACTER(ID:"+result.getString("account_name")+", NAME:"+result.getString("char_name")+")");
+				deleteCharByObjId(result.getInt("obj_id"));
+			}
+			result.close();
+			statement.close();
+        }
+        catch (Exception e)
+        {
+            _log.warning("could not cleanup character:"+e);
+        } 
+        finally 
+        {
+            try { con.close(); } catch (Exception e) {}
+        }*/
     }
 	
     public void doCleanupClan(){
-       
+        /*
+        java.sql.Connection con = null;
+        try
+        {
+            con = L2DatabaseFactory.getInstance().getConnection();
+            PreparedStatement statement;
+            ResultSet result;
+            
+            statement = con.prepareStatement("SELECT clan_data.clan_id, clan_name, char_name, lastaccess"
+											 + " FROM clan_data, characters"
+											 + " WHERE clan_data.leader_id = characters.obj_id"
+											 + " AND characters.lastaccess < (UNIX_TIMESTAMP()*1000 - 86400000*60)"
+											 + " ORDER BY clan_data.clan_id");
+			result = statement.executeQuery();
+			while(result.next())
+			{
+        		_log.info("[CHECK CLANDATA] DELETE CLAN(NAME:"+result.getString("clan_name")+", LEADER:"+result.getString("char_name")+")!");
+        		ClanTable.getInstance().destroyClan(Integer.parseInt(result.getString("clan_id")));
+            }
+			result.close();
+			statement.close();
+        }
+        catch (Exception e)
+        {
+            _log.warning("could not cleanup clan:"+e);
+        } 
+        finally 
+        {
+            try { con.close(); } catch (Exception e) {}
+        }*/
     }
 	
     public void doCleanupClanHall(){
-       
+        /*
+        java.sql.Connection con = null;
+        try
+        {
+            con = L2DatabaseFactory.getInstance().getConnection();
+            PreparedStatement statement;
+            ResultSet result;
+            
+            statement = con.prepareStatement("SELECT clanhall.id, clan_data.clan_name"
+            								 + " FROM clanhall, clan_data, characters"
+											 + " WHERE clanhall.ownerid = clan_data.clan_id"
+											 + " AND clan_data.leader_id = characters.obj_id"
+											 + " AND characters.lastaccess < (UNIX_TIMESTAMP()*1000 - 86400000*14)"
+											 + " ORDER BY clanhall.id");
+            result = statement.executeQuery();
+            while(result.next())
+            {
+            	ClanHall clanhall = ClanHallManager.getInstance().getClanHallById(result.getInt("id"));
+            	_log.info("[CHECK CLANHALL] "+result.getString("clan_name")+" part with ClanHall("+clanhall.getName()+")!");
+            	ClanHallManager.getInstance().setFree(result.getInt("id"));
+            }
+            statement.close();
+        }
+        catch (Exception e)
+        {
+            _log.warning("could not cleanup clanhall:"+e);
+        } 
+        finally 
+        {
+            try { con.close(); } catch (Exception e) {}
+        }*/
     }
     
 	public void deleteCharByObjId(int objid)

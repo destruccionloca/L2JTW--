@@ -66,14 +66,14 @@ public class Recall implements ISkillHandler
 
                     // Check to see if the current player target is in a festival.
                     if (targetChar.isFestivalParticipant()) {
-                        targetChar.sendPacket(SystemMessage.sendString("堵穞步ㄥい礚猭ㄏノ."));
+                        targetChar.sendPacket(SystemMessage.sendString("堵穞步ㄥい礚猭ㄏノ"));
                         continue;
                     }
 
                     // Check to see if player is in jail
                     if (targetChar.isInJail())
                     {
-                        targetChar.sendPacket(SystemMessage.sendString("礚猭GM高拜矪ㄏノ"));
+                        targetChar.sendPacket(SystemMessage.sendString("礚猭GM高拜矪ㄏノ"));
                         continue;
                     }
 

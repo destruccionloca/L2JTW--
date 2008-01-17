@@ -100,11 +100,11 @@ public class AdminRes implements IAdminCommandHandler
 					for (L2PcInstance knownPlayer : activeChar.getKnownList().getKnownPlayersInRadius(radius))
 						doResurrect(knownPlayer);
 
-					activeChar.sendMessage("所有玩家在 " + radius + " 半徑內復活.");
+					activeChar.sendMessage("所有玩家在 " + radius + " 半徑內復活。");
 					return;
 				}
 				catch (NumberFormatException e) {
-					activeChar.sendMessage("格式錯誤.");
+					activeChar.sendMessage("格式錯誤。");
 					return;
 				}
 			}
@@ -146,11 +146,11 @@ public class AdminRes implements IAdminCommandHandler
 					        && !(knownChar instanceof L2ControllableMobInstance))
 							doResurrect(knownChar);
 
-				activeChar.sendMessage("所有非玩家在 " + radius + " 半徑內復活");
+				activeChar.sendMessage("所有非玩家在 " + radius + " 半徑內復活。");
 			}
 		}
 		catch (NumberFormatException e) {
-			activeChar.sendMessage("錯誤資料");
+			activeChar.sendMessage("資料錯誤。");
 			return;
 		}
 

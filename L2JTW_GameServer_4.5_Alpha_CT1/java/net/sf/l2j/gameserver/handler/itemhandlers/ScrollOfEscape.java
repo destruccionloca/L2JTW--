@@ -90,7 +90,7 @@ public class ScrollOfEscape implements IItemHandler
         // Check to see if the player is in a festival.
         if (activeChar.isFestivalParticipant())
         {
-            activeChar.sendPacket(SystemMessage.sendString("堵穞步ㄥい礚猭ㄏノ."));
+            activeChar.sendPacket(SystemMessage.sendString("堵穞步ㄥい礚猭ㄏノ"));
             return;
         }
 
@@ -98,7 +98,7 @@ public class ScrollOfEscape implements IItemHandler
         // Check to see if player is in jail
         if (activeChar.isInJail())
         {
-            activeChar.sendMessage("GM高拜矪い礚猭ㄏノ");
+            activeChar.sendMessage("GM高拜矪い礚猭ㄏノ");
             return;
         }
         // Check to see if player is in a duel

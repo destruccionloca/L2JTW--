@@ -856,7 +856,7 @@ public class SevenSignsFestival implements SpawnListener
                 festivalName = "未滿65級";
                 break;
             default:
-                festivalName = "無限制";
+                festivalName = "無等級限制";
             break;
         }
 
@@ -1346,9 +1346,9 @@ public class SevenSignsFestival implements SpawnListener
     public final String getTimeToNextFestivalStr()
     {
         if (SevenSigns.getInstance().isSealValidationPeriod())
-            return "<font color=\"FF0000\">目前是封印有效期限,黑暗祭典將在下禮拜重新開始.</font>";
+            return "<font color=\"FF0000\">封印的有效期間已結束，黑暗祭典將在下一個競爭期間重新開始。</font>";
         
-        return "<font color=\"FF0000\">黑暗的祭典將在" + getMinsToNextFestival() + "分鐘後開始.</font>";            
+        return "<font color=\"FF0000\">至下一個祭典的申請所剩餘的時間：" + getMinsToNextFestival() + "分</font>";            
 
     }
 
@@ -1818,7 +1818,7 @@ public class SevenSignsFestival implements SpawnListener
             if (Config.DEBUG)
                 _log.info("SevenSignsFestival: Festival manager initialized. Those wishing to participate have " + getMinsToNextFestival() + " minute(s) to sign up.");
 
-            sendMessageToAll("祭典的引導者", "祭典將在" + getMinsToNextFestival() + "分鐘後開始.請盡快申請註冊參與.");
+            sendMessageToAll("祭典的引導者", getMinsToNextFestival() + "分鐘後開始舉行黑暗的祭典。請踴躍參加。");
 
             // Stand by until the allowed signup period has elapsed.
             try {
@@ -1853,7 +1853,7 @@ public class SevenSignsFestival implements SpawnListener
             _festivalInitialized = true;
 
             setNextFestivalStart(Config.ALT_FESTIVAL_CYCLE_LENGTH);
-            sendMessageToAll("祭典的引導者", "黑暗的祭典正式開始.");
+            sendMessageToAll("祭典的引導者", "黑暗的祭典正式開始。");
 
             if (Config.DEBUG)
                 _log.info("SevenSignsFestival: The current set of festivals will begin in " + (Config.ALT_FESTIVAL_FIRST_SPAWN / 60000) + " minute(s).");
@@ -1906,7 +1906,7 @@ public class SevenSignsFestival implements SpawnListener
             {
                 festivalInst.spawnFestivalMonsters(FESTIVAL_DEFAULT_RESPAWN / 2, 2);
 
-                festivalInst.sendMessageToParticipants("黑暗的祭典將在" + ((Config.ALT_FESTIVAL_LENGTH - Config.ALT_FESTIVAL_SECOND_SPAWN) / 60000) + "分鐘後結束.");
+                festivalInst.sendMessageToParticipants(((Config.ALT_FESTIVAL_LENGTH - Config.ALT_FESTIVAL_SECOND_SPAWN) / 60000) + "分鐘後黑暗的祭典將要結束。");
 
             }
 
@@ -1936,7 +1936,7 @@ public class SevenSignsFestival implements SpawnListener
             for (L2DarknessFestival festivalInst : _festivalInstances.values())
             {
                 festivalInst.spawnFestivalMonsters(FESTIVAL_DEFAULT_RESPAWN, 3);
-                festivalInst.sendMessageToParticipants("寶箱已經出來了!快點!祭典即將結束!");
+                festivalInst.sendMessageToParticipants("寶箱已經出來了！黑暗的祭典即將結束！");
             }
 
             elapsedTime += Config.ALT_FESTIVAL_CHEST_SPAWN - Config.ALT_FESTIVAL_SECOND_SWARM;
@@ -1963,7 +1963,7 @@ public class SevenSignsFestival implements SpawnListener
             // Allow signups for the next festival cycle.
             _festivalInitialized = false;
 
-            sendMessageToAll("祭典的巫女", "很好,將在最快的時間內傳送你們出去.");
+            sendMessageToAll("祭典的巫女", "祭物很充足！！我將立刻把你移到外面！");
 
             if (Config.DEBUG)
                 _log.info("SevenSignsFestival: The next set of festivals begin in " + getMinsToNextFestival() + " minute(s).");
@@ -2142,7 +2142,7 @@ public class SevenSignsFestival implements SpawnListener
             _witchInst.broadcastPacket(msu);
 
             // Send a message to all participants from the witch.
-            sendMessageToParticipants("黑暗的祭典將在2分鐘後開始");
+            sendMessageToParticipants("2分鐘後開始舉行黑暗的祭典。請踴躍參加。");
         }
 
         protected void festivalStart()
@@ -2365,14 +2365,14 @@ public class SevenSignsFestival implements SpawnListener
 
                 participant.getAI().setIntention(CtrlIntention.AI_INTENTION_IDLE);
                 participant.teleToLocation(origPosition._x, origPosition._y, origPosition._z, true);
-                participant.sendMessage("You have been removed from the festival arena.");
+                //participant.sendMessage("You have been removed from the festival arena.");
             }
             catch (Exception e)
             {
                 // If an exception occurs, just move the player to the nearest town.
                 try {
                 	participant.teleToLocation(MapRegionTable.TeleportWhereType.Town);
-                	participant.sendMessage("You have been removed from the festival arena.");
+                	//participant.sendMessage("You have been removed from the festival arena.");
                 } catch (NullPointerException e2) {}
             }
 

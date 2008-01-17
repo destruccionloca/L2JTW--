@@ -201,14 +201,14 @@ public class L2MerchantInstance extends L2FolkInstance
         if (!Config.LIST_PET_RENT_NPC.contains(getTemplate().npcId)) return;
 
 
-        TextBuilder html1 = new TextBuilder("<html><body>Pet Manager:<br>");
-        html1.append("你可以付錢租用飛龍或座龍.<br>價格:<br>");
-        html1.append("<table border=0><tr><td>騎座</td></tr>");
+        TextBuilder html1 = new TextBuilder("<html><body>寵物管理員：<br>");
+        html1.append("你可以租借飛龍或座龍。<br>價格如下：<br1>");
+        html1.append("<table border=0><tr><td>騎乘</td></tr>");
         html1.append("<tr><td>飛龍</td><td>座龍</td></tr>");
-        html1.append("<tr><td><a action=\"bypass -h npc_%objectId%_RentPet 1\">30秒/1800金幣</a></td><td><a action=\"bypass -h npc_%objectId%_RentPet 11\">30秒/900金幣</a></td></tr>");
-        html1.append("<tr><td><a action=\"bypass -h npc_%objectId%_RentPet 2\">1分鐘/7200金幣</a></td><td><a action=\"bypass -h npc_%objectId%_RentPet 12\">1分鐘/3600金幣</a></td></tr>");
-        html1.append("<tr><td><a action=\"bypass -h npc_%objectId%_RentPet 3\">10分鐘/720000金幣</a></td><td><a action=\"bypass -h npc_%objectId%_RentPet 13\">10分鐘/360000金幣</a></td></tr>");
-        html1.append("<tr><td><a action=\"bypass -h npc_%objectId%_RentPet 4\">30分鐘/6480000金幣</a></td><td><a action=\"bypass -h npc_%objectId%_RentPet 14\">30分鐘/3240000金幣</a></td></tr>");
+        html1.append("<tr><td><a action=\"bypass -h npc_%objectId%_RentPet 1\">30 秒/1800 金幣</a></td><td><a action=\"bypass -h npc_%objectId%_RentPet 11\">30 秒/900 金幣</a></td></tr>");
+        html1.append("<tr><td><a action=\"bypass -h npc_%objectId%_RentPet 2\">1 分/7200 金幣</a></td><td><a action=\"bypass -h npc_%objectId%_RentPet 12\">1 分/3600 金幣</a></td></tr>");
+        html1.append("<tr><td><a action=\"bypass -h npc_%objectId%_RentPet 3\">10 分/720000 金幣</a></td><td><a action=\"bypass -h npc_%objectId%_RentPet 13\">10 分/360000 金幣</a></td></tr>");
+        html1.append("<tr><td><a action=\"bypass -h npc_%objectId%_RentPet 4\">30 分/6480000 金幣</a></td><td><a action=\"bypass -h npc_%objectId%_RentPet 14\">30 分/3240000 金幣</a></td></tr>");
 
         html1.append("</table>");
         html1.append("</body></html>");

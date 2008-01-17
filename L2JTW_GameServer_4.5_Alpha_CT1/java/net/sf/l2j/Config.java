@@ -747,6 +747,22 @@ public final class Config
 
     public static final String  L2JMOD_CONFIG_FILE            = "./config/l2jmods.properties";
     public static int MAX_ITEM_IN_PACKET;
+    // addon =========================================================
+    /** Properties file for configuration */
+    public static final String  CUSTOM_FILE              = "./config/custom.properties";
+    /** Properties file for Four-Sepulchers configuration */
+    public static final String  FS_CONFIG_FILE              = "./config/foursepulchers.properties";
+    /** Properties file for Sailren configuration */
+    public static final String  FWS_CONFIG_FILE              = "./config/sailren.properties";
+    /** Properties file for Antharas configuration */
+    public static final String  FWA_CONFIG_FILE              = "./config/antharas.properties";
+    /** Properties file for Valakas configuration */
+    public static final String  FWV_CONFIG_FILE              = "./config/valakas.properties";
+    /** Properties file for Baium configuration */
+    public static final String  FWB_CONFIG_FILE              = "./config/baium.properties";
+    /** Properties file for High Priestess van Halter */
+    public static final String  HPH_CONFIG_FILE              = "./config/vanhalter.properties";
+    // ===============================================================
 
     public static boolean CHECK_KNOWN;
 
@@ -764,7 +780,8 @@ public final class Config
     public static int        LINKED_NODE_ID;
     public static String     NEW_NODE_TYPE;
 
-
+    /** Show License at login.*/
+    public static boolean SHOW_L2J_LICENSE;
     /** Show "data/html/servnews.htm" whenever a character enters world.*/
     public static boolean SERVER_NEWS;
     /** Show L2Monster level and aggro ? */
@@ -1101,6 +1118,103 @@ public final class Config
     /** Maximum number of petitions pending */
     public static int     MAX_PETITIONS_PENDING;
 
+    /***************************************************************************
+     * Custom CONFIG                                                           *
+     **************************************************************************/
+    /** Config for Fake Death Faild Feature **/
+    public static boolean   FAILD_FAKEDEATH;
+    /** Config for Wyvern can make a landing in zone of 'No Landing' **/
+    public static boolean ALT_WYVERN_MAKEALANDING;
+    /** Config for Dismount from a wyvern in zone of 'No Landing' **/
+    public static boolean ALT_DISMOUNT_WYVERN_IN_NOLANDING;
+    /** Config for Wyvern enable flying in siege **/
+    public static boolean ALT_FLYING_WYVERN_IN_SIEGE;
+    /** Chance that an item will succesfully be enchanted */
+    public static int BLESSED_ENCHANT_CHANCE;
+    public static int CRYSTAL_ENCHANT_CHANCE;
+    public static int SAFETY_ENCHANT_MAX;
+    public static int LIMIT_PATK_SPD;
+    public static int LIMIT_MATK_SPD;
+    public static int TIME_IN_A_DAY_OF_OPEN_A_DOOR;
+    public static int TIME_OF_OPENING_A_DOOR;
+    /** Config for boss controler **/
+    public static int NURSEANT_RESPAWN_DELAY;
+    /** Config for Custom Community Board **/
+    public static boolean CUSTOM_COMMUNITY_BOARD;
+    /** Time limit of invade to lair of bosses after server restarted **/
+    public static int TIMELIMITOFINVADE;
+
+    // addon =========================================================
+    /***************************************************************************
+     * Four-Sepulchers Custom CONFIG                                           *
+     **************************************************************************/
+    public static int FS_TIME_ATTACK;
+    public static int FS_TIME_COOLDOWN;
+    public static int FS_TIME_ENTRY;
+    public static int FS_TIME_WARMUP;
+    public static int FS_PARTY_MEMBER_COUNT;
+
+    /***************************************************************************
+     * fight with sailren Custom CONFIG                                        *
+     **************************************************************************/
+    public static boolean FWS_ENABLESINGLEPLAYER;
+    public static int FWS_FIXINTERVALOFSAILRENSPAWN;
+    public static int FWS_RANDOMINTERVALOFSAILRENSPAWN;
+    public static int FWS_INTERVALOFNEXTMONSTER;
+    public static int FWS_ACTIVITYTIMEOFMOBS;
+
+    /***************************************************************************
+     * fight with Antharas Custom CONFIG                                       *
+     **************************************************************************/
+    public static int FWA_FIXINTERVALOFANTHARAS;
+    public static int FWA_RANDOMINTERVALOFANTHARAS;
+    public static int FWA_APPTIMEOFANTHARAS;
+    public static int FWA_ACTIVITYTIMEOFANTHARAS;
+    public static boolean FWA_OLDANTHARAS;
+    public static int FWA_LIMITOFWEAK;
+    public static int FWA_LIMITOFNORMAL;
+    public static int FWA_INTERVALOFBEHEMOTHONWEAK;
+    public static int FWA_INTERVALOFBEHEMOTHONNORMAL;
+    public static int FWA_INTERVALOFBEHEMOTHONSTRONG;
+    public static int FWA_INTERVALOFBOMBERONWEAK;
+    public static int FWA_INTERVALOFBOMBERONNORMAL;
+    public static int FWA_INTERVALOFBOMBERONSTRONG;
+    public static boolean FWA_MOVEATRANDOM;
+    
+    /***************************************************************************
+     * fight with Valakas Custom CONFIG                                        *
+     **************************************************************************/
+    public static int FWV_FIXINTERVALOFVALAKAS;
+    public static int FWV_RANDOMINTERVALOFVALAKAS;
+    public static int FWV_APPTIMEOFVALAKAS;
+    public static int FWV_ACTIVITYTIMEOFVALAKAS;
+    public static int FWV_CAPACITYOFLAIR;
+    public static boolean FWV_MOVEATRANDOM;
+    /** Time limit of invade to lair of bosses after server restarted **/
+
+    /***************************************************************************
+     * JP fight with Baium Custom CONFIG                                       *
+     **************************************************************************/
+    public static int FWB_FIXINTERVALOFBAIUM;
+    public static int FWB_RANDOMINTERVALOFBAIUM;
+    public static int FWB_ACTIVITYTIMEOFBAIUM;
+    public static boolean FWB_MOVEATRANDOM;
+    public static int FWB_LIMITUNTILSLEEP;
+
+    /***************************************************************************
+     * JP fight against High Priestess van Halter Custom CONFIG                *
+     **************************************************************************/
+    public static int HPH_FIXINTERVALOFHALTER;
+    public static int HPH_RANDOMINTERVALOFHALTER;
+    public static int HPH_APPTIMEOFHALTER;
+    public static int HPH_ACTIVITYTIMEOFHALTER;
+    public static int HPH_FIGHTTIMEOFHALTER;
+    public static int HPH_CALLROYALGUARDHELPERCOUNT;
+    public static int HPH_CALLROYALGUARDHELPERINTERVAL;
+    public static int HPH_INTERVALOFDOOROFALTER;
+    public static int HPH_TIMEOFLOCKUPDOOROFALTAR;
+    // ===============================================================
+
     public static int AI_FIGHTER_HATE_MULTIPLICATOR_RAID;
     public static int AI_FIGHTER_HATE_MULTIPLICATOR_NORM;
     
@@ -1213,163 +1327,6 @@ public final class Config
     /** Decay Time */
 
     public static int DECAY_TIME;
-    
-    
-    
-    
-    //L2J JP Source Code
-    
-    // [L2J_JP ADD]
-    /** Properties file for L2J_JP configuration */
-	// public static final String  JP_CUSTOM_FILE              = "./config/jp-custom.properties";
-    // [L2J_JP ADD SANDMAN]
-    /** Properties file for L2J_JP Four-Sepulchers configuration */
-    public static final String  FS_CONFIG_FILE              = "./config/foursepulchers.properties";
-    // [L2J_JP ADD SANDMAN]
-    /** Properties file for L2J_JP Sailren configuration */
-    public static final String  FWS_CONFIG_FILE              = "./config/sailren.properties";
-    // [L2J_JP ADD SANDMAN]
-    /** Properties file for L2J_JP Antharas configuration */
-    public static final String  FWA_CONFIG_FILE              = "./config/antharas.properties";
-    // [L2J_JP ADD SANDMAN]
-    /** Properties file for L2J_JP Valakas configuration */
-    public static final String  FWV_CONFIG_FILE              = "./config/valakas.properties";
-    // [L2J_JP ADD SANDMAN]
-    /** Properties file for L2J_JP Baium configuration */
-    public static final String  FWB_CONFIG_FILE              = "./config/baium.properties";
-    // [L2J_JP ADD SANDMAN]
-    /** Properties file for L2J_JP High Priestess van Halter */
-    public static final String  HPH_CONFIG_FILE              = "./config/vanhalter.properties";
-
-    
-    
-    
-    
-    /***************************************************************************
-     * JP Custom CONFIG                                                        *
-     **************************************************************************/
-     
-    /** Config for Fake Death Faild Feature **/
-    //public static boolean   FAILD_FAKEDEATH;
-    /** Config for Wyvern can make a landing in zone of 'No Landing' **/
-    //public static boolean ALT_WYVERN_MAKEALANDING;
-    /** Config for Dismount from a wyvern in zone of 'No Landing' **/
-    //public static boolean ALT_DISMOUNT_WYVERN_IN_NOLANDING;
-    /** Config for Wyvern enable flying in siege **/
-    //public static boolean ALT_FLYING_WYVERN_IN_SIEGE;
-    /** Chance that an item will succesfully be enchanted */
-    //public static int BLESSED_ENCHANT_CHANCE;
-    //public static int CRYSTAL_ENCHANT_CHANCE;
-    //public static int SAFETY_ENCHANT_MAX;
-    //public static int LIMIT_PATK_SPD;
-    //public static int LIMIT_MATK_SPD;
-    //public static int TIME_IN_A_DAY_OF_OPEN_A_DOOR;
-    //public static int TIME_OF_OPENING_A_DOOR;
-    /** Config for boss controler **/
-    //public static int NURSEANT_RESPAWN_DELAY;
-    /** Config for Custom Community Board **/
-    //public static boolean CUSTOM_COMMUNITY_BOARD;
-
-    
-    /***************************************************************************
-     * JP Custom CONFIG END                                                    *
-     **************************************************************************/
-
-    // [L2J_JP ADD SANDMAN]
-    /***************************************************************************
-     * JP Four-Sepulchers Custom CONFIG                                        *
-     **************************************************************************/
-    public static int FS_TIME_ATTACK;
-    public static int FS_TIME_COOLDOWN;
-    public static int FS_TIME_ENTRY;
-    public static int FS_TIME_WARMUP;
-    public static int FS_PARTY_MEMBER_COUNT;
-    /***************************************************************************
-     * JP Four-Sepulchers Custom CONFIG END                                    *
-     **************************************************************************/
-
-    // [L2J_JP ADD SANDMAN]
-    /***************************************************************************
-     * JP fight with sailren Custom CONFIG                                     *
-     **************************************************************************/
-    public static boolean FWS_ENABLESINGLEPLAYER;
-    public static int FWS_FIXINTERVALOFSAILRENSPAWN;
-    public static int FWS_RANDOMINTERVALOFSAILRENSPAWN;
-    public static int FWS_INTERVALOFNEXTMONSTER;
-    public static int FWS_ACTIVITYTIMEOFMOBS;
-    /***************************************************************************
-     * JP fight with sailren Custom CONFIG END                                 *
-     **************************************************************************/
-    
-    // [L2J_JP ADD SANDMAN]
-    /***************************************************************************
-     * JP fight with Antharas Custom CONFIG                                     *
-     **************************************************************************/
-    public static int FWA_FIXINTERVALOFANTHARAS;
-    public static int FWA_RANDOMINTERVALOFANTHARAS;
-    public static int FWA_APPTIMEOFANTHARAS;
-    public static int FWA_ACTIVITYTIMEOFANTHARAS;
-    public static boolean FWA_OLDANTHARAS;
-    public static int FWA_LIMITOFWEAK;
-    public static int FWA_LIMITOFNORMAL;
-    public static int FWA_INTERVALOFBEHEMOTHONWEAK;
-    public static int FWA_INTERVALOFBEHEMOTHONNORMAL;
-    public static int FWA_INTERVALOFBEHEMOTHONSTRONG;
-    public static int FWA_INTERVALOFBOMBERONWEAK;
-    public static int FWA_INTERVALOFBOMBERONNORMAL;
-    public static int FWA_INTERVALOFBOMBERONSTRONG;
-    public static boolean FWA_MOVEATRANDOM;
-    /***************************************************************************
-     * JP fight with Antharas Custom CONFIG END                                 *
-     **************************************************************************/
-    
-    // [L2J_JP ADD SANDMAN]
-    /***************************************************************************
-     * JP fight with Valakas Custom CONFIG                                     *
-     **************************************************************************/
-    public static int FWV_FIXINTERVALOFVALAKAS;
-    public static int FWV_RANDOMINTERVALOFVALAKAS;
-    public static int FWV_APPTIMEOFVALAKAS;
-    public static int FWV_ACTIVITYTIMEOFVALAKAS;
-    public static int FWV_CAPACITYOFLAIR;
-    public static boolean FWV_MOVEATRANDOM;
-    /** Time limit of invade to lair of bosses after server restarted **/
-    public static int TIMELIMITOFINVADE;
-    /***************************************************************************
-     * JP fight with Valakas Custom CONFIG END                                 *
-     **************************************************************************/
-    
-    // [L2J_JP ADD SANDMAN]
-    /***************************************************************************
-     * JP fight with Baium Custom CONFIG                                     *
-     **************************************************************************/
-    public static int FWB_FIXINTERVALOFBAIUM;
-    public static int FWB_RANDOMINTERVALOFBAIUM;
-    public static int FWB_ACTIVITYTIMEOFBAIUM;
-    public static boolean FWB_MOVEATRANDOM;
-    /***************************************************************************
-     * JP fight with Baium Custom CONFIG END                                 *
-     **************************************************************************/
-
-    // [L2J_JP ADD SANDMAN]
-    /***************************************************************************
-     * JP fight against High Priestess van Halter Custom CONFIG                *
-     **************************************************************************/
-    public static int HPH_FIXINTERVALOFHALTER;
-    public static int HPH_RANDOMINTERVALOFHALTER;
-    public static int HPH_APPTIMEOFHALTER;
-    public static int HPH_ACTIVITYTIMEOFHALTER;
-    public static int HPH_FIGHTTIMEOFHALTER;
-    public static int HPH_CALLROYALGUARDHELPERCOUNT;
-    public static int HPH_CALLROYALGUARDHELPERINTERVAL;
-    public static int HPH_INTERVALOFDOOROFALTER;
-    public static int HPH_TIMEOFLOCKUPDOOROFALTAR;
-    /***************************************************************************
-     * JP fight against High Priestess van Halter Custom CONFIG END            *
-     **************************************************************************/
-    
-    
-    
     /**
      * This class initializes all global variables for configuration.<br>
      * If key doesn't appear in properties file, a default value is setting on by this class.
@@ -1379,230 +1336,6 @@ public final class Config
     {
         if(Server.serverMode == Server.MODE_GAMESERVER)
         {
-            
-            
-            
-            
-            //L2J JP Source 
-            
-            // JP Custom Setting
-            /*
-            try
-            {
-                Properties Settings   = new Properties();
-                InputStream is          = new FileInputStream(JP_CUSTOM_FILE);  
-                Settings.load(is);
-                is.close();  
-                FAILD_FAKEDEATH = Boolean.parseBoolean(Settings.getProperty("FaildFakeDeath", "true"));
-                ALT_WYVERN_MAKEALANDING = Boolean.parseBoolean(Settings.getProperty("AltWyvernMakeALanding", "false"));
-                ALT_DISMOUNT_WYVERN_IN_NOLANDING = Boolean.parseBoolean(Settings.getProperty("AltDismountWyvernInNoLanding", "true"));
-                ALT_FLYING_WYVERN_IN_SIEGE = Boolean.parseBoolean(Settings.getProperty("AltFlyingWyvernInSiege", "false"));
-                BLESSED_ENCHANT_CHANCE = Integer.parseInt(Settings.getProperty("BlessedEnchantChance", "65"));
-                CRYSTAL_ENCHANT_CHANCE = Integer.parseInt(Settings.getProperty("CrystalEnchantChance", "65"));
-                SAFETY_ENCHANT_MAX = Integer.parseInt(Settings.getProperty("SafetyEnchantMax", "3"));
-                LIMIT_PATK_SPD = Integer.parseInt(Settings.getProperty("LimitPAtkSpeed", "999"));
-                LIMIT_MATK_SPD = Integer.parseInt(Settings.getProperty("LimitMAtkSpeed", "999"));
-                TIME_IN_A_DAY_OF_OPEN_A_DOOR = Integer.parseInt(Settings.getProperty("TimeInADayOfOpenADoor", "0"));
-                TIME_OF_OPENING_A_DOOR = Integer.parseInt(Settings.getProperty("TimeOfOpeningADoor", "2"));
-                NURSEANT_RESPAWN_DELAY = Integer.parseInt(Settings.getProperty("NurseAntRespawnDelay", "15"));
-                if (NURSEANT_RESPAWN_DELAY < 15) NURSEANT_RESPAWN_DELAY = 15;
-                else if (NURSEANT_RESPAWN_DELAY > 120) NURSEANT_RESPAWN_DELAY = 120;
-                NURSEANT_RESPAWN_DELAY = NURSEANT_RESPAWN_DELAY * 1000;
-                CUSTOM_COMMUNITY_BOARD = Boolean.parseBoolean(Settings.getProperty("CustomCommunityBoard", "true"));
-                
-           }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-                throw new Error("Failed to Load "+JP_CUSTOM_FILE+" File.");
-                
-            }
-            */
-            // JP Four-Sepulchers Custom Setting
-            try
-            {
-                Properties Settings   = new Properties();
-                InputStream is          = new FileInputStream(FS_CONFIG_FILE);  
-                Settings.load(is);
-                is.close();
-                FS_TIME_ATTACK = Integer.parseInt(Settings.getProperty("TimeOfAttack", "50"));
-                if(FS_TIME_ATTACK <= 0) FS_TIME_ATTACK = 50;
-                FS_TIME_COOLDOWN = Integer.parseInt(Settings.getProperty("TimeOfCoolDown", "5"));
-                if(FS_TIME_COOLDOWN <= 0) FS_TIME_COOLDOWN = 5;
-                FS_TIME_ENTRY = Integer.parseInt(Settings.getProperty("TimeOfEntry", "3"));
-                if(FS_TIME_ENTRY <= 0) FS_TIME_ENTRY = 3;
-                FS_TIME_WARMUP = Integer.parseInt(Settings.getProperty("TimeOfWarmUp", "2"));
-                if(FS_TIME_WARMUP <= 0) FS_TIME_WARMUP = 2;
-                FS_PARTY_MEMBER_COUNT = Integer.parseInt(Settings.getProperty("NumberOfNecessaryPartyMembers", "4"));
-                if(FS_PARTY_MEMBER_COUNT < 0) FS_PARTY_MEMBER_COUNT = 4;
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-                throw new Error("Failed to Load "+FS_CONFIG_FILE+" File.");
-            }
-            // JP fight with sailren Custom Setting
-            try
-            {
-                Properties Settings   = new Properties();
-                InputStream is          = new FileInputStream(FWS_CONFIG_FILE);  
-                Settings.load(is);
-                is.close();
-                FWS_ENABLESINGLEPLAYER = Boolean.parseBoolean(Settings.getProperty("EnableSinglePlayer", "False"));
-                FWS_FIXINTERVALOFSAILRENSPAWN = Integer.parseInt(Settings.getProperty("FixIntervalOfSailrenSpawn", "1440"));
-                if(FWS_FIXINTERVALOFSAILRENSPAWN < 5 || FWS_FIXINTERVALOFSAILRENSPAWN > 2880) FWS_FIXINTERVALOFSAILRENSPAWN = 1440;
-                FWS_FIXINTERVALOFSAILRENSPAWN = FWS_FIXINTERVALOFSAILRENSPAWN * 60000;
-                FWS_RANDOMINTERVALOFSAILRENSPAWN = Integer.parseInt(Settings.getProperty("RandomIntervalOfSailrenSpawn", "1440"));
-                if(FWS_RANDOMINTERVALOFSAILRENSPAWN < 5 || FWS_RANDOMINTERVALOFSAILRENSPAWN > 2880) FWS_RANDOMINTERVALOFSAILRENSPAWN = 1440;
-                FWS_RANDOMINTERVALOFSAILRENSPAWN = FWS_RANDOMINTERVALOFSAILRENSPAWN * 60000;
-                FWS_INTERVALOFNEXTMONSTER = Integer.parseInt(Settings.getProperty("IntervalOfNextMonster", "1"));
-                if(FWS_INTERVALOFNEXTMONSTER < 1 || FWS_INTERVALOFNEXTMONSTER > 10) FWS_INTERVALOFNEXTMONSTER = 1;
-                FWS_INTERVALOFNEXTMONSTER = FWS_INTERVALOFNEXTMONSTER * 60000;
-                FWS_ACTIVITYTIMEOFMOBS = Integer.parseInt(Settings.getProperty("ActivityTimeOfMobs", "120"));
-                if(FWS_ACTIVITYTIMEOFMOBS < 1 || FWS_ACTIVITYTIMEOFMOBS > 120) FWS_ACTIVITYTIMEOFMOBS = 120;
-                FWS_ACTIVITYTIMEOFMOBS = FWS_ACTIVITYTIMEOFMOBS * 60000;
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-                throw new Error("Failed to Load "+FWS_CONFIG_FILE+" File.");
-            }
-            // JP fight with Antharas Custom Setting
-            try
-            {
-                Properties Settings   = new Properties();
-                InputStream is          = new FileInputStream(FWA_CONFIG_FILE);  
-                Settings.load(is);
-                is.close();
-                
-                FWA_FIXINTERVALOFANTHARAS = Integer.parseInt(Settings.getProperty("FixIntervalOfAntharas", "11520"));
-                if(FWA_FIXINTERVALOFANTHARAS < 5 || FWA_FIXINTERVALOFANTHARAS > 20160) FWA_FIXINTERVALOFANTHARAS = 11520;
-                FWA_FIXINTERVALOFANTHARAS = FWA_FIXINTERVALOFANTHARAS * 60000;
-                FWA_RANDOMINTERVALOFANTHARAS = Integer.parseInt(Settings.getProperty("RandomIntervalOfAntharas", "8640"));
-                if(FWA_RANDOMINTERVALOFANTHARAS < 5 || FWA_RANDOMINTERVALOFANTHARAS > 20160) FWA_RANDOMINTERVALOFANTHARAS = 8640;
-                FWA_RANDOMINTERVALOFANTHARAS = FWA_RANDOMINTERVALOFANTHARAS * 60000;
-                FWA_APPTIMEOFANTHARAS = Integer.parseInt(Settings.getProperty("AppTimeOfAntharas", "10"));
-                if(FWA_APPTIMEOFANTHARAS < 5 || FWA_APPTIMEOFANTHARAS > 60) FWA_APPTIMEOFANTHARAS = 10;
-                FWA_APPTIMEOFANTHARAS = FWA_APPTIMEOFANTHARAS * 60000;
-                FWA_ACTIVITYTIMEOFANTHARAS = Integer.parseInt(Settings.getProperty("ActivityTimeOfAntharas", "120"));
-                if(FWA_ACTIVITYTIMEOFANTHARAS < 120 || FWA_ACTIVITYTIMEOFANTHARAS > 720) FWA_ACTIVITYTIMEOFANTHARAS = 120;
-                FWA_ACTIVITYTIMEOFANTHARAS = FWA_ACTIVITYTIMEOFANTHARAS * 60000;
-                FWA_OLDANTHARAS = Boolean.parseBoolean(Settings.getProperty("OldAntharas", "False"));
-                FWA_LIMITOFWEAK = Integer.parseInt(Settings.getProperty("LimitOfWeak", "299"));
-                FWA_LIMITOFNORMAL = Integer.parseInt(Settings.getProperty("LimitOfNormal", "399"));
-                if(FWA_LIMITOFWEAK >= FWA_LIMITOFNORMAL) FWA_LIMITOFNORMAL = FWA_LIMITOFWEAK + 1;
-                FWA_INTERVALOFBEHEMOTHONWEAK = Integer.parseInt(Settings.getProperty("IntervalOfBehemothOnWeak", "8"));
-                if(FWA_INTERVALOFBEHEMOTHONWEAK < 1 || FWA_INTERVALOFBEHEMOTHONWEAK > 10) FWA_INTERVALOFBEHEMOTHONWEAK = 8;
-                FWA_INTERVALOFBEHEMOTHONWEAK = FWA_INTERVALOFBEHEMOTHONWEAK * 60000;
-                FWA_INTERVALOFBEHEMOTHONNORMAL = Integer.parseInt(Settings.getProperty("IntervalOfBehemothOnNormal", "5"));
-                if(FWA_INTERVALOFBEHEMOTHONNORMAL < 1 || FWA_INTERVALOFBEHEMOTHONNORMAL > 10) FWA_INTERVALOFBEHEMOTHONNORMAL = 5;
-                FWA_INTERVALOFBEHEMOTHONNORMAL = FWA_INTERVALOFBEHEMOTHONNORMAL * 60000;
-                FWA_INTERVALOFBEHEMOTHONSTRONG = Integer.parseInt(Settings.getProperty("IntervalOfBehemothOnStrong", "3"));
-                if(FWA_INTERVALOFBEHEMOTHONSTRONG < 1 || FWA_INTERVALOFBEHEMOTHONSTRONG > 10) FWA_INTERVALOFBEHEMOTHONSTRONG = 3;
-                FWA_INTERVALOFBEHEMOTHONSTRONG = FWA_INTERVALOFBEHEMOTHONSTRONG * 60000;
-                FWA_INTERVALOFBOMBERONWEAK = Integer.parseInt(Settings.getProperty("IntervalOfBomberOnWeak", "6"));
-                if(FWA_INTERVALOFBOMBERONWEAK < 1 || FWA_INTERVALOFBOMBERONWEAK > 10) FWA_INTERVALOFBOMBERONWEAK = 6;
-                FWA_INTERVALOFBOMBERONWEAK = FWA_INTERVALOFBOMBERONWEAK * 60000;
-                FWA_INTERVALOFBOMBERONNORMAL = Integer.parseInt(Settings.getProperty("IntervalOfBomberOnNormal", "4"));
-                if(FWA_INTERVALOFBOMBERONNORMAL < 1 || FWA_INTERVALOFBOMBERONNORMAL > 10) FWA_INTERVALOFBOMBERONNORMAL = 4;
-                FWA_INTERVALOFBOMBERONNORMAL = FWA_INTERVALOFBOMBERONNORMAL * 60000;
-                FWA_INTERVALOFBOMBERONSTRONG = Integer.parseInt(Settings.getProperty("IntervalOfBomberOnStrong", "3"));
-                if(FWA_INTERVALOFBOMBERONSTRONG < 1 || FWA_INTERVALOFBOMBERONSTRONG > 10) FWA_INTERVALOFBOMBERONSTRONG = 3;
-                FWA_INTERVALOFBOMBERONSTRONG = FWA_INTERVALOFBOMBERONSTRONG * 60000;
-                FWA_MOVEATRANDOM = Boolean.parseBoolean(Settings.getProperty("MoveAtRandom", "True"));
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-                throw new Error("Failed to Load "+FWA_CONFIG_FILE+" File.");
-            }
-            // JP fight with Valakas Custom Setting
-            try
-            {
-                Properties Settings   = new Properties();
-                InputStream is          = new FileInputStream(FWV_CONFIG_FILE);  
-                Settings.load(is);
-                is.close();
-                
-                FWV_FIXINTERVALOFVALAKAS = Integer.parseInt(Settings.getProperty("FixIntervalOfValakas", "11520"));
-                if(FWV_FIXINTERVALOFVALAKAS < 5 || FWV_FIXINTERVALOFVALAKAS > 20160) FWV_FIXINTERVALOFVALAKAS = 11520;
-                FWV_FIXINTERVALOFVALAKAS = FWV_FIXINTERVALOFVALAKAS * 60000;
-                FWV_RANDOMINTERVALOFVALAKAS = Integer.parseInt(Settings.getProperty("RandomIntervalOfValakas", "8640"));
-                if(FWV_RANDOMINTERVALOFVALAKAS < 5 || FWV_RANDOMINTERVALOFVALAKAS > 20160) FWV_RANDOMINTERVALOFVALAKAS = 8640;
-                FWV_RANDOMINTERVALOFVALAKAS = FWV_RANDOMINTERVALOFVALAKAS * 60000;
-                FWV_APPTIMEOFVALAKAS = Integer.parseInt(Settings.getProperty("AppTimeOfValakas", "20"));
-                if(FWV_APPTIMEOFVALAKAS < 5 || FWV_APPTIMEOFVALAKAS > 60) FWV_APPTIMEOFVALAKAS = 10;
-                FWV_APPTIMEOFVALAKAS = FWV_APPTIMEOFVALAKAS * 60000;
-                FWV_ACTIVITYTIMEOFVALAKAS = Integer.parseInt(Settings.getProperty("ActivityTimeOfValakas", "120"));
-                if(FWV_ACTIVITYTIMEOFVALAKAS < 120 || FWV_ACTIVITYTIMEOFVALAKAS > 720) FWV_ACTIVITYTIMEOFVALAKAS = 120;
-                FWV_ACTIVITYTIMEOFVALAKAS = FWV_ACTIVITYTIMEOFVALAKAS * 60000;
-                FWV_CAPACITYOFLAIR = Integer.parseInt(Settings.getProperty("CapacityOfLairOfValakas", "200"));
-                FWV_MOVEATRANDOM = Boolean.parseBoolean(Settings.getProperty("MoveAtRandom", "True"));
-                TIMELIMITOFINVADE = Integer.parseInt(Settings.getProperty("TimeLimitOfInvade", "1800000"));
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-                throw new Error("Failed to Load "+FWV_CONFIG_FILE+" File.");
-            }
-            // JP fight with Baium Custom Setting
-            try
-            {
-                Properties Settings   = new Properties();
-                InputStream is          = new FileInputStream(FWB_CONFIG_FILE);  
-                Settings.load(is);
-                is.close();
-                
-                FWB_FIXINTERVALOFBAIUM = Integer.parseInt(Settings.getProperty("FixIntervalOfBaium", "7200"));
-                if(FWB_FIXINTERVALOFBAIUM < 5 || FWB_FIXINTERVALOFBAIUM > 12960) FWB_FIXINTERVALOFBAIUM = 7200;
-                FWB_FIXINTERVALOFBAIUM = FWB_FIXINTERVALOFBAIUM * 60000;
-                FWB_RANDOMINTERVALOFBAIUM = Integer.parseInt(Settings.getProperty("RandomIntervalOfBaium", "5760"));
-                if(FWB_RANDOMINTERVALOFBAIUM < 5 || FWB_RANDOMINTERVALOFBAIUM > 12960) FWB_RANDOMINTERVALOFBAIUM = 5760;
-                FWB_RANDOMINTERVALOFBAIUM = FWB_RANDOMINTERVALOFBAIUM * 60000;
-                FWB_ACTIVITYTIMEOFBAIUM = Integer.parseInt(Settings.getProperty("ActivityTimeOfBaium", "120"));
-                if(FWB_ACTIVITYTIMEOFBAIUM < 120 || FWB_ACTIVITYTIMEOFBAIUM > 720) FWB_ACTIVITYTIMEOFBAIUM = 120;
-                FWB_ACTIVITYTIMEOFBAIUM = FWB_ACTIVITYTIMEOFBAIUM * 60000;
-                FWB_MOVEATRANDOM = Boolean.parseBoolean(Settings.getProperty("MoveAtRandom", "True"));
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-                throw new Error("Failed to Load "+FWB_CONFIG_FILE+" File.");
-            }
-            // JP fight with High Priestess van Halter Custom Setting
-            try
-            {
-                Properties Settings   = new Properties();
-                InputStream is          = new FileInputStream(HPH_CONFIG_FILE);  
-                Settings.load(is);
-                is.close();
-
-                HPH_FIXINTERVALOFHALTER = Integer.parseInt(Settings.getProperty("FixIntervalOfHalter", "172800"));
-                if (HPH_FIXINTERVALOFHALTER < 300 || HPH_FIXINTERVALOFHALTER > 864000) HPH_FIXINTERVALOFHALTER = 172800;
-                HPH_RANDOMINTERVALOFHALTER = Integer.parseInt(Settings.getProperty("RandomIntervalOfHalter", "86400"));
-                if (HPH_RANDOMINTERVALOFHALTER < 300 || HPH_RANDOMINTERVALOFHALTER > 864000) HPH_RANDOMINTERVALOFHALTER = 86400;
-                HPH_APPTIMEOFHALTER = Integer.parseInt(Settings.getProperty("AppTimeOfHalter", "20"));
-                if (HPH_APPTIMEOFHALTER < 5 || HPH_APPTIMEOFHALTER > 60) HPH_APPTIMEOFHALTER = 20;
-                HPH_ACTIVITYTIMEOFHALTER = Integer.parseInt(Settings.getProperty("ActivityTimeOfHalter", "21600"));
-                if (HPH_ACTIVITYTIMEOFHALTER < 7200 || HPH_ACTIVITYTIMEOFHALTER > 86400) HPH_ACTIVITYTIMEOFHALTER = 21600;
-                HPH_FIGHTTIMEOFHALTER = Integer.parseInt(Settings.getProperty("FightTimeOfHalter", "7200"));
-                if (HPH_FIGHTTIMEOFHALTER < 7200 || HPH_FIGHTTIMEOFHALTER > 21600) HPH_FIGHTTIMEOFHALTER = 7200;
-                HPH_CALLROYALGUARDHELPERCOUNT = Integer.parseInt(Settings.getProperty("CallRoyalGuardHelperCount", "6"));
-                if (HPH_CALLROYALGUARDHELPERCOUNT < 1 || HPH_CALLROYALGUARDHELPERCOUNT > 6) HPH_CALLROYALGUARDHELPERCOUNT = 6;
-                HPH_CALLROYALGUARDHELPERINTERVAL = Integer.parseInt(Settings.getProperty("CallRoyalGuardHelperInterval", "10"));
-                if (HPH_CALLROYALGUARDHELPERINTERVAL < 1 || HPH_CALLROYALGUARDHELPERINTERVAL > 60) HPH_CALLROYALGUARDHELPERINTERVAL = 10;
-                HPH_INTERVALOFDOOROFALTER = Integer.parseInt(Settings.getProperty("IntervalOfDoorOfAlter", "5400"));
-                if (HPH_INTERVALOFDOOROFALTER < 60 || HPH_INTERVALOFDOOROFALTER > 5400) HPH_INTERVALOFDOOROFALTER = 5400;
-                HPH_TIMEOFLOCKUPDOOROFALTAR = Integer.parseInt(Settings.getProperty("TimeOfLockUpDoorOfAltar", "180"));
-                if (HPH_TIMEOFLOCKUPDOOROFALTAR < 60 || HPH_TIMEOFLOCKUPDOOROFALTAR > 600) HPH_TIMEOFLOCKUPDOOROFALTAR = 180;
-
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-                throw new Error("Failed to Load "+HPH_CONFIG_FILE+" File.");
-            }
-            
             _log.info("loading gameserver config");
             try {
                 Properties serverSettings    = new Properties();
@@ -1737,10 +1470,7 @@ public final class Config
                 MIN_MONSTER_ANIMATION           = Integer.parseInt(optionsSettings.getProperty("MinMonsterAnimation", "5"));
                 MAX_MONSTER_ANIMATION           = Integer.parseInt(optionsSettings.getProperty("MaxMonsterAnimation", "20"));
  
-                
-                SHOW_NPC_LVL					= Boolean.valueOf(optionsSettings.getProperty("ShowNpcLevel", "False"));
-
-
+                SHOW_L2J_LICENSE                = Boolean.valueOf(optionsSettings.getProperty("ShowL2JLicense", "false"));
                 SERVER_NEWS                     = Boolean.valueOf(optionsSettings.getProperty("ShowServerNews", "False"));
                 SHOW_NPC_LVL                    = Boolean.valueOf(optionsSettings.getProperty("ShowNpcLevel", "False"));
 
@@ -2573,6 +2303,226 @@ public final class Config
             {
                 _log.warning("Could not load HexID file ("+HEXID_FILE+"). Hopefully login will give us one.");
             }
+            // addon =========================================================
+            // Custom Setting ================================================
+            try
+            {
+                Properties Settings   = new Properties();
+                InputStream is          = new FileInputStream(CUSTOM_FILE);  
+                Settings.load(is);
+                is.close();  
+                FAILD_FAKEDEATH = Boolean.parseBoolean(Settings.getProperty("FaildFakeDeath", "true"));
+                ALT_WYVERN_MAKEALANDING = Boolean.parseBoolean(Settings.getProperty("AltWyvernMakeALanding", "false"));
+                ALT_DISMOUNT_WYVERN_IN_NOLANDING = Boolean.parseBoolean(Settings.getProperty("AltDismountWyvernInNoLanding", "true"));
+                ALT_FLYING_WYVERN_IN_SIEGE = Boolean.parseBoolean(Settings.getProperty("AltFlyingWyvernInSiege", "false"));
+                BLESSED_ENCHANT_CHANCE = Integer.parseInt(Settings.getProperty("BlessedEnchantChance", "65"));
+                CRYSTAL_ENCHANT_CHANCE = Integer.parseInt(Settings.getProperty("CrystalEnchantChance", "65"));
+                SAFETY_ENCHANT_MAX = Integer.parseInt(Settings.getProperty("SafetyEnchantMax", "3"));
+                LIMIT_PATK_SPD = Integer.parseInt(Settings.getProperty("LimitPAtkSpeed", "999"));
+                LIMIT_MATK_SPD = Integer.parseInt(Settings.getProperty("LimitMAtkSpeed", "999"));
+                TIME_IN_A_DAY_OF_OPEN_A_DOOR = Integer.parseInt(Settings.getProperty("TimeInADayOfOpenADoor", "0"));
+                TIME_OF_OPENING_A_DOOR = Integer.parseInt(Settings.getProperty("TimeOfOpeningADoor", "2"));
+                NURSEANT_RESPAWN_DELAY = Integer.parseInt(Settings.getProperty("NurseAntRespawnDelay", "15"));
+                if (NURSEANT_RESPAWN_DELAY < 15) NURSEANT_RESPAWN_DELAY = 15;
+                else if (NURSEANT_RESPAWN_DELAY > 120) NURSEANT_RESPAWN_DELAY = 120;
+                NURSEANT_RESPAWN_DELAY = NURSEANT_RESPAWN_DELAY * 1000;
+                CUSTOM_COMMUNITY_BOARD = Boolean.parseBoolean(Settings.getProperty("CustomCommunityBoard", "true"));
+                TIMELIMITOFINVADE = Integer.parseInt(Settings.getProperty("TimeLimitOfInvade", "1800000"));
+           }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                throw new Error("Failed to Load "+CUSTOM_FILE+" File.");
+                
+            }
+            // Four-Sepulchers Custom Setting
+            try
+            {
+                Properties Settings   = new Properties();
+                InputStream is          = new FileInputStream(FS_CONFIG_FILE);  
+                Settings.load(is);
+                is.close();
+                FS_TIME_ATTACK = Integer.parseInt(Settings.getProperty("TimeOfAttack", "50"));
+                if(FS_TIME_ATTACK <= 0) FS_TIME_ATTACK = 50;
+                FS_TIME_COOLDOWN = Integer.parseInt(Settings.getProperty("TimeOfCoolDown", "5"));
+                if(FS_TIME_COOLDOWN <= 0) FS_TIME_COOLDOWN = 5;
+                FS_TIME_ENTRY = Integer.parseInt(Settings.getProperty("TimeOfEntry", "3"));
+                if(FS_TIME_ENTRY <= 0) FS_TIME_ENTRY = 3;
+                FS_TIME_WARMUP = Integer.parseInt(Settings.getProperty("TimeOfWarmUp", "2"));
+                if(FS_TIME_WARMUP <= 0) FS_TIME_WARMUP = 2;
+                FS_PARTY_MEMBER_COUNT = Integer.parseInt(Settings.getProperty("NumberOfNecessaryPartyMembers", "4"));
+                if(FS_PARTY_MEMBER_COUNT < 0) FS_PARTY_MEMBER_COUNT = 4;
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                throw new Error("Failed to Load "+FS_CONFIG_FILE+" File.");
+            }
+            // fight with sailren Custom Setting
+            try
+            {
+                Properties Settings   = new Properties();
+                InputStream is          = new FileInputStream(FWS_CONFIG_FILE);  
+                Settings.load(is);
+                is.close();
+                FWS_ENABLESINGLEPLAYER = Boolean.parseBoolean(Settings.getProperty("EnableSinglePlayer", "False"));
+                FWS_FIXINTERVALOFSAILRENSPAWN = Integer.parseInt(Settings.getProperty("FixIntervalOfSailrenSpawn", "1440"));
+                if(FWS_FIXINTERVALOFSAILRENSPAWN < 5 || FWS_FIXINTERVALOFSAILRENSPAWN > 2880) FWS_FIXINTERVALOFSAILRENSPAWN = 1440;
+                FWS_FIXINTERVALOFSAILRENSPAWN = FWS_FIXINTERVALOFSAILRENSPAWN * 60000;
+                FWS_RANDOMINTERVALOFSAILRENSPAWN = Integer.parseInt(Settings.getProperty("RandomIntervalOfSailrenSpawn", "1440"));
+                if(FWS_RANDOMINTERVALOFSAILRENSPAWN < 5 || FWS_RANDOMINTERVALOFSAILRENSPAWN > 2880) FWS_RANDOMINTERVALOFSAILRENSPAWN = 1440;
+                FWS_RANDOMINTERVALOFSAILRENSPAWN = FWS_RANDOMINTERVALOFSAILRENSPAWN * 60000;
+                FWS_INTERVALOFNEXTMONSTER = Integer.parseInt(Settings.getProperty("IntervalOfNextMonster", "1"));
+                if(FWS_INTERVALOFNEXTMONSTER < 1 || FWS_INTERVALOFNEXTMONSTER > 10) FWS_INTERVALOFNEXTMONSTER = 1;
+                FWS_INTERVALOFNEXTMONSTER = FWS_INTERVALOFNEXTMONSTER * 60000;
+                FWS_ACTIVITYTIMEOFMOBS = Integer.parseInt(Settings.getProperty("ActivityTimeOfMobs", "120"));
+                if(FWS_ACTIVITYTIMEOFMOBS < 1 || FWS_ACTIVITYTIMEOFMOBS > 120) FWS_ACTIVITYTIMEOFMOBS = 120;
+                FWS_ACTIVITYTIMEOFMOBS = FWS_ACTIVITYTIMEOFMOBS * 60000;
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                throw new Error("Failed to Load "+FWS_CONFIG_FILE+" File.");
+            }
+            // fight with Antharas Custom Setting
+            try
+            {
+                Properties Settings   = new Properties();
+                InputStream is          = new FileInputStream(FWA_CONFIG_FILE);  
+                Settings.load(is);
+                is.close();
+                
+                FWA_FIXINTERVALOFANTHARAS = Integer.parseInt(Settings.getProperty("FixIntervalOfAntharas", "11520"));
+                if(FWA_FIXINTERVALOFANTHARAS < 5 || FWA_FIXINTERVALOFANTHARAS > 20160) FWA_FIXINTERVALOFANTHARAS = 11520;
+                FWA_FIXINTERVALOFANTHARAS = FWA_FIXINTERVALOFANTHARAS * 60000;
+                FWA_RANDOMINTERVALOFANTHARAS = Integer.parseInt(Settings.getProperty("RandomIntervalOfAntharas", "8640"));
+                if(FWA_RANDOMINTERVALOFANTHARAS < 5 || FWA_RANDOMINTERVALOFANTHARAS > 20160) FWA_RANDOMINTERVALOFANTHARAS = 8640;
+                FWA_RANDOMINTERVALOFANTHARAS = FWA_RANDOMINTERVALOFANTHARAS * 60000;
+                FWA_APPTIMEOFANTHARAS = Integer.parseInt(Settings.getProperty("AppTimeOfAntharas", "10"));
+                if(FWA_APPTIMEOFANTHARAS < 5 || FWA_APPTIMEOFANTHARAS > 60) FWA_APPTIMEOFANTHARAS = 10;
+                FWA_APPTIMEOFANTHARAS = FWA_APPTIMEOFANTHARAS * 60000;
+                FWA_ACTIVITYTIMEOFANTHARAS = Integer.parseInt(Settings.getProperty("ActivityTimeOfAntharas", "120"));
+                if(FWA_ACTIVITYTIMEOFANTHARAS < 120 || FWA_ACTIVITYTIMEOFANTHARAS > 720) FWA_ACTIVITYTIMEOFANTHARAS = 120;
+                FWA_ACTIVITYTIMEOFANTHARAS = FWA_ACTIVITYTIMEOFANTHARAS * 60000;
+                FWA_OLDANTHARAS = Boolean.parseBoolean(Settings.getProperty("OldAntharas", "False"));
+                FWA_LIMITOFWEAK = Integer.parseInt(Settings.getProperty("LimitOfWeak", "299"));
+                FWA_LIMITOFNORMAL = Integer.parseInt(Settings.getProperty("LimitOfNormal", "399"));
+                if(FWA_LIMITOFWEAK >= FWA_LIMITOFNORMAL) FWA_LIMITOFNORMAL = FWA_LIMITOFWEAK + 1;
+                FWA_INTERVALOFBEHEMOTHONWEAK = Integer.parseInt(Settings.getProperty("IntervalOfBehemothOnWeak", "8"));
+                if(FWA_INTERVALOFBEHEMOTHONWEAK < 1 || FWA_INTERVALOFBEHEMOTHONWEAK > 10) FWA_INTERVALOFBEHEMOTHONWEAK = 8;
+                FWA_INTERVALOFBEHEMOTHONWEAK = FWA_INTERVALOFBEHEMOTHONWEAK * 60000;
+                FWA_INTERVALOFBEHEMOTHONNORMAL = Integer.parseInt(Settings.getProperty("IntervalOfBehemothOnNormal", "5"));
+                if(FWA_INTERVALOFBEHEMOTHONNORMAL < 1 || FWA_INTERVALOFBEHEMOTHONNORMAL > 10) FWA_INTERVALOFBEHEMOTHONNORMAL = 5;
+                FWA_INTERVALOFBEHEMOTHONNORMAL = FWA_INTERVALOFBEHEMOTHONNORMAL * 60000;
+                FWA_INTERVALOFBEHEMOTHONSTRONG = Integer.parseInt(Settings.getProperty("IntervalOfBehemothOnStrong", "3"));
+                if(FWA_INTERVALOFBEHEMOTHONSTRONG < 1 || FWA_INTERVALOFBEHEMOTHONSTRONG > 10) FWA_INTERVALOFBEHEMOTHONSTRONG = 3;
+                FWA_INTERVALOFBEHEMOTHONSTRONG = FWA_INTERVALOFBEHEMOTHONSTRONG * 60000;
+                FWA_INTERVALOFBOMBERONWEAK = Integer.parseInt(Settings.getProperty("IntervalOfBomberOnWeak", "6"));
+                if(FWA_INTERVALOFBOMBERONWEAK < 1 || FWA_INTERVALOFBOMBERONWEAK > 10) FWA_INTERVALOFBOMBERONWEAK = 6;
+                FWA_INTERVALOFBOMBERONWEAK = FWA_INTERVALOFBOMBERONWEAK * 60000;
+                FWA_INTERVALOFBOMBERONNORMAL = Integer.parseInt(Settings.getProperty("IntervalOfBomberOnNormal", "4"));
+                if(FWA_INTERVALOFBOMBERONNORMAL < 1 || FWA_INTERVALOFBOMBERONNORMAL > 10) FWA_INTERVALOFBOMBERONNORMAL = 4;
+                FWA_INTERVALOFBOMBERONNORMAL = FWA_INTERVALOFBOMBERONNORMAL * 60000;
+                FWA_INTERVALOFBOMBERONSTRONG = Integer.parseInt(Settings.getProperty("IntervalOfBomberOnStrong", "3"));
+                if(FWA_INTERVALOFBOMBERONSTRONG < 1 || FWA_INTERVALOFBOMBERONSTRONG > 10) FWA_INTERVALOFBOMBERONSTRONG = 3;
+                FWA_INTERVALOFBOMBERONSTRONG = FWA_INTERVALOFBOMBERONSTRONG * 60000;
+                FWA_MOVEATRANDOM = Boolean.parseBoolean(Settings.getProperty("MoveAtRandom", "True"));
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                throw new Error("Failed to Load "+FWA_CONFIG_FILE+" File.");
+            }
+            // fight with Valakas Custom Setting
+            try
+            {
+                Properties Settings   = new Properties();
+                InputStream is          = new FileInputStream(FWV_CONFIG_FILE);  
+                Settings.load(is);
+                is.close();
+                
+                FWV_FIXINTERVALOFVALAKAS = Integer.parseInt(Settings.getProperty("FixIntervalOfValakas", "11520"));
+                if(FWV_FIXINTERVALOFVALAKAS < 5 || FWV_FIXINTERVALOFVALAKAS > 20160) FWV_FIXINTERVALOFVALAKAS = 11520;
+                FWV_FIXINTERVALOFVALAKAS = FWV_FIXINTERVALOFVALAKAS * 60000;
+                FWV_RANDOMINTERVALOFVALAKAS = Integer.parseInt(Settings.getProperty("RandomIntervalOfValakas", "8640"));
+                if(FWV_RANDOMINTERVALOFVALAKAS < 5 || FWV_RANDOMINTERVALOFVALAKAS > 20160) FWV_RANDOMINTERVALOFVALAKAS = 8640;
+                FWV_RANDOMINTERVALOFVALAKAS = FWV_RANDOMINTERVALOFVALAKAS * 60000;
+                FWV_APPTIMEOFVALAKAS = Integer.parseInt(Settings.getProperty("AppTimeOfValakas", "20"));
+                if(FWV_APPTIMEOFVALAKAS < 5 || FWV_APPTIMEOFVALAKAS > 60) FWV_APPTIMEOFVALAKAS = 10;
+                FWV_APPTIMEOFVALAKAS = FWV_APPTIMEOFVALAKAS * 60000;
+                FWV_ACTIVITYTIMEOFVALAKAS = Integer.parseInt(Settings.getProperty("ActivityTimeOfValakas", "120"));
+                if(FWV_ACTIVITYTIMEOFVALAKAS < 120 || FWV_ACTIVITYTIMEOFVALAKAS > 720) FWV_ACTIVITYTIMEOFVALAKAS = 120;
+                FWV_ACTIVITYTIMEOFVALAKAS = FWV_ACTIVITYTIMEOFVALAKAS * 60000;
+                FWV_CAPACITYOFLAIR = Integer.parseInt(Settings.getProperty("CapacityOfLairOfValakas", "200"));
+                FWV_MOVEATRANDOM = Boolean.parseBoolean(Settings.getProperty("MoveAtRandom", "True"));
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                throw new Error("Failed to Load "+FWV_CONFIG_FILE+" File.");
+            }
+            // fight with Baium Custom Setting
+            try
+            {
+                Properties Settings   = new Properties();
+                InputStream is          = new FileInputStream(FWB_CONFIG_FILE);  
+                Settings.load(is);
+                is.close();
+                
+                FWB_FIXINTERVALOFBAIUM = Integer.parseInt(Settings.getProperty("FixIntervalOfBaium", "7200"));
+                if(FWB_FIXINTERVALOFBAIUM < 5 || FWB_FIXINTERVALOFBAIUM > 12960) FWB_FIXINTERVALOFBAIUM = 7200;
+                FWB_FIXINTERVALOFBAIUM = FWB_FIXINTERVALOFBAIUM * 60000;
+                FWB_RANDOMINTERVALOFBAIUM = Integer.parseInt(Settings.getProperty("RandomIntervalOfBaium", "5760"));
+                if(FWB_RANDOMINTERVALOFBAIUM < 5 || FWB_RANDOMINTERVALOFBAIUM > 12960) FWB_RANDOMINTERVALOFBAIUM = 5760;
+                FWB_RANDOMINTERVALOFBAIUM = FWB_RANDOMINTERVALOFBAIUM * 60000;
+                FWB_ACTIVITYTIMEOFBAIUM = Integer.parseInt(Settings.getProperty("ActivityTimeOfBaium", "120"));
+                if(FWB_ACTIVITYTIMEOFBAIUM < 120 || FWB_ACTIVITYTIMEOFBAIUM > 720) FWB_ACTIVITYTIMEOFBAIUM = 120;
+                FWB_ACTIVITYTIMEOFBAIUM = FWB_ACTIVITYTIMEOFBAIUM * 60000;
+                FWB_MOVEATRANDOM = Boolean.parseBoolean(Settings.getProperty("MoveAtRandom", "True"));
+                FWB_LIMITUNTILSLEEP = Integer.parseInt(Settings.getProperty("LimitUntilSleep", "30"));
+                if(FWB_LIMITUNTILSLEEP < 30 || FWB_LIMITUNTILSLEEP > 90) FWB_LIMITUNTILSLEEP = 30;
+                FWB_LIMITUNTILSLEEP = FWB_LIMITUNTILSLEEP * 60000;
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                throw new Error("Failed to Load "+FWB_CONFIG_FILE+" File.");
+            }
+            // fight with High Priestess van Halter Custom Setting
+            try
+            {
+                Properties Settings   = new Properties();
+                InputStream is          = new FileInputStream(HPH_CONFIG_FILE);  
+                Settings.load(is);
+                is.close();
+
+                HPH_FIXINTERVALOFHALTER = Integer.parseInt(Settings.getProperty("FixIntervalOfHalter", "172800"));
+                if (HPH_FIXINTERVALOFHALTER < 300 || HPH_FIXINTERVALOFHALTER > 864000) HPH_FIXINTERVALOFHALTER = 172800;
+                HPH_RANDOMINTERVALOFHALTER = Integer.parseInt(Settings.getProperty("RandomIntervalOfHalter", "86400"));
+                if (HPH_RANDOMINTERVALOFHALTER < 300 || HPH_RANDOMINTERVALOFHALTER > 864000) HPH_RANDOMINTERVALOFHALTER = 86400;
+                HPH_APPTIMEOFHALTER = Integer.parseInt(Settings.getProperty("AppTimeOfHalter", "20"));
+                if (HPH_APPTIMEOFHALTER < 5 || HPH_APPTIMEOFHALTER > 60) HPH_APPTIMEOFHALTER = 20;
+                HPH_ACTIVITYTIMEOFHALTER = Integer.parseInt(Settings.getProperty("ActivityTimeOfHalter", "21600"));
+                if (HPH_ACTIVITYTIMEOFHALTER < 7200 || HPH_ACTIVITYTIMEOFHALTER > 86400) HPH_ACTIVITYTIMEOFHALTER = 21600;
+                HPH_FIGHTTIMEOFHALTER = Integer.parseInt(Settings.getProperty("FightTimeOfHalter", "7200"));
+                if (HPH_FIGHTTIMEOFHALTER < 7200 || HPH_FIGHTTIMEOFHALTER > 21600) HPH_FIGHTTIMEOFHALTER = 7200;
+                HPH_CALLROYALGUARDHELPERCOUNT = Integer.parseInt(Settings.getProperty("CallRoyalGuardHelperCount", "6"));
+                if (HPH_CALLROYALGUARDHELPERCOUNT < 1 || HPH_CALLROYALGUARDHELPERCOUNT > 6) HPH_CALLROYALGUARDHELPERCOUNT = 6;
+                HPH_CALLROYALGUARDHELPERINTERVAL = Integer.parseInt(Settings.getProperty("CallRoyalGuardHelperInterval", "10"));
+                if (HPH_CALLROYALGUARDHELPERINTERVAL < 1 || HPH_CALLROYALGUARDHELPERINTERVAL > 60) HPH_CALLROYALGUARDHELPERINTERVAL = 10;
+                HPH_INTERVALOFDOOROFALTER = Integer.parseInt(Settings.getProperty("IntervalOfDoorOfAlter", "5400"));
+                if (HPH_INTERVALOFDOOROFALTER < 60 || HPH_INTERVALOFDOOROFALTER > 5400) HPH_INTERVALOFDOOROFALTER = 5400;
+                HPH_TIMEOFLOCKUPDOOROFALTAR = Integer.parseInt(Settings.getProperty("TimeOfLockUpDoorOfAltar", "180"));
+                if (HPH_TIMEOFLOCKUPDOOROFALTAR < 60 || HPH_TIMEOFLOCKUPDOOROFALTAR > 600) HPH_TIMEOFLOCKUPDOOROFALTAR = 180;
+
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                throw new Error("Failed to Load "+HPH_CONFIG_FILE+" File.");
+            }
+            // ===============================================================
+
         }
         else if(Server.serverMode == Server.MODE_LOGINSERVER)
         {
@@ -2654,11 +2604,6 @@ public final class Config
         {
             _log.severe("Could not Load Config: server mode was not set");
         }
-        
-        
-        
-     
-
     }
 
     /**
@@ -2730,6 +2675,7 @@ public final class Config
         else if (pName.equalsIgnoreCase("NamePageSizeOnCommunityBoard")) NAME_PAGE_SIZE_COMMUNITYBOARD = Integer.parseInt(pValue);
         else if (pName.equalsIgnoreCase("NamePerRowOnCommunityBoard")) NAME_PER_ROW_COMMUNITYBOARD = Integer.parseInt(pValue);
 
+        else if (pName.equalsIgnoreCase("ShowL2JLicense")) SHOW_L2J_LICENSE = Boolean.valueOf(pValue);
         else if (pName.equalsIgnoreCase("ShowServerNews")) SERVER_NEWS = Boolean.valueOf(pValue);
         else if (pName.equalsIgnoreCase("ShowNpcLevel")) SHOW_NPC_LVL = Boolean.valueOf(pValue);
 
@@ -2908,12 +2854,7 @@ public final class Config
         else if (pName.equalsIgnoreCase("CTFEvenTeams"))  CTF_EVEN_TEAMS = pValue;
         else if (pName.equalsIgnoreCase("MenuStyle"))  GM_ADMIN_MENU_STYLE = pValue;
         
-        
-        //L2J JP Source
-        
-        
         // JP Custom Setting
-        /*
         else if (pName.equalsIgnoreCase("FaildFakeDeath")) FAILD_FAKEDEATH = Boolean.valueOf(pValue);
         else if (pName.equalsIgnoreCase("AltWyvernMakeALanding")) ALT_WYVERN_MAKEALANDING = Boolean.valueOf(pValue);
         else if (pName.equalsIgnoreCase("AltDismountWyvernInNoLanding")) ALT_DISMOUNT_WYVERN_IN_NOLANDING = Boolean.valueOf(pValue);
@@ -2927,8 +2868,7 @@ public final class Config
         else if (pName.equalsIgnoreCase("TimeOfOpeningADoor")) TIME_OF_OPENING_A_DOOR = Integer.parseInt(pValue);
         else if (pName.equalsIgnoreCase("NurseAntRespawnDelay")) NURSEANT_RESPAWN_DELAY = Integer.parseInt(pValue);
         else if (pName.equalsIgnoreCase("CustomCommunityBoard")) CUSTOM_COMMUNITY_BOARD = Boolean.valueOf(pValue);
-        
-        */
+        else if (pName.equalsIgnoreCase("TimeLimitOfInvade")) TIMELIMITOFINVADE = Integer.parseInt(pValue);
         // JP Four-Sepulchers Custom Setting
         else if (pName.equalsIgnoreCase("TimeOfAttack")) FS_TIME_ATTACK = Integer.parseInt(pValue);
         else if (pName.equalsIgnoreCase("TimeOfCoolDown")) FS_TIME_COOLDOWN = Integer.parseInt(pValue);
@@ -2963,12 +2903,12 @@ public final class Config
         else if (pName.equalsIgnoreCase("ActivityTimeOfValakas")) FWV_ACTIVITYTIMEOFVALAKAS = Integer.parseInt(pValue);
         else if (pName.equalsIgnoreCase("CapacityOfLairOfValakas")) FWV_CAPACITYOFLAIR = Integer.parseInt(pValue);
         else if (pName.equalsIgnoreCase("MoveAtRandom")) FWV_MOVEATRANDOM = Boolean.parseBoolean(pValue);
-        else if (pName.equalsIgnoreCase("TimeLimitOfInvade")) TIMELIMITOFINVADE = Integer.parseInt(pValue);
         // JP fight with Baium Custom Setting
         else if (pName.equalsIgnoreCase("FixIntervalOfBaium")) FWB_FIXINTERVALOFBAIUM = Integer.parseInt(pValue);
         else if (pName.equalsIgnoreCase("RandomIntervalOfBaium")) FWB_RANDOMINTERVALOFBAIUM = Integer.parseInt(pValue);
         else if (pName.equalsIgnoreCase("ActivityTimeOfBaium")) FWB_ACTIVITYTIMEOFBAIUM = Integer.parseInt(pValue);
         else if (pName.equalsIgnoreCase("MoveAtRandom")) FWB_MOVEATRANDOM = Boolean.parseBoolean(pValue);
+        else if (pName.equalsIgnoreCase("LimitUntilSleep")) FWB_LIMITUNTILSLEEP = Integer.parseInt(pValue);
 
         else return false;
         return true;

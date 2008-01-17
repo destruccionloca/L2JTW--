@@ -66,13 +66,7 @@ public final class RequestChangePetName extends L2GameClientPacket
 		}
         else if ((_name.length() < 2) || (_name.length() > 16))
 		{
-            SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-            sm.addString("SYS");
-            sm.addString("寵物名稱最多只能使用8個中文字16個英文.");
-			// SystemMessage sm = new SystemMessage(SystemMessage.NAMING_PETNAME_UP_TO_8CHARS);
-        	activeChar.sendPacket(sm);
-        	sm = null;
-
+        	activeChar.sendPacket(new SystemMessage(SystemMessageId.NAMING_PETNAME_UP_TO_8CHARS));
 			return;
 		}
         else if (!PetNameTable.getInstance().isValidPetName(_name))

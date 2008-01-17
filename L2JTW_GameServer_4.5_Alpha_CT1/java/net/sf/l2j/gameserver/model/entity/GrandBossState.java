@@ -21,6 +21,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Calendar;
+import java.util.logging.Logger;
 
 import net.sf.l2j.L2DatabaseFactory;
 
@@ -41,6 +42,8 @@ public class GrandBossState
     private int _bossId;
     private long _respawnDate;
     private StateEnum _state;
+
+    protected static Logger _log = Logger.getLogger(GrandBossState.class.getName());
 
     public int getBossId()
     {
@@ -124,6 +127,9 @@ public class GrandBossState
                 	else _state = StateEnum.NOTSPAWN;
             	}
             }
+            
+            rset.close();
+            statement.close();
     	}
         catch (Exception e)
         {
@@ -138,7 +144,7 @@ public class GrandBossState
     
     public void save()
     {
-        java.sql.Connection con = null;
+        Connection con = null;
         
         try
         {
@@ -147,7 +153,7 @@ public class GrandBossState
             statement.setInt(1, _bossId);
             statement.setLong(2, _respawnDate);
             statement.setInt(3, _state.ordinal());
-            statement.execute();
+            statement.executeUpdate();
             statement.close();
         }
         catch (Exception e)
@@ -162,7 +168,7 @@ public class GrandBossState
 
     public void update()
     {
-        java.sql.Connection con = null;
+        Connection con = null;
         
         try
         {
@@ -171,8 +177,9 @@ public class GrandBossState
             statement.setLong(1, _respawnDate);
             statement.setInt(2, _state.ordinal());
             statement.setInt(3, _bossId);
-            statement.execute();
+            statement.executeUpdate();
             statement.close();
+            _log.info("update GrandBossState : ID-" + _bossId + ",RespawnDate-" + _respawnDate + ",State-" + _state.toString());
         }
         catch (Exception e)
         {

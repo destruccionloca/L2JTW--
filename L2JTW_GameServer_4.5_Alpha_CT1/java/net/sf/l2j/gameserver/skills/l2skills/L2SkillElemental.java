@@ -123,7 +123,7 @@ public class L2SkillElemental extends L2Skill {
 			if (!charged){
 				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 				sm.addString("SYS"); 
-				sm.addString("所需的元素不足."); 
+				sm.addString("所需的元素不足。");
 
 				activeChar.sendPacket(sm);
 				continue;

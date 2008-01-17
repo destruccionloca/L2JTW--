@@ -77,8 +77,8 @@ public class L2DoormenInstance extends L2FolkInstance
                 {
                     getClanHall().openCloseDoors(true);
                     player.sendPacket(new NpcHtmlMessage(getObjectId(),
-                        "<html><body>You have <font color=\"LEVEL\">opened</font> the clan hall door.<br>Outsiders may enter the clan hall while the door is open. Please close it when you've finished your business.<br><center><button value=\"Close\" action=\"bypass -h npc_"
-                       + getObjectId() + "_close_doors\" width=70 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></center></body></html>"));
+                    		"<html><body><font color=\"LEVEL\">已經開啟</font>根據地的門。<br>若開著門，除了血盟成員以外的角色也可進出，辦完事請務必關門。<br><center><br>" +
+                    		"<button action=\"bypass -h npc_" + getObjectId()+ "_close_doors\" value=\"關閉\" width=74 height=21 back=\"L2UI_CH3.Btn1_normalOn\" fore=\"L2UI_CH3.Btn1_normal\"></center></body></html>"));
                 }
                 else
                 {
@@ -103,8 +103,8 @@ public class L2DoormenInstance extends L2FolkInstance
                 {
                     getClanHall().openCloseDoors(false);
                     player.sendPacket(new NpcHtmlMessage(getObjectId(),
-                        "<html><body>You have <font color=\"LEVEL\">closed</font> the clan hall door.<br>Good day!<br><center><button value=\"To Begining\" action=\"bypass -h npc_"
-                        + getObjectId() + "_Chat\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></center></body></html>"));
+                    		"<html><body><font color=\"LEVEL\">已經關閉</font>根據地的門。<br>祝您有個愉快的一天！<br><center><br>" +
+                    		"<button action=\"bypass -h npc_" + getObjectId()+ "_Chat\" value=\"首頁\" width=74 height=21 back=\"L2UI_CH3.Btn1_normalOn\" fore=\"L2UI_CH3.Btn1_normal\"></center></body></html>"));
                 }
                 else
                 {
@@ -186,25 +186,24 @@ public class L2DoormenInstance extends L2FolkInstance
         {
             if (condition == COND_HALL_OWNER)
             {
-                str = "<html><body>Hello!<br><font color=\"55FFFF\">" + getName()
-                    + "</font> I am honored to serve your clan.<br>How may i serve you?<br>";
-                str += "<center><table><tr><td><button value=\"Open Door\" action=\"bypass -h npc_%objectId%_open_doors\" width=70 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"><br1></td></tr></table><br>";
-                str += "<table><tr><td><button value=\"Close Door\" action=\"bypass -h npc_%objectId%_close_doors\" width=70 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr></table></center></body></html>";
+                str = "<html><body>啊，您來了？<br><font color=\"55FFFF\">" + getName()+ "</font>很榮幸迎接到血盟成員。<br>有什麼事情需要我幫忙？<br><center>";
+                str += "<br><button action=\"bypass -h npc_%objectId%_open_doors\" value=\"開門\" width=74 height=21 back=\"L2UI_CH3.Btn1_normalOn\" fore=\"L2UI_CH3.Btn1_normal\">";
+                str += "<br><button action=\"bypass -h npc_%objectId%_close_doors\" value=\"關門\" width=74 height=21 back=\"L2UI_CH3.Btn1_normalOn\" fore=\"L2UI_CH3.Btn1_normal\"></center></body></html>";
             }
             else
             {
                 L2Clan owner = ClanTable.getInstance().getClan(getClanHall().getOwnerId());
                 if (owner != null && owner.getLeader() != null)
                 {
-                    str = "<html><body>Hello there!<br>This clan hall is owned by <font color=\"55FFFF\">"
-                        + owner.getLeader().getName() + " who is the Lord of the ";
-                    str += owner.getName() + "</font> clan.<br>";
-                    str += "I am sorry, but only the clan members who belong to the <font color=\"55FFFF\">"
-                        + owner.getName() + "</font> clan can enter the clan hall.</body></html>";
+                    str = "<html><body>您好！<br>這根據地的主人是<font color=\"55FFFF\">"
+                        + owner.getLeader().getName() + "血盟之血盟主";
+                    str += owner.getName() + "</font>陛下。<br>";
+                    str += "很抱歉，非<font color=\"55FFFF\">"
+                        + owner.getName() + "</font>血盟之血盟成員不得進入。</body></html>";
                 }
-                else str = "<html><body>" + getName() + ":<br1>Clan hall <font color=\"LEVEL\">"
+                else str = "<html><body>" + getName() + "<br1>根據地<font color=\"LEVEL\">"
                     + getClanHall().getName()
-                    + "</font> have no owner clan.<br>You can rent it at auctioneers..</body></html>";
+                    + "</font>尚未有主人。<br>您可以找拍賣管理者投標它..</body></html>";
             }
             html.setHtml(str);
         }

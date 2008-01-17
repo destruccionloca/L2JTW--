@@ -39,7 +39,7 @@ public class PartyInfo implements IUserCommandHandler
     	{
     		SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);  
             sm.addString("SYS");
-            sm.addString("不在隊伍內");
+            sm.addString("不在隊伍內。");
     		return false;
     	}
 

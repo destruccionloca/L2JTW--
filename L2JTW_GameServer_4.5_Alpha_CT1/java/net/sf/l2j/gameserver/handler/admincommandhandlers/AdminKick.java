@@ -67,7 +67,7 @@ public class AdminKick implements IAdminCommandHandler {
         			RegionBBSManager.getInstance().changeCommunityBoard();
         		}
             }
-        	activeChar.sendMessage("踢除 "+counter+" 玩家");
+        	activeChar.sendMessage("踢除 "+counter+" 玩家。");
         }
         return true;
     }

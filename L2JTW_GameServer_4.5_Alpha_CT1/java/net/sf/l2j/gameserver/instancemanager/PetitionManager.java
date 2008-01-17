@@ -133,7 +133,7 @@ public final class PetitionManager
 			{
 				if (endState == PetitionState.Responder_Reject)
 				{
-					getPetitioner().sendMessage("您的訴求被退回,請稍後再嘗試.");
+					getPetitioner().sendMessage("您的訴求被退回，請稍後再嘗試。");
 				}
 				else
 				{
@@ -506,7 +506,7 @@ public final class PetitionManager
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM HH:mm z");
 
 		if (getPendingPetitionCount() == 0)
-			htmlContent.append("<tr><td colspan=\"4\">目前沒有任何訴求.</td></tr>");
+			htmlContent.append("<tr><td colspan=\"4\">目前沒有任何訴求。</td></tr>");
 		else
 			htmlContent.append("<tr><td></td><td><font color=\"999999\">訴求者</font></td>" +
 			"<td><font color=\"999999\">訴求類型</font></td><td><font color=\"999999\">傳送</font></td></tr>");
@@ -522,7 +522,7 @@ public final class PetitionManager
 				htmlContent.append("<button value=\"檢視\" action=\"bypass -h admin_view_petition " + currPetition.getId() + "\" " +
 		"width=\"40\" height=\"15\" back=\"sek.cbui94\" fore=\"sek.cbui92\">");
 			else
-				htmlContent.append("<font color=\"999999\">處理中</font>");
+				htmlContent.append("<font color=\"999999\">狀態</font>");
 
 			htmlContent.append("</td><td>" + currPetition.getPetitioner().getName() +
 			                   "</td><td>" + currPetition.getTypeAsString() + "</td><td>" +
@@ -546,7 +546,7 @@ public final class PetitionManager
 		getPendingPetitions().put(newPetitionId, newPetition);
 
 		// Notify all GMs that a new petition has been submitted.
-		String msgContent = petitioner.getName() + " 送出新的訴求."; //(ID: " + newPetitionId + ").";
+		String msgContent = petitioner.getName() + " 送出新的訴求。"; //(ID: " + newPetitionId + ").";
 		GmListTable.broadcastToGMs(new CreatureSay(petitioner.getObjectId(), 17, "Petition System", msgContent));
 
 		return newPetitionId;

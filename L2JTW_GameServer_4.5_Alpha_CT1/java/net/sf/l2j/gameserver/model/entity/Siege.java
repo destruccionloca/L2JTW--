@@ -120,26 +120,23 @@ public class Siege
 				}
 				else if ((timeRemaining <= 3600000) && (timeRemaining > 600000))
 				{
-					announceToPlayer(Math.round(timeRemaining / 60000) + " 分鐘後 " + getCastle().getName() + " 攻城戰將結束.", true);
-					ThreadPoolManager.getInstance().scheduleGeneral(new ScheduleEndSiegeTask(_castleInst), timeRemaining - 600000); // Prepare task for 10 minute left.
+					announceToPlayer("離攻城戰結束時間還有 " + Math.round(timeRemaining / 60000) + " 分鐘。", true);
+					ThreadPoolManager.getInstance().scheduleGeneral(new ScheduleEndSiegeTask(_castleInst),timeRemaining - 600000); // Prepare task for 10 minute left.
 				}
 				else if ((timeRemaining <= 600000) && (timeRemaining > 300000))
 				{
-					announceToPlayer(Math.round(timeRemaining / 60000) + " 分鐘後 " + getCastle().getName() + " 攻城戰將結束.", true);
-
-					ThreadPoolManager.getInstance().scheduleGeneral(new ScheduleEndSiegeTask(_castleInst), timeRemaining - 300000); // Prepare task for 5 minute left.
+					announceToPlayer("離攻城戰結束時間還有 " + Math.round(timeRemaining / 60000) + " 分鐘。", true);
+					ThreadPoolManager.getInstance().scheduleGeneral(new ScheduleEndSiegeTask(_castleInst),timeRemaining - 300000); // Prepare task for 5 minute left.
 				}
 				else if ((timeRemaining <= 300000) && (timeRemaining > 10000))
 				{
-				    announceToPlayer(Math.round(timeRemaining / 60000) + " 分鐘後 " + getCastle().getName() + " 攻城戰將結束.", true);
-
-					ThreadPoolManager.getInstance().scheduleGeneral(new ScheduleEndSiegeTask(_castleInst), timeRemaining - 10000); // Prepare task for 10 seconds count down
+					announceToPlayer("離攻城戰結束時間還有 " + Math.round(timeRemaining / 60000) + " 分鐘。", true);
+					ThreadPoolManager.getInstance().scheduleGeneral(new ScheduleEndSiegeTask(_castleInst),timeRemaining - 10000); // Prepare task for 10 seconds count down
 				}
 				else if ((timeRemaining <= 10000) && (timeRemaining > 0))
 				{
-
-				    announceToPlayer(getCastle().getName() + " 攻城戰 " + Math.round(timeRemaining / 1000) + " 秒後結束!", true);
-					ThreadPoolManager.getInstance().scheduleGeneral(new ScheduleEndSiegeTask(_castleInst), timeRemaining); // Prepare task for second count down
+					announceToPlayer("離攻城戰結束時間還有 " + Math.round(timeRemaining / 1000) + " 秒！", true);
+					ThreadPoolManager.getInstance().scheduleGeneral(new ScheduleEndSiegeTask(_castleInst),timeRemaining); // Prepare task for second count down
 				}
 				else
 				{
@@ -178,32 +175,32 @@ public class Siege
 				}
 				else if ((timeRemaining <= 86400000) && (timeRemaining > 13600000))
 				{
-					announceToPlayer("" + getCastle().getName() + " 攻城戰申請時間結束.", false);
+					announceToPlayer("" + getCastle().getName() + " 的攻城登記時間結束。", false);
 					_isRegistrationOver = true;
 					clearSiegeWaitingClan();
 					ThreadPoolManager.getInstance().scheduleGeneral(new ScheduleStartSiegeTask(_castleInst), timeRemaining - 13600000); // Prepare task for 1 hr left before siege start.
 				}
 				else if ((timeRemaining <= 13600000) && (timeRemaining > 600000))
 				{
-					announceToPlayer(Math.round(timeRemaining / 60000) + " 分鐘後 " + getCastle().getName() + " 攻城戰開始.", false);
+					announceToPlayer("攻城戰將在 " + Math.round(timeRemaining / 60000) + " 分鐘後開始。", false);
 
 					ThreadPoolManager.getInstance().scheduleGeneral(new ScheduleStartSiegeTask(_castleInst), timeRemaining - 600000); // Prepare task for 10 minute left.
 
 	            }
 	            else if ((timeRemaining <= 600000) && (timeRemaining > 300000))
 	            {
-	                announceToPlayer(Math.round(timeRemaining / 60000) + " 分鐘後 " + getCastle().getName() + " 攻城戰開始.", false);
+	                announceToPlayer("攻城戰將在" + Math.round(timeRemaining / 60000) + " 分鐘後開始。", false);
 					ThreadPoolManager.getInstance().scheduleGeneral(new ScheduleStartSiegeTask(_castleInst), timeRemaining - 300000); // Prepare task for 5 minute left.
 				}
 				else if ((timeRemaining <= 300000) && (timeRemaining > 10000))
 				{
-				    announceToPlayer(Math.round(timeRemaining / 60000) + " 分鐘後 " + getCastle().getName() + " 攻城戰開始.", false);
+				    announceToPlayer("攻城戰將在" + Math.round(timeRemaining / 60000) + " 秒後開始。", false);
 
 					ThreadPoolManager.getInstance().scheduleGeneral(new ScheduleStartSiegeTask(_castleInst), timeRemaining - 10000); // Prepare task for 10 seconds count down
 				}
 				else if ((timeRemaining <= 10000) && (timeRemaining > 0))
 				{
-				    announceToPlayer(getCastle().getName() + " 攻城戰將在 " + Math.round(timeRemaining / 1000) + " 秒後開始!", false);
+				    announceToPlayer("攻城戰將在" + Math.round(timeRemaining / 60000) + " 秒後開始。", false);
 
 					ThreadPoolManager.getInstance().scheduleGeneral(new ScheduleStartSiegeTask(_castleInst), timeRemaining); // Prepare task for second count down
 				}
@@ -259,10 +256,10 @@ public class Siege
     {
         if (getIsInProgress())
         {
-            announceToPlayer("" + getCastle().getName() + " 攻城戰宣佈結束!", false);
+            announceToPlayer("「" + getCastle().getName() + "」的佔領戰已結束。", false);
 
             if (getCastle().getOwnerId() <= 0)
-                announceToPlayer("" + getCastle().getName() + " 攻城戰宣佈結束!", false);
+                announceToPlayer("「" + getCastle().getName() + "」的佔領戰結果為平手。", false);
 
             removeFlags(); // Removes all flags. Note: Remove flag before teleporting players
             teleportPlayer(Siege.TeleportWhoType.Attacker, MapRegionTable.TeleportWhereType.Town); // Teleport to the second closest town
@@ -434,7 +431,7 @@ public class Siege
             _siegeEndDate.add(Calendar.MINUTE, SiegeManager.getInstance().getSiegeLength());
             ThreadPoolManager.getInstance().scheduleGeneral(new ScheduleEndSiegeTask(getCastle()), 1000); // Prepare auto end task
 
-            announceToPlayer("" + getCastle().getName() + "攻城戰宣佈開始!", false);
+            announceToPlayer("「" + getCastle().getName() + "」的佔領戰已開始。", false);
         }
     }
 
@@ -747,8 +744,7 @@ public class Siege
 
     public void registerDefender(L2PcInstance player, boolean force)
     {
-        if (getCastle().getOwnerId() <= 0) player.sendMessage("無法申請為 "
-            + getCastle().getName() + " 守城方.");
+        if (getCastle().getOwnerId() <= 0) player.sendMessage("您屬於擁有城堡的血盟之同盟，因此無法登記為攻城方。");
         else if (force || checkIfCanRegister(player)) saveSiegeClan(player.getClan(), 2, false); // Save to database
     }
 
@@ -908,18 +904,14 @@ public class Siege
      */
     private boolean checkIfCanRegister(L2PcInstance player)
     {
-        if (getIsRegistrationOver()) player.sendMessage(""
-            + getCastle().getName() + " 攻城戰申請時間已過.");
-        else if (getIsInProgress()) player.sendMessage("目前時間任何攻城戰資訊無法修改");
+        if (getIsRegistrationOver()) player.sendMessage("「"+ getCastle().getName() + "」的佔領戰登記時間已結束。");
+        else if (getIsInProgress()) player.sendMessage("不是攻城登記期間，因此無法登記或取消。");
         else if (player.getClan() == null
-            || player.getClan().getLevel() < SiegeManager.getInstance().getSiegeClanMinLevel()) player.sendMessage("只有血盟等級 "
-            + SiegeManager.getInstance().getSiegeClanMinLevel()
-
-            + "  或者更高才可以參加攻城戰");
-        else if (player.getClan().getHasCastle() > 0) player.sendMessage("無法申請攻城戰,該署血盟已有城堡.");
+            || player.getClan().getLevel() < SiegeManager.getInstance().getSiegeClanMinLevel()) player.sendMessage(SiegeManager.getInstance().getSiegeClanMinLevel()+ "級以上的血盟才可以登記攻城戰。");
+        else if (player.getClan().getHasCastle() > 0) player.sendMessage("擁有城堡的血盟不能參加別的攻城戰。");
         else if (player.getClan().getClanId() == getCastle().getOwnerId())
             player.sendPacket(new SystemMessage(SystemMessageId.CLAN_THAT_OWNS_CASTLE_IS_AUTOMATICALLY_REGISTERED_DEFENDING));
-        else if (SiegeManager.getInstance().checkIsRegistered(player.getClan(), getCastle().getCastleId())) player.sendMessage("已申請攻城戰.");
+        else if (SiegeManager.getInstance().checkIsRegistered(player.getClan(), getCastle().getCastleId())) player.sendMessage("已申請攻城戰。");
         else return true;
 
         return false;
@@ -1146,20 +1138,17 @@ public class Siege
             if (typeId == 0 || typeId == -1)
             {
                 addDefender(clan.getClanId());
-                announceToPlayer(clan.getName() + " 申請為 "
-                    + getCastle().getName() +" 攻城戰守城方", false);
+                announceToPlayer(clan.getName() + "已登記為「" + getCastle().getName()+ "」守城方。", false);
             }
             else if (typeId == 1)
             {
                 addAttacker(clan.getClanId());
-                announceToPlayer(clan.getName() + " 申請為 "
-                    + getCastle().getName() + "攻城戰攻城方", false);
+                announceToPlayer(clan.getName() + "已登記為「"+ getCastle().getName()+ "」攻城方。", false);
             }
             else if (typeId == 2)
             {
                 addDefenderWaiting(clan.getClanId());
-                announceToPlayer(clan.getName() + " 要求守護 " + getCastle().getName() + " 城堡",
-                                 false);
+                announceToPlayer(clan.getName() + "接受請求為「" + getCastle().getName()+ "」的守城方", false);
             }
         }
         catch (Exception e)

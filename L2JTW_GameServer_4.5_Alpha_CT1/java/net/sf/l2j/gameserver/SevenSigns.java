@@ -54,59 +54,59 @@ public class SevenSigns
 	public static final String SEVEN_SIGNS_DATA_FILE = "config/signs.properties";
 	public static final String SEVEN_SIGNS_HTML_PATH = "data/html/seven_signs/";
 
-	public static final int CABAL_NULL = 0;
-	public static final int CABAL_DUSK = 1;
-	public static final int CABAL_DAWN = 2;
+	public static final int CABAL_NULL = 0; //未參加陣營
+	public static final int CABAL_DUSK = 1; //黃昏陣營
+	public static final int CABAL_DAWN = 2; //黎明陣營
 
-	public static final int SEAL_NULL = 0;
-	public static final int SEAL_AVARICE = 1;
-	public static final int SEAL_GNOSIS = 2;
-	public static final int SEAL_STRIFE = 3;
+	public static final int SEAL_NULL = 0; //未參加封印
+	public static final int SEAL_AVARICE = 1; //貪欲的封印
+	public static final int SEAL_GNOSIS = 2; //啟示的封印
+	public static final int SEAL_STRIFE = 3; //戰亂的封印
 
-	public static final int PERIOD_COMP_RECRUITING = 0;
-	public static final int PERIOD_COMPETITION = 1;
-	public static final int PERIOD_COMP_RESULTS = 2;
-	public static final int PERIOD_SEAL_VALIDATION = 3;
+	public static final int PERIOD_COMP_RECRUITING = 0; //準備期間
+	public static final int PERIOD_COMPETITION = 1; //競爭期間
+	public static final int PERIOD_COMP_RESULTS = 2; //計算期間
+	public static final int PERIOD_SEAL_VALIDATION = 3; //有效期間
 
-	public static final int PERIOD_START_HOUR = 18;
-	public static final int PERIOD_START_MINS = 00;
-    public static final int PERIOD_START_DAY = Calendar.MONDAY;
+	public static final int PERIOD_START_HOUR = 18; //時
+	public static final int PERIOD_START_MINS = 00; //分
+	public static final int PERIOD_START_DAY = Calendar.MONDAY; //日
 
-    // The quest event and seal validation periods last for approximately one week
-    // with a 15 minutes "interval" period sandwiched between them.
-    public static final int PERIOD_MINOR_LENGTH = 900000;
-    public static final int PERIOD_MAJOR_LENGTH = 604800000 - PERIOD_MINOR_LENGTH;
+	// The quest event and seal validation periods last for approximately one week
+	// with a 15 minutes "interval" period sandwiched between them.
+	public static final int PERIOD_MINOR_LENGTH = 900000;
+	public static final int PERIOD_MAJOR_LENGTH = 604800000 - PERIOD_MINOR_LENGTH;
 
-	public static final int ANCIENT_ADENA_ID = 5575;
-	public static final int RECORD_SEVEN_SIGNS_ID = 5707;
-    public static final int CERTIFICATE_OF_APPROVAL_ID = 6388;
-	public static final int RECORD_SEVEN_SIGNS_COST = 500;
-    public static final int ADENA_JOIN_DAWN_COST = 50000;
+	public static final int ANCIENT_ADENA_ID = 5575; //古代的金幣
+	public static final int RECORD_SEVEN_SIGNS_ID = 5707; //七個封印的實錄
+	public static final int CERTIFICATE_OF_APPROVAL_ID = 6388; //領主的認可
+	public static final int RECORD_SEVEN_SIGNS_COST = 500; //七個封印實錄價格
+	public static final int ADENA_JOIN_DAWN_COST = 50000; //黎明陣營參加費用
 
-    // NPC Related Constants \\
-	public static final int ORATOR_NPC_ID = 31094;
-	public static final int PREACHER_NPC_ID = 31093;
-    public static final int MAMMON_MERCHANT_ID = 31113;
-    public static final int MAMMON_BLACKSMITH_ID = 31126;
-    public static final int MAMMON_MARKETEER_ID = 31092;
-    public static final int SPIRIT_IN_ID = 31111;
-    public static final int SPIRIT_OUT_ID = 31112;
-    public static final int LILITH_NPC_ID = 25283;
-    public static final int ANAKIM_NPC_ID = 25286;
-    public static final int CREST_OF_DAWN_ID = 31170;
-    public static final int CREST_OF_DUSK_ID = 31171;
+	// NPC Related Constants \\
+	public static final int ORATOR_NPC_ID = 31094; //道破啟示的人
+	public static final int PREACHER_NPC_ID = 31093; //吶喊滅亡的人
+	public static final int MAMMON_MERCHANT_ID = 31113; //財富的商人
+	public static final int MAMMON_BLACKSMITH_ID = 31126; //財富的鐵匠
+	public static final int MAMMON_MARKETEER_ID = 31092; //財富的地下商人
+	public static final int SPIRIT_IN_ID = 31111; //靈魂守門人 - 使徒的古代公墓
+	public static final int SPIRIT_OUT_ID = 31112; //靈魂守門人 - 擊敗亞納或莉莉絲後產生
+	public static final int LILITH_NPC_ID = 25283; //莉莉絲
+	public static final int ANAKIM_NPC_ID = 25286; //亞納
+	public static final int CREST_OF_DAWN_ID = 31170; //黎明的紋章
+	public static final int CREST_OF_DUSK_ID = 31171; //黃昏的紋章
 	// Seal Stone Related Constants \\
-	public static final int SEAL_STONE_BLUE_ID = 6360;
-	public static final int SEAL_STONE_GREEN_ID = 6361;
-	public static final int SEAL_STONE_RED_ID = 6362;
+	public static final int SEAL_STONE_BLUE_ID = 6360; //藍色封印石
+	public static final int SEAL_STONE_GREEN_ID = 6361; //綠色封印石
+	public static final int SEAL_STONE_RED_ID = 6362; //紅色封印石
 
-	public static final int SEAL_STONE_BLUE_VALUE = 3;
-	public static final int SEAL_STONE_GREEN_VALUE = 5;
-	public static final int SEAL_STONE_RED_VALUE = 10;
+	public static final int SEAL_STONE_BLUE_VALUE = 3; //藍色封印石交換數量
+	public static final int SEAL_STONE_GREEN_VALUE = 5; //綠色封印石交換數量
+	public static final int SEAL_STONE_RED_VALUE = 10; //紅色封印石交換數量
 
-	public static final int BLUE_CONTRIB_POINTS = 3;
-	public static final int GREEN_CONTRIB_POINTS = 5;
-	public static final int RED_CONTRIB_POINTS = 10;
+	public static final int BLUE_CONTRIB_POINTS = 3; //藍色封印石交付數量
+	public static final int GREEN_CONTRIB_POINTS = 5; //綠色封印石交付數量
+	public static final int RED_CONTRIB_POINTS = 10; //紅色封印石交付數量
 
 	private final Calendar _calendar = Calendar.getInstance();
 
@@ -362,7 +362,7 @@ public class SevenSigns
 		switch (cabal)
 		{
 			case CABAL_DAWN:
-				return "黎民的君主";
+				return "黎明的君主們";
 			case CABAL_DUSK:
 				return "黃昏的革命軍";
 		}
@@ -1313,7 +1313,7 @@ public class SevenSigns
                     onlinePlayer.teleToLocation(MapRegionTable.TeleportWhereType.Town);
 
                     onlinePlayer.setIsIn7sDungeon(false);
-                    onlinePlayer.sendMessage("封印期間已經開始,將傳送至最近的村莊.");
+                    //onlinePlayer.sendMessage("封印期間已經開始,將傳送至最近的村莊.");
 
                 }
 
@@ -1325,7 +1325,7 @@ public class SevenSigns
                     onlinePlayer.teleToLocation(MapRegionTable.TeleportWhereType.Town);
 
                     onlinePlayer.setIsIn7sDungeon(false);
-                    onlinePlayer.sendMessage("未參加任何封印將傳送至村莊.");
+                    //onlinePlayer.sendMessage("未參加任何封印將傳送至村莊.");
 
                 }
             }

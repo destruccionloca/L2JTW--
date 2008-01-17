@@ -92,13 +92,13 @@ public final class L2AuctioneerInstance extends L2FolkInstance
         if (condition == COND_ALL_FALSE)
         {
         	//TODO: html
-        	player.sendMessage("目前無法進行競標.");
+        	player.sendMessage("無法參加拍賣。");
         	return;
         }
         if (condition == COND_BUSY_BECAUSE_OF_SIEGE)
         {
         	//TODO: html
-        	player.sendMessage("攻城戰期間無法進行.");
+        	player.sendMessage("攻城戰期間無法參加拍賣。");
         	return;
         }
         else if (condition == COND_REGULAR)
@@ -145,12 +145,12 @@ public final class L2AuctioneerInstance extends L2FolkInstance
                     }
                     catch (Exception e)
                     {
-                        player.sendMessage("競標錯誤!");
+                        player.sendMessage("投標錯誤！");
                     }
                 }
                 catch (Exception e)
                 {
-                    player.sendMessage("競標錯誤!");
+                    player.sendMessage("投標錯誤！");
                 }
                 return;
             }
@@ -191,7 +191,7 @@ public final class L2AuctioneerInstance extends L2FolkInstance
 	                    html.replace("%AGIT_LEASE%", String.valueOf(ClanHallManager.getInstance().getClanHallById(a.getItemId()).getLease()));
 	                    html.replace("%AGIT_LOCATION%", ClanHallManager.getInstance().getClanHallById(a.getItemId()).getLocation());
 	                    html.replace("%AGIT_AUCTION_END%", String.valueOf(format.format(a.getEndDate())));
-	                    html.replace("%AGIT_AUCTION_REMAIN%", String.valueOf((a.getEndDate()- System.currentTimeMillis())/3600000)+" hours "+String.valueOf((((a.getEndDate() - System.currentTimeMillis()) / 60000) % 60))+" minutes");
+	                    html.replace("%AGIT_AUCTION_REMAIN%", String.valueOf((a.getEndDate()- System.currentTimeMillis())/3600000)+" 時 "+String.valueOf((((a.getEndDate() - System.currentTimeMillis()) / 60000) % 60))+" 分");
 	                    html.replace("%AGIT_AUCTION_MINBID%", String.valueOf(a.getStartingBid()));
 	                    html.replace("%AGIT_AUCTION_COUNT%", String.valueOf(a.getBidders().size()));
 	                    html.replace("%AGIT_AUCTION_DESC%", ClanHallManager.getInstance().getClanHallById(a.getItemId()).getDesc());
@@ -205,7 +205,7 @@ public final class L2AuctioneerInstance extends L2FolkInstance
                 }
                 catch (Exception e)
                 {
-                    player.sendMessage("競標錯誤!");
+                    player.sendMessage("投標錯誤！");
                 }
 
                 return;
@@ -226,12 +226,12 @@ public final class L2AuctioneerInstance extends L2FolkInstance
                     }
                     catch (Exception e)
                     {
-                        player.sendMessage("競標錯誤!");
+                        player.sendMessage("投標錯誤！");
                     }
                 }
                 catch (Exception e)
                 {
-                    player.sendMessage("競標錯誤!");
+                    player.sendMessage("投標錯誤！");
                 }
 
                 return;
@@ -240,14 +240,14 @@ public final class L2AuctioneerInstance extends L2FolkInstance
             {
                 if (player.getClan() == null || player.getClan().getLevel() < 2)
                 {
-                    player.sendMessage("血盟必須達到2級才能進行競標.");
+                    player.sendMessage("血盟必須達到2級才可進行投標。");
                     return;
                 }
 
                 if (val == "") return;
                 if ((player.getClan().getAuctionBiddedAt() > 0 && player.getClan().getAuctionBiddedAt() != Integer.parseInt(val)) || player.getClan().getHasHideout() > 0)
                 {
-                    player.sendMessage("無法繼標超過一樣");
+                    player.sendMessage("無法同時投標兩個以上的商品。");
                     return;
                 }
 
@@ -269,7 +269,7 @@ public final class L2AuctioneerInstance extends L2FolkInstance
                 }
                 catch (Exception e)
                 {
-                    player.sendMessage("競標錯誤!");
+                    player.sendMessage("投標錯誤！");
                 }
                 return;
             }
@@ -369,7 +369,7 @@ public final class L2AuctioneerInstance extends L2FolkInstance
 		                html.replace("%AGIT_LEASE%", String.valueOf(ClanHallManager.getInstance().getClanHallById(a.getItemId()).getLease()));
 		                html.replace("%AGIT_LOCATION%", ClanHallManager.getInstance().getClanHallById(a.getItemId()).getLocation());
 		                html.replace("%AGIT_AUCTION_END%", String.valueOf(format.format(a.getEndDate())));
-		                html.replace("%AGIT_AUCTION_REMAIN%", String.valueOf((a.getEndDate()-System.currentTimeMillis()) / 3600000)+" hours "+String.valueOf((((a.getEndDate()-System.currentTimeMillis()) / 60000) % 60))+" minutes");
+		                html.replace("%AGIT_AUCTION_REMAIN%", String.valueOf((a.getEndDate()-System.currentTimeMillis()) / 3600000)+" 時 "+String.valueOf((((a.getEndDate()-System.currentTimeMillis()) / 60000) % 60))+" 分");
 		                html.replace("%AGIT_AUCTION_MINBID%", String.valueOf(a.getStartingBid()));
 		                html.replace("%AGIT_AUCTION_MYBID%", String.valueOf(a.getBidders().get(player.getClanId()).getBid()));
 		                html.replace("%AGIT_AUCTION_DESC%", ClanHallManager.getInstance().getClanHallById(a.getItemId()).getDesc());
@@ -396,7 +396,7 @@ public final class L2AuctioneerInstance extends L2FolkInstance
 	                    html.replace("%AGIT_LEASE%", String.valueOf(ClanHallManager.getInstance().getClanHallById(a.getItemId()).getLease()));
 	                    html.replace("%AGIT_LOCATION%", ClanHallManager.getInstance().getClanHallById(a.getItemId()).getLocation());
 	                    html.replace("%AGIT_AUCTION_END%", String.valueOf(format.format(a.getEndDate())));
-	                    html.replace("%AGIT_AUCTION_REMAIN%", String.valueOf((a.getEndDate()-System.currentTimeMillis()) / 3600000)+" hours "+String.valueOf((((a.getEndDate()-System.currentTimeMillis()) / 60000) % 60))+" minutes");
+	                    html.replace("%AGIT_AUCTION_REMAIN%", String.valueOf((a.getEndDate()-System.currentTimeMillis()) / 3600000)+" 時 "+String.valueOf((((a.getEndDate()-System.currentTimeMillis()) / 60000) % 60))+" 分");
 	                    html.replace("%AGIT_AUCTION_MINBID%", String.valueOf(a.getStartingBid()));
 	                    html.replace("%AGIT_AUCTION_BIDCOUNT%", String.valueOf(a.getBidders().size()));
 	                    html.replace("%AGIT_AUCTION_DESC%", ClanHallManager.getInstance().getClanHallById(a.getItemId()).getDesc());
@@ -448,7 +448,7 @@ public final class L2AuctioneerInstance extends L2FolkInstance
                 if (AuctionManager.getInstance().getAuction(player.getClan().getAuctionBiddedAt()) != null)
                 {
                     AuctionManager.getInstance().getAuction(player.getClan().getAuctionBiddedAt()).cancelBid(player.getClanId());
-                    player.sendMessage("成功取消競標.");
+                    player.sendMessage("成功取消投標。");
                 }
                 return;
             }
@@ -456,7 +456,7 @@ public final class L2AuctioneerInstance extends L2FolkInstance
             {
                 if (!((player.getClanPrivileges() & L2Clan.CP_CH_AUCTION) == L2Clan.CP_CH_AUCTION))
                 {
-                    player.sendMessage("權限不足!");
+                    player.sendMessage("權限不足！");
                     return;
                 }
                 String filename = "data/html/auction/AgitSaleCancel.htm";
@@ -473,7 +473,7 @@ public final class L2AuctioneerInstance extends L2FolkInstance
                 if (AuctionManager.getInstance().getAuction(player.getClan().getHasHideout()) != null)
                 {
                     AuctionManager.getInstance().getAuction(player.getClan().getHasHideout()).cancelAuction();
-                    player.sendMessage("競標取消.");
+                    player.sendMessage("投標取消。");
                 }
                 return;
             }
@@ -492,7 +492,7 @@ public final class L2AuctioneerInstance extends L2FolkInstance
             {
                 if (!((player.getClanPrivileges() & L2Clan.CP_CH_AUCTION) == L2Clan.CP_CH_AUCTION))
                 {
-                    player.sendMessage("權限不足!");
+                    player.sendMessage("權限不足！");
                     return;
                 }
                 String filename = "data/html/auction/AgitSale1.htm";
@@ -510,9 +510,7 @@ public final class L2AuctioneerInstance extends L2FolkInstance
             	SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
                 if (!((player.getClanPrivileges() & L2Clan.CP_CH_AUCTION) == L2Clan.CP_CH_AUCTION))
                 {
-
-                    player.sendMessage("權限不足!");
-
+                    player.sendMessage("權限不足！");
                     return;
                 }
                 try
@@ -534,7 +532,7 @@ public final class L2AuctioneerInstance extends L2FolkInstance
                 }
                 catch (Exception e)
                 {
-                    player.sendMessage("競標錯誤!");
+                    player.sendMessage("投標錯誤！");
                 }
                 return;
             }

@@ -141,7 +141,7 @@ public class L2StaticObjectInstance extends L2Object
 				String content = HtmCache.getInstance().getHtm(filename);
 				NpcHtmlMessage html = new NpcHtmlMessage(getObjectId());
 
-				if (content == null) html.setHtml("<html><body>Signboard is missing:<br>"+filename+"</body></html>");
+				if (content == null) html.setHtml("<html><body>決鬥場看板遺失<br>"+filename+"</body></html>");
 				else html.setHtml(content);
 
 				player.sendPacket(html);
@@ -171,7 +171,7 @@ public class L2StaticObjectInstance extends L2Object
 	            if(content == null)
 	            {
 	                NpcHtmlMessage html = new NpcHtmlMessage(1);
-	                html.setHtml((new StringBuilder()).append("<html><head><body>決鬥場看板遺失<br>請找回:<br>").append(filename).append("</body></html>").toString());
+	                html.setHtml((new StringBuilder()).append("<html><head><body>決鬥場看板遺失<br>").append(filename).append("</body></html>").toString());
 	                player.sendPacket(html);
 	                player.sendPacket(new ActionFailed());
 	            } else

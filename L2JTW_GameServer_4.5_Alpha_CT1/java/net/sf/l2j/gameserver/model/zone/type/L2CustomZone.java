@@ -63,7 +63,7 @@ public class L2CustomZone extends L2ZoneType
 		if (character instanceof L2PcInstance)
 		{
 			if (((L2PcInstance)character).isGM())
-				((L2PcInstance)character).sendMessage("[DEBUG] You entered "+_zoneName);
+				((L2PcInstance)character).sendMessage("You entered "+_zoneName);
 
 	        // When the player invades the flight prohibition zone.
 	        // player is banished. 
@@ -81,7 +81,7 @@ public class L2CustomZone extends L2ZoneType
 		if (character instanceof L2PcInstance)
 		{
 			if (((L2PcInstance)character).isGM())
-				((L2PcInstance)character).sendMessage("[DEBUG] You left "+_zoneName);
+				((L2PcInstance)character).sendMessage("You left "+_zoneName);
 		}
 	}
 	

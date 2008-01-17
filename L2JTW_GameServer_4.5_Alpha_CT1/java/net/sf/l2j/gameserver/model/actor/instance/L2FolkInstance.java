@@ -63,10 +63,9 @@ public class L2FolkInstance extends L2NpcInstance
 		{
 			NpcHtmlMessage html = new NpcHtmlMessage(getObjectId());
             TextBuilder sb = new TextBuilder();
-            sb.append("<html><head><body>");
-            sb.append("我無法交你任何東西.<br> 請告知管理員修正.<br>NPC編號:"+npcId+", 職業編號:"+player.getClassId().getId()+"<br>");
+            sb.append("<html><body>");
+            sb.append("我無法教你任何東西。<br>請告知管理員修正。<br>NpcId："+npcId+"，你的職業："+player.getClassId().getId()+"<br>");
             sb.append("</body></html>");
-
 			html.setHtml(sb.toString());
 			player.sendPacket(html);
 
@@ -78,10 +77,7 @@ public class L2FolkInstance extends L2NpcInstance
         {
 			NpcHtmlMessage html = new NpcHtmlMessage(getObjectId());
             TextBuilder sb = new TextBuilder();
-
-            sb.append("<html><head><body>");
-            sb.append("我無法交你任何東西.<br> 你必須尋找你所屬職業的教師.");
-            sb.append("</body></html>");
+            sb.append("<html><body>我無法教你任何東西。<br>你必須尋找你所屬職業的教師。</body></html>");
 			html.setHtml(sb.toString());
 			player.sendPacket(html);
 
@@ -149,7 +145,7 @@ public class L2FolkInstance extends L2NpcInstance
             NpcHtmlMessage html = new NpcHtmlMessage(getObjectId());
             TextBuilder sb = new TextBuilder();
             sb.append("<html><body>");
-            sb.append("I cannot teach you. My class list is empty.<br> Ask admin to fix it. Need add my npcid and classes to skill_learn.sql.<br>NpcId:"+npcId+", Your classId:"+player.getClassId().getId()+"<br>");
+            sb.append("我無法教你任何東西。<br>請告知管理員修正。<br>NpcId："+npcId+"，你的職業："+player.getClassId().getId()+"<br>");
             sb.append("</body></html>");
             html.setHtml(sb.toString());
             player.sendPacket(html);
@@ -161,9 +157,7 @@ public class L2FolkInstance extends L2NpcInstance
         {
             NpcHtmlMessage html = new NpcHtmlMessage(getObjectId());
             TextBuilder sb = new TextBuilder();
-            sb.append("<html><body>");
-            sb.append("I cannot teach you any skills.<br> You must find your current class teachers.");
-            sb.append("</body></html>");
+            sb.append("<html><body>我無法教你任何東西。<br>你必須尋找你所屬職業的教師。</body></html>");
             html.setHtml(sb.toString());
             player.sendPacket(html);
 
@@ -173,9 +167,7 @@ public class L2FolkInstance extends L2NpcInstance
         {
         	NpcHtmlMessage html = new NpcHtmlMessage(getObjectId());
             TextBuilder sb = new TextBuilder();
-            sb.append("<html><body>");
-            sb.append("You must have 3rd class change quest completed.");
-            sb.append("</body></html>");
+            sb.append("<html><body>必須完成第3次轉職任務。</body></html>");
             html.setHtml(sb.toString());
             player.sendPacket(html);
 
@@ -208,9 +200,7 @@ public class L2FolkInstance extends L2NpcInstance
             else
             {
                 TextBuilder sb = new TextBuilder();
-                sb.append("<html><body>");
-                sb.append("You've learned all skills for your class.<br>");
-                sb.append("</body></html>");
+                sb.append("<html><body>已經學習所有技能。</body></html>");
                 html.setHtml(sb.toString());
                 player.sendPacket(html);
             }
@@ -257,7 +247,7 @@ public class L2FolkInstance extends L2NpcInstance
 					String text =
 						"<html>"+
 						"<body>"+
-						"<center>技能學習:</center>"+
+						"<center>技能學習︰</center>"+
 						"<br>";
 
 
@@ -268,13 +258,12 @@ public class L2FolkInstance extends L2NpcInstance
 						text +=
 
 
-							 "所屬職業是最簡單學習的.<br>"+
-	                            "其他職業有點困難.<br>"+
-	                            "其他種族將會更難學習.<br>"+
-	                            "你也可以學習 "+mages+" 的技能, 但是他們更難去學習!"+
+							 "所屬職業技能是最簡單學習的，<br>\n"+
+	                            "相同種族的其他職業技能則會有點困難，<br>\n"+
+	                            "其他種族的技能將會更難學習，<br>\n"+
+	                            "當然，你也可以學習"+mages+"的技能，但是它們是最難學習的！"+
 	                            "<br>"+
 	                            "<br>";
-
 
 					}
 
@@ -296,7 +285,7 @@ public class L2FolkInstance extends L2NpcInstance
 						            continue;
 
 						        String className = CharTemplateTable.getClassNameById(cid.getId());
-						        text += "<a action=\"bypass -h npc_%objectId%_SkillList "+cid.getId()+"\">學習 "+cid+"技能</a><br>\n";
+						        text += "<a action=\"bypass -h npc_%objectId%_SkillList "+cid.getId()+"\">學習"+cid+"技能</a><br>\n";
 
 						        count++;
 						    }

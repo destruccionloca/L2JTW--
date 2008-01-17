@@ -633,7 +633,7 @@ public abstract class L2Character extends L2Object
 		if (this instanceof L2PcInstance && DimensionalRiftManager.getInstance().checkIfInRiftZone(getX(), getY(), getZ(), true)) // true -> ignore waiting room :)
 		{
 			L2PcInstance player = (L2PcInstance)this;
-			player.sendMessage("傳送至等候室");
+			player.sendMessage("傳送至等候室。");
 			if(player.isInParty() && player.getParty().isInDimensionalRift())
 			{
 				player.getParty().getDimensionalRift().usedTeleport(player);
@@ -698,14 +698,14 @@ public abstract class L2Character extends L2Object
 	        if (target instanceof L2PcInstance)
 	        {
 		        if (((L2PcInstance)target).isCursedWeaponEquiped() && ((L2PcInstance)this).getLevel()<=20){
-		        	((L2PcInstance)this).sendMessage("無法在等級低於21下進行攻擊");
+		        	((L2PcInstance)this).sendMessage("無法對等級低於21下進行攻擊。");
 		        	sendPacket(new ActionFailed());
 		        	return;
 		        }
 
 		        if (((L2PcInstance)this).isCursedWeaponEquiped() && ((L2PcInstance)target).getLevel()<=20){
 
-		        	((L2PcInstance)this).sendMessage("無法攻擊新手玩家");
+		        	((L2PcInstance)this).sendMessage("無法攻擊新手玩家。");
 
 		        	sendPacket(new ActionFailed());
 		        	return;

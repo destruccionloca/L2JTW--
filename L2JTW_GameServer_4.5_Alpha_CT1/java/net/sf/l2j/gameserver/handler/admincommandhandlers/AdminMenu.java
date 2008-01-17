@@ -159,10 +159,10 @@ public class AdminMenu implements IAdminCommandHandler
 				if (plyr != null)
 				{
 					plyr.logout();
-					sm.addString("踢除 " + plyr.getName() + " 從遊戲內.");
+					sm.addString("踢除玩家「" + plyr.getName() + "」。");
 				}
 				else
-					sm.addString("人物 " + player + " 在遊戲內無法查詢到.");
+					sm.addString("目標 " + player + " 不在遊戲。");
 				activeChar.sendPacket(sm);
 			}
 			showMainPage(activeChar);
@@ -262,7 +262,7 @@ public class AdminMenu implements IAdminCommandHandler
 		else
 		{
 			activeChar.teleToLocation(player.getX(), player.getY(), player.getZ(), true);
-			activeChar.sendMessage("傳送至人物 " + player.getName());
+			//activeChar.sendMessage("傳送至人物 " + player.getName());
 		}
 		showMainPage(activeChar);
 	}
@@ -292,17 +292,16 @@ public class AdminMenu implements IAdminCommandHandler
 				{
 					LoginServerThread.getInstance().sendAccessLevel(acc_name, banLevel);
 					sm.addString("SYS");
-					sm.addString("設置帳號等級從 "+player+" 至 "+banLevel+".");
+					sm.addString("設置帳號等級從 "+player+" 至 "+banLevel+"。");
 				}
 				else
 				{
-					sm.addString("SYS");
-					sm.addString("無法查詢人物 "+player+".");
+					sm.addString("目標 "+player+"不在遊戲。");
 				}
 				activeChar.sendPacket(sm);
 			}
 			else
-				activeChar.sendMessage("此人物並沒有正確的帳號.");
+				activeChar.sendMessage("無此帳號。");
 			statement.close();
 		}
 		catch (Exception e)

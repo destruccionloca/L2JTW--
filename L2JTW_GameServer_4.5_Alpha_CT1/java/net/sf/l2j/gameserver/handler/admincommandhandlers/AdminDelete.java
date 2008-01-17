@@ -85,13 +85,13 @@ public class AdminDelete implements IAdminCommandHandler
             SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
             sm.addString("SYS");
             sm.addString("刪除 " + target.getName() + " 從 " + target.getObjectId() + ".");
-            activeChar.sendPacket(sm);
+            //activeChar.sendPacket(sm);
         }
         else
         {
             SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
             sm.addString("SYS");
-            sm.addString("錯誤目標");
+            sm.addString("錯誤目標。");
             activeChar.sendPacket(sm);
         }
     }

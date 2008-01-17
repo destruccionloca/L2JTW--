@@ -61,7 +61,7 @@ public class AdminGm implements IAdminCommandHandler {
             GmListTable.getInstance().deleteGm(activeChar);
 			activeChar.setIsGM(false);
 
-            activeChar.sendMessage("GMª¬ºAÃö³¬.");
+            activeChar.sendMessage("GMª¬ºAÃö³¬¡C");
 
 			if (Config.DEBUG) _log.fine("GM: "+activeChar.getName()+"("+activeChar.getObjectId()+") turned his GM status off");
 		}
@@ -69,7 +69,7 @@ public class AdminGm implements IAdminCommandHandler {
             GmListTable.getInstance().addGm(activeChar, false);
 			activeChar.setIsGM(true);
 
-			activeChar.sendMessage("GMª¬ºA±Ò°Ê");
+			activeChar.sendMessage("GMª¬ºA±Ò°Ê¡C");
 
 			if (Config.DEBUG) _log.fine("GM: "+activeChar.getName()+"("+activeChar.getObjectId()+") turned his GM status on");
 		}

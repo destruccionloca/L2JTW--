@@ -47,8 +47,7 @@ public class AdminRideWyvern implements IAdminCommandHandler
         {
             if(activeChar.isMounted() || activeChar.getPet() != null){
                 SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-                sm.addString("SYS");
-                sm.addString("已經有使魔召喚");
+                sm.addString("已召喚使魔。");
                 activeChar.sendPacket(sm);
                 return false;
             }
@@ -61,8 +60,7 @@ public class AdminRideWyvern implements IAdminCommandHandler
             else
             {
                 SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-                sm.addString("SYS");
-                sm.addString("指令 '"+command+"' 錯誤");
+                sm.addString("指令 '"+command+"' 錯誤。");
                 activeChar.sendPacket(sm);
                 return false;
             }

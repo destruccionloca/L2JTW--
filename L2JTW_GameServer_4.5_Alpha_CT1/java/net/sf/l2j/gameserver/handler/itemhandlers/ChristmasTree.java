@@ -80,7 +80,7 @@ public class ChristmasTree implements IItemHandler
         {
             SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 			sm.addString( "SYS" ); 
-			sm.addString( "目標錯誤" ); 
+			sm.addString( "目標錯誤。" ); 
             activeChar.sendPacket(sm);
         }
     }

@@ -304,7 +304,7 @@ public class AdminEffects implements IAdminCommandHandler
 			}
 			catch (Exception e)
 			{
-				activeChar.sendMessage("使用方法 //gmspeed value (0=off...4=max).");
+				activeChar.sendMessage("使用方法: //gmspeed value (0=off...4=max).");
 			}
 			finally
 			{
@@ -374,7 +374,7 @@ public class AdminEffects implements IAdminCommandHandler
 						NpcInfo info1 = new NpcInfo((L2NpcInstance)player, null);
 						player.broadcastPacket(info1);
 					}
-					activeChar.sendMessage("修改名稱從 "+ oldName +" 至 "+ name +".");
+					activeChar.sendMessage("修改名稱"+ oldName +"為"+ name +"。");
 				}
 				catch (Exception e){}
 			}
@@ -407,7 +407,7 @@ public class AdminEffects implements IAdminCommandHandler
 						{
 							SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 							sm.addString("SYS");
-							sm.addString("加入隊伍 " + teamVal);
+							sm.addString("加入"+ teamVal+"隊伍。");
 							player.sendPacket(sm);
 						}
 						player.broadcastUserInfo();
@@ -433,7 +433,7 @@ public class AdminEffects implements IAdminCommandHandler
 			{
 				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 				sm.addString("SYS");
-				sm.addString("加入隊伍 " + teamVal);
+				sm.addString("加入"+ teamVal+"隊伍。");
 				player.sendPacket(sm);
 			}
 			player.broadcastUserInfo();
@@ -454,7 +454,7 @@ public class AdminEffects implements IAdminCommandHandler
 						if (player != null)
 						{
 							if (performSocial(social,player,activeChar))
-								activeChar.sendMessage(player.getName()+" 被影響.");
+								activeChar.sendMessage(player.getName()+" 被影響。");
 						}
 						else
 						{
@@ -464,7 +464,7 @@ public class AdminEffects implements IAdminCommandHandler
 								for (L2Object object : activeChar.getKnownList().getKnownObjects().values())
 									if (activeChar.isInsideRadius(object, radius, false, false))
 										performSocial(social,object,activeChar);
-								activeChar.sendMessage(radius+ " 範圍內被影響.");
+								activeChar.sendMessage(radius+ " 範圍內被影響。");
 							}
 							catch (NumberFormatException nbe)
 							{
@@ -481,7 +481,7 @@ public class AdminEffects implements IAdminCommandHandler
 					if (obj != null)
 					{
 						if (performSocial(social,obj,activeChar))
-							activeChar.sendMessage(obj.getName()+ " 被影響.");
+							activeChar.sendMessage(obj.getName()+ " 被影響。");
 						else
 							activeChar.sendPacket(new SystemMessage(SystemMessageId.NOTHING_HAPPENED));
 					}
@@ -689,7 +689,7 @@ public class AdminEffects implements IAdminCommandHandler
 		PlaySound _snd = new PlaySound(1,sound,0,0,0,0,0);
 		activeChar.sendPacket(_snd);
 		activeChar.broadcastPacket(_snd);
-		activeChar.sendMessage("Playing "+sound+".");
+		activeChar.sendMessage("播放 "+sound+"。");
 	}
 
 

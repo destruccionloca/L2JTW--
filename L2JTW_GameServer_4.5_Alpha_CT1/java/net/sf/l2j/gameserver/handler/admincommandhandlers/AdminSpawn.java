@@ -203,7 +203,7 @@ public class AdminSpawn implements IAdminCommandHandler
 			spawn.setHeading(activeChar.getHeading());
 			spawn.setRespawnDelay(respawnTime);
 			if (RaidBossSpawnManager.getInstance().isDefined(spawn.getNpcid()))
-				activeChar.sendMessage("無法創造另一個Instance " + template1.name + ".");
+				activeChar.sendMessage("無法創造" + template1.name + "。");
 			else
 			{
 				if (RaidBossSpawnManager.getInstance().getValidTemplate(spawn.getNpcid()) != null)
@@ -213,7 +213,7 @@ public class AdminSpawn implements IAdminCommandHandler
 				spawn.init();
 				if (!permanent)
 					spawn.stopRespawn();
-				activeChar.sendMessage("創造 " + template1.name + " 在 " + target.getObjectId());
+				//activeChar.sendMessage("創造 " + template1.name + " 在 " + target.getObjectId());
 			}
 		}
 		catch (Exception e)
@@ -231,9 +231,9 @@ public class AdminSpawn implements IAdminCommandHandler
 
 
 		// Start
-		tb.append("<html><title>創造NPC:</title><body><p> 等級 "+level+":<br>總數 : "+mobs.length+"<br>");
-		String end1 = "<br><center><button value=\"下一步\" action=\"bypass -h admin_spawn_index "+level+" $from$\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></center></body></html>";
-		String end2 = "<br><center><button value=\"返回\" action=\"bypass -h admin_show_spawns\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></center></body></html>";
+		tb.append("<html><title>創造NPC：</title><body><p> 等級："+level+"<br>總數："+mobs.length+"<br>");
+		String end1 = "<br><center><button value=\"下一頁\" action=\"bypass -h admin_spawn_index "+level+" $from$\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></center></body></html>";
+		String end2 = "<br><center><button value=\"上一頁\" action=\"bypass -h admin_show_spawns\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></center></body></html>";
 
 
 		// Loop
@@ -267,9 +267,9 @@ public class AdminSpawn implements IAdminCommandHandler
 		TextBuilder tb = new TextBuilder();
 		L2NpcTemplate[] mobs = NpcTable.getInstance().getAllNpcStartingWith(starting);
 		// Start
-		tb.append("<html><title>創造NPC:</title><body><p> 總數為 "+mobs.length+" 名稱為 "+starting+":<br>");
-		String end1 = "<br><center><button value=\"下一步\" action=\"bypass -h admin_npc_index "+starting+" $from$\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></center></body></html>";
-		String end2 = "<br><center><button value=\"返回\" action=\"bypass -h admin_show_npcs\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></center></body></html>";
+		tb.append("<html><title>創造NPC：</title><body><p> 總數："+mobs.length+" 名稱："+starting+":<br>");
+		String end1 = "<br><center><button value=\"下一頁\" action=\"bypass -h admin_npc_index "+starting+" $from$\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></center></body></html>";
+		String end2 = "<br><center><button value=\"上一頁\" action=\"bypass -h admin_show_npcs\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></center></body></html>";
 		// Loop
 		boolean ended = true;
 		for (int i=from; i<mobs.length; i++)

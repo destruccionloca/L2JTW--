@@ -81,11 +81,11 @@ public class AdminKill implements IAdminCommandHandler
 								kill(activeChar, knownChar);
 							}
 
-							activeChar.sendMessage("滅亡所有物件在 " + radius + " 半徑內.");
+							activeChar.sendMessage("消滅所有物件在 " + radius + " 半徑內。");
 							return true;
 						}
 						catch (NumberFormatException e) {
-							activeChar.sendMessage("半徑錯誤");
+							activeChar.sendMessage("半徑錯誤。");
 							return false;
 						}
 					} else
@@ -106,7 +106,7 @@ public class AdminKill implements IAdminCommandHandler
 							kill(activeChar, knownChar);
 						}
 
-						activeChar.sendMessage("滅亡所有物件在 " + radius + " 半徑內.");
+						activeChar.sendMessage("消滅所有物件在 " + radius + " 半徑內。");
 						return true;
 					}
 					catch (NumberFormatException e) {

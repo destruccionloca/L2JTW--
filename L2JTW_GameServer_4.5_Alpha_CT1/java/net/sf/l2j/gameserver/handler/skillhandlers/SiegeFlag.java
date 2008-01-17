@@ -64,7 +64,7 @@ public class SiegeFlag implements ISkillHandler
         }
         catch (Exception e)
         {
-            player.sendMessage("放至錯誤 " + e);
+            player.sendMessage("放置錯誤 " + e);
         }
     }
 
@@ -96,26 +96,26 @@ public class SiegeFlag implements ISkillHandler
         if (castle == null || castle.getCastleId() <= 0)
         {
             sm.addString("SYS");
-            sm.addString("你必須在城堡周圍放置陣旗.");
+            sm.addString("必須在城堡周圍放置陣旗。");
         }
         else if (!castle.getSiege().getIsInProgress())
         {
             sm.addString("SYS");
-            sm.addString("你只能再攻城戰期間放置陣旗.");
+            sm.addString("只能再攻城戰期間放置陣旗。");
         }
         else if (castle.getSiege().getAttackerClan(player.getClan()) == null)
         {
             sm.addString("SYS");
-            sm.addString("你必須是攻城方才能放置陣旗");
+            sm.addString("必須是攻城方才能放置陣旗。");
         }
         else if (player.getClan() == null || !player.isClanLeader())
         {
             sm.addString("SYS");
-            sm.addString("你必須是血盟盟主");
+            sm.addString("必須是血盟盟主。");
         }
 
         else if (castle.getSiege().getAttackerClan(player.getClan()).getNumFlags() >= SiegeManager.getInstance().getFlagMaxCount())
-        	sm.addString("陣旗放置數量已達到極限");
+        	sm.addString("陣旗放置數量已達到極限。");
 
         else
             return true;

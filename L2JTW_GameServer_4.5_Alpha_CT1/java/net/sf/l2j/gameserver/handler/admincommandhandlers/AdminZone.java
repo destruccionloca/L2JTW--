@@ -93,7 +93,7 @@ public class AdminZone implements IAdminCommandHandler
 
         {
         	//ZoneManager.getInstance().reload();
-        	GmListTable.broadcastMessageToGMs("區域重新讀取無效.");
+        	GmListTable.broadcastMessageToGMs("區域重新載入失敗。");
         }
 
 

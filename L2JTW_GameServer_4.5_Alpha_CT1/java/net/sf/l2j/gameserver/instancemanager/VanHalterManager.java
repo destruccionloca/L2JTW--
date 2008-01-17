@@ -21,7 +21,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Date;
 import java.util.logging.Logger;
-import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledFuture;
 import java.util.List;
 import java.util.Map;
 import javolution.util.FastList;
@@ -94,15 +94,15 @@ public class VanHalterManager
     protected L2RaidBossInstance _vanHalter = null;
     
     // Task
-    protected Future _MovieTask = null;
-    protected Future _CloseDoorOfAltarTask = null;
-    protected Future _OpenDoorOfAltarTask = null;
-    protected Future _LockUpDoorOfAltarTask = null;
-    protected Future _CallRoyalGuardHelperTask = null;
-    protected Future _TimeUpTask = null;
-    protected Future _IntervalTask = null;
-    protected Future _HalterEscapeTask = null;
-    protected Future _SetBleedTask = null;
+    protected ScheduledFuture _MovieTask = null;
+    protected ScheduledFuture _CloseDoorOfAltarTask = null;
+    protected ScheduledFuture _OpenDoorOfAltarTask = null;
+    protected ScheduledFuture _LockUpDoorOfAltarTask = null;
+    protected ScheduledFuture _CallRoyalGuardHelperTask = null;
+    protected ScheduledFuture _TimeUpTask = null;
+    protected ScheduledFuture _IntervalTask = null;
+    protected ScheduledFuture _HalterEscapeTask = null;
+    protected ScheduledFuture _SetBleedTask = null;
     
     // state of High Priestess van Halter
     boolean _isLocked = false;
@@ -231,11 +231,11 @@ public class VanHalterManager
         
     	// set time up.
     	if (_TimeUpTask != null) _TimeUpTask.cancel(true);
-    	_TimeUpTask = ThreadPoolManager.getInstance().scheduleEffect(new TimeUp(),Config.HPH_ACTIVITYTIMEOFHALTER * 1000);
+    	_TimeUpTask = ThreadPoolManager.getInstance().scheduleGeneral(new TimeUp(),Config.HPH_ACTIVITYTIMEOFHALTER * 1000);
         
     	// set bleeding to palyers.
 		if (_SetBleedTask != null) _SetBleedTask.cancel(true);
-		_SetBleedTask = ThreadPoolManager.getInstance().scheduleEffect(new Bleeding(),2000);
+		_SetBleedTask = ThreadPoolManager.getInstance().scheduleGeneral(new Bleeding(),2000);
 
 		// check state of High Priestess van Halter.
 		_log.info("VanHaletrManager : State of High Priestess van Halter is " + _State.getState() + ".");
@@ -878,7 +878,7 @@ public class VanHalterManager
     	if (!_PlayersInLair.contains(intruder)) _PlayersInLair.add(intruder);
     	if (_LockUpDoorOfAltarTask == null && !_isLocked && _isCaptainSpawned)
     	{
-    		_LockUpDoorOfAltarTask = ThreadPoolManager.getInstance().scheduleEffect(new LockUpDoorOfAltar(),Config.HPH_TIMEOFLOCKUPDOOROFALTAR * 1000);
+    		_LockUpDoorOfAltarTask = ThreadPoolManager.getInstance().scheduleGeneral(new LockUpDoorOfAltar(),Config.HPH_TIMEOFLOCKUPDOOROFALTAR * 1000);
     	}
     }
     
@@ -910,7 +910,7 @@ public class VanHalterManager
 
     		if (_CloseDoorOfAltarTask != null) _CloseDoorOfAltarTask.cancel(true);
     		_CloseDoorOfAltarTask = null;
-    		_CloseDoorOfAltarTask = ThreadPoolManager.getInstance().scheduleEffect(new CloseDoorOfAltar(),Config.HPH_INTERVALOFDOOROFALTER * 1000);
+    		_CloseDoorOfAltarTask = ThreadPoolManager.getInstance().scheduleGeneral(new CloseDoorOfAltar(),Config.HPH_INTERVALOFDOOROFALTER * 1000);
     	}
     	else
     	{
@@ -943,7 +943,7 @@ public class VanHalterManager
     	{
     		if(_OpenDoorOfAltarTask != null) _OpenDoorOfAltarTask.cancel(true);
     		_OpenDoorOfAltarTask = null;
-    		_OpenDoorOfAltarTask = ThreadPoolManager.getInstance().scheduleEffect(new OpenDoorOfAltar(),Config.HPH_INTERVALOFDOOROFALTER * 1000);
+    		_OpenDoorOfAltarTask = ThreadPoolManager.getInstance().scheduleGeneral(new OpenDoorOfAltar(),Config.HPH_INTERVALOFDOOROFALTER * 1000);
     	}
     	else
     	{
@@ -1025,7 +1025,7 @@ public class VanHalterManager
     	if (_TimeUpTask != null) _TimeUpTask.cancel(true);
     	_TimeUpTask = null;
     	
-    	_MovieTask = ThreadPoolManager.getInstance().scheduleEffect(new Movie(1),Config.HPH_APPTIMEOFHALTER * 1000);
+    	_MovieTask = ThreadPoolManager.getInstance().scheduleGeneral(new Movie(1),Config.HPH_APPTIMEOFHALTER * 1000);
     }
     
     // update knownlist.
@@ -1042,7 +1042,7 @@ public class VanHalterManager
     protected void combatBeginning()
     {
     	if (_TimeUpTask != null) _TimeUpTask.cancel(true);
-    	_TimeUpTask = ThreadPoolManager.getInstance().scheduleEffect(new TimeUp(),Config.HPH_FIGHTTIMEOFHALTER * 1000);
+    	_TimeUpTask = ThreadPoolManager.getInstance().scheduleGeneral(new TimeUp(),Config.HPH_FIGHTTIMEOFHALTER * 1000);
 
     	Map<Integer, L2PcInstance> _targets = new FastMap<Integer, L2PcInstance>();
     	int i = 0;
@@ -1063,8 +1063,8 @@ public class VanHalterManager
     	if (!_isHelperCalled)
     	{
         	_isHelperCalled = true;
-        	_HalterEscapeTask = ThreadPoolManager.getInstance().scheduleEffect(new HalterEscape(),500);
-        	_CallRoyalGuardHelperTask = ThreadPoolManager.getInstance().scheduleEffect(new CallRoyalGuardHelper(),1000);
+        	_HalterEscapeTask = ThreadPoolManager.getInstance().scheduleGeneral(new HalterEscape(),500);
+        	_CallRoyalGuardHelperTask = ThreadPoolManager.getInstance().scheduleGeneral(new CallRoyalGuardHelper(),1000);
     	}
     	
     }
@@ -1083,7 +1083,7 @@ public class VanHalterManager
     		if (_RoyalGuardHepler.size() <= Config.HPH_CALLROYALGUARDHELPERCOUNT && !_vanHalter.isDead())
     		{
 	    		if (_CallRoyalGuardHelperTask != null) _CallRoyalGuardHelperTask.cancel(true);
-    			_CallRoyalGuardHelperTask = ThreadPoolManager.getInstance().scheduleEffect(new CallRoyalGuardHelper(),Config.HPH_CALLROYALGUARDHELPERINTERVAL * 1000);
+    			_CallRoyalGuardHelperTask = ThreadPoolManager.getInstance().scheduleGeneral(new CallRoyalGuardHelper(),Config.HPH_CALLROYALGUARDHELPERINTERVAL * 1000);
     		}
     		else
     		{
@@ -1135,7 +1135,7 @@ public class VanHalterManager
         	    	}
     			}
     	  		if (_HalterEscapeTask != null)	_HalterEscapeTask.cancel(true);
-    	  		_HalterEscapeTask = ThreadPoolManager.getInstance().scheduleEffect(new HalterEscape(),5000);
+    	  		_HalterEscapeTask = ThreadPoolManager.getInstance().scheduleGeneral(new HalterEscape(),5000);
     		}
     		else
     		{
@@ -1194,7 +1194,7 @@ public class VanHalterManager
     		addBleeding();
     		
     		if (_SetBleedTask != null) _SetBleedTask.cancel(true);
-    		_SetBleedTask = ThreadPoolManager.getInstance().scheduleEffect(new Bleeding(),2000);
+    		_SetBleedTask = ThreadPoolManager.getInstance().scheduleGeneral(new Bleeding(),2000);
 
     	}
     }
@@ -1255,7 +1255,7 @@ public class VanHalterManager
     		
     	}
     	
-    	_IntervalTask = ThreadPoolManager.getInstance().scheduleEffect(new Interval(),_State.getInterval());
+    	_IntervalTask = ThreadPoolManager.getInstance().scheduleGeneral(new Interval(),_State.getInterval());
     }
     
     // interval.
@@ -1270,9 +1270,6 @@ public class VanHalterManager
     	{
     		_PlayersInLair.clear();
     		setupAlter();
-    		
-    		if (_IntervalTask != null) _IntervalTask.cancel(true);
-    		_IntervalTask = null;
     	}
     }
 
@@ -1336,7 +1333,7 @@ public class VanHalterManager
     	
     	// set time up.
     	if (_TimeUpTask != null) _TimeUpTask.cancel(true);
-    	_TimeUpTask = ThreadPoolManager.getInstance().scheduleEffect(new TimeUp(), Config.HPH_ACTIVITYTIMEOFHALTER * 1000);
+    	_TimeUpTask = ThreadPoolManager.getInstance().scheduleGeneral(new TimeUp(), Config.HPH_ACTIVITYTIMEOFHALTER * 1000);
     }
 
     // time up.
@@ -1350,10 +1347,6 @@ public class VanHalterManager
     	public void run()
     	{
     		enterInterval();
-    		
-       		if (_TimeUpTask != null) _TimeUpTask.cancel(true);
-       		_TimeUpTask = null;
-    		
     	}
     }
     
@@ -1397,7 +1390,7 @@ public class VanHalterManager
 					// set next task.
 		            if(_MovieTask != null) _MovieTask.cancel(true);
 	            	_MovieTask = null;
-		            _MovieTask = ThreadPoolManager.getInstance().scheduleEffect(new Movie(2), 16);
+		            _MovieTask = ThreadPoolManager.getInstance().scheduleGeneral(new Movie(2), 16);
 	
 					break;
 	    			
@@ -1418,7 +1411,7 @@ public class VanHalterManager
 					// set next task.
 		            if(_MovieTask != null) _MovieTask.cancel(true);
 	            	_MovieTask = null;
-		            _MovieTask = ThreadPoolManager.getInstance().scheduleEffect(new Movie(3), 1);
+		            _MovieTask = ThreadPoolManager.getInstance().scheduleGeneral(new Movie(3), 1);
 	
 					break;
 	    			
@@ -1439,7 +1432,7 @@ public class VanHalterManager
 					// set next task.
 		            if(_MovieTask != null) _MovieTask.cancel(true);
 		            _MovieTask = null;
-		            _MovieTask = ThreadPoolManager.getInstance().scheduleEffect(new Movie(4), 1500);
+		            _MovieTask = ThreadPoolManager.getInstance().scheduleGeneral(new Movie(4), 1500);
 	
 					break;
 
@@ -1460,7 +1453,7 @@ public class VanHalterManager
 					// set next task.
 		            if(_MovieTask != null) _MovieTask.cancel(true);
 	            	_MovieTask = null;
-		            _MovieTask = ThreadPoolManager.getInstance().scheduleEffect(new Movie(5), 1);
+		            _MovieTask = ThreadPoolManager.getInstance().scheduleGeneral(new Movie(5), 1);
 	
 					break;
 	    			
@@ -1481,7 +1474,7 @@ public class VanHalterManager
 					// set next task.
 		            if(_MovieTask != null) _MovieTask.cancel(true);
 	            	_MovieTask = null;
-		            _MovieTask = ThreadPoolManager.getInstance().scheduleEffect(new Movie(6), 1500);
+		            _MovieTask = ThreadPoolManager.getInstance().scheduleGeneral(new Movie(6), 1500);
 	
 					break;
 	    			
@@ -1502,7 +1495,7 @@ public class VanHalterManager
 					// set next task.
 		            if(_MovieTask != null) _MovieTask.cancel(true);
 	            	_MovieTask = null;
-		            _MovieTask = ThreadPoolManager.getInstance().scheduleEffect(new Movie(7), 1);
+		            _MovieTask = ThreadPoolManager.getInstance().scheduleGeneral(new Movie(7), 1);
 	
 					break;
 	    			
@@ -1523,7 +1516,7 @@ public class VanHalterManager
 					// set next task.
 		            if(_MovieTask != null) _MovieTask.cancel(true);
 	            	_MovieTask = null;
-		            _MovieTask = ThreadPoolManager.getInstance().scheduleEffect(new Movie(8), 1500);
+		            _MovieTask = ThreadPoolManager.getInstance().scheduleGeneral(new Movie(8), 1500);
 	
 					break;
 	    			
@@ -1544,7 +1537,7 @@ public class VanHalterManager
 					// set next task.
 		            if(_MovieTask != null) _MovieTask.cancel(true);
 	            	_MovieTask = null;
-		            _MovieTask = ThreadPoolManager.getInstance().scheduleEffect(new Movie(9), 1);
+		            _MovieTask = ThreadPoolManager.getInstance().scheduleGeneral(new Movie(9), 1);
 	
 					break;
 	    			
@@ -1565,7 +1558,7 @@ public class VanHalterManager
 					// set next task.
 		            if(_MovieTask != null) _MovieTask.cancel(true);
 	            	_MovieTask = null;
-		            _MovieTask = ThreadPoolManager.getInstance().scheduleEffect(new Movie(10), 1500);
+		            _MovieTask = ThreadPoolManager.getInstance().scheduleGeneral(new Movie(10), 1500);
 	
 					break;
 	    			
@@ -1586,7 +1579,7 @@ public class VanHalterManager
 					// set next task.
 		            if(_MovieTask != null) _MovieTask.cancel(true);
 	            	_MovieTask = null;
-		            _MovieTask = ThreadPoolManager.getInstance().scheduleEffect(new Movie(11), 1);
+		            _MovieTask = ThreadPoolManager.getInstance().scheduleGeneral(new Movie(11), 1);
 	
 					break;
 	    			
@@ -1607,7 +1600,7 @@ public class VanHalterManager
 					// set next task.
 		            if(_MovieTask != null) _MovieTask.cancel(true);
 	            	_MovieTask = null;
-		            _MovieTask = ThreadPoolManager.getInstance().scheduleEffect(new Movie(12), 2000);
+		            _MovieTask = ThreadPoolManager.getInstance().scheduleGeneral(new Movie(12), 2000);
 	
 					break;
 	    			
@@ -1628,7 +1621,7 @@ public class VanHalterManager
 					// set next task.
 		            if(_MovieTask != null) _MovieTask.cancel(true);
 	            	_MovieTask = null;
-		            _MovieTask = ThreadPoolManager.getInstance().scheduleEffect(new Movie(13), 1000);
+		            _MovieTask = ThreadPoolManager.getInstance().scheduleGeneral(new Movie(13), 1000);
 	
 					break;
 	    			
@@ -1644,7 +1637,7 @@ public class VanHalterManager
 					// set next task.
 		            if(_MovieTask != null) _MovieTask.cancel(true);
 	            	_MovieTask = null;
-		            _MovieTask = ThreadPoolManager.getInstance().scheduleEffect(new Movie(14), 4700);
+		            _MovieTask = ThreadPoolManager.getInstance().scheduleGeneral(new Movie(14), 4700);
 	
 					break;
 	    			
@@ -1655,7 +1648,7 @@ public class VanHalterManager
 					// set next task.
 		            if(_MovieTask != null) _MovieTask.cancel(true);
 	            	_MovieTask = null;
-		            _MovieTask = ThreadPoolManager.getInstance().scheduleEffect(new Movie(15), 4300);
+		            _MovieTask = ThreadPoolManager.getInstance().scheduleGeneral(new Movie(15), 4300);
 	
 					break;
 	    			
@@ -1679,7 +1672,7 @@ public class VanHalterManager
 					// set next task.
 		            if(_MovieTask != null) _MovieTask.cancel(true);
 	            	_MovieTask = null;
-		            _MovieTask = ThreadPoolManager.getInstance().scheduleEffect(new Movie(16), 2000);
+		            _MovieTask = ThreadPoolManager.getInstance().scheduleGeneral(new Movie(16), 2000);
 	
 					break;
 	    			
@@ -1700,7 +1693,7 @@ public class VanHalterManager
 					// set next task.
 		            if(_MovieTask != null) _MovieTask.cancel(true);
 	            	_MovieTask = null;
-		            _MovieTask = ThreadPoolManager.getInstance().scheduleEffect(new Movie(17), 6000);
+		            _MovieTask = ThreadPoolManager.getInstance().scheduleGeneral(new Movie(17), 6000);
 	
 					break;
 
@@ -1717,7 +1710,7 @@ public class VanHalterManager
 
 		            if(_MovieTask != null) _MovieTask.cancel(true);
 	            	_MovieTask = null;
-			    	_MovieTask = ThreadPoolManager.getInstance().scheduleEffect(new Movie(18), 1000);
+			    	_MovieTask = ThreadPoolManager.getInstance().scheduleGeneral(new Movie(18), 1000);
 		        	
 					break;
 				

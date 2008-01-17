@@ -249,7 +249,7 @@ public class EnterWorld extends L2GameClientPacket
         sendPacket(sm);
 		*/
 
-        Welcome_Path = "data/html/welcome/welcome.htm";
+        Welcome_Path = "data/html/servnews.htm";
         File mainText = new File(Config.DATAPACK_ROOT, Welcome_Path);        // Return the pathfile of the HTML file
         if (mainText.exists())
         {   
@@ -326,7 +326,7 @@ public class EnterWorld extends L2GameClientPacket
 		if (Olympiad.getInstance().playerInStadia(activeChar))
         {
             activeChar.teleToLocation(MapRegionTable.TeleportWhereType.Town);
-            activeChar.sendMessage("因在奧林匹亞競技場內所以將傳送至最近的村莊");
+            //activeChar.sendMessage("因在奧林匹亞競技場內所以將傳送至最近的村莊");
         }
 
         if (DimensionalRiftManager.getInstance().checkIfInRiftZone(activeChar.getX(), activeChar.getY(), activeChar.getZ(), false))
@@ -367,7 +367,7 @@ public class EnterWorld extends L2GameClientPacket
 		{
             // Attacker or spectator logging in to a siege zone. Actually should be checked for inside castle only?
 			activeChar.teleToLocation(MapRegionTable.TeleportWhereType.Town);
-            activeChar.sendMessage("因為在攻城戰區域內,將傳送至最近的村莊.");
+            //activeChar.sendMessage("因為在攻城戰區域內,將傳送至最近的村莊.");
 		}
 
 		RegionBBSManager.getInstance().changeCommunityBoard();
@@ -423,7 +423,7 @@ public class EnterWorld extends L2GameClientPacket
 
             if (partner != null)
             {
-                partner.sendMessage("您的同伴以登入.");
+                partner.sendMessage("你的好友已登入。");
             }
 
             partner = null;

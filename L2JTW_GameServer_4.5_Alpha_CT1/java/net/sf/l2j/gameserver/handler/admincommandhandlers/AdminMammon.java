@@ -65,12 +65,12 @@ public class AdminMammon implements IAdminCommandHandler
 			}
 			catch (Exception NumberFormatException)
 			{
-				activeChar.sendMessage("用法: //mammon_find [teleportIndex] (where 1 = Blacksmith, 2 = Merchant)");
+				activeChar.sendMessage("使用方法: //mammon_find [teleportIndex] (where 1 = Blacksmith, 2 = Merchant)");
 			}
 
 			if (!_isSealValidation)
 			{
-				activeChar.sendMessage("目前為競爭時期.");
+				activeChar.sendMessage("現在是競爭期間。");
 				return true;
 			}
 			if (blackSpawnInst!=null)
@@ -79,49 +79,49 @@ public class AdminMammon implements IAdminCommandHandler
 				if (blackInst.length > 0)
 				{
 					int x1=blackInst[0].getX(),y1=blackInst[0].getY(),z1=blackInst[0].getZ();
-					activeChar.sendMessage("Blacksmith of Mammon: "+x1+" "+y1+" "+z1);
+					activeChar.sendMessage("財富的鐵匠︰"+x1+" "+y1+" "+z1);
 					if (teleportIndex == 1)
 						activeChar.teleToLocation(x1, y1, z1, true);
 				}
 			}
 			else
-				activeChar.sendMessage("財富鐵匠/財富商人並未在 Spawn 資料內.");
+				activeChar.sendMessage("財富的鐵匠/財富的商人未登記在 Spawn 資料內。");
 			if (merchSpawnInst!=null)
 			{
 				L2NpcInstance[] merchInst = merchSpawnInst.getNPCInstanceList();
 				if (merchInst.length > 0)
 				{
 					int x2=merchInst[0].getX(),y2=merchInst[0].getY(),z2=merchInst[0].getZ();
-					activeChar.sendMessage("財富鐵匠: "+x2+" "+y2+" "+z2);
+					activeChar.sendMessage("財富的鐵匠︰"+x2+" "+y2+" "+z2);
 					if (teleportIndex == 2)
 						activeChar.teleToLocation(x2, y2, z2, true);
 				}
 			}
 			else
-				activeChar.sendMessage("財富鐵匠/財富商人並未在 Spawn 資料內.");
+				activeChar.sendMessage("財富的鐵匠/財富的商人未登記在 Spawn 資料內。");
 		}
 
 		else if (command.startsWith("admin_mammon_respawn"))
 		{
 			if (!_isSealValidation)
 			{
-				activeChar.sendMessage("目前為競爭時期.");
+				activeChar.sendMessage("現在是競爭期間。");
 				return true;
 			}
 			if (merchSpawnInst!=null)
 			{
 				long merchRespawn = AutoSpawnHandler.getInstance().getTimeToNextSpawn(merchSpawnInst);
-				activeChar.sendMessage("財富商人將在 "+(merchRespawn/60000)+" 分鐘後重新定位");
+				activeChar.sendMessage("財富的商人將在 "+(merchRespawn/60000)+" 分鐘後重新定位。");
 			}
 			else
-				activeChar.sendMessage("財富鐵匠/財富商人並未在 Spawn 資料內.");
+				activeChar.sendMessage("財富的鐵匠/財富的商人未登記在 Spawn 資料內。");
 			if (blackSpawnInst!=null)
 			{
 				long blackRespawn = AutoSpawnHandler.getInstance().getTimeToNextSpawn(blackSpawnInst);
-				activeChar.sendMessage("財富鐵匠將在 "+(blackRespawn/60000)+" 分鐘重新後定位.");
+				activeChar.sendMessage("財富的鐵匠將在 "+(blackRespawn/60000)+" 分鐘重新後定位。");
 			}
 			else
-				activeChar.sendMessage("財富鐵匠/財富商人並未在 Spawn 資料內.");
+				activeChar.sendMessage("財富的鐵匠/財富的商人未登記在 Spawn 資料內。");
 		}
 
 		else if (command.startsWith("admin_list_spawns"))
@@ -142,7 +142,7 @@ public class AdminMammon implements IAdminCommandHandler
 			}
 			catch (Exception e)
 			{
-				activeChar.sendPacket(SystemMessage.sendString("指令為 //list_spawns <npcId|npc_name> [tele_index]"));
+				activeChar.sendPacket(SystemMessage.sendString("使用方法: //list_spawns <npcId|npc_name> [tele_index]"));
 			}
 
 			SpawnTable.getInstance().findNPCInstances(activeChar, npcId, teleportIndex);
@@ -159,7 +159,7 @@ public class AdminMammon implements IAdminCommandHandler
 			}
 			catch (Exception e)
 			{
-				activeChar.sendMessage("指令為: //msg <SYSTEM_MSG_ID>");
+				activeChar.sendMessage("使用方法: //msg <SYSTEM_MSG_ID>");
 				return true;
 			}
 			activeChar.sendPacket(new SystemMessage(msgId));

@@ -54,7 +54,7 @@ public class AdminCache implements IAdminCommandHandler
 		if (command.startsWith("admin_cache_htm_rebuild") || command.equals("admin_cache_htm_reload"))
 		{
 			HtmCache.getInstance().reload(Config.DATAPACK_ROOT);
-			activeChar.sendMessage("Cache[HTML]: " + HtmCache.getInstance().getMemoryUsage()  + " MB " + HtmCache.getInstance().getLoadedFiles() + " 個檔案讀取.");
+			activeChar.sendMessage("Cache[HTML]: " + HtmCache.getInstance().getMemoryUsage()  + " MB " + HtmCache.getInstance().getLoadedFiles() + " 個檔案讀取。");
 		}
 		else if (command.startsWith("admin_cache_reload_path "))
 		{
@@ -62,11 +62,11 @@ public class AdminCache implements IAdminCommandHandler
 			{
 				String path = command.split(" ")[1];
 				HtmCache.getInstance().reloadPath(new File(Config.DATAPACK_ROOT, path));
-				activeChar.sendMessage("Cache[HTML]: " + HtmCache.getInstance().getMemoryUsage()  + " MB  " + HtmCache.getInstance().getLoadedFiles() + " 個檔案讀取.");
+				activeChar.sendMessage("Cache[HTML]: " + HtmCache.getInstance().getMemoryUsage()  + " MB  " + HtmCache.getInstance().getLoadedFiles() + " 個檔案讀取。");
 			}
 			catch (Exception e)
 			{
-				activeChar.sendMessage("使用方法: //cache_reload_path <path>");
+				activeChar.sendMessage("使用方法︰//cache_reload_path <path>");
 			}
 		}
 		else if (command.startsWith("admin_cache_reload_file "))
@@ -76,27 +76,27 @@ public class AdminCache implements IAdminCommandHandler
 				String path = command.split(" ")[1];
 				if (HtmCache.getInstance().loadFile(new File(Config.DATAPACK_ROOT,path)) != null)
 				{
-					activeChar.sendMessage("Cache[HTML]: 讀取成功");
+					activeChar.sendMessage("Cache[HTML]: 讀取成功。");
 				}
 				else
 				{
-					activeChar.sendMessage("Cache[HTML]: 無法讀取");
+					activeChar.sendMessage("Cache[HTML]: 無法讀取。");
 				}
 			}
 			catch (Exception e)
 			{
-				activeChar.sendMessage("使用方法: //cache_reload_file <relative_path/file>");
+				activeChar.sendMessage("使用方法︰//cache_reload_file <relative_path/file>");
 			}
 		}
 		else if (command.startsWith("admin_cache_crest_rebuild") || command.startsWith("admin_cache_crest_reload"))
 		{
 			CrestCache.getInstance().reload();
-			activeChar.sendMessage("Cache[Crest]: " + String.format("%.3f",CrestCache.getInstance().getMemoryUsage())  + " megabytes  " + CrestCache.getInstance().getLoadedFiles() + " 個檔案讀取");
+			activeChar.sendMessage("Cache[Crest]: " + String.format("%.3f",CrestCache.getInstance().getMemoryUsage())  + " MB  " + CrestCache.getInstance().getLoadedFiles() + " 個檔案讀取。");
 		}
 		else if (command.startsWith("admin_cache_crest_fix"))
 		{
 			CrestCache.getInstance().convertOldPedgeFiles();
-			activeChar.sendMessage("Cache[Crest]: 盟輝修正");
+			activeChar.sendMessage("Cache[Crest]: 盟徽修正");
 		}
 		String target = (activeChar.getTarget() != null?activeChar.getTarget().getName():"no-target");
 		GMAudit.auditGMAction(activeChar.getName(), command, target, "");

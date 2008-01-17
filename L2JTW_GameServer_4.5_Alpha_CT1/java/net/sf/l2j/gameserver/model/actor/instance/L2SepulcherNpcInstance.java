@@ -69,7 +69,7 @@ public class L2SepulcherNpcInstance extends L2NpcInstance
     protected Future _SpawnMonsterTask = null;
     
 
-    private final String _HTML_FILE_PATH = "data/html/SepulcherNpc/";
+    private final String _HTML_FILE_PATH = "data/html/four_sepulcher/";
     
 
     private final int _HallsKey = 7260;

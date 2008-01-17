@@ -315,17 +315,18 @@ public final class L2VillageMasterInstance extends L2FolkInstance
                     	QuestState qs = player.getQuestState("234_FatesWhisper"); 
                     	if(qs == null || !qs.isCompleted()) 
                         {
-                            player.sendMessage("必須完成「命運的私語」的任務，才可追加副職業。");
+                    		html.setFile("data/html/villagemaster/MimirsElixir_Fail.htm");
+                            player.sendPacket(html);
                             return;
                         }
 
-                        
                         if (player.getRace() != Race.Kamael)
                         {
                         	qs = player.getQuestState("235_MimirsElixir");
                         	if(qs == null || !qs.isCompleted())
                             {
-                                player.sendMessage("必須完成「命運的私語」的任務，才可追加副職業。");
+                                html.setFile("data/html/villagemaster/MimirsElixir_Fail.htm");
+                                player.sendPacket(html);
                                 return;
                             }
                         }
@@ -336,7 +337,8 @@ public final class L2VillageMasterInstance extends L2FolkInstance
                             qs = player.getQuestState("236_SeedsOfChaos");
                             if(qs == null || !qs.isCompleted())
                             {
-                                player.sendMessage("必須完成「混沌的種子」的任務，才可追加副職業。");
+                                html.setFile("data/html/villagemaster/SeedsOfChaos_Fail.htm");
+                                player.sendPacket(html);
                                 return;
                             }
 
@@ -382,8 +384,8 @@ public final class L2VillageMasterInstance extends L2FolkInstance
 
                     player.setActiveClass(paramOne);
 
-                    content.append("副職業間進行變更:<br>目前正在使用的副職業為 <font color=\"LEVEL\">"
-                        + CharTemplateTable.getClassNameById(player.getActiveClass()) + "</font>.");
+                    content.append("副職業間進行變更：<br>目前正在使用的副職業為 <font color=\"LEVEL\">"
+                        + CharTemplateTable.getClassNameById(player.getActiveClass()) + "</font>。");
 
                     player.sendPacket(new SystemMessage(SystemMessageId.SUBCLASS_TRANSFER_COMPLETED)); // Transfer completed.
                     break;
@@ -416,8 +418,8 @@ public final class L2VillageMasterInstance extends L2FolkInstance
                     {
                         player.setActiveClass(paramOne);
 
-                        content.append("副職業間進行變更:<br>副職業變更為 <font color=\"LEVEL\">"
-                            + CharTemplateTable.getClassNameById(paramTwo) + "</font>.");
+                        content.append("副職業間進行變更：<br>副職業變更為 <font color=\"LEVEL\">"
+                            + CharTemplateTable.getClassNameById(paramTwo) + "</font>。");
 
                         player.sendPacket(new SystemMessage(SystemMessageId.ADD_NEW_SUBCLASS)); // Subclass added.
                     }
@@ -431,7 +433,7 @@ public final class L2VillageMasterInstance extends L2FolkInstance
                          */
                         player.setActiveClass(0); // Also updates _classIndex plus switching _classid to baseclass.
 
-                        player.sendMessage("副職業無法增加,將還原到原始職業.");
+                        player.sendMessage("副職業無法追加。");
                         return;
                     }
                     break;

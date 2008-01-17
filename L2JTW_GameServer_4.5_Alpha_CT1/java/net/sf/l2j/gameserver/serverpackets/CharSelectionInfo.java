@@ -21,6 +21,7 @@ import java.util.logging.Logger;
 
 import javolution.util.FastList;
 import net.sf.l2j.L2DatabaseFactory;
+import net.sf.l2j.gameserver.instancemanager.CleanUpManager;
 import net.sf.l2j.gameserver.model.CharSelectInfoPackage;
 import net.sf.l2j.gameserver.model.Inventory;
 import net.sf.l2j.gameserver.model.L2Clan;
@@ -36,11 +37,14 @@ public class CharSelectionInfo extends L2GameServerPacket
 {
     // d SdSddddddddddffddddddddddddddddddddddddddddddddddddddddddddddffd
     private static final String _S__1F_CHARSELECTINFO = "[S] 09 CharSelectInfo";
-    private static Logger _log = Logger.getLogger(CharSelectionInfo.class.getName());
-    private String _loginName; 
-    private int _sessionId, _activeId;
-    private CharSelectInfoPackage[] _characterPackages;
     
+    private static Logger _log = Logger.getLogger(CharSelectionInfo.class.getName());
+    
+    private String _loginName;
+    
+    private int _sessionId, _activeId;
+    
+    private CharSelectInfoPackage[] _characterPackages;
     
     /**
      * @param _characters
@@ -278,7 +282,8 @@ public class CharSelectionInfo extends L2GameServerPacket
                 if(clan != null)
                     clan.removeClanMember(cha.getName(), 0);
                 
-                L2GameClient.deleteCharByObjId(objectId);
+                // [L2J_JP EDIT - TSL] L2GameClient.deleteCharByObjId(objectId);
+                CleanUpManager.getInstance().deleteCharByObjId(objectId);
                 return null;
             }
         }

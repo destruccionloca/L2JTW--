@@ -37,6 +37,7 @@ import static net.sf.l2j.gameserver.ai.CtrlIntention.AI_INTENTION_ACTIVE;
 
 import java.text.DateFormat;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import javolution.text.TextBuilder;
 import javolution.util.FastList;
@@ -46,18 +47,20 @@ import net.sf.l2j.gameserver.SevenSigns;
 import net.sf.l2j.gameserver.SevenSignsFestival;
 import net.sf.l2j.gameserver.ThreadPoolManager;
 import net.sf.l2j.gameserver.ai.CtrlIntention;
-import net.sf.l2j.gameserver.ai.L2AttackableAI;
+//import net.sf.l2j.gameserver.ai.L2AttackableAI;
 //import net.sf.l2j.gameserver.ai.L2NpcAI;
-import net.sf.l2j.gameserver.ai.L2CharacterAI;
+//import net.sf.l2j.gameserver.ai.L2CharacterAI;
 import net.sf.l2j.gameserver.cache.HtmCache;
 import net.sf.l2j.gameserver.clientpackets.Say2;
 import net.sf.l2j.gameserver.datatables.ClanTable;
+import net.sf.l2j.gameserver.datatables.DoorTable;
 import net.sf.l2j.gameserver.datatables.HelperBuffTable;
 import net.sf.l2j.gameserver.datatables.ItemTable;
 import net.sf.l2j.gameserver.datatables.NpcTable;
 import net.sf.l2j.gameserver.datatables.SkillTable;
 import net.sf.l2j.gameserver.datatables.SpawnTable;
 import net.sf.l2j.gameserver.idfactory.IdFactory;
+import net.sf.l2j.gameserver.instancemanager.BaiumManager;
 import net.sf.l2j.gameserver.instancemanager.CastleManager;
 import net.sf.l2j.gameserver.instancemanager.DimensionalRiftManager;
 import net.sf.l2j.gameserver.instancemanager.QuestManager;
@@ -78,7 +81,7 @@ import net.sf.l2j.gameserver.model.L2Spawn;
 import net.sf.l2j.gameserver.model.L2Summon;
 import net.sf.l2j.gameserver.model.L2World;
 import net.sf.l2j.gameserver.model.MobGroupTable;
-import net.sf.l2j.gameserver.model.L2Character.AIAccessor;
+//import net.sf.l2j.gameserver.model.L2Character.AIAccessor;
 import net.sf.l2j.gameserver.model.L2Skill.SkillType;
 import net.sf.l2j.gameserver.model.actor.knownlist.NpcKnownList;
 import net.sf.l2j.gameserver.model.actor.stat.NpcStat;
@@ -113,7 +116,7 @@ import net.sf.l2j.gameserver.templates.L2Item;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
 import net.sf.l2j.gameserver.templates.L2Weapon;
 import net.sf.l2j.gameserver.util.Broadcast;
-import net.sf.l2j.gameserver.model.L2WorldRegion;
+//import net.sf.l2j.gameserver.model.L2WorldRegion;
 
 import net.sf.l2j.util.Rnd;
 /**
@@ -1260,55 +1263,44 @@ public class L2NpcInstance extends L2Character
             // Send a Server->Client NpcHtmlMessage() containing the GM console about this L2NpcInstance
             NpcHtmlMessage html = new NpcHtmlMessage(0);
 
-            TextBuilder html1 = new TextBuilder("<html><body><center><font color=\"LEVEL\">NPC 資訊</font></center><br>");
-
+            TextBuilder html1 = new TextBuilder("<html><body><center><font color=\"LEVEL\">NPC 資訊</font></center>");
             String className = getClass().getName().substring(43);
-            html1.append("<br>");
-
-
-            html1.append("種類: " + className + "<br1>群組: " + getFactionId() + "<br1>位置: " + (getSpawn() != null ? getSpawn().getLocation() : 0) + "<br1>");
-
-
+            
+            html1.append("<br1>型態：" + className + "<br1>種類：" + getFactionId() + "<br1>位置：" + (getSpawn() != null ? getSpawn().getLocation() : 0) + "<br1>");
+            
             if (this instanceof L2ControllableMobInstance)
-                html1.append("群組:" + MobGroupTable.getInstance().getGroupForMob((L2ControllableMobInstance)this).getGroupId() + "<br>");
+                html1.append("群組：" + MobGroupTable.getInstance().getGroupForMob((L2ControllableMobInstance)this).getGroupId() + "<br>");
             else
-
-                html1.append("時間:" + (getSpawn()!=null ? (getSpawn().getRespawnDelay() / 1000)+"秒<br>" : "秒<br>"));
-
-
+                html1.append("重生時間：" + (getSpawn()!=null ? (getSpawn().getRespawnDelay() / 1000)+"  秒<br>" : "?  秒<br>"));
+            
             html1.append("<table border=\"0\" width=\"100%\">");
-            html1.append("<tr><td>物件</td><td>"+getObjectId()+"</td><td>編號</td><td>"+getTemplate().npcId+"</td></tr>");
-            html1.append("<tr><td>區域</td><td>"+getCastle().getCastleId()+"</td><td>位置:</td><td>"+getX()+","+getY()+","+getZ()+"</td></tr>");
+            html1.append("<tr><td>物件</td><td>"+getObjectId()+"</td><td>NPC ID</td><td>"+getTemplate().npcId+"</td></tr>");
+            html1.append("<tr><td>區域</td><td>"+getCastle().getCastleId()+"</td><td>位置</td><td>"+getX()+","+getY()+","+getZ()+"</td></tr>");
             html1.append("<tr><td>等級</td><td>"+getLevel()+"</td><td>主動性</td><td>"+((this instanceof L2Attackable)? ((L2Attackable)this).getAggroRange() : 0)+"</td></tr>");
             html1.append("</table><br>");
-
-            html1.append("<font color=\"LEVEL\">戰鬥資料</font>");
-
+            
+            html1.append("<font color=\"LEVEL\">狀態</font>");
             html1.append("<table border=\"0\" width=\"100%\">");
-
             html1.append("<tr><td>目前HP</td><td>"+getCurrentHp()+"</td><td>目前MP</td><td>"+getCurrentMp()+"</td></tr>");
             html1.append("<tr><td>最大HP</td><td>"+(int)(getMaxHp()/getStat().calcStat(Stats.MAX_HP , 1, this, null))+"*"+getStat().calcStat(Stats.MAX_HP , 1, this, null)+"</td><td>最大MP</td><td>"+getMaxMp()+"</td></tr>");
 			html1.append("<tr><td>物攻</td><td>"+getPAtk(null)+"</td><td>魔攻</td><td>"+getMAtk(null,null)+"</td></tr>");
             html1.append("<tr><td>物防</td><td>"+getPDef(null)+"</td><td>魔防</td><td>"+getMDef(null,null)+"</td></tr>");
             html1.append("<tr><td>命中</td><td>"+getAccuracy()+"</td><td>迴避</td><td>"+getEvasionRate(null)+"</td></tr>");
-            html1.append("<tr><td>致命</td><td>"+getCriticalHit(null,null)+"</td><td>移動</td><td>"+getRunSpeed()+"</td></tr>");
+            html1.append("<tr><td>致命</td><td>"+getCriticalHit(null,null)+"</td><td>速度</td><td>"+getRunSpeed()+"</td></tr>");
             html1.append("<tr><td>攻速</td><td>"+getPAtkSpd()+"</td><td>施展</td><td>"+getMAtkSpd()+"</td></tr>");
             html1.append("<tr><td>種族</td><td>"+getTemplate().race+"</td><td></td><td></td></tr>");
-            html1.append("</table>");
-
-
+            html1.append("</table><br>");
+            
             html1.append("<font color=\"LEVEL\">基本屬性</font>");
             html1.append("<table border=\"0\" width=\"100%\">");
             html1.append("<tr><td>STR</td><td>"+getSTR()+"</td><td>DEX</td><td>"+getDEX()+"</td><td>CON</td><td>"+getCON()+"</td></tr>");
             html1.append("<tr><td>INT</td><td>"+getINT()+"</td><td>WIT</td><td>"+getWIT()+"</td><td>MEN</td><td>"+getMEN()+"</td></tr>");
             html1.append("</table>");
 
-
-            html1.append("<br><center><table><tr><td><button value=\"修改\" action=\"bypass -h admin_edit_npc " + getTemplate().npcId + "\" width=100 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"><br1></td>");
-            html1.append("<td><button value=\"滅亡\" action=\"bypass -h admin_kill\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td><br1></tr>");
-            html1.append("<tr><td><button value=\"掉落檢視\" action=\"bypass -h admin_show_droplist " + getTemplate().npcId + "\" width=100 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
+            html1.append("<br><center><table><tr><td><button value=\"編輯\" action=\"bypass -h admin_edit_npc " + getTemplate().npcId + "\" width=100 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"><br1></td>");
+            html1.append("<td><button value=\"消滅\" action=\"bypass -h admin_kill\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td><br1></tr>");
+            html1.append("<tr><td><button value=\"掉落清單\" action=\"bypass -h admin_show_droplist " + getTemplate().npcId + "\" width=100 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");			
             html1.append("<td><button value=\"刪除\" action=\"bypass -h admin_delete\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
-
             html1.append("</table></center><br>");
             html1.append("</body></html>");
 
@@ -1340,17 +1332,13 @@ public class L2NpcInstance extends L2Character
 
             html1.append("<br><center><font color=\"LEVEL\">[戰鬥狀態]</font></center>");
             html1.append("<table border=0 width=\"100%\">");
-
-
-			html1.append("<tr><td>MAX-HP</td><td>"+(int)(getMaxHp()/(int) getStat().calcStat(Stats.MAX_HP , 1, this, null))+"*"+(int) getStat().calcStat(Stats.MAX_HP , 1, this, null)+"</td><td>MaAX-MP</td><td>"+getMaxMp()+"</td></tr>");
-			html1.append("<tr><td>物攻</td><td>"+getPAtk(null)+"</td><td>魔攻</td><td>"+getMAtk(null,null)+"</td></tr>");
+            html1.append("<tr><td>最大HP</td><td>"+(int)(getMaxHp()/getStat().calcStat(Stats.MAX_HP , 1, this, null))+"*"+(int) getStat().calcStat(Stats.MAX_HP , 1, this, null)+"</td><td>最大MP</td><td>"+getMaxMp()+"</td></tr>");
+            html1.append("<tr><td>物攻</td><td>"+getPAtk(null)+"</td><td>魔攻</td><td>"+getMAtk(null,null)+"</td></tr>");
             html1.append("<tr><td>物防</td><td>"+getPDef(null)+"</td><td>魔防</td><td>"+getMDef(null,null)+"</td></tr>");
             html1.append("<tr><td>命中</td><td>"+getAccuracy()+"</td><td>迴避</td><td>"+getEvasionRate(null)+"</td></tr>");
-            html1.append("<tr><td>致命</td><td>"+getCriticalHit(null,null)+"</td><td>移動</td><td>"+getRunSpeed()+"</td></tr>");
+            html1.append("<tr><td>致命</td><td>"+getCriticalHit(null,null)+"</td><td>速度</td><td>"+getRunSpeed()+"</td></tr>");
             html1.append("<tr><td>攻速</td><td>"+getPAtkSpd()+"</td><td>施展</td><td>"+getMAtkSpd()+"</td></tr>");
             html1.append("<tr><td>種族</td><td>"+getTemplate().race+"</td><td></td><td></td></tr>");
-
-
             html1.append("</table>");
 
             html1.append("<br><center><font color=\"LEVEL\">[基本能力]</font></center>");
@@ -1360,9 +1348,8 @@ public class L2NpcInstance extends L2Character
             html1.append("</table>");
 
             html1.append("<br><center><font color=\"LEVEL\">[掉落資訊]</font></center>");
-            html1.append("機率: <font color=\"ff0000\">50%+</font> <font color=\"00ff00\">30%+</font> <font color=\"0000ff\">低於 30%</font>");
+            html1.append("機率︰<font color=\"ff0000\">50%+</font> <font color=\"00ff00\">30%+</font> <font color=\"0000ff\">低於 30%</font>");
             html1.append("<table border=0 width=\"100%\">");
-
 
             for(L2DropCategory cat:getTemplate().getDropData())
 	    	    for(L2DropData drop : cat.getAllDrops())
@@ -1587,7 +1574,7 @@ public class L2NpcInstance extends L2Character
                         player.sendPacket(new RadarControl(0,1,spawn.getLocx(),spawn.getLocy(),spawn.getLocz()));
                 } catch (NumberFormatException nfe)
                 { 
-                	player.sendMessage("指令錯誤");
+                	player.sendMessage("指令錯誤。");
                 }
 
             }
@@ -1623,6 +1610,36 @@ public class L2NpcInstance extends L2Character
                     DimensionalRiftManager.getInstance().handleCheat(player, this);
                 }
             }
+
+            else if (command.startsWith("open_gate"))
+            {
+                final DoorTable _doorTable = DoorTable.getInstance();
+                int doorId;
+
+                StringTokenizer st = new StringTokenizer(command.substring(10), ", ");
+                
+                while (st.hasMoreTokens())
+                {
+                    doorId = Integer.parseInt(st.nextToken());
+                    try
+                    {
+                        _doorTable.getDoor(doorId).openMe();
+                        _doorTable.getDoor(doorId).onOpen();
+                    }
+                    catch(NullPointerException e)
+                    {
+                        _log.warning("Door Id does not exist.(" +doorId + ")" );
+                    }
+                }
+                return;
+
+            }
+            else if (command.equalsIgnoreCase("wake_baium"))
+            {
+            	setTarget(player);
+                BaiumManager.getInstance().spawnBaium(this);
+            }
+
         }
     }
     
@@ -1760,7 +1777,7 @@ public class L2NpcInstance extends L2Character
     {
         TextBuilder sb = new TextBuilder();
         
-        sb.append("<html><body><title>關於:</title><br>");
+        sb.append("<html><body><title>關於︰</title><br>");
         
         for (Quest q : quests) 
         {
@@ -1779,7 +1796,7 @@ public class L2NpcInstance extends L2Character
      * Open a quest window on client with the text of the L2NpcInstance.<BR><BR>
      * 
      * <B><U> Actions</U> :</B><BR><BR>
-     * <li>Get the text of the quest state in the folder data/jscripts/quests/questId/stateId.htm </li>
+     * <li>Get the text of the quest state in the folder data/scripts/quests/questId/stateId.htm </li>
      * <li>Send a Server->Client NpcHtmlMessage containing the text of the L2NpcInstance to the L2PcInstance </li>
      * <li>Send a Server->Client ActionFailed to the L2PcInstance in order to avoid that the client wait another packet </li><BR><BR>
      * 
@@ -1794,9 +1811,7 @@ public class L2NpcInstance extends L2Character
         Quest q = QuestManager.getInstance().getQuest(questId);
 
         if (player.getWeightPenalty()>=3 && q.getQuestIntId() >= 1 && q.getQuestIntId() < 1000 ){	
-
             player.sendPacket(new SystemMessage(SystemMessageId.INVENTORY_LESS_THAN_80_PERCENT));
-
             return;
         }
         
@@ -1841,13 +1856,13 @@ public class L2NpcInstance extends L2Character
         if (qs == null) 
         {
             // no quests found
-            content = "<html><body>並無任何任務可以接受.</body></html>";
+            content = "<html><body>目前沒有執行任務，或條件不符。</body></html>";
         } 
         else 
         {
             questId = qs.getQuest().getName();
             String stateId = State.getStateName(qs.getState());
-            String path = "data/jscripts/quests/"+questId+"/"+stateId+".htm";
+            String path = "data/scripts/quests/"+questId+"/"+stateId+".htm";
             content = HtmCache.getInstance().getHtm(path); //TODO path for quests html
             
             if (Config.DEBUG)
@@ -2127,7 +2142,7 @@ public class L2NpcInstance extends L2Character
             }
             if (message == "")
             {
-                message += "There is no winning lottery ticket...<br>";
+                message += "沒有中獎的彩券。<br>";
             }
             html.replace("%result%", message);
         }
@@ -2168,7 +2183,7 @@ public class L2NpcInstance extends L2Character
         if (getNpcId() != 31225 && getNpcId() != 31226) return;
         if (player.isCursedWeaponEquiped())
         {
-        	player.sendMessage("Go away, you're not welcome here.");
+        	player.sendMessage("請離開，這裡不歡迎你。");
         	return;
         }
 
@@ -2212,7 +2227,6 @@ public class L2NpcInstance extends L2Character
         
         // Select the player
         setTarget(player);
-
         
         
         // Calculate the min and max level between wich the player must be to obtain buff
@@ -2231,22 +2245,16 @@ public class L2NpcInstance extends L2Character
         // If the player is too high level, display a message and return
         if (player_level > higestLevel || !player.isNewbie())
         {
-
-            String content = "<html><body>初學者嚮導:<br>等級尚未達到8級，等你8級再來找我吧，我會給你一些輔助魔法。</body></html>";
-
-
+            String content = "<html><body>初學者嚮導：<br>輔助魔法只限於<font color=\"LEVEL\">等級"+ higestLevel +"以下的角色</font>。</body></html>";
             insertObjectIdAndShowChatWindow(player, content);
             return;
         }
-
+        
         
         // If the player is too low level, display a message and return
         if (player_level < lowestLevel)
         {
-
-            String content = "<html><body>初學者嚮導:<br>輔助魔法<font color=\"LEVEL\">只限於等級25以下的新進角色</font>。<br>新進角色是指你進入這世界時培養的第一個角色。</body></html>";
-
-
+            String content = "<html><body>初學者嚮導：<br>目前尚未有任何對您必要的輔助魔法。請您到了等級"+ lowestLevel +"之後再來。</body></html>";
             insertObjectIdAndShowChatWindow(player, content);
             return;
         }
@@ -2278,8 +2286,8 @@ public class L2NpcInstance extends L2Character
                }
         }
         
-        }
-    
+        
+    }
     
     public void showChatWindow(L2PcInstance player)
     {
@@ -2722,19 +2730,6 @@ public class L2NpcInstance extends L2Character
     @Override
 	public boolean doDie(L2Character killer) 
     {
-    	((L2Attackable)this)._ssrecharged = true;
-    	((L2Attackable)this)._spsrecharged = true;
-
-    	if(getNpcId() == 25050)
-    	{
-            CreatureSay cs2 = new CreatureSay(getObjectId(), Say2.ALL, "巴溫", "我..我的...力量....");
-            
-            for (L2PcInstance player : L2World.getInstance().getAllPlayers())
-            {
-                player.sendPacket(cs2);
-            }
-    	
-    	}
         if (!super.doDie(killer))
         	return false;
         

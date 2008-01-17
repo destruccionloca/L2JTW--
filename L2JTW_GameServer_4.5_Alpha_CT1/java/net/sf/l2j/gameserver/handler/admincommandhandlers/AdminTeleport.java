@@ -371,7 +371,7 @@ public class AdminTeleport implements IAdminCommandHandler
         if (player != null) {
             //Common character information
 
-            player.sendMessage("管理員傳送.");
+            //player.sendMessage("管理員傳送.");
 
 
             player.getAI().setIntention(CtrlIntention.AI_INTENTION_IDLE);
@@ -410,7 +410,7 @@ public class AdminTeleport implements IAdminCommandHandler
             activeChar.teleToLocation(x, y, z, true);
 
 
-            activeChar.sendMessage("傳送至  " + player.getName() + ".");
+            activeChar.sendMessage("傳送至 " + player.getName() + "。");
 
         }
     }
@@ -426,7 +426,7 @@ public class AdminTeleport implements IAdminCommandHandler
             if (template1 == null)
             {
 
-                activeChar.sendMessage("錯誤NPC基本編號.");
+                activeChar.sendMessage("NPCID 錯誤。");
 
                 _log.warning("ERROR: NPC " + target.getObjectId() + " has a 'null' template.");
                 return;
@@ -435,7 +435,7 @@ public class AdminTeleport implements IAdminCommandHandler
             L2Spawn spawn = target.getSpawn();
             if (spawn == null)
             {
-                activeChar.sendMessage("錯誤創造.");
+                activeChar.sendMessage("創造錯誤。");
                 _log.warning("ERROR: NPC " + target.getObjectId() + " has a 'null' spawn.");
                 return;
             }
@@ -459,10 +459,10 @@ public class AdminTeleport implements IAdminCommandHandler
                 SpawnTable.getInstance().addNewSpawn(spawn, true);
                 spawn.init();
 
-                SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-                sm.addString("SYS");
-                sm.addString("創造 " + template1.name + " 在 " + target.getObjectId() + ".");
-                activeChar.sendPacket(sm);
+                //SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
+                //sm.addString("SYS");
+                //sm.addString("創造 " + template1.name + " 在 " + target.getObjectId() + ".");
+                //activeChar.sendPacket(sm);
 
                 if (Config.DEBUG)
                 {
@@ -473,7 +473,7 @@ public class AdminTeleport implements IAdminCommandHandler
             catch (Exception e)
             {
 
-                activeChar.sendMessage("錯誤目標");
+                activeChar.sendMessage("目標錯誤。");
 
             }
 

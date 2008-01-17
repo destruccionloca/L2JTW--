@@ -21,6 +21,7 @@ import java.util.logging.Logger;
 import javolution.util.FastMap;
 import net.sf.l2j.gameserver.ThreadPoolManager;
 import net.sf.l2j.gameserver.model.L2Character;
+import net.sf.l2j.gameserver.model.actor.instance.L2MonsterInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2RaidBossInstance;
 
 /**
@@ -76,20 +77,56 @@ public class DecayTaskManager
         public void run()
         {
             Long current = System.currentTimeMillis();
-            int delay;
+            // [L2J_JP ADD SANDMAN]
+            long forDecay = 0;
             try
             {
-            	if (_decayTasks != null)
-            		for(L2Character actor : _decayTasks.keySet())
-            		{
-            			if(actor instanceof L2RaidBossInstance) delay = 30000;
-            			else delay = 8500;
-            			if((current - _decayTasks.get(actor)) > delay)
-            			{
-            				actor.onDecay();
-            				_decayTasks.remove(actor);
-            			}
-            		}
+                if (_decayTasks != null)
+                {
+                    for( L2Character actor : _decayTasks.keySet())
+                    {
+                        // [L2J_JP EDIT START]
+                        if(actor instanceof L2RaidBossInstance)
+                        {
+                            forDecay = 30000;
+                        }
+                        else if(actor instanceof L2MonsterInstance)
+                        {
+                            L2MonsterInstance monster = (L2MonsterInstance) actor;
+                            switch(monster.getNpcId())
+                            {
+                                case 29028:     // Varakas
+                                    forDecay = 18000;
+                                    break;
+                                case 29019:     // Antharas
+                                case 29066:     // Antharas
+                                case 29067:     // Antharas
+                                case 29068:     // Antharas
+                                    forDecay = 12000;
+                                    break;
+                                case 29014:     // Orfen
+                                    forDecay = 150000;
+                                    break;
+                                case 29001:     // Queen Ant
+                                    forDecay = 150000;
+                                    break;
+                                default:
+                                    forDecay = 8500;
+                            }
+                        }
+                        else
+                        {
+                            forDecay = 8500;                            
+                        }
+                        
+                        if((current - _decayTasks.get(actor)) > forDecay)
+                        {
+                            actor.onDecay();
+                            _decayTasks.remove(actor);
+                        }
+                        // [L2J_JP EDIT END]
+                    }
+                }
             } catch (Throwable e) {
 				// TODO: Find out the reason for exception. Unless caught here, mob decay would stop.
             	_log.warning(e.toString());

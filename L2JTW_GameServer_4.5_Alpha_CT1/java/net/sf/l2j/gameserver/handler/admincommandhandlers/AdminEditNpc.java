@@ -289,7 +289,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
 				{
 					try
 					{
-						String msg = "權限:";
+						String msg = "權限︰";
 						for (Object p : box.getAccess())
 							msg += " "+(String)p;
 						activeChar.sendMessage(msg);
@@ -326,7 +326,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
 			updateTradeList(itemID, price, tradeListID, order);
 
 
-			activeChar.sendMessage("更新 "+item.getName()+" 價格在販賣表 "+tradeListID);
+			//activeChar.sendMessage("更新 "+item.getName()+" 價格在販賣表 "+tradeListID);
 			showShopList(activeChar, tradeListID, 1);
 
 			return;
@@ -335,18 +335,18 @@ public class AdminEditNpc implements IAdminCommandHandler {
 		NpcHtmlMessage adminReply = new NpcHtmlMessage(5);
 
 		TextBuilder replyMSG = new TextBuilder();
-		replyMSG.append("<html><title>商店物品修改</title>");
-		replyMSG.append("<body>");
-		replyMSG.append("<br>更改商店資料.");
-		replyMSG.append("<br>更改物品: "+item.getName());
-		replyMSG.append("<table>");
-		replyMSG.append("<tr><td width=100>屬性</td><td width=100>修改</td><td width=100>數值</td></tr>");
-		replyMSG.append("<tr><td><br></td><td></td></tr>");
-		replyMSG.append("<tr><td>價格</td><td><edit var=\"price\" width=80></td><td>"+tradeList.getPriceForItemId(itemID)+"</td></tr>");
-		replyMSG.append("</table>");
-		replyMSG.append("<center><br><br><br>");
-		replyMSG.append("<button value=\"存取\" action=\"bypass -h admin_editShopItem " + tradeListID + " " + itemID + " $price\"  width=100 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
-		replyMSG.append("<br><button value=\"返回\" action=\"bypass -h admin_showShopList " + tradeListID +" 1\"  width=100 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+        replyMSG.append("<html><title>商店販賣物品編輯</title>");
+        replyMSG.append("<body>");
+        replyMSG.append("<br> 在販賣清單內修改數值。");
+        replyMSG.append("<br> 編輯物品："+item.getName());
+        replyMSG.append("<table>");
+        replyMSG.append("<tr><td width=100>內容</td><td width=100>修改</td><td width=100>原始</td></tr>");
+        replyMSG.append("<tr><td><br></td><td></td></tr>");
+        replyMSG.append("<tr><td>價格</td><td><edit var=\"price\" width=80></td><td>"+tradeList.getPriceForItemId(itemID)+"</td></tr>");
+        replyMSG.append("</table>");
+        replyMSG.append("<center><br><br><br>");
+        replyMSG.append("<button value=\"儲存\" action=\"bypass -h admin_editShopItem " + tradeListID + " " + itemID + " $price\"  width=80 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+        replyMSG.append("<button value=\"返回\" action=\"bypass -h admin_showShopList " + tradeListID +" 1\"  width=80 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
 		replyMSG.append("</center>");
 		replyMSG.append("</body></html>");
 
@@ -370,7 +370,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
 			tradeList.removeItem(itemID);
 			deleteTradeList(tradeListID, order);
 
-			activeChar.sendMessage("Deleted "+ItemTable.getInstance().getTemplate(itemID).getName()+" from Trade List "+tradeListID);
+			//activeChar.sendMessage("Deleted "+ItemTable.getInstance().getTemplate(itemID).getName()+" from Trade List "+tradeListID);
 			showShopList(activeChar, tradeListID, 1);
 			return;
 		}
@@ -378,18 +378,18 @@ public class AdminEditNpc implements IAdminCommandHandler {
 		NpcHtmlMessage adminReply = new NpcHtmlMessage(5);
 
 		TextBuilder replyMSG = new TextBuilder();
-		replyMSG.append("<html><title>商店物品修改</title>");
-		replyMSG.append("<body>");
-		replyMSG.append("<br>刪除商店資料.");
-		replyMSG.append("<br>刪除物品: "+ItemTable.getInstance().getTemplate(itemID).getName());
-		replyMSG.append("<table>");
-		replyMSG.append("<tr><td width=100>Property</td><td width=100>數值</td></tr>");
-		replyMSG.append("<tr><td><br></td><td></td></tr>");
-		replyMSG.append("<tr><td>價格</td><td>"+tradeList.getPriceForItemId(itemID)+"</td></tr>");
-		replyMSG.append("</table>");
-		replyMSG.append("<center><br><br><br>");
-		replyMSG.append("<button value=\"確認\" action=\"bypass -h admin_delShopItem " + tradeListID + " " + itemID + " 1\"  width=100 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
-		replyMSG.append("<br><button value=\"返回\" action=\"bypass -h admin_showShopList " + tradeListID +" 1\"  width=100 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+        replyMSG.append("<html><title>商店販賣物品刪除</title>");
+        replyMSG.append("<body>");
+        replyMSG.append("<br> 在販賣清單內刪除數值。");
+        replyMSG.append("<br> 刪除物品："+ItemTable.getInstance().getTemplate(itemID).getName());
+        replyMSG.append("<table>");
+        replyMSG.append("<tr><td width=100>內容</td><td width=100>數量</td></tr>");
+        replyMSG.append("<tr><td><br></td><td></td></tr>");
+        replyMSG.append("<tr><td>價格</td><td>"+tradeList.getPriceForItemId(itemID)+"</td></tr>");
+        replyMSG.append("</table>");
+        replyMSG.append("<center><br><br><br>");
+        replyMSG.append("<button value=\"儲存\" action=\"bypass -h admin_delShopItem " + tradeListID + " " + itemID + " 1\"  width=80 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+        replyMSG.append("<button value=\"返回\" action=\"bypass -h admin_showShopList " + tradeListID +" 1\"  width=80 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
 		replyMSG.append("</center>");
 		replyMSG.append("</body></html>");
 
@@ -405,7 +405,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
 		if (tradeList == null)
 		{
 
-			activeChar.sendMessage("商店資料無法查詢到!");
+			activeChar.sendMessage("商店資料無法查詢到！");
 			return;
 		}
 
@@ -422,7 +422,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
 			storeTradeList(itemID, price, tradeListID, order);
 
 
-			activeChar.sendMessage("增加 "+ItemTable.getInstance().getTemplate(itemID).getName()+" 至商店資料 "+tradeList.getListId());
+			//activeChar.sendMessage("增加 "+ItemTable.getInstance().getTemplate(itemID).getName()+" 至商店資料 "+tradeList.getListId());
 			showShopList(activeChar, tradeListID, 1);
 
 			return;
@@ -431,18 +431,18 @@ public class AdminEditNpc implements IAdminCommandHandler {
 		NpcHtmlMessage adminReply = new NpcHtmlMessage(5);
 
 		TextBuilder replyMSG = new TextBuilder();
-		replyMSG.append("<html><title>商店物品修改</title>");
-		replyMSG.append("<body>");
-		replyMSG.append("<br>增加物品至商店.");
-		replyMSG.append("<table>");
-		replyMSG.append("<tr><td width=100>屬性</td><td>更改</td></tr>");
-		replyMSG.append("<tr><td><br></td><td></td></tr>");
-		replyMSG.append("<tr><td>物品ID</td><td><edit var=\"itemID\" width=80></td></tr>");
-		replyMSG.append("<tr><td>價格</td><td><edit var=\"price\" width=80></td></tr>");
-		replyMSG.append("</table>");
-		replyMSG.append("<center><br><br><br>");
-		replyMSG.append("<button value=\"存取\" action=\"bypass -h admin_addShopItem " + tradeListID + " $itemID $price\"  width=100 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
-		replyMSG.append("<br><button value=\"返回\" action=\"bypass -h admin_showShopList " + tradeListID +" 1\"  width=100 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+        replyMSG.append("<html><title>商店販賣物品增加</title>");
+        replyMSG.append("<body>");
+        replyMSG.append("<br> 在販賣清單內增加數值。");
+        replyMSG.append("<table>");
+        replyMSG.append("<tr><td width=100>內容</td><td>修改</td></tr>");
+        replyMSG.append("<tr><td><br></td><td></td></tr>");
+        replyMSG.append("<tr><td>物品</td><td><edit var=\"itemID\" width=80></td></tr>");
+        replyMSG.append("<tr><td>價格</td><td><edit var=\"price\" width=80></td></tr>");
+        replyMSG.append("</table>");
+        replyMSG.append("<center><br><br><br>");
+        replyMSG.append("<button value=\"儲存\" action=\"bypass -h admin_addShopItem " + tradeListID + " $itemID $price\"  width=80 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+        replyMSG.append("<button value=\"返回\" action=\"bypass -h admin_showShopList " + tradeListID +" 1\"  width=80 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
 		replyMSG.append("</center>");
 		replyMSG.append("</body></html>");
 
@@ -468,9 +468,9 @@ public class AdminEditNpc implements IAdminCommandHandler {
 	{
 		TextBuilder replyMSG = new TextBuilder();
 
-		replyMSG.append("<html><title>商店列表: "+page+"</title>");
-		replyMSG.append("<body>");
-		replyMSG.append("<br>修改,增加,刪除 從商店列表內.");
+        replyMSG.append("<html><title>商店販賣清單頁面："+page+"</title>");
+        replyMSG.append("<body>");
+        replyMSG.append("<br> 修改增加與刪除數值在販賣清單。<br>");
 		replyMSG.append("<table>");
 		replyMSG.append("<tr><td width=150>物品</td><td width=60>價格</td><td width=40>刪除</td></tr>");
 		int start = ((page-1) * PAGE_LIMIT);
@@ -487,19 +487,19 @@ public class AdminEditNpc implements IAdminCommandHandler {
 		int max = tradeList.getItems().size() / PAGE_LIMIT + 1;
 		if (page > 1)
 		{
-			replyMSG.append("<td><button value=\"頁"+(page - 1)+"\" action=\"bypass -h admin_showShopList "+tradeList.getListId()+" "+(page - 1)+"\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
+			replyMSG.append("<td><button value=\"第"+(page - 1)+"頁\" action=\"bypass -h admin_showShopList "+tradeList.getListId()+" "+(page - 1)+"\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
 		}
 		if (page < max)
 		{
 			if (page <= min)
 				replyMSG.append("<td></td>");
-			replyMSG.append("<td><button value=\"頁"+(page + 1)+"\" action=\"bypass -h admin_showShopList "+tradeList.getListId()+" "+(page + 1)+"\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
+			replyMSG.append("<td><button value=\"第"+(page + 1)+"頁\" action=\"bypass -h admin_showShopList "+tradeList.getListId()+" "+(page + 1)+"\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
 		}
-		replyMSG.append("</tr><tr><td>.</td></tr>");
+		replyMSG.append("</tr><tr><td><br></td></tr>");
 		replyMSG.append("</table>");
 		replyMSG.append("<center>");
-		replyMSG.append("<button value=\"增加\" action=\"bypass -h admin_addShopItem "+tradeList.getListId()+"\" width=100 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
-		replyMSG.append("<button value=\"關閉\" action=\"bypass -h admin_close_window\" width=100 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+		replyMSG.append("<button value=\"增加\" action=\"bypass -h admin_addShopItem "+tradeList.getListId()+"\" width=80 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+		replyMSG.append("<button value=\"關閉\" action=\"bypass -h admin_close_window\" width=80 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
 		replyMSG.append("</center></body></html>");
 
 		return replyMSG;
@@ -511,13 +511,13 @@ public class AdminEditNpc implements IAdminCommandHandler {
 		if(tradeLists == null)
 		{
 
-			activeChar.sendMessage("不明ID" + merchantID);
+			//activeChar.sendMessage("不明ID" + merchantID);
 			return ;
 		}
 
 		NpcHtmlMessage adminReply = new NpcHtmlMessage(5);
 
-		TextBuilder replyMSG = new TextBuilder("<html><title>商店資料表</title>");
+		TextBuilder replyMSG = new TextBuilder("<html><title>商店販賣清單</title>");
 		replyMSG.append("<body>");
         if (activeChar.getTarget() != null && activeChar.getTarget() instanceof L2MerchantInstance) 
          	{ 
@@ -525,14 +525,14 @@ public class AdminEditNpc implements IAdminCommandHandler {
          	     replyMSG.append("<br>NPC: "+activeChar.getTarget().getName()); 
          	     replyMSG.append("<br>Price Config: "+mpcName); 
          	} 
-		replyMSG.append("<br>選取並檢閱資料");
+		replyMSG.append("<br>選擇清單檢視");
 		replyMSG.append("<table>");
-		replyMSG.append("<tr><td>商店編號</td></tr>");
+		replyMSG.append("<tr><td>販賣清單</td></tr>");
 
 		for (L2TradeList tradeList : tradeLists)
 		{
 			if (tradeList != null)
-				replyMSG.append("<tr><td><a action=\"bypass -h admin_showShopList "+tradeList.getListId()+" 1\">商店表"+tradeList.getListId()+"</a></td></tr>");
+				replyMSG.append("<tr><td><a action=\"bypass -h admin_showShopList "+tradeList.getListId()+" 1\">商店清單"+tradeList.getListId()+"</a></td></tr>");
 		}
 
 		replyMSG.append("</table>");
@@ -749,7 +749,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
 			adminReply.replace("%absorbLevel%", String.valueOf(npc.absorbLevel));
 		}
 		else
-			adminReply.setHtml("<html><head><body>資料無法查詢: data/html/admin/editnpc.htm</body></html>");
+			adminReply.setHtml("<html><head><body>檔案遺失: data/html/admin/editnpc.htm</body></html>");
 		activeChar.sendPacket(adminReply);
 	}
 
@@ -885,25 +885,25 @@ public class AdminEditNpc implements IAdminCommandHandler {
 
 		NpcHtmlMessage adminReply = new NpcHtmlMessage(5);
 
-		TextBuilder replyMSG = new TextBuilder("<html><title>NPC: "+ npcData.name + "("+npcData.npcId+") 掉落管理</title>");
-		replyMSG.append("<body>");
-		replyMSG.append("<br>注意: 點選[編號]顯示相關資料,點選[刪]刪除資料!");
-		replyMSG.append("<table>");
-		replyMSG.append("<tr><td>NPC</td><td>物品編號</td><td>類</td><td>刪</td></tr>");
+	    TextBuilder replyMSG = new TextBuilder("<html><title>NPC："+ npcData.name + "("+npcData.npcId+") - 物品掉落</title>");
+	    replyMSG.append("<body>");
+	    replyMSG.append("<br>注意：按下[物品名稱]會顯示掉落資料，按下[刪]會刪除掉落資料！");
+	    replyMSG.append("<table>");
+	    replyMSG.append("<tr><td></td><td></td><td></td><td></td></tr><br>");
 
 		for(L2DropCategory cat:npcData.getDropData())
 			for(L2DropData drop : cat.getAllDrops())
 			{
 				replyMSG.append("<tr><td><a action=\"bypass -h admin_edit_drop " + npcData.npcId + " " + drop.getItemId()+ " " + cat.getCategoryType() + "\">"
-						+ npcData.npcId + "</a></td>" +
-						"<td>" + ItemTable.getInstance().getTemplate(drop.getItemId()).getName() + "[" + drop.getItemId() + "]" + "</td><td>" + (drop.isQuestDrop()?"Q":(cat.isSweep()?"S":"D")) + "</td><td>" +
-						"<a action=\"bypass -h admin_del_drop " + npcData.npcId + " " + drop.getItemId() +" "+ cat.getCategoryType() +"\">刪</a></td></tr>");
+	                    + ItemTable.getInstance().getTemplate(drop.getItemId()).getName() + "</a></td>" +
+	                    "<td> - [" + drop.getItemId() + "]" + "</td><td></td><td>" +
+	                    "<a action=\"bypass -h admin_del_drop " + npcData.npcId + " " + drop.getItemId() +" "+ cat.getCategoryType() +"\">刪</a></td></tr>");
 			}
 
-		replyMSG.append("</table>");
-		replyMSG.append("<center>");
-		replyMSG.append("<button value=\"增加掉落資料\" action=\"bypass -h admin_add_drop "+ npcId + "\" width=100 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
-		replyMSG.append("<button value=\"關閉\" action=\"bypass -h admin_close_window\" width=100 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+	    replyMSG.append("</table>");
+	    replyMSG.append("<center>");
+	    replyMSG.append("<br><button value=\"增加掉落資料\" action=\"bypass -h admin_add_drop "+ npcId + "\" width=80 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+	    replyMSG.append("<button value=\"關閉\" action=\"bypass -h admin_close_window\" width=80 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
 		replyMSG.append("</center></body></html>");
 
 		adminReply.setHtml(replyMSG.toString());
@@ -924,7 +924,7 @@ public class AdminEditNpc implements IAdminCommandHandler {
 
 			NpcHtmlMessage adminReply = new NpcHtmlMessage(5);
 
-			TextBuilder replyMSG = new TextBuilder("<html><title>掉落資料: (" + npcId + " " + itemId + " " + category + ")</title>");
+			TextBuilder replyMSG = new TextBuilder("<html><title>掉落資訊：(" + npcId + " " + itemId + " " + category + ")</title>");
 			replyMSG.append("<body>");
 
 			if(dropData.next()){
@@ -932,14 +932,14 @@ public class AdminEditNpc implements IAdminCommandHandler {
 				replyMSG.append("<tr><td>NPC</td><td>"+ NpcTable.getInstance().getTemplate(dropData.getInt("mobId")).name + "</td></tr>");
 				replyMSG.append("<tr><td>物品</td><td>"+ ItemTable.getInstance().getTemplate(dropData.getInt("itemId")).getName() + "(" + dropData.getInt("itemId") + ")</td></tr>");
 				replyMSG.append("<tr><td>種類</td><td>"+ ((category==-1)?"sweep":Integer.toString(category)) + "</td></tr>");
-				replyMSG.append("<tr><td>最小值(" + dropData.getInt("min") + ")</td><td><edit var=\"min\" width=80></td></tr>");
-				replyMSG.append("<tr><td>最大值(" + dropData.getInt("max") + ")</td><td><edit var=\"max\" width=80></td></tr>");
+				replyMSG.append("<tr><td>最小(" + dropData.getInt("min") + ")</td><td><edit var=\"min\" width=80></td></tr>");
+				replyMSG.append("<tr><td>最大(" + dropData.getInt("max") + ")</td><td><edit var=\"max\" width=80></td></tr>");
 				replyMSG.append("<tr><td>機率("+ dropData.getInt("chance") + ")</td><td><edit var=\"chance\" width=80></td></tr>");
 				replyMSG.append("</table>");
 
 				replyMSG.append("<center>");
-				replyMSG.append("<button value=\"存取\" action=\"bypass -h admin_edit_drop " + npcId + " " + itemId + " " + category +" $min $max $chance\"  width=100 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
-				replyMSG.append("<br><button value=\"掉落資訊\" action=\"bypass -h admin_show_droplist " + dropData.getInt("mobId") +"\"  width=100 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+	            replyMSG.append("<br><br><button value=\"儲存修改\" action=\"bypass -h admin_edit_drop " + npcId + " " + itemId + " " + category +" $min $max $chance\"  width=80 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+	            replyMSG.append("<button value=\"掉落清單\" action=\"bypass -h admin_show_droplist " + dropData.getInt("mobId") +"\"  width=80 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
 				replyMSG.append("</center>");
 			}
 
@@ -962,19 +962,19 @@ public class AdminEditNpc implements IAdminCommandHandler {
 	{
 		NpcHtmlMessage adminReply = new NpcHtmlMessage(5);
 
-		TextBuilder replyMSG = new TextBuilder("<html><title>增加掉落資料 " + npcData.name + "(" + npcData.npcId + ")</title>");
+        TextBuilder replyMSG = new TextBuilder("<html><title>增加掉落物品到 - " + npcData.name + "(" + npcData.npcId + ")</title>");
 		replyMSG.append("<body>");
 		replyMSG.append("<table>");
 		replyMSG.append("<tr><td>物品</td><td><edit var=\"itemId\" width=80></td></tr>");
-		replyMSG.append("<tr><td>最小值</td><td><edit var=\"min\" width=80></td></tr>");
-		replyMSG.append("<tr><td>最大值</td><td><edit var=\"max\" width=80></td></tr>");
+		replyMSG.append("<tr><td>最小</td><td><edit var=\"min\" width=80></td></tr>");
+		replyMSG.append("<tr><td>最大</td><td><edit var=\"max\" width=80></td></tr>");
 		replyMSG.append("<tr><td>種類(自體變化=-1)</td><td><edit var=\"category\" width=80></td></tr>");
 		replyMSG.append("<tr><td>機率(0-1000000)</td><td><edit var=\"chance\" width=80></td></tr>");
 		replyMSG.append("</table>");
 
 		replyMSG.append("<center>");
-		replyMSG.append("<button value=\"存取\" action=\"bypass -h admin_add_drop " + npcData.npcId + " $itemId $category $min $max $chance\"  width=100 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
-		replyMSG.append("<br><button value=\"掉落資訊\" action=\"bypass -h admin_show_droplist " + npcData.npcId +"\"  width=100 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+        replyMSG.append("<br><br><button value=\"儲存修改\" action=\"bypass -h admin_add_drop " + npcData.npcId + " $itemId $category $min $max $chance\"  width=80 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+        replyMSG.append("<button value=\"掉落清單\" action=\"bypass -h admin_show_droplist " + npcData.npcId +"\"  width=80 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
 		replyMSG.append("</center>");
 		replyMSG.append("</body></html>");
 		adminReply.setHtml(replyMSG.toString());
@@ -1016,16 +1016,16 @@ public class AdminEditNpc implements IAdminCommandHandler {
 				reLoadNpcDropList(npcId);
 
 				NpcHtmlMessage adminReply = new NpcHtmlMessage(5);
-				TextBuilder replyMSG = new TextBuilder("<html><title>掉落資料修改完成!</title>");
+		        TextBuilder replyMSG = new TextBuilder("<html><title>掉落資料修改成功！</title>");
 				replyMSG.append("<body>");
-				replyMSG.append("<center><button value=\"掉落資訊\" action=\"bypass -h admin_show_droplist "+ npcId + "\" width=100 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></center>");
+		        replyMSG.append("<center><br><br><br><button value=\"掉落清單\" action=\"bypass -h admin_show_droplist "+ npcId + "\" width=80 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></center>");
 				replyMSG.append("</body></html>");
 
 				adminReply.setHtml(replyMSG.toString());
 				activeChar.sendPacket(adminReply);
 			}
 			else
-				activeChar.sendMessage("發生錯誤!");
+				activeChar.sendMessage("未知的錯誤！");
 		}
 		catch(Exception e){ e.printStackTrace(); }
 		finally
