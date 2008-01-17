@@ -237,7 +237,7 @@ public class EnterWorld extends L2GameClientPacket
         sendPacket(new FriendList(activeChar));
 
         SystemMessage sms = new SystemMessage(SystemMessageId.S1_S2);
-        sms.addString(getText("TDJKVFcgNC41IEFscGhhIC0gQ29kZW5hbWU6IEthbWVs"));check =1;
+        sms.addString(getText("TDJKVFcgNC41IEFscGhhIGNvZGVuYW1lOiBLYW1hZWw="));check =1;
         sendPacket(sms);
         
         SystemMessage sm = new SystemMessage(SystemMessageId.WELCOME_TO_LINEAGE);

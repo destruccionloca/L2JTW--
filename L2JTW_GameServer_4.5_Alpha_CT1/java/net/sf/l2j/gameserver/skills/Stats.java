@@ -165,6 +165,7 @@ public enum Stats
 
 
 	ATK_REUSE 		("atkReuse"),
+	P_REUSE 		("pReuse"),
 
 	//ExSkill :)
 	INV_LIM 		("inventoryLimit"),

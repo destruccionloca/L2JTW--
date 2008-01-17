@@ -602,6 +602,9 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         // If this is a festival monster, then it remains in the same location.
         if (_actor instanceof L2FestivalMonsterInstance) return;
 
+    	// Check if the mob should not return to spawn point
+    	if (!npc.canReturnToSpawnPoint()) return;
+        
         // Minions following leader
         if (_actor instanceof L2MinionInstance && ((L2MinionInstance)_actor).getLeader() != null)
         {
@@ -1523,13 +1526,14 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
              _skills.put(size++,sk);
         }
         rndskillindex = Rnd.nextInt(size);
+        L2Skill sk = null;
         
-        if (skills != null)
+        sk = _skills.get(rndskillindex);
+        
+        if (sk != null)
     	//for (L2Skill sk : skills)
         {
-            L2Skill sk = null;
-            
-    	    sk = _skills.get(rndskillindex);
+
     	    
     		//_log.warning("AttackableAI: CheckSkill");
     		// If the skill is magic.. and caster is muted...then search for next skill...
