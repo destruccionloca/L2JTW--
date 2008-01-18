@@ -1397,7 +1397,7 @@ public class FourSepulchersManager
 
             for(L2PcInstance player :L2World.getInstance().getAllPlayers())
             {
-            	if (CustomZoneManager.getInstance().checkIfInZone("FourSepulcher", player) &&
+            	if (BossZoneManager.getInstance().checkIfInZone("FourSepulcher", player) &&
             		(player.getZ() >= -7250 && player.getZ() <= -6841) &&
             		!player.isGM())
             	{

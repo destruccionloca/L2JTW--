@@ -27,7 +27,7 @@ import net.sf.l2j.Config;
 import net.sf.l2j.L2DatabaseFactory;
 import net.sf.l2j.gameserver.instancemanager.ArenaManager;
 import net.sf.l2j.gameserver.instancemanager.BossZoneManager;
-import net.sf.l2j.gameserver.instancemanager.CustomZoneManager;
+//import net.sf.l2j.gameserver.instancemanager.CustomZoneManager;
 import net.sf.l2j.gameserver.instancemanager.FishingZoneManager;
 import net.sf.l2j.gameserver.instancemanager.OlympiadStadiaManager;
 import net.sf.l2j.gameserver.instancemanager.TownManager;
@@ -41,7 +41,7 @@ import net.sf.l2j.gameserver.model.zone.type.L2BigheadZone;
 import net.sf.l2j.gameserver.model.zone.type.L2BossZone;
 import net.sf.l2j.gameserver.model.zone.type.L2CastleZone;
 import net.sf.l2j.gameserver.model.zone.type.L2ClanHallZone;
-import net.sf.l2j.gameserver.model.zone.type.L2CustomZone;
+//import net.sf.l2j.gameserver.model.zone.type.L2CustomZone;
 import net.sf.l2j.gameserver.model.zone.type.L2DamageZone;
 import net.sf.l2j.gameserver.model.zone.type.L2DerbyTrackZone;
 import net.sf.l2j.gameserver.model.zone.type.L2FishingZone;
@@ -165,12 +165,8 @@ public class ZoneData
 								temp = new L2JailZone(zoneId);
 							else if (zoneType.equals("DerbyTrackZone"))
 								temp = new L2DerbyTrackZone(zoneId);
-                            else if (zoneType.equals("BossZone"))
-                                temp = new L2BossZone(zoneId);
-							// [L2J_JP ADD - TSL]
-							else if (zoneType.equals("CustomZone"))
-								temp = new L2CustomZone(zoneId);
-
+							else if (zoneType.equals("BossZone"))
+								temp = new L2BossZone(zoneId);
 
 							// Check for unknown type
 							if (temp == null)
@@ -319,11 +315,8 @@ public class ZoneData
 								TownManager.getInstance().addTown((L2TownZone)temp);
 							else if (temp instanceof L2OlympiadStadiumZone)
 								OlympiadStadiaManager.getInstance().addStadium((L2OlympiadStadiumZone)temp);
-			                else if (temp instanceof L2BossZone)
-				                BossZoneManager.getInstance().addZone((L2BossZone) temp);
-							// [L2J_JP ADD - TSL]
-							else if (temp instanceof L2CustomZone)
-								CustomZoneManager.getInstance().addZone((L2CustomZone)temp);
+							else if (temp instanceof L2BossZone)
+								BossZoneManager.getInstance().addZone((L2BossZone) temp);
 
 							// Increase the counter
 							zoneCount++;

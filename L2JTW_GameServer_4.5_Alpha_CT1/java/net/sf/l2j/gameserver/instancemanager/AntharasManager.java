@@ -252,7 +252,7 @@ public class AntharasManager
 		{
 			// player is must be alive and stay inside of lair.
 			if (!pc.isDead()
-					&& CustomZoneManager.getInstance().checkIfInZone(_ZoneType, pc))
+					&& BossZoneManager.getInstance().checkIfInZone(_ZoneType, pc))
 			{
 				return false;
 			}
@@ -266,7 +266,7 @@ public class AntharasManager
     	for(L2PcInstance pc : _PlayersInLair)
     	{
     		if(pc.getQuestState(_QuestName) != null) pc.getQuestState(_QuestName).exitQuest(true);
-    		if(CustomZoneManager.getInstance().checkIfInZone(_ZoneType, pc))
+    		if(BossZoneManager.getInstance().checkIfInZone(_ZoneType, pc))
     		{
         		int driftX = Rnd.get(-80,80);
         		int driftY = Rnd.get(-80,80);

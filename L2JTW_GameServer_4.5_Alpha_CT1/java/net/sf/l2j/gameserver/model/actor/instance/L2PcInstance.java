@@ -71,10 +71,10 @@ import net.sf.l2j.gameserver.handler.skillhandlers.StrSiegeAssault;
 import net.sf.l2j.gameserver.handler.skillhandlers.TakeCastle;
 import net.sf.l2j.gameserver.instancemanager.AntharasManager;
 import net.sf.l2j.gameserver.instancemanager.BaiumManager;
+import net.sf.l2j.gameserver.instancemanager.BossZoneManager;
 import net.sf.l2j.gameserver.instancemanager.CastleManager;
 import net.sf.l2j.gameserver.instancemanager.CoupleManager;
 import net.sf.l2j.gameserver.instancemanager.CursedWeaponsManager;
-import net.sf.l2j.gameserver.instancemanager.CustomZoneManager;
 import net.sf.l2j.gameserver.instancemanager.DimensionalRiftManager;
 import net.sf.l2j.gameserver.instancemanager.DuelManager;
 import net.sf.l2j.gameserver.instancemanager.FourSepulchersManager;
@@ -4609,24 +4609,24 @@ public final class L2PcInstance extends L2PlayableInstance
 		stopRentPet();
 		stopWaterTask();
     	// When the player has been annihilated, the player is banished from the Four Sepulcher.
-    	if (CustomZoneManager.getInstance().checkIfInZone("FourSepulcher", this))
+    	if (BossZoneManager.getInstance().checkIfInZone("FourSepulcher", this))
        	{
     		FourSepulchersManager.getInstance().checkAnnihilated(this);
    		}
     	// When the player has been annihilated, the player is banished from the lair.
-    	if (CustomZoneManager.getInstance().checkIfInZone("LairofSailren", this))
+    	if (BossZoneManager.getInstance().checkIfInZone("LairofSailren", this))
     	{
     		SailrenManager.getInstance().checkAnnihilated(this);
     	}
-    	if (CustomZoneManager.getInstance().checkIfInZone("LairofAntharas", this))
+    	if (BossZoneManager.getInstance().checkIfInZone("LairofAntharas", this))
     	{
     		AntharasManager.getInstance().checkAnnihilated();
     	}
-    	if (CustomZoneManager.getInstance().checkIfInZone("LairofValakas", this))
+    	if (BossZoneManager.getInstance().checkIfInZone("LairofValakas", this))
     	{
     		ValakasManager.getInstance().checkAnnihilated();
     	}
-    	if (CustomZoneManager.getInstance().checkIfInZone("LairofBaium", this))
+    	if (BossZoneManager.getInstance().checkIfInZone("LairofBaium", this))
     	{
     		BaiumManager.getInstance().checkAnnihilated();
     	}
@@ -9312,9 +9312,9 @@ public final class L2PcInstance extends L2PlayableInstance
 
 		revalidateZone(true);
 		// [L2J_JP ADD SANDMAN] Check of a restart prohibition area.
-		if(CustomZoneManager.getInstance().getZone(this) != null && !isGM())
+		if(BossZoneManager.getInstance().getZone(this) != null && !isGM())
 		{
-	    	String zn = CustomZoneManager.getInstance().getZone(this).getZoneName();
+	    	String zn = BossZoneManager.getInstance().getZone(this).getZoneName();
 
 	    	// Four-Sepulcher,It is less than 5 minutes.
 	    	if (zn.equalsIgnoreCase("FourSepulcher") &&

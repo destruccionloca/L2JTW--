@@ -275,7 +275,7 @@ public class SailrenManager
 		{
 			for(L2PcInstance mem:pc.getParty().getPartyMembers())
 			{
-				if(!mem.isDead() && CustomZoneManager.getInstance().checkIfInZone("LairofSailren", pc))
+				if(!mem.isDead() && BossZoneManager.getInstance().checkIfInZone("LairofSailren", pc))
 				{
 					return false;
 				}
@@ -293,7 +293,7 @@ public class SailrenManager
     	for(L2PcInstance pc : _PlayersInSailrenLair)
     	{
     		if(pc.getQuestState("sailren") != null) pc.getQuestState("sailren").exitQuest(true);
-    		if(CustomZoneManager.getInstance().checkIfInZone("LairofSailren", pc))
+    		if(BossZoneManager.getInstance().checkIfInZone("LairofSailren", pc))
     		{
         		int driftX = Rnd.get(-80,80);
         		int driftY = Rnd.get(-80,80);
