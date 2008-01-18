@@ -370,7 +370,7 @@ public class SevenSigns
 		return "No Cabal";
 	}
 
-	public static final String getSealName(int seal, boolean shortName)
+	public static final String getSealFileName(int seal, boolean shortName)
 	{
 		String sealName = (!shortName) ? "" : "ªº«Ê¦L";
 		
@@ -390,7 +390,7 @@ public class SevenSigns
 		return sealName;
 	}
 	
-	public static final String getSealFileName(int seal, boolean shortName) 
+	public static final String getSealName(int seal, boolean shortName) 
 	{
 		String sealName = (!shortName) ? "Seal of " : "";
 

@@ -582,9 +582,9 @@ public class L2SignsPriestInstance extends L2FolkInstance
                         int sealOwner = SevenSigns.getInstance().getSealOwner(i);
 
                         if (sealOwner != SevenSigns.CABAL_NULL) contentBuffer.append("["
-                            + SevenSigns.getSealName(i, false) + ": "
+                            + SevenSigns.getSealFileName(i, false) + ": "
                             + SevenSigns.getCabalName(sealOwner) + "]<br>");
-                        else contentBuffer.append("[" + SevenSigns.getSealName(i, false)
+                        else contentBuffer.append("[" + SevenSigns.getSealFileName(i, false)
                             + ": µL]<br>");
                     }
 
