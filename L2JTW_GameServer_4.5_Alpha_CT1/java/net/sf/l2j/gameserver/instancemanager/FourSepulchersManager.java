@@ -45,6 +45,7 @@ import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.L2ItemInstance;
 import net.sf.l2j.gameserver.model.L2World;
 //import net.sf.l2j.gameserver.serverpackets.CreatureSay;
+import net.sf.l2j.gameserver.serverpackets.NpcHtmlMessage;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.util.Util;
 import net.sf.l2j.gameserver.model.L2Spawn;
@@ -749,16 +750,21 @@ public class FourSepulchersManager
     
     public synchronized boolean IsEnableEntry(int npcId,L2PcInstance player)
     {
+        NpcHtmlMessage html = new NpcHtmlMessage(1);
 
         if(!IsEntryTime())
         {
-        	player.sendMessage("現在好像不是可以入場的時間，等一會兒再試試吧。");
+            html.setFile("data/scripts/quests/"+_QuestId+"/"+npcId+"-02.htm");
+            player.sendPacket(html);
+        	//player.sendMessage("現在好像不是可以入場的時間，等一會兒再試試吧。");
         	return false;
         }
         
         else if(_HallInUse.get(npcId).booleanValue()) 
         {
-        	player.sendMessage("其他隊伍正在進行中。下次可以入場的時侯再來挑戰吧。");
+            html.setFile("data/scripts/quests/"+_QuestId+"/"+npcId+"-07.htm");
+            player.sendPacket(html);
+        	//player.sendMessage("其他隊伍正在進行中。下次可以入場的時侯再來挑戰吧。");
         	return false;
         }
 
@@ -767,19 +773,25 @@ public class FourSepulchersManager
 
         	if(player.getParty() == null) 
             {
-            	player.sendMessage("想起來了，隊員至少需要有4名才行。要再找隊員然後再來。");
+                html.setFile("data/scripts/quests/"+_QuestId+"/"+npcId+"-04.htm");
+                player.sendPacket(html);
+            	//player.sendMessage("想起來了，隊員至少需要有4名才行。要再找隊員然後再來。");
             	return false;
             }
         		
         	if(!player.getParty().isLeader(player)) 
             {
-            	player.sendMessage("恐怕要隊長把手放在石像上才行。我把手放上去也沒有反應。");
+                html.setFile("data/scripts/quests/"+_QuestId+"/"+npcId+"-03.htm");
+                player.sendPacket(html);
+            	//player.sendMessage("恐怕要隊長把手放在石像上才行。我把手放上去也沒有反應。");
             	return false;
             }
         	
             if (player.getParty().getMemberCount() < Config.FS_PARTY_MEMBER_COUNT) 
             {
-            	player.sendMessage("想起來了，隊員至少需要有4名才行。要再找隊員然後再來。");
+                html.setFile("data/scripts/quests/"+_QuestId+"/"+npcId+"-04.htm");
+                player.sendPacket(html);
+            	//player.sendMessage("想起來了，隊員至少需要有4名才行。要再找隊員然後再來。");
             	return false;
             }
 
@@ -790,13 +802,17 @@ public class FourSepulchersManager
 
                     if(mem.getQuestState(_QuestId).get("<state>") == null) 
                     {
-                    	player.sendMessage("這麼一看，原來隊員中有不聽從無名的靈魂的囑托的。看來得讓隊員去和無名的靈魂談話，然後再回來。");
+                        html.setFile("data/scripts/quests/"+_QuestId+"/"+npcId+"-06.htm");
+                        player.sendPacket(html);
+                    	//player.sendMessage("這麼一看，原來隊員中有不聽從無名的靈魂的囑托的。看來得讓隊員去和無名的靈魂談話，然後再回來。");
                     	return false;
                     }
 
                     if (mem.getInventory().getItemByItemId(_EntrancePass) == null)
                     {
-                    	player.sendMessage("這麼一看，原來隊員中有沒帶陵墓通行證的。得給隊員陵墓通行證，或者讓他去弄來。");
+                        html.setFile("data/scripts/quests/"+_QuestId+"/"+npcId+"-05.htm");
+                        player.sendPacket(html);
+                    	//player.sendMessage("這麼一看，原來隊員中有沒帶陵墓通行證的。得給隊員陵墓通行證，或者讓他去弄來。");
                     	return false;
                     }
 
@@ -825,7 +841,9 @@ public class FourSepulchersManager
 
             if(player.getInventory().getItemByItemId(_EntrancePass) == null) 
             {
-            	player.sendMessage("這麼一看，原來你沒帶陵墓通行證。快去把陵墓通行證帶來吧。");
+                html.setFile("data/scripts/quests/"+_QuestId+"/"+npcId+"-05.htm");
+                player.sendPacket(html);
+            	//player.sendMessage("這麼一看，原來你沒帶陵墓通行證。快去把陵墓通行證帶來吧。");
             	return false;
             }
 
@@ -1480,7 +1498,7 @@ public class FourSepulchersManager
             //sendMessageToAll("征服者陵墓管理員", "現在已經過了40分鐘。");
             //sendMessageToAll("征服者陵墓管理員", "現在已經過了45分鐘。");
 
-            //結束時段備用訊息 Cool-Down Time (50分鐘的時候) 
+            //清場時段備用訊息 Cool-Down Time (50分鐘的時候) 
             //sendMessageToAll("征服者陵墓管理員", "挑戰已結束，稍後將自動進行傳送");
 
 /* ================================================================================================

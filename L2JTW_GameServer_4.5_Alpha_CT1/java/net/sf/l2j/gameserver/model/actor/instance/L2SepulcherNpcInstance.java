@@ -337,7 +337,7 @@ public class L2SepulcherNpcInstance extends L2NpcInstance
                 } catch (NumberFormatException nfe) {}
                 showChatWindow(player, val);
             }
-            // ‰ï“°‚Ì”à‚ðŠJ‚­
+
             else if (command.startsWith("open_gate"))
             {
                 L2ItemInstance HallsKey = player.getInventory().getItemByItemId(_HallsKey);
@@ -362,13 +362,13 @@ public class L2SepulcherNpcInstance extends L2NpcInstance
                 else
                 {
         			{
-        				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-        				sm.addString("©|¥¼¹F¨ì©Ò»Ý­nªº±ø¥ó");
-        				player.sendPacket(sm);
+        				//SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
+        				//sm.addString("©|¥¼¹F¨ì©Ò»Ý­nªº±ø¥ó");
+        				//player.sendPacket(sm);
         			}
                 }
             }
-            // —ì•_“à‚É“ü‚é
+
             else if (command.startsWith("Entry"))
             {
             	FourSepulchersManager.getInstance().Entry(getNpcId(),player);
