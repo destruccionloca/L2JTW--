@@ -155,15 +155,17 @@ public class AdminMenu implements IAdminCommandHandler
 				st.nextToken();
 				String player = st.nextToken();
 				L2PcInstance plyr = L2World.getInstance().getPlayer(player);
-				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 				if (plyr != null)
 				{
 					plyr.logout();
-					sm.addString("踢除玩家「" + plyr.getName() + "」。");
+					SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
+					sm.addString("踢除玩家 " + plyr.getName() + "。");
 				}
 				else
-					sm.addString("目標 " + player + " 不在遊戲。");
-				activeChar.sendPacket(sm);
+				{
+					SystemMessage sm = new SystemMessage(SystemMessageId.TARGET_IS_NOT_FOUND_IN_THE_GAME);
+					activeChar.sendPacket(sm);
+				}
 			}
 			showMainPage(activeChar);
 		}
@@ -287,21 +289,24 @@ public class AdminMenu implements IAdminCommandHandler
 			if (result.next())
 			{
 				String acc_name = result.getString(1);
-				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 				if(acc_name.length() > 0)
 				{
 					LoginServerThread.getInstance().sendAccessLevel(acc_name, banLevel);
-					sm.addString("SYS");
+					SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 					sm.addString("設置帳號等級從 "+player+" 至 "+banLevel+"。");
+					activeChar.sendPacket(sm);
 				}
 				else
 				{
-					sm.addString("目標 "+player+"不在遊戲。");
+					SystemMessage sm = new SystemMessage(SystemMessageId.TARGET_IS_NOT_FOUND_IN_THE_GAME);
+					activeChar.sendPacket(sm);
 				}
-				activeChar.sendPacket(sm);
 			}
 			else
-				activeChar.sendMessage("無此帳號。");
+			{
+				SystemMessage sm = new SystemMessage(SystemMessageId.ID_DOES_NOT_EXIST);
+				activeChar.sendPacket(sm);
+			}
 			statement.close();
 		}
 		catch (Exception e)

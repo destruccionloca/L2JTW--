@@ -16,8 +16,10 @@ package net.sf.l2j.gameserver.model.actor.instance;
 
 import net.sf.l2j.gameserver.instancemanager.RaidBossSpawnManager;
 import net.sf.l2j.gameserver.model.L2Spawn;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.ExShowQuestInfo;
 import net.sf.l2j.gameserver.serverpackets.RadarControl;
+import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
 
 /**
@@ -52,7 +54,7 @@ public class L2AdventurerInstance extends L2FolkInstance
                                                            spawn.getLocz()));
                         break;
                     case UNDEFINED:
-                        player.sendMessage("目標不在遊戲內。");
+                    	player.sendPacket(new SystemMessage(SystemMessageId.TARGET_IS_NOT_FOUND_IN_THE_GAME));
                         break;
                 }
             }

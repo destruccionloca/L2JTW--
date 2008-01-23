@@ -83,18 +83,14 @@ public class RequestGiveNickName extends L2GameClientPacket
                 }
                 else
                 {
-                    SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-                    sm.addString("SYS");
-                    sm.addString("目標必須在線上");
+                    SystemMessage sm = new SystemMessage(SystemMessageId.TARGET_IS_NOT_FOUND_IN_THE_GAME);
                     activeChar.sendPacket(sm);
                     sm = null;
                 }
 			}
             else
             {
-                SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-                sm.addString("SYS");
-                sm.addString("目標不屬於此血盟.");
+                SystemMessage sm = new SystemMessage(SystemMessageId.TARGET_MUST_BE_IN_CLAN);
                 activeChar.sendPacket(sm);
                 sm = null;
             }

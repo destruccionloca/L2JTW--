@@ -309,6 +309,12 @@ public enum SystemMessageId
     S1_INVITED_YOU_TO_PARTY(66),
 
     /**
+    * ID: 75<br>
+    * Message: ID Does not exist.
+    */
+    ID_DOES_NOT_EXIST(75),
+
+    /**
     * ID: 79<br>
     * Message: This name already exists.
     */
@@ -752,6 +758,12 @@ public enum SystemMessageId
     * Message: The party has dispersed.
     */
     PARTY_DISPERSED(203),
+
+    /**
+    * ID: 204<br>
+    * Message: Incorrect name. Please try again.
+    */
+    INCORRECT_NAME_PLEASE_TRY_AGAIN(204),
 
     /**
     * ID: 212<br>

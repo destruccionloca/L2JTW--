@@ -122,7 +122,7 @@ public class SummonItems implements IItemHandler
             }
             catch (Exception e)
             {
-                activeChar.sendMessage("¥Ø¼Ð¿ù»~");
+            	activeChar.sendPacket(new SystemMessage(SystemMessageId.TARGET_IS_INCORRECT));
             }
 
         	break;

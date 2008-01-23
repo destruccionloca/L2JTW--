@@ -135,7 +135,7 @@ public class ScrollOfResurrection implements IItemHandler
                     else if (!humanScroll)
                     {
                         condGood = false;
-                        activeChar.sendMessage("¿ù»~¥Ø¼Ð");
+                        activeChar.sendPacket(new SystemMessage(SystemMessageId.TARGET_IS_INCORRECT));
                     }
                 }
 

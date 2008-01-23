@@ -55,14 +55,17 @@ public class AdminTarget implements IAdminCommandHandler {
 			L2Object obj = L2World.getInstance().getPlayer(targetName);
 			if ((obj != null) && (obj instanceof L2PcInstance)) {
 				obj.onAction(activeChar);
-			} else {
-				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-				sm.addString("目標 "+targetName+" 不在遊戲。");
+			} 
+			else 
+			{
+				SystemMessage sm = new SystemMessage(SystemMessageId.TARGET_IS_NOT_FOUND_IN_THE_GAME);
 				activeChar.sendPacket(sm);
 			}
-		} catch (IndexOutOfBoundsException e) {
-			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-			sm.addString("請確認角色名稱。");
+		} 
+		catch 
+		(IndexOutOfBoundsException e) 
+		{
+			SystemMessage sm = new SystemMessage(SystemMessageId.INCORRECT_NAME_PLEASE_TRY_AGAIN);
 			activeChar.sendPacket(sm);
 		}
 	}

@@ -56,8 +56,7 @@ public class AdminHeal implements IAdminCommandHandler {
 			{
 				if (Config.DEVELOPER)
 					_log.warning("Heal error: "+e);
-				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-				sm.addString("¿ù»~¥b®|©Î¥Ø¼Ð¡C");
+				SystemMessage sm = new SystemMessage(SystemMessageId.TARGET_IS_INCORRECT);
 				activeChar.sendPacket(sm);
 			}
 		}
