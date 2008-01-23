@@ -14,47 +14,56 @@
  */
 package net.sf.l2j.gameserver.serverpackets;
 
-import net.sf.l2j.gameserver.model.L2Clan;
-import net.sf.l2j.gameserver.model.L2Skill;
+import net.sf.l2j.gameserver.model.actor.instance.L2BoatInstance;
 
 /**
- * Format: (ch) d [dd]
+ * @author Maktakien
  *
- * @author  -Wooden-
  */
-public class PledgeSkillList extends L2GameServerPacket
+public class VehicleCheckLocation extends L2GameServerPacket
 {
-	private static final String _S__FE_39_PLEDGESKILLLIST = "[S] FE:3a PledgeSkillList";
-	private L2Skill[] _skills;
-
-	public PledgeSkillList(L2Clan clan)
+	private L2BoatInstance _boat;
+	private int _x;
+	private int _y;
+	private int _z;
+    
+	/**
+	 * @param instance
+	 * @param x
+	 * @param y
+	 * @param z
+	 */
+	public VehicleCheckLocation(L2BoatInstance instance, int x, int y, int z)
 	{
-        _skills = clan.getAllSkills();
+		_boat = instance;
+		_x = x;
+		_y = y;
+		_z = z;
 	}
 
-	/**
+	/* (non-Javadoc)
 	 * @see net.sf.l2j.gameserver.serverpackets.ServerBasePacket#writeImpl()
 	 */
 	@Override
-	protected void writeImpl()
+	protected
+	void writeImpl()
 	{
-		writeC(0xfe);
-		writeH(0x3a);
-		writeD(_skills.length);
-        writeD(0x00);
-		for(L2Skill sk : _skills)
-		{
-			writeD(sk.getId());
-			writeD(sk.getLevel());
-		}
+		writeC(0x6d);
+		writeD(_boat.getObjectId());
+		writeD(_x);
+		writeD(_y);
+		writeD(_z);
+		writeD(_boat.getPosition().getHeading());
 	}
 
-	/**
+	/* (non-Javadoc)
 	 * @see net.sf.l2j.gameserver.BasePacket#getType()
 	 */
 	@Override
 	public String getType()
 	{
-		return _S__FE_39_PLEDGESKILLLIST;
+		// TODO Auto-generated method stub
+		return null;
 	}
+
 }

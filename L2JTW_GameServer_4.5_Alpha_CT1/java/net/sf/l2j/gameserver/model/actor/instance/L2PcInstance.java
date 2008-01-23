@@ -259,16 +259,17 @@ public final class L2PcInstance extends L2PlayableInstance
 	public static final int STORE_PRIVATE_MANUFACTURE = 5;
 	public static final int STORE_PRIVATE_PACKAGE_SELL = 8;
 
-	/** The table containing all minimum level needed for each Expertise (None, D, C, B, A, S)*/
-	private static final int[] EXPERTISE_LEVELS =
-	{
-	 SkillTreeTable.getInstance().getExpertiseLevel(0), //NONE
-	 SkillTreeTable.getInstance().getExpertiseLevel(1), //D
-	 SkillTreeTable.getInstance().getExpertiseLevel(2), //C
-	 SkillTreeTable.getInstance().getExpertiseLevel(3), //B
-	 SkillTreeTable.getInstance().getExpertiseLevel(4), //A
-	 SkillTreeTable.getInstance().getExpertiseLevel(5), //S
-	};
+	/** The table containing all minimum level needed for each Expertise (None, D, C, B, A, S, S80)*/
+    private static final int[] EXPERTISE_LEVELS =
+    {
+	    SkillTreeTable.getInstance().getExpertiseLevel(0), //NONE
+	    SkillTreeTable.getInstance().getExpertiseLevel(1), //D
+	    SkillTreeTable.getInstance().getExpertiseLevel(2), //C
+	    SkillTreeTable.getInstance().getExpertiseLevel(3), //B
+	    SkillTreeTable.getInstance().getExpertiseLevel(4), //A
+	    SkillTreeTable.getInstance().getExpertiseLevel(5), //S
+	    SkillTreeTable.getInstance().getExpertiseLevel(6), //S80
+    };
 
 	private static final int[] COMMON_CRAFT_LEVELS =
 	{
@@ -4286,57 +4287,60 @@ public final class L2PcInstance extends L2PlayableInstance
 
 	public boolean isWearingHeavyArmor()
 	{
-        if ((getChestArmorInstance() != null) && getLegsArmorInstance() != null)
+        L2ItemInstance legs = getLegsArmorInstance();
+        L2ItemInstance armor = getChestArmorInstance();
+        
+	    if (armor != null && legs != null)
         {
-            L2ItemInstance legs = getLegsArmorInstance();
-            L2ItemInstance armor = getChestArmorInstance();
-            if ((L2ArmorType)legs.getItemType() == L2ArmorType.HEAVY && ((L2ArmorType)armor.getItemType() == L2ArmorType.HEAVY))
-            return true;
+            if ((L2ArmorType)legs.getItemType() == L2ArmorType.HEAVY 
+                    && ((L2ArmorType)armor.getItemType() == L2ArmorType.HEAVY))
+                return true;
         }
-	    if (getChestArmorInstance() != null)
+	    if (armor != null)
 	    {
-	        L2ItemInstance armor = getChestArmorInstance();
-	        
-	        if ((getInventory().getPaperdollItem(Inventory.PAPERDOLL_CHEST).getItem().getBodyPart() == L2Item.SLOT_FULL_ARMOR && (L2ArmorType)armor.getItemType() == L2ArmorType.HEAVY))
-	        return true;
+	        if ((getInventory().getPaperdollItem(Inventory.PAPERDOLL_CHEST).getItem().getBodyPart() == L2Item.SLOT_FULL_ARMOR 
+	                && (L2ArmorType)armor.getItemType() == L2ArmorType.HEAVY))
+	            return true;
 	    }
 		return false;
 	}
 
 	public boolean isWearingLightArmor()
 	{
-        if ((getChestArmorInstance() != null) && getLegsArmorInstance() != null)
+        L2ItemInstance legs = getLegsArmorInstance();
+        L2ItemInstance armor = getChestArmorInstance();
+
+	    if (armor != null && legs != null)
         {
-            L2ItemInstance legs = getLegsArmorInstance();
-            L2ItemInstance armor = getChestArmorInstance();
-            if ((L2ArmorType)legs.getItemType() == L2ArmorType.LIGHT && ((L2ArmorType)armor.getItemType() == L2ArmorType.LIGHT))
-            return true;
+            if ((L2ArmorType)legs.getItemType() == L2ArmorType.LIGHT 
+                    && ((L2ArmorType)armor.getItemType() == L2ArmorType.LIGHT))
+                return true;
         }
-        if (getChestArmorInstance() != null)
+        if (armor != null)
         {
-            L2ItemInstance armor = getChestArmorInstance();
-            
-            if ((getInventory().getPaperdollItem(Inventory.PAPERDOLL_CHEST).getItem().getBodyPart() == L2Item.SLOT_FULL_ARMOR && (L2ArmorType)armor.getItemType() == L2ArmorType.LIGHT))
-            return true;
+            if ((getInventory().getPaperdollItem(Inventory.PAPERDOLL_CHEST).getItem().getBodyPart() == L2Item.SLOT_FULL_ARMOR 
+                    && (L2ArmorType)armor.getItemType() == L2ArmorType.LIGHT))
+                return true;
         }
 		return false;
 	}
 
 	public boolean isWearingMagicArmor()
 	{
-        if ((getChestArmorInstance() != null) && getLegsArmorInstance() != null)
+        L2ItemInstance legs = getLegsArmorInstance();
+        L2ItemInstance armor = getChestArmorInstance();
+
+	    if (armor != null && legs != null)
         {
-            L2ItemInstance legs = getLegsArmorInstance();
-            L2ItemInstance armor = getChestArmorInstance();
-            if ((L2ArmorType)legs.getItemType() == L2ArmorType.MAGIC && ((L2ArmorType)armor.getItemType() == L2ArmorType.MAGIC))
-            return true;
+            if ((L2ArmorType)legs.getItemType() == L2ArmorType.MAGIC 
+                    && ((L2ArmorType)armor.getItemType() == L2ArmorType.MAGIC))
+                return true;
         }
-        if (getChestArmorInstance() != null)
+        if (armor != null)
         {
-            L2ItemInstance armor = getChestArmorInstance();
-            
-            if ((getInventory().getPaperdollItem(Inventory.PAPERDOLL_CHEST).getItem().getBodyPart() == L2Item.SLOT_FULL_ARMOR && (L2ArmorType)armor.getItemType() == L2ArmorType.MAGIC))
-            return true;
+            if ((getInventory().getPaperdollItem(Inventory.PAPERDOLL_CHEST).getItem().getBodyPart() == L2Item.SLOT_FULL_ARMOR 
+                    && (L2ArmorType)armor.getItemType() == L2ArmorType.MAGIC))
+                return true;
         }
 		return false;
 	}
@@ -5424,33 +5428,61 @@ public final class L2PcInstance extends L2PlayableInstance
 	}
 
 	/**
-	 * Reduce the number of arrows owned by the L2PcInstance and send it Server->Client Packet InventoryUpdate or ItemList (to unequip if the last arrow was consummed).<BR><BR>
+	 * Reduce the number of arrows/bolts owned by the L2PcInstance and send it Server->Client Packet InventoryUpdate or ItemList (to unequip if the last arrow was consummed).<BR><BR>
 	 */
 	@Override
-	protected void reduceArrowCount()
+	protected void reduceArrowCount(boolean bolts)
 	{
-		L2ItemInstance arrows = getInventory().destroyItem("Consume", getInventory().getPaperdollObjectId(Inventory.PAPERDOLL_LHAND), 1, this, null);
+	    L2ItemInstance arrows = getInventory().getPaperdollItem(Inventory.PAPERDOLL_LHAND);
 
-		if (Config.DEBUG) _log.fine("arrow count:" + (arrows==null? 0 : arrows.getCount()));
+	    if (arrows == null)
+        {
+            getInventory().unEquipItemInSlot(Inventory.PAPERDOLL_LHAND);
+            if (bolts) 
+                _boltItem = null;
+            else
+                _arrowItem = null;
+            sendPacket(new ItemList(this,false));
+            return;
+        }
+	    
+	    // Adjust item quantity
+        if (arrows.getCount() > 1)
+        {
+            synchronized(arrows)
+            {
+                arrows.changeCountWithoutTrace("Consume", -1, this, null);
+                arrows.setLastChange(L2ItemInstance.MODIFIED);
 
-		if (arrows == null || arrows.getCount() == 0)
+                // could do also without saving, but let's save approx 1 of 10
+                if(GameTimeController.getGameTicks() % 10 == 0)
+                    arrows.updateDatabase();
+                _inventory.refreshWeight();
+            }
+        }
+        else
+        {
+            // Destroy entire item and save to database
+            _inventory.destroyItem("Consume", arrows, this, null);
+            
+            getInventory().unEquipItemInSlot(Inventory.PAPERDOLL_LHAND);
+            if (bolts) 
+                _boltItem = null;
+            else
+                _arrowItem = null;
+
+            if (Config.DEBUG) _log.fine("removed arrows count");
+            sendPacket(new ItemList(this,false));
+            return;
+        }
+	    
+		if (!Config.FORCE_INVENTORY_UPDATE)
 		{
-			getInventory().unEquipItemInSlot(Inventory.PAPERDOLL_LHAND);
-			_arrowItem = null;
-
-			if (Config.DEBUG) _log.fine("removed arrows count");
-			sendPacket(new ItemList(this,false));
+		    InventoryUpdate iu = new InventoryUpdate();
+		    iu.addModifiedItem(arrows);
+		    sendPacket(iu);
 		}
-		else
-		{
-			if (!Config.FORCE_INVENTORY_UPDATE)
-			{
-				InventoryUpdate iu = new InventoryUpdate();
-				iu.addModifiedItem(arrows);
-				sendPacket(iu);
-			}
-			else sendPacket(new ItemList(this, false));
-		}
+		else sendPacket(new ItemList(this, false));
 	}
 
 	/**
@@ -5485,36 +5517,6 @@ public final class L2PcInstance extends L2PlayableInstance
 	}
 
 	/**
-     * Reduce the number of bolts owned by the L2PcInstance and send it Server->Client Packet InventoryUpdate or ItemList (to unequip if the last bolt was consummed).<BR><BR>
-     */
-    @Override
-    protected void reduceBoltCount()
-    {
-        L2ItemInstance bolts = getInventory().destroyItem("Consume", getInventory().getPaperdollObjectId(Inventory.PAPERDOLL_LHAND), 1, this, null);
-
-        if (Config.DEBUG) _log.fine("bolt count:" + (bolts==null? 0 : bolts.getCount()));
-
-        if (bolts == null || bolts.getCount() == 0)
-        {
-            getInventory().unEquipItemInSlot(Inventory.PAPERDOLL_LHAND);
-            _boltItem = null;
-
-            if (Config.DEBUG) _log.fine("removed bolts count");
-            sendPacket(new ItemList(this,false));
-        }
-        else
-        {
-            if (!Config.FORCE_INVENTORY_UPDATE)
-            {
-                InventoryUpdate iu = new InventoryUpdate();
-                iu.addModifiedItem(bolts);
-                sendPacket(iu);
-            }
-            else sendPacket(new ItemList(this, false));
-        }
-    }
-
-    /**
      * Equip bolts needed in left hand and send a Server->Client packet ItemList to the L2PcINstance then return True.<BR><BR>
      */
     @Override
@@ -7464,6 +7466,8 @@ public final class L2PcInstance extends L2PlayableInstance
         {
             // Target the player if skill type is AURA, PARTY, CLAN or SELF
             case TARGET_AURA:
+	    case TARGET_FRONT_AURA:
+	    case TARGET_BEHIND_AURA:
             case TARGET_PARTY:
             case TARGET_ALLY:
             case TARGET_CLAN:
@@ -7677,6 +7681,8 @@ public final class L2PcInstance extends L2PlayableInstance
 			// Check if a Forced ATTACK is in progress on non-attackable target
             if (!target.isAutoAttackable(this) && !forceUse && !(_inEventCTF && CTF._started) &&
 					sklTargetType != SkillTargetType.TARGET_AURA &&
+					sklTargetType != SkillTargetType.TARGET_FRONT_AURA &&
+					sklTargetType != SkillTargetType.TARGET_BEHIND_AURA &&
 					sklTargetType != SkillTargetType.TARGET_CLAN &&
 					sklTargetType != SkillTargetType.TARGET_ALLY &&
 					sklTargetType != SkillTargetType.TARGET_PARTY &&
@@ -7710,6 +7716,8 @@ public final class L2PcInstance extends L2PlayableInstance
 			if ((target instanceof L2MonsterInstance) && !forceUse
                     && (sklTargetType != SkillTargetType.TARGET_PET)
                     && (sklTargetType != SkillTargetType.TARGET_AURA)
+		    && (sklTargetType != SkillTargetType.TARGET_FRONT_AURA)
+		    && (sklTargetType != SkillTargetType.TARGET_BEHIND_AURA)
                     && (sklTargetType != SkillTargetType.TARGET_CLAN)
                     && (sklTargetType != SkillTargetType.TARGET_SELF)
                     && (sklTargetType != SkillTargetType.TARGET_PARTY)
@@ -7787,6 +7795,8 @@ public final class L2PcInstance extends L2PlayableInstance
 			case TARGET_ALLY:   // For such skills, checkPvpSkill() is called from L2Skill.getTargetList()
 			case TARGET_CLAN:   // For such skills, checkPvpSkill() is called from L2Skill.getTargetList()
 			case TARGET_AURA:
+			case TARGET_FRONT_AURA:
+			case TARGET_BEHIND_AURA:
 			case TARGET_SELF:
 				break;
 			default:
@@ -9173,6 +9183,10 @@ public final class L2PcInstance extends L2PlayableInstance
         //_macroses.sendUpdate();
         _shortCuts.restore();
         sendPacket(new ShortCutInit(this));
+        
+        // Method untransform() already check if player is transformed
+        untransform();
+            
 
         broadcastPacket(new SocialAction(getObjectId(), 15));
 
@@ -9975,9 +9989,12 @@ public final class L2PcInstance extends L2PlayableInstance
 		if (isVisible())
 			try { decayMe(); } catch (Throwable t) {_log.log(Level.SEVERE, "deleteMe()", t); }
 
-		// If a Party is in progress, leave it
+		// If a Party is in progress, leave it (and festival party)
 		if (isInParty()) try { leaveParty(); } catch (Throwable t) {_log.log(Level.SEVERE, "deleteMe()", t); }
 
+		if (getOlympiadGameId() != -1) // handle removal from olympiad game
+		    Olympiad.getInstance().removeDisconnectedCompetitor(this);
+		
 		// If the L2PcInstance has Pet, unsummon it
 		if (getPet() != null)
 		{
@@ -10911,21 +10928,22 @@ public final class L2PcInstance extends L2PlayableInstance
 			reuse = _reuse;
 			stamp = System.currentTimeMillis()+ reuse; 
 		 	        } 
-		 	
-		 	        public int getSkill() 
-		 	{ 
-		 	    return skill; 
-		 	} 
-		 	 
-		 	public long getReuse() 
-		 	{ 
-		 	    return reuse; 
-		 	} 
-		 	 
-		 	public long getRemaining() 
-		 	{ 
-		 	    return Math.max(System.currentTimeMillis() - stamp, 0); 
-		 	} 
+
+
+		public int getSkill()
+        {
+            return skill;
+        }
+        
+        public long getReuse()
+        {
+            return reuse;
+        }
+        
+        public long getRemaining()
+        {
+            return Math.max(stamp - System.currentTimeMillis(), 0);
+        }
 
 		/* Check if the reuse delay has passed and
 		 * if it has not then update the stored reuse time

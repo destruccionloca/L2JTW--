@@ -465,17 +465,15 @@ public final class QuestState
             if (count > 1)
             {
     			SystemMessage smsg = new SystemMessage(SystemMessageId.EARNED_S2_S1_S);
-                smsg.addItemName(item.getItemId());
     			smsg.addNumber(count);
+                smsg.addItemName(item.getItemId());
     			getPlayer().sendPacket(smsg);
             } else
             {
                 SystemMessage smsg = new SystemMessage(SystemMessageId.EARNED_ITEM);
-                getPlayer().sendPacket(smsg);
                 smsg.addItemName(item.getItemId());
-
+                getPlayer().sendPacket(smsg);
             }
-
 		}
         getPlayer().sendPacket(new ItemList(getPlayer(), false));
 
@@ -664,12 +662,21 @@ public final class QuestState
      */
     public void startQuestTimer(String name, long time)
     {
-    	getQuest().startQuestTimer(name, time, null, getPlayer());
+        getQuest().startQuestTimer(name, time, null, getPlayer(), false);
     }
 
     public void startQuestTimer(String name, long time, L2NpcInstance npc)
     {
-    	getQuest().startQuestTimer(name, time, npc, getPlayer());
+        getQuest().startQuestTimer(name, time, npc, getPlayer(), false);
+    }
+    public void startRepeatingQuestTimer(String name, long time)
+    {
+        getQuest().startQuestTimer(name, time, null, getPlayer(), true);
+    }
+
+    public void startRepeatingQuestTimer(String name, long time, L2NpcInstance npc)
+    {
+        getQuest().startQuestTimer(name, time, npc, getPlayer(), true);
     }
 
     /**

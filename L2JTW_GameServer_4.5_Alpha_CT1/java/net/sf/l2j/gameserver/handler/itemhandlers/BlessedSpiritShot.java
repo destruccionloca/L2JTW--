@@ -36,7 +36,7 @@ public class BlessedSpiritShot implements IItemHandler
 {
 	// all the items ids that this handler knowns
 	private static final int[] ITEM_IDS  = { 3947, 3948, 3949, 3950, 3951, 3952 };
-	private static final int[] SKILL_IDS = { 2061, 2160, 2161, 2162, 2163, 2164 };
+	private static final int[] SKILL_IDS = { 2061, 2160, 2161, 2162, 2163, 2164, 2164 };
 
 	/* (non-Javadoc)
 	 * @see net.sf.l2j.gameserver.handler.IItemHandler#useItem(net.sf.l2j.gameserver.model.L2PcInstance, net.sf.l2j.gameserver.model.L2ItemInstance)
@@ -50,7 +50,8 @@ public class BlessedSpiritShot implements IItemHandler
         L2Weapon weaponItem = activeChar.getActiveWeaponItem();
         int itemId = item.getItemId();
 
-        if (activeChar.isInOlympiadMode()){
+        if (activeChar.isInOlympiadMode())
+        {
         	SystemMessage sm = new SystemMessage(SystemMessageId.THIS_ITEM_IS_NOT_AVAILABLE_FOR_THE_OLYMPIAD_EVENT);
 			sm.addString(item.getItemName());
 			activeChar.sendPacket(sm);
@@ -76,7 +77,8 @@ public class BlessedSpiritShot implements IItemHandler
     		(weaponGrade == L2Item.CRYSTAL_C && itemId != 3949) ||
     		(weaponGrade == L2Item.CRYSTAL_B && itemId != 3950) ||
     		(weaponGrade == L2Item.CRYSTAL_A && itemId != 3951) ||
-    		(weaponGrade == L2Item.CRYSTAL_S && itemId != 3952))
+    		(weaponGrade == L2Item.CRYSTAL_S && itemId != 3952) ||
+    		(weaponGrade == L2Item.CRYSTAL_S80 && itemId != 3952))
         {
             if(!activeChar.getAutoSoulShot().containsKey(itemId))
                 activeChar.sendPacket(new SystemMessage(SystemMessageId.SPIRITSHOTS_GRADE_MISMATCH));

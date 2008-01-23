@@ -36,7 +36,7 @@ public class SpiritShot implements IItemHandler
 {
 	// All the item IDs that this handler knows.
 	private static final int[] ITEM_IDS = { 5790, 2509, 2510, 2511, 2512, 2513, 2514 };
-	private static final int[] SKILL_IDS = { 2061, 2155, 2156, 2157, 2158, 2159 };
+	private static final int[] SKILL_IDS = { 2061, 2155, 2156, 2157, 2158, 2159, 2159 };
 
 	/* (non-Javadoc)
  	* @see net.sf.l2j.gameserver.handler.IItemHandler#useItem(net.sf.l2j.gameserver.model.L2PcInstance, net.sf.l2j.gameserver.model.L2ItemInstance)
@@ -68,7 +68,8 @@ public class SpiritShot implements IItemHandler
     		(weaponGrade == L2Item.CRYSTAL_C && itemId != 2511) ||
     		(weaponGrade == L2Item.CRYSTAL_B && itemId != 2512) ||
     		(weaponGrade == L2Item.CRYSTAL_A && itemId != 2513) ||
-    		(weaponGrade == L2Item.CRYSTAL_S && itemId != 2514))
+    		(weaponGrade == L2Item.CRYSTAL_S && itemId != 2514) ||
+    		(weaponGrade == L2Item.CRYSTAL_S80 && itemId != 2514))
 		{
             if(!activeChar.getAutoSoulShot().containsKey(itemId))
                 activeChar.sendPacket(new SystemMessage(SystemMessageId.SPIRITSHOTS_GRADE_MISMATCH));

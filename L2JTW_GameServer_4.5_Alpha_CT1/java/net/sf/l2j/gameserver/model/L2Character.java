@@ -595,7 +595,9 @@ public abstract class L2Character extends L2Object
 		setTarget(null);
 
 		// Remove from world regions zones
-		getWorldRegion().removeFromZones(this);
+		if (getWorldRegion() != null)
+		    getWorldRegion().removeFromZones(this);
+		
 
 		getAI().setIntention(CtrlIntention.AI_INTENTION_ACTIVE);
 
@@ -1010,7 +1012,7 @@ public abstract class L2Character extends L2Object
 		boolean miss1 = Formulas.getInstance().calcHitMiss(this, target);
 
 		// Consumme arrows
-		reduceArrowCount();
+		reduceArrowCount(false);
 		_move = null;
 
 		// Check if hit isn't missed
@@ -1092,8 +1094,8 @@ public abstract class L2Character extends L2Object
         // Calculate if hit is missed or not
         boolean miss1 = Formulas.getInstance().calcHitMiss(this, target);
 
-        // Consumme arrows
-        reduceBoltCount();
+        // Consume bolts
+        reduceArrowCount(true);
 
         _move = null;
 
@@ -1571,7 +1573,9 @@ public abstract class L2Character extends L2Object
 			target = (L2Character) getTarget();
 
 		// AURA skills should always be using caster as target
-		if (skill.getTargetType() == SkillTargetType.TARGET_AURA)
+		if (skill.getTargetType() == SkillTargetType.TARGET_AURA
+		|| skill.getTargetType() == SkillTargetType.TARGET_FRONT_AURA
+		|| skill.getTargetType() == SkillTargetType.TARGET_BEHIND_AURA)
 			target = this;
 
 		if (target == null && skill.getTargetType() != SkillTargetType.TARGET_AURA)
@@ -1917,6 +1921,8 @@ public abstract class L2Character extends L2Object
 		switch (skill.getTargetType())
 		{
 			case TARGET_AURA:    // AURA, SELF should be cast even if no target has been found
+			case TARGET_FRONT_AURA:
+			case TARGET_BEHIND_AURA:
 			case TARGET_SELF:
 				target = this;
 				break;
@@ -5473,9 +5479,9 @@ public abstract class L2Character extends L2Object
 	 * <li> L2PcInstance</li><BR><BR>
 	 *
 	 */
-	protected void reduceArrowCount()
+	protected void reduceArrowCount(boolean bolts)
 	{
-		// default is to do nothin
+		// default is to do nothing
 	}
 	protected void reduceBoltCount() 
  	{ 
@@ -6504,25 +6510,24 @@ public abstract class L2Character extends L2Object
 	 */
 	public boolean isFront(L2Object target)
 	{
-        double angleChar, angleTarget, angleDiff, maxAngleDiff = 45;
-
-        if(target == null)
+		double angleChar, angleTarget, angleDiff, maxAngleDiff = 45;
+		if(target == null)
 			return false;
 
 		if (target instanceof L2Character)
 		{
 			L2Character target1 = (L2Character) target;
-            angleChar = Util.calculateAngleFrom(target1, this);
-            angleTarget = Util.convertHeadingToDegree(target1.getHeading());
-            angleDiff = angleChar - angleTarget;
-            if (angleDiff <= -180 + maxAngleDiff) angleDiff += 180;
-            if (angleDiff >= 180 - maxAngleDiff) angleDiff -= 180;
-            if (Math.abs(angleDiff) <= maxAngleDiff)
-            {
-                if (Config.DEBUG)
-                    _log.info("Char " + getName() + " is side " + target.getName());
-                return true;
-            }
+			angleChar = Util.calculateAngleFrom(target1, this);
+			angleTarget = Util.convertHeadingToDegree(target1.getHeading());
+			angleDiff = angleChar - angleTarget;
+			if (angleDiff <= -180 + maxAngleDiff) angleDiff += 180;
+			if (angleDiff >= 180 - maxAngleDiff) angleDiff -= 180;
+			if (Math.abs(angleDiff) <= maxAngleDiff)
+			{
+				if (Config.DEBUG)
+					_log.info("Char " + getName() + " is side " + target.getName());
+				return true;
+			}
 		}
 		else
 		{

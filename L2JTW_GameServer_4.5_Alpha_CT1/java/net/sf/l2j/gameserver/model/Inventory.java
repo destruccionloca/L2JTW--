@@ -1204,7 +1204,8 @@ public abstract class Inventory extends ItemContainer
 		case L2Item.CRYSTAL_C:      arrowsId = 1342; break; // Fine steel arrow
 		case L2Item.CRYSTAL_B:      arrowsId = 1343; break; // Silver arrow
 		case L2Item.CRYSTAL_A:      arrowsId = 1344; break; // Mithril arrow
-		case L2Item.CRYSTAL_S:      arrowsId = 1345; break; // Shining arrow
+		case L2Item.CRYSTAL_S:
+		case L2Item.CRYSTAL_S80:    arrowsId = 1345; break; // Shining arrow
 		}
 
 		// Get the L2ItemInstance corresponding to the item identifier and return it
@@ -1228,7 +1229,8 @@ public abstract class Inventory extends ItemContainer
         case L2Item.CRYSTAL_C:      boltsId = 9634; break; // Steel Bolt
         case L2Item.CRYSTAL_B:      boltsId = 9635; break; // Silver Bolt
         case L2Item.CRYSTAL_A:      boltsId = 9636; break; // Mithril Bolt
-        case L2Item.CRYSTAL_S:      boltsId = 9637; break; // Shining Bolt
+        case L2Item.CRYSTAL_S:
+        case L2Item.CRYSTAL_S80:    boltsId = 9637; break; // Shining Bolt
         }
 
         // Get the L2ItemInstance corresponding to the item identifier and return it
@@ -1245,8 +1247,7 @@ public abstract class Inventory extends ItemContainer
 	    {
 	        con = L2DatabaseFactory.getInstance().getConnection();
 	        PreparedStatement statement = con.prepareStatement(
-	                                                           "SELECT object_id FROM items WHERE owner_id=? AND (loc=? OR loc=?) " +
-	        "ORDER BY object_id DESC");
+	                "SELECT object_id, item_id, count, enchant_level, loc, loc_data, price_sell, price_buy, custom_type1, custom_type2, mana_left FROM items WHERE owner_id=? AND (loc=? OR loc=?) ");
 	        statement.setInt(1, getOwner().getObjectId());
 	        statement.setString(2, getBaseLocation().name());
 	        statement.setString(3, getEquipLocation().name());
@@ -1255,8 +1256,7 @@ public abstract class Inventory extends ItemContainer
 	        L2ItemInstance item;
 	        while (inv.next())
 	        {
-	            int objectId = inv.getInt(1);
-	            item = L2ItemInstance.restoreFromDb(objectId);
+	            item = L2ItemInstance.restoreFromDb(getOwner().getObjectId(), inv);
 	            if (item == null) continue;
 	            
 	            if(getOwner() instanceof L2PcInstance)

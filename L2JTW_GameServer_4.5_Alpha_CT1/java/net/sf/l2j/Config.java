@@ -551,6 +551,9 @@ public final class Config
     public static String  PROTECTED_ITEMS;
     /** List of items that will not be destroyed */
     public static List<Integer> LIST_PROTECTED_ITEMS = new FastList<Integer>();
+    
+    /** Interval that the gameserver will update and store character information */
+    public static int CHAR_STORE_INTERVAL;
 
     /** Auto destroy nonequipable items dropped by players */
     public static boolean     DESTROY_DROPPED_PLAYER_ITEM;
@@ -688,6 +691,7 @@ public final class Config
     // Community Board
     /** Type of community */
     public static String COMMUNITY_TYPE;
+    public static boolean BBS_SHOW_PLAYERLIST;
     public static String BBS_DEFAULT;
     /** Show level of the community board ? */
     public static boolean SHOW_LEVEL_COMMUNITYBOARD;
@@ -1408,6 +1412,9 @@ public final class Config
                 for (String id : PROTECTED_ITEMS.split(",")) {
                     LIST_PROTECTED_ITEMS.add(Integer.parseInt(id));
                 }
+                
+                CHAR_STORE_INTERVAL        = Integer.parseInt(optionsSettings.getProperty("CharacterDataStoreInterval", "15"));
+                
                 DESTROY_DROPPED_PLAYER_ITEM        = Boolean.valueOf(optionsSettings.getProperty("DestroyPlayerDroppedItem", "false"));
                 DESTROY_EQUIPABLE_PLAYER_ITEM    = Boolean.valueOf(optionsSettings.getProperty("DestroyEquipableItem", "false"));
                 SAVE_DROPPED_ITEM                = Boolean.valueOf(optionsSettings.getProperty("SaveDroppedItem", "false"));
@@ -1455,6 +1462,7 @@ public final class Config
                 GMAUDIT                         = Boolean.valueOf(optionsSettings.getProperty("GMAudit", "False"));
 
                 COMMUNITY_TYPE                  = optionsSettings.getProperty("CommunityType", "old").toLowerCase();
+                BBS_SHOW_PLAYERLIST             = Boolean.valueOf(optionsSettings.getProperty("BBSShowPlayerList", "false"));
                 BBS_DEFAULT                     = optionsSettings.getProperty("BBSDefault", "_bbshome");
                 SHOW_LEVEL_COMMUNITYBOARD       = Boolean.valueOf(optionsSettings.getProperty("ShowLevelOnCommunityBoard", "False"));
                 SHOW_STATUS_COMMUNITYBOARD      = Boolean.valueOf(optionsSettings.getProperty("ShowStatusOnCommunityBoard", "True"));
@@ -2669,6 +2677,7 @@ public final class Config
         else if (pName.equalsIgnoreCase("BypassValidation")) BYPASS_VALIDATION = Boolean.valueOf(pValue);
 
         else if (pName.equalsIgnoreCase("CommunityType")) COMMUNITY_TYPE = pValue.toLowerCase();
+        else if (pName.equalsIgnoreCase("BBSShowPlayerList")) BBS_SHOW_PLAYERLIST = Boolean.valueOf(pValue);
         else if (pName.equalsIgnoreCase("BBSDefault")) BBS_DEFAULT = pValue;
         else if (pName.equalsIgnoreCase("ShowLevelOnCommunityBoard")) SHOW_LEVEL_COMMUNITYBOARD = Boolean.valueOf(pValue);
         else if (pName.equalsIgnoreCase("ShowStatusOnCommunityBoard")) SHOW_STATUS_COMMUNITYBOARD = Boolean.valueOf(pValue);
