@@ -1416,8 +1416,7 @@ public class FourSepulchersManager
             for(L2PcInstance player :L2World.getInstance().getAllPlayers())
             {
             	if (BossZoneManager.getInstance().checkIfInZone("FourSepulcher", player) &&
-            		(player.getZ() >= -7250 && player.getZ() <= -6841) &&
-            		!player.isGM())
+            		(player.getZ() >= -7250 && player.getZ() <= -6841))
             	{
             		int driftX = Rnd.get(-80,80);
             		int driftY = Rnd.get(-80,80);

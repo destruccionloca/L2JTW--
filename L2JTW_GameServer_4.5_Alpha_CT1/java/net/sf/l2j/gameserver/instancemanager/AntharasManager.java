@@ -266,13 +266,13 @@ public class AntharasManager
     	for(L2PcInstance pc : _PlayersInLair)
     	{
     		if(pc.getQuestState(_QuestName) != null) pc.getQuestState(_QuestName).exitQuest(true);
-    		if(BossZoneManager.getInstance().checkIfInZone(_ZoneType, pc))
-    		{
-        		int driftX = Rnd.get(-80,80);
-        		int driftY = Rnd.get(-80,80);
-        		int loc = Rnd.get(4);
-        		pc.teleToLocation(_BanishmentLocation[loc][0] + driftX,_BanishmentLocation[loc][1] + driftY,_BanishmentLocation[loc][2]);
-    		}
+    		if(BossZoneManager.getInstance().checkIfInZone(_ZoneType, pc));
+    		//{
+        		//int driftX = Rnd.get(-80,80);
+        		//int driftY = Rnd.get(-80,80);
+        		//int loc = Rnd.get(4);
+        		//pc.teleToLocation(_BanishmentLocation[loc][0] + driftX,_BanishmentLocation[loc][1] + driftY,_BanishmentLocation[loc][2]);
+    		//}
     	}
     	_PlayersInLair.clear();
     }

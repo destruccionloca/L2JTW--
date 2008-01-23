@@ -9325,8 +9325,9 @@ public final class L2PcInstance extends L2PlayableInstance
             sendMessage("±K»yÀW¹DÃö³¬¡C");
 
 		revalidateZone(true);
+
 		// [L2J_JP ADD SANDMAN] Check of a restart prohibition area.
-		if(BossZoneManager.getInstance().getZone(this) != null && !isGM())
+		if(BossZoneManager.getInstance().getZone(this) != null)
 		{
 	    	String zn = BossZoneManager.getInstance().getZone(this).getZoneName();
 
@@ -9338,7 +9339,7 @@ public final class L2PcInstance extends L2PlayableInstance
 	    		int driftY = Rnd.get(-80,80);
 	    		teleToLocation(178293 + driftX,-84607 + driftY,-7216);
 	    	}
-	    	
+/**	    	
 	    	// It is less than a time limit from player restarting.
     		// TODO write code for restart fight against bosses.
 	    	// Lair of bosses,It is less than 30 minutes from server starting.
@@ -9434,6 +9435,7 @@ public final class L2PcInstance extends L2PlayableInstance
         		if (getQuestState("sailren") != null) getQuestState("sailren").exitQuest(true);
     			teleToLocation(MapRegionTable.TeleportWhereType.Town);
     		}
+**/
 		}
 	}
 	public long getLastAccess()
