@@ -3544,6 +3544,12 @@ public enum SystemMessageId
         CANNOT_ATTACK_WITH_FISHING_POLE(1472),
 
         /**
+         * ID: 1474<br>
+         * Message: $s1 is not available.
+         */
+        S1_IS_NOT_AVAILABLE(1474),
+
+        /**
          * ID: 1479<br>
          * Message: That is the wrong grade of soulshot for that fishing pole.
          */

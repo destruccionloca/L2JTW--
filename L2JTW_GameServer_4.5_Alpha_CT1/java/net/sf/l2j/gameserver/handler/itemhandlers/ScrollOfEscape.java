@@ -74,10 +74,13 @@ public class ScrollOfEscape implements IItemHandler
             return;
         }
 
-        if (BossZoneManager.getInstance().getZone(activeChar) != null && !activeChar.isGM())
+        if (BossZoneManager.getInstance().getZone(activeChar) != null )//&& !activeChar.isGM())
         {
             activeChar.sendPacket(new ActionFailed());
-            activeChar.sendPacket(new SystemMessage(SystemMessageId.CANNOT_USE_SCROLL_OF_ESCAPE_INSIDE_BOSS_ZONE));
+
+			SystemMessage smsg = new SystemMessage(SystemMessageId.S1_IS_NOT_AVAILABLE);
+			smsg.addItemName(item.getItemId());
+			activeChar.sendPacket(smsg);
             return;
         }
 
