@@ -70,11 +70,12 @@ public class ScrollOfEscape implements IItemHandler
 
         if (activeChar.isSitting())
         {
+            // 坐下時角色無法行動。
             activeChar.sendPacket(new SystemMessage(SystemMessageId.CANT_MOVE_SITTING));
             return;
         }
-
-        if (BossZoneManager.getInstance().getZone(activeChar) != null )//&& !activeChar.isGM())
+/**
+        if (BossZoneManager.getInstance().getZone(activeChar) != null && !activeChar.isGM())
         {
             activeChar.sendPacket(new ActionFailed());
 
@@ -83,36 +84,43 @@ public class ScrollOfEscape implements IItemHandler
 			activeChar.sendPacket(smsg);
             return;
         }
-
+**/
         if (activeChar.isInOlympiadMode())
         {
             activeChar.sendPacket(new SystemMessage(SystemMessageId.THIS_ITEM_IS_NOT_AVAILABLE_FOR_THE_OLYMPIAD_EVENT));
             return;
         }
 
-        // Check to see if the player is in a festival.
+        // 檢查玩家如果在黑暗的祭典
         if (activeChar.isFestivalParticipant())
         {
-            activeChar.sendPacket(SystemMessage.sendString("黑暗的祭典中無法使用。"));
+        	//無法使用「$s1」。
+        	SystemMessage smsg = new SystemMessage(SystemMessageId.S1_IS_NOT_AVAILABLE);
+			smsg.addItemName(item.getItemId());
+			activeChar.sendPacket(smsg);
             return;
         }
 
-
-        // Check to see if player is in jail
+        // 檢查玩家如果在監獄
         if (activeChar.isInJail())
         {
-            activeChar.sendMessage("GM詢問處中無法使用。");
+        	//無法使用「$s1」。
+			SystemMessage smsg = new SystemMessage(SystemMessageId.S1_IS_NOT_AVAILABLE);
+			smsg.addItemName(item.getItemId());
+			activeChar.sendPacket(smsg);
             return;
         }
-        // Check to see if player is in a duel
+        // 檢查玩家如果在決鬥中
         if (activeChar.isInDuel())
         {
-        	activeChar.sendPacket(SystemMessage.sendString("You cannot use escape skills during a duel."));
+        	//無法使用「$s1」。
+			SystemMessage smsg = new SystemMessage(SystemMessageId.S1_IS_NOT_AVAILABLE);
+			smsg.addItemName(item.getItemId());
+			activeChar.sendPacket(smsg);
             return;
         }
 
-
-	//activeChar.abortCast();
+        //activeChar.abortCast();
         activeChar.getAI().setIntention(CtrlIntention.AI_INTENTION_IDLE);
         //SoE Animation section
         activeChar.setTarget(activeChar);
@@ -171,12 +179,16 @@ public class ScrollOfEscape implements IItemHandler
                 }
                 else if(_itemId == 5858) // do nothing
                 {
+                	//血盟沒有擁有根據地。
                 	_activeChar.sendPacket(new SystemMessage(SystemMessageId.CLAN_HAS_NO_CLAN_HALL));
                     return;
                 }
                 else if(_itemId == 5859) // do nothing
                 {
-                	_activeChar.sendPacket(SystemMessage.sendString("Your clan does not own a castle."));
+                	//無法使用「$s1」。
+        			SystemMessage smsg = new SystemMessage(SystemMessageId.S1_IS_NOT_AVAILABLE);
+        			smsg.addItemName(_itemId);
+                	_activeChar.sendPacket(smsg);
                     return;
                 }
                 else

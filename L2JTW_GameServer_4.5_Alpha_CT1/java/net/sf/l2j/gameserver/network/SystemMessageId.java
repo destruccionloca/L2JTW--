@@ -2187,10 +2187,16 @@ public enum SystemMessageId
 
 
     /**
-    * ID: 810<br>
-    * Message: Invalid macro. Refer to the Help file for instructions.
+    * ID: 809<br>
+    * Message: You are stuck. You will be transported to the nearest village in five minutes.
     */
-    INVALID_MACRO(810),
+    YOU_ARE_STUCK(809),
+
+    /**
+     * ID: 810<br>
+     * Message: Invalid macro. Refer to the Help file for instructions.
+     */
+     INVALID_MACRO(810),
 
     /**
     * ID: 816<br>
@@ -2808,6 +2814,12 @@ public enum SystemMessageId
          * Message: The next seed purchase price is $s1 adena.
          */
         THE_NEXT_SEED_PURCHASE_PRICE_IS_S1_ADENA(1041),
+
+        /**
+         * ID: 1043<br>
+         * Message: At the current time, the "/unstuck" command cannot be used. Please send in a petition.
+         */
+        UNSTUCK_COMMAND_CANNOT_BE_USED(1043),
 
         /**
          * ID: 1044<br>

@@ -57,30 +57,31 @@ public class Escape implements IUserCommandHandler
 
               int unstuckTimer = (activeChar.getAccessLevel() >=REQUIRED_LEVEL? 5000 : Config.UNSTUCK_INTERVAL*1000 );
 
-        // Check to see if the player is in a festival.
+        // 檢查玩家如果在黑暗祭典內
         if (activeChar.isFestivalParticipant())
         {
-            activeChar.sendPacket(SystemMessage.sendString("無法在黑暗的祭典內使用。"));
+            //現在時刻無法嘗試「/逃脫」指令。請申請訴求。
+    		activeChar.sendPacket(new SystemMessage(SystemMessageId.UNSTUCK_COMMAND_CANNOT_BE_USED));
             return false;
         }
 
-        // Check to see if player is in jail
+        // 檢查玩家如果在監獄
         if (activeChar.isInJail())
         {
-            activeChar.sendMessage("You can not escape from jail.");
+            //現在時刻無法嘗試「/逃脫」指令。請申請訴求。
+    		activeChar.sendPacket(new SystemMessage(SystemMessageId.UNSTUCK_COMMAND_CANNOT_BE_USED));
             return false;
         }
 
-  
+/**  
         if (BossZoneManager.getInstance().getZone(activeChar) != null && !activeChar.isGM())
         {
             activeChar.sendMessage("You may not use an escape command in a Boss Zone.");
             return false;
         }
-
-        SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-        sm.addString("SYS");
-        sm.addString("將在" + unstuckTimer/60000 + "分鐘後返回村莊。");
+**/
+        //不能確認是否處於無法移動的地形。5分鐘之後將逃脫到村莊。
+		activeChar.sendPacket(new SystemMessage(SystemMessageId.YOU_ARE_STUCK));
 
         activeChar.getAI().setIntention(CtrlIntention.AI_INTENTION_IDLE);
         //SoE Animation section
