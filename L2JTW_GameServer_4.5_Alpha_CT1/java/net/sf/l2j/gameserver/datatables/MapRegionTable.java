@@ -226,6 +226,39 @@ public class MapRegionTable
 		return castle;
 	}
 
+	public String getAreaName(L2Character activeChar)
+	{
+		int areaId = getClosestTownNumber(activeChar);
+		String AreaName ;
+		switch (areaId)
+		{
+		case 0:  AreaName = "緗"; break;//Talking Island Village
+        case 1:  AreaName = "稼风"; break; //Elven Village
+        case 2:  AreaName = "稼风"; break; //Dark Elven Village
+        case 3:  AreaName = "疭"; break; //Orc Village
+        case 4:  AreaName = "疭"; break; //Dwarven Village
+        case 5:  AreaName = "緗"; break; //Town of Gludio
+        case 6:  AreaName = "緗"; break; //Gludin Village
+        case 7:  AreaName = "緗"; break; //Town of Dion
+        case 8:  AreaName = "━"; break; //Town of Giran
+        case 9:  AreaName = "稼风"; break; //Town of Oren
+        case 10: AreaName = "ㄈ"; break; //Town of Aden
+        case 11: AreaName = "ㄈ"; break; //Hunters Village
+        case 12: AreaName = "━"; break; //Giran Harbor
+        case 13: AreaName = "眔"; break; //Heine
+        case 14: AreaName = "緗"; break; //Rune Township
+        case 15: AreaName = "蔼笷疭"; break; //Town of Goddard
+        case 16: AreaName = "疭"; break; //Town of Shuttgart
+        case 17: AreaName = "稼风"; break; //Ivory Tower
+        case 18: AreaName = "緗"; break; //Primeval Isle Wharf
+        case 19: AreaName = "ㄈ"; break; //Kamael Village 
+     	case 20: AreaName = "眔"; break; //South of Wastelands Camp 
+     	case 21: AreaName = "緗"; break; //Fantasy Island 
+        default: AreaName = "ㄈ"; break; //Town of Aden
+		}
+		return AreaName;
+	}
+
 	public int getClosestTownNumber(L2Character activeChar)
     {
         return getMapRegion(activeChar.getX(), activeChar.getY());

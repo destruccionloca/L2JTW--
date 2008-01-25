@@ -32,7 +32,6 @@ import net.sf.l2j.gameserver.model.L2Multisell;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
-import net.sf.l2j.gameserver.serverpackets.L2GameServerPacket;
 import net.sf.l2j.gameserver.serverpackets.NpcHtmlMessage;
 import javolution.text.TextBuilder;
 
@@ -73,47 +72,58 @@ public class AdminAdmin implements IAdminCommandHandler {
 		 "admin_config_other",
 		 "admin_config_rate","admin_reload", 
 		 "admin_set",
-		 "admin_cache",
 		 "admin_saveolymp",
-		 "admin_manualhero",
-		 "admin_eventmenu",
 		 "admin_manualhero",
 		 "admin_set_mod",
 		 "admin_set",
 		 "admin_set_menu",
+		 "admin_eventmenu"
 		 };
 
 
 
 	private static final int REQUIRED_LEVEL = Config.GM_MENU;
 
-	public boolean useAdminCommand(String command, L2PcInstance activeChar) 
-	{
-
-        if (!Config.ALT_PRIVILEGES_ADMIN)
-            if (!(checkLevel(activeChar.getAccessLevel()) && activeChar.isGM())) return false;
-        
-        //if (command.equals("admin_admin")) showMainPage(activeChar);
-        //if (command.equals("admin_admin2")) showMainPage2(activeChar);
-        if (command.equals("admin_cache")) showMainPageCache(activeChar);
-        if (command.equals("admin_eventmenu")) showMainPageEventMenu(activeChar);
-        
-        if (command.equals("admin_config_option"))      showOptionConfigPage(activeChar);
-        if (command.equals("admin_config_altsetting"))  showAltsetConfigPage(activeChar);
-        if (command.equals("admin_config_other"))       showOtherConfigPage(activeChar);
-        if (command.equals("admin_config_rate"))        showRateConfigPage(activeChar);
-        
-        
+	public boolean useAdminCommand(String command, L2PcInstance activeChar) {
 
 		if (!Config.ALT_PRIVILEGES_ADMIN)
 			if (!(checkLevel(activeChar.getAccessLevel()) && activeChar.isGM()))
 				return false;
 
+        //if (command.equals("admin_admin")) showMainPage(activeChar);
+        //if (command.equals("admin_admin2")) showMainPage2(activeChar);
+        //if (command.equals("admin_cache")) //showMainPageCache(activeChar);
+        //if (command.equals("admin_eventmenu")) //showMainPageEventMenu(activeChar);
+
 		GMAudit.auditGMAction(activeChar.getName(), command, (activeChar.getTarget() != null?activeChar.getTarget().getName():"no-target"), "");
 
 		if (command.startsWith("admin_admin"))
 		{
-			showPage(activeChar,command);
+			showMainPage(activeChar,command);
+		}
+		else if (command.startsWith("admin_tw_menu"))
+		{
+			showTWMainPage(activeChar,command);
+		}
+		else if (command.equals("admin_eventmenu"))
+		{
+			showMainPageEventMenu(activeChar,command);
+		}
+		else if (command.equals("admin_config_option"))
+		{
+			showOptionConfigPage(activeChar,command);
+		}
+		else if (command.equals("admin_config_altsetting"))
+		{
+			showAltsetConfigPage(activeChar,command);
+		}
+		else if (command.equals("admin_config_other"))
+		{
+			showOtherConfigPage(activeChar,command);
+		}
+		else if (command.equals("admin_config_rate"))
+		{
+			showRateConfigPage(activeChar,command);
 		}
 		else if(command.startsWith("admin_gmliston"))
 		{
@@ -282,20 +292,14 @@ public class AdminAdmin implements IAdminCommandHandler {
 				String pName = parameter[0].trim();
 				String pValue = parameter[1].trim();
 				if (Config.setParameterValue(pName, pValue))
-					activeChar.sendMessage("數值 "+pName+" 成功設定為 "+pValue);
+					activeChar.sendMessage("數值 "+pName+" 成功設定為 "+pValue+"。");
 				else
 					activeChar.sendMessage("設定值錯誤。");
-				
-				 if (command.equals("admin_config_option"))      showOptionConfigPage(activeChar);
-			        if (command.equals("admin_config_altsetting"))  showAltsetConfigPage(activeChar);
-			        if (command.equals("admin_config_other"))       showOtherConfigPage(activeChar);
-			        if (command.equals("admin_config_rate"))        showRateConfigPage(activeChar);
 			}
 			catch(Exception e)
 			{
-
 				if (cmd.length==2)
-					activeChar.sendMessage("使用方法: //set 函數 數值");
+					activeChar.sendMessage("使用方法: //set 函數數值。");
 			}
 			finally
 			{
@@ -308,9 +312,9 @@ public class AdminAdmin implements IAdminCommandHandler {
 				}
 			}
 		}
-				return true;
+		return true;
+	}
 
-		}
 	public String[] getAdminCommandList()
 	{
 		return ADMIN_COMMANDS;
@@ -322,10 +326,8 @@ public class AdminAdmin implements IAdminCommandHandler {
 	}
 
 
-	private void showPage(L2PcInstance activeChar, String command)
+	private void showMainPage(L2PcInstance activeChar, String command)
 	{
-
-		
 
 		int mode = 0;
 		String filename=null;
@@ -338,7 +340,8 @@ public class AdminAdmin implements IAdminCommandHandler {
 		{
 		case 1:
 			{
-			showMainPage(activeChar);
+			//showTWMainPage(activeChar);
+			filename="main";
 			break;
 			}
 		case 2:
@@ -362,32 +365,25 @@ public class AdminAdmin implements IAdminCommandHandler {
 			break;
 			}
 		default:
-			showMainPage(activeChar);
-			
-/*
+			//showMainPage(activeChar);
 			if (Config.GM_ADMIN_MENU_STYLE.equals("modern"))
 				filename="main";
 			else
 				filename="classic";
-*/
+
 		break;
 		}
-		if (filename!=null)
+		//if (filename!=null)
 		AdminHelpPage.showHelpPage(activeChar, filename+"_menu.htm");
-		else
-		showMainPage(activeChar);
-
+		//else
+		//showMainPage(activeChar);
 	}
 
-
-	 public void showMainPage(L2PcInstance activeChar)
+	 public void showTWMainPage(L2PcInstance activeChar, String command)
 	    {
 	        NpcHtmlMessage adminReply = new NpcHtmlMessage(5);
 
-
-
-
-	        StringBuffer replyMSG = new StringBuffer("<html><title>L2JTW 伺服器控制介面</title><body>");
+	        StringBuffer replyMSG = new StringBuffer("<html><title>L2JTW 伺服器控制首頁</title><body>");
 	        replyMSG.append("<br><center><table width=260>");
 	       	replyMSG.append("<tr>");
 	        replyMSG.append("<td><button value=\"設定\" action=\"bypass -h admin_config_option\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
@@ -415,7 +411,7 @@ public class AdminAdmin implements IAdminCommandHandler {
 	        replyMSG.append("<button value=\"傳送選單\" action=\"bypass -h admin_show_moves\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
 	        replyMSG.append("<br>");
 	        replyMSG.append("<button value=\"物品強化管理\" action=\"bypass -h admin_enchant\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
-	        replyMSG.append("<button value=\"Cache控制介面\" action=\"bypass -h admin_cache\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");    
+	        replyMSG.append("<button value=\"多功能介面\" action=\"bypass -h admin_ctf\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");    
 	        replyMSG.append("<button value=\"訴求管理介面\" action=\"bypass -h admin_view_petitions\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
 	        replyMSG.append("<button value=\"NPC管理介面\" action=\"bypass -h admin_show_spawns\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
 	        replyMSG.append("<br>");
@@ -444,16 +440,16 @@ public class AdminAdmin implements IAdminCommandHandler {
 	        adminReply.setHtml(replyMSG.toString());
 	        activeChar.sendPacket(adminReply); 
 	    }
-	    
+/*	    
 	    public void showMainPage2(L2PcInstance activeChar)
 	    {
 	        NpcHtmlMessage adminReply = new NpcHtmlMessage(5);
 
-	        StringBuffer replyMSG = new StringBuffer("<html><body>");
+	        StringBuffer replyMSG = new StringBuffer("<html><title>L2JTW 多功能控制介面</title><body>");
 	        replyMSG.append("<center><table width=260><tr><td width=40>");
 	        replyMSG.append("<button value=\"首頁\" action=\"bypass -h admin_admin\" width=45 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
 	        replyMSG.append("</td><td width=180>");
-	        replyMSG.append("<center>伺服器管理台</center>");
+	        replyMSG.append("<center>多功能控制介面</center>");
 	        replyMSG.append("</td><td width=40><button value=\"返回\" action=\"bypass -h admin_admin\" width=45 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
 	        replyMSG.append("</td></tr></table></center>");
 	        replyMSG.append("<center><table width=200><tr><td>");
@@ -550,12 +546,12 @@ public class AdminAdmin implements IAdminCommandHandler {
 	        adminReply.setHtml(replyMSG.toString());
 	        activeChar.sendPacket(adminReply); 
 	    }
-	    
-	    public void showMainPageEventMenu(L2PcInstance activeChar)
+*/
+	    public void showMainPageEventMenu(L2PcInstance activeChar, String command)
 	    {
 	        NpcHtmlMessage adminReply = new NpcHtmlMessage(5);
 
-	        StringBuffer replyMSG = new StringBuffer("<html><body>");
+	        StringBuffer replyMSG = new StringBuffer("<html><title>L2JTW 多功能控制介面</title><body>");
 	        replyMSG.append("<center><table width=260><tr><td width=40>");
 	        replyMSG.append("<button value=\"首頁\" action=\"bypass -h admin_admin\" width=45 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
 	        replyMSG.append("</td><td width=180>");
@@ -581,13 +577,23 @@ public class AdminAdmin implements IAdminCommandHandler {
 	        adminReply.setHtml(replyMSG.toString());
 	        activeChar.sendPacket(adminReply); 
 	    }
-        public void showOptionConfigPage(L2PcInstance activeChar)
+
+    	/**
+    	 * 選擇設定處理 - 來自options.properties檔案資料
+    	 * @param activeChar
+    	 * @param command 
+    	 */
+        public void showOptionConfigPage(L2PcInstance activeChar, String command)
         {
             NpcHtmlMessage adminReply = new NpcHtmlMessage(5);
             
-            TextBuilder replyMSG = new TextBuilder("<html><body>");
+            TextBuilder replyMSG = new TextBuilder("<html><title>組態設定</title><body>");
             
-            replyMSG.append("<center><table width=270><tr><td width=60><button value=\"首頁\" action=\"bypass -h admin_admin\" width=60 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td><td width=150><center><font color=\"LEVEL\">伺服器管理主頁</font></center></td><td width=60><button value=\"返回\" action=\"bypass -h admin_config_option\" width=60 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr></table></center><br>");
+            replyMSG.append("<center><table width=270><tr>");
+            replyMSG.append("<td width=60><button value=\"首頁\" action=\"bypass -h admin_admin\" width=60 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
+            replyMSG.append("<td width=150><center><font color=\"LEVEL\">其他設定</font></center></td>");
+            replyMSG.append("<td width=60><button value=\"返回\" action=\"bypass -h admin_config_option\" width=60 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
+            replyMSG.append("</tr></table></center><br>");
             replyMSG.append("<center><table width=260><tr>");
             replyMSG.append("<td width=60>");
             replyMSG.append("<button value=\"選擇設定\" action=\"bypass -h admin_config_option\" width=60 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
@@ -611,24 +617,29 @@ public class AdminAdmin implements IAdminCommandHandler {
             //replyMSG.append("<tr><td><font color=\"LEVEL\">允許玩家丟棄物品</font> = " + Config.ALLOW_DISCARDITEM + "</td><td></td><td><button value=\"" + !Config.ALLOW_DISCARDITEM + "\" action=\"bypass -h admin_set AllowDiscardItem " + !Config.ALLOW_DISCARDITEM + "\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
             replyMSG.append("<tr><td><font color=\"LEVEL\">精確掉落計算處理</font> = " + Config.PRECISE_DROP_CALCULATION + "</td><td></td><td><button value=\"" + !Config.PRECISE_DROP_CALCULATION + "\" action=\"bypass -h admin_set PreciseDropCalculation=" + !Config.PRECISE_DROP_CALCULATION + "\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
             replyMSG.append("<tr><td><font color=\"LEVEL\">堆疊物品掉落設定</font> = " + Config.MULTIPLE_ITEM_DROP + "</td><td></td><td><button value=\"" + !Config.MULTIPLE_ITEM_DROP + "\" action=\"bypass -h admin_set MultipleItemDrop " + !Config.MULTIPLE_ITEM_DROP + "\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
-            replyMSG.append("<tr><td><font color=\"LEVEL\">公布欄玩家等級顯示</font> = " + Config.SHOW_LEVEL_COMMUNITYBOARD + "</td><td></td><td><button value=\"" + !Config.SHOW_LEVEL_COMMUNITYBOARD + "\" action=\"bypass -h admin_set ShowLevelOnCommunityBoard=" + !Config.SHOW_LEVEL_COMMUNITYBOARD + "\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
-            replyMSG.append("<tr><td><font color=\"LEVEL\">公布欄玩家狀態顯示</font> = " + Config.SHOW_STATUS_COMMUNITYBOARD + "</td><td></td><td><button value=\"" + !Config.SHOW_STATUS_COMMUNITYBOARD + "\" action=\"bypass -h admin_set ShowStatusOnCommunityBoard=" + !Config.SHOW_STATUS_COMMUNITYBOARD + "\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
+            replyMSG.append("<tr><td><font color=\"LEVEL\">佈告欄玩家等級顯示</font> = " + Config.SHOW_LEVEL_COMMUNITYBOARD + "</td><td></td><td><button value=\"" + !Config.SHOW_LEVEL_COMMUNITYBOARD + "\" action=\"bypass -h admin_set ShowLevelOnCommunityBoard=" + !Config.SHOW_LEVEL_COMMUNITYBOARD + "\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
+            replyMSG.append("<tr><td><font color=\"LEVEL\">佈告欄玩家狀態顯示</font> = " + Config.SHOW_STATUS_COMMUNITYBOARD + "</td><td></td><td><button value=\"" + !Config.SHOW_STATUS_COMMUNITYBOARD + "\" action=\"bypass -h admin_set ShowStatusOnCommunityBoard=" + !Config.SHOW_STATUS_COMMUNITYBOARD + "\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
             replyMSG.append("</table></center></body></html>");
             adminReply.setHtml(replyMSG.toString());
             activeChar.sendPacket(adminReply);
         }
         
         /**
-         * 選擇設定處理頁 - 來自altsettings.properties檔案資料
+         * 替代設定處理 - 來自altsettings.properties檔案資料
          * @param activeChar
+         * @param command 
          */
-        public void showAltsetConfigPage(L2PcInstance activeChar)
+        public void showAltsetConfigPage(L2PcInstance activeChar, String command)
         {
             NpcHtmlMessage adminReply = new NpcHtmlMessage(5);
             
-            TextBuilder replyMSG = new TextBuilder("<html><body>");
+            TextBuilder replyMSG = new TextBuilder("<html><title>組態設定</title><body>");
             
-            replyMSG.append("<center><table width=270><tr><td width=60><button value=\"首頁\" action=\"bypass -h admin_admin\" width=60 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td><td width=150><center><font color=\"LEVEL\">選擇設定處理頁</font></center></td><td width=60><button value=\"返回\" action=\"bypass -h admin_config_option\" width=60 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr></table></center><br>");
+            replyMSG.append("<center><table width=270><tr>");
+            replyMSG.append("<td width=60><button value=\"首頁\" action=\"bypass -h admin_admin\" width=60 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
+            replyMSG.append("<td width=150><center><font color=\"LEVEL\">替代設定</font></center></td>");
+            replyMSG.append("<td width=60><button value=\"返回\" action=\"bypass -h admin_config_option\" width=60 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
+            replyMSG.append("</tr></table></center><br>");
             replyMSG.append("<center><table width=260><tr>");
             replyMSG.append("<td width=60>");
             replyMSG.append("<button value=\"選擇設定\" action=\"bypass -h admin_config_option\" width=60 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
@@ -657,16 +668,22 @@ public class AdminAdmin implements IAdminCommandHandler {
         }
         
         /**
-         * 其他設定處理頁 - 來自other.properties檔案資料
+         * 其他設定處理 - 來自other.properties檔案資料
          * @param activeChar
+         * @param command 
          */
-        public void showOtherConfigPage(L2PcInstance activeChar)
+        public void showOtherConfigPage(L2PcInstance activeChar, String command)
         {
             NpcHtmlMessage adminReply = new NpcHtmlMessage(5);
             
-            TextBuilder replyMSG = new TextBuilder("<html><body>");
+            TextBuilder replyMSG = new TextBuilder("<html><title>組態設定</title><body>");
             
-            replyMSG.append("<center><table width=270><tr><td width=60><button value=\"主頁\" action=\"bypass -h admin_admin\" width=60 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td><td width=150><center><font color=\"LEVEL\">其他設定處理頁</font></center></td><td width=60><button value=\"返回\" action=\"bypass -h admin_config_option\" width=60 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr></table></center><br>");
+            replyMSG.append("<center><table width=270><tr>");
+            replyMSG.append("<td width=60><button value=\"首頁\" action=\"bypass -h admin_admin\" width=60 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
+            replyMSG.append("<td width=150><center><font color=\"LEVEL\">其他設定</font></center></td>");
+            replyMSG.append("<td width=60><button value=\"返回\" action=\"bypass -h admin_config_option\" width=60 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
+            replyMSG.append("</tr></table></center><br>");
+
             replyMSG.append("<center><table width=260><tr>");
             replyMSG.append("<td width=60>");
             replyMSG.append("<button value=\"選擇設定\" action=\"bypass -h admin_config_option\" width=60 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
@@ -685,26 +702,26 @@ public class AdminAdmin implements IAdminCommandHandler {
             replyMSG.append("<tr><td><font color=\"LEVEL\">騎上座龍增加速度</font> = " + Config.STRIDER_SPEED + "</td><td><edit var=\"menu_command3\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set StriderSpeed=$menu_command3\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
             replyMSG.append("<tr><td><font color=\"LEVEL\">玩家攜帶物品限制</font> = " + Config.INVENTORY_MAXIMUM_NO_DWARF + "</td><td><edit var=\"menu_command4\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set=MaximumSlotsForNoDwarf $menu_command4\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
             replyMSG.append("<tr><td><font color=\"LEVEL\">矮人攜帶物品限制</font> = " + Config.INVENTORY_MAXIMUM_DWARF + "</td><td><edit var=\"menu_command5\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set=MaximumSlotsForDwarf $menu_command5\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
-            replyMSG.append("<tr><td><font color=\"LEVEL\">強化卷軸成功機率</font> = " + Config.ENCHANT_CHANCE_ARMOR + "</td><td><edit var=\"menu_command6\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set=EnchantChanceArmor $menu_command6\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
-            replyMSG.append("<tr><td><font color=\"LEVEL\">強化卷軸成功機率</font> = " + Config.ENCHANT_CHANCE_WEAPON + "</td><td><edit var=\"menu_command6\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set=EnchantChanceWeapon $menu_command6\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
-            //replyMSG.append("<tr><td><font color=\"LEVEL\">強化等級最高上限</font> = " + Config.ENCHANT_MAX_ARMOR + "</td><td><edit var=\"menu_command7\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set EnchantMaxArmor $menu_command7\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
-            replyMSG.append("<tr><td><font color=\"LEVEL\">強化等級最高上限</font> = " + Config.ENCHANT_MAX_WEAPON + "</td><td><edit var=\"menu_command7\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set EnchantMaxWeapon=$menu_command7\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
+            replyMSG.append("<tr><td><font color=\"LEVEL\">防具強化成功機率</font> = " + Config.ENCHANT_CHANCE_ARMOR + "</td><td><edit var=\"menu_command6\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set=EnchantChanceArmor $menu_command6\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
+            replyMSG.append("<tr><td><font color=\"LEVEL\">武器強化成功機率</font> = " + Config.ENCHANT_CHANCE_WEAPON + "</td><td><edit var=\"menu_command7\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set=EnchantChanceWeapon $menu_command6\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
+            replyMSG.append("<tr><td><font color=\"LEVEL\">防具強化最高上限</font> = " + Config.ENCHANT_MAX_ARMOR + "</td><td><edit var=\"menu_command8\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set EnchantMaxArmor $menu_command7\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
+            replyMSG.append("<tr><td><font color=\"LEVEL\">武器強化最高上限</font> = " + Config.ENCHANT_MAX_WEAPON + "</td><td><edit var=\"menu_command9\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set EnchantMaxWeapon=$menu_command7\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
             
             /*----回覆倍率----*/
-            replyMSG.append("<tr><td><font color=\"LEVEL\">體力回覆速度倍率</font> = " + Config.HP_REGEN_MULTIPLIER + "</td><td><edit var=\"menu_command8\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set HpRegenMultiplier=$menu_command8\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
-            replyMSG.append("<tr><td><font color=\"LEVEL\">魔法回覆速度倍率</font> = " + Config.MP_REGEN_MULTIPLIER + "</td><td><edit var=\"menu_command9\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set MpRegenMultiplier=$menu_command9\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
-            replyMSG.append("<tr><td><font color=\"LEVEL\">鬥志回覆速度倍率</font> = " + Config.CP_REGEN_MULTIPLIER + "</td><td><edit var=\"menu_command10\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set CpRegenMultiplier=$menu_command10\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
-            replyMSG.append("<tr><td><font color=\"LEVEL\">首領體力回覆倍率</font> = " + Config.RAID_HP_REGEN_MULTIPLIER + "</td><td><edit var=\"menu_command11\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set RaidHpRegenMultiplier=$menu_command11\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
-            replyMSG.append("<tr><td><font color=\"LEVEL\">首領魔法回覆倍率</font> = " + Config.RAID_MP_REGEN_MULTIPLIER + "</td><td><edit var=\"menu_command12\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set RaidMpRegenMultiplier=$menu_command12\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
-            replyMSG.append("<tr><td><font color=\"LEVEL\">首領強化防禦倍率</font> = " + Config.RAID_DEFENCE_MULTIPLIER + "</td><td><edit var=\"menu_command13\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set RaidDefenceMultiplier=$menu_command13\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
+            replyMSG.append("<tr><td><font color=\"LEVEL\">體力回覆速度倍率</font> = " + Config.HP_REGEN_MULTIPLIER + "</td><td><edit var=\"menu_command10\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set HpRegenMultiplier=$menu_command8\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
+            replyMSG.append("<tr><td><font color=\"LEVEL\">魔法回覆速度倍率</font> = " + Config.MP_REGEN_MULTIPLIER + "</td><td><edit var=\"menu_command11\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set MpRegenMultiplier=$menu_command9\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
+            replyMSG.append("<tr><td><font color=\"LEVEL\">鬥志回覆速度倍率</font> = " + Config.CP_REGEN_MULTIPLIER + "</td><td><edit var=\"menu_command12\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set CpRegenMultiplier=$menu_command10\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
+            replyMSG.append("<tr><td><font color=\"LEVEL\">首領體力回覆倍率</font> = " + Config.RAID_HP_REGEN_MULTIPLIER + "</td><td><edit var=\"menu_command13\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set RaidHpRegenMultiplier=$menu_command11\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
+            replyMSG.append("<tr><td><font color=\"LEVEL\">首領魔法回覆倍率</font> = " + Config.RAID_MP_REGEN_MULTIPLIER + "</td><td><edit var=\"menu_command14\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set RaidMpRegenMultiplier=$menu_command12\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
+            replyMSG.append("<tr><td><font color=\"LEVEL\">首領強化防禦倍率</font> = " + Config.RAID_DEFENCE_MULTIPLIER + "</td><td><edit var=\"menu_command15\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set RaidDefenceMultiplier=$menu_command13\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
             /*----處理機制----*/
-            replyMSG.append("<tr><td><font color=\"LEVEL\">脫逃指令處理時間</font> = " + Config.UNSTUCK_INTERVAL + "</td><td><edit var=\"menu_command14\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set UnstuckInterval=$menu_command14\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
-            replyMSG.append("<tr><td><font color=\"LEVEL\">登入傳送保護時間</font> = " + Config.PLAYER_SPAWN_PROTECTION + "</td><td><edit var=\"menu_command15\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set PlayerSpawnProtection $menu_command15\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
-            replyMSG.append("<tr><td><font color=\"LEVEL\">重生後鬥志恢復值</font> = " + Config.RESPAWN_RESTORE_CP + "</td><td><edit var=\"menu_command16\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set RespawnRestoreCP=$menu_command16\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
-            replyMSG.append("<tr><td><font color=\"LEVEL\">重生後體力恢復值</font> = " + Config.RESPAWN_RESTORE_HP + "</td><td><edit var=\"menu_command17\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set RespawnRestoreHP=$menu_command17\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
-            replyMSG.append("<tr><td><font color=\"LEVEL\">重生後魔法恢復值</font> = " + Config.RESPAWN_RESTORE_MP + "</td><td><edit var=\"menu_command18\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set RespawnRestoreMP=$menu_command18\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
-            replyMSG.append("<tr><td><font color=\"LEVEL\">一般商店最大數量</font> = " + Config.MAX_PVTSTORE_SLOTS_OTHER + "</td><td><edit var=\"menu_command19\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set MaxPvtStoreSlotsOther=$menu_command19\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
-            replyMSG.append("<tr><td><font color=\"LEVEL\">矮人商店最大數量</font> = " + Config.MAX_PVTSTORE_SLOTS_DWARF + "</td><td><edit var=\"menu_command20\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set MaxPvtStoreSlotsDwarf=$menu_command20\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
+            replyMSG.append("<tr><td><font color=\"LEVEL\">脫逃指令處理時間</font> = " + Config.UNSTUCK_INTERVAL + "</td><td><edit var=\"menu_command16\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set UnstuckInterval=$menu_command14\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
+            replyMSG.append("<tr><td><font color=\"LEVEL\">登入傳送保護時間</font> = " + Config.PLAYER_SPAWN_PROTECTION + "</td><td><edit var=\"menu_command17\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set PlayerSpawnProtection $menu_command15\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
+            replyMSG.append("<tr><td><font color=\"LEVEL\">重生後鬥志恢復值</font> = " + Config.RESPAWN_RESTORE_CP + "</td><td><edit var=\"menu_command18\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set RespawnRestoreCP=$menu_command16\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
+            replyMSG.append("<tr><td><font color=\"LEVEL\">重生後體力恢復值</font> = " + Config.RESPAWN_RESTORE_HP + "</td><td><edit var=\"menu_command19\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set RespawnRestoreHP=$menu_command17\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
+            replyMSG.append("<tr><td><font color=\"LEVEL\">重生後魔法恢復值</font> = " + Config.RESPAWN_RESTORE_MP + "</td><td><edit var=\"menu_command20\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set RespawnRestoreMP=$menu_command18\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
+            replyMSG.append("<tr><td><font color=\"LEVEL\">一般商店最大數量</font> = " + Config.MAX_PVTSTORE_SLOTS_OTHER + "</td><td><edit var=\"menu_command21\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set MaxPvtStoreSlotsOther=$menu_command19\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
+            replyMSG.append("<tr><td><font color=\"LEVEL\">矮人商店最大數量</font> = " + Config.MAX_PVTSTORE_SLOTS_DWARF + "</td><td><edit var=\"menu_command22\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set MaxPvtStoreSlotsDwarf=$menu_command20\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
             /*----啟用管理----*/
             replyMSG.append("<tr><td><font color=\"LEVEL\">允許寵物進化處理</font> = " + Config.ALLOW_WYVERN_UPGRADER + "</td><td></td><td><button value=\"" + !Config.ALLOW_WYVERN_UPGRADER + "\" action=\"bypass -h admin_set AllowWyvernUpgrader=" + !Config.ALLOW_WYVERN_UPGRADER + "\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
             replyMSG.append("<tr><td><font color=\"LEVEL\">覆蓋技能較低效果</font> = " + Config.EFFECT_CANCELING + "</td><td></td><td><button value=\"" + !Config.EFFECT_CANCELING + "\" action=\"bypass -h admin_set CancelLesserEffect " + !Config.EFFECT_CANCELING + "\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
@@ -718,16 +735,22 @@ public class AdminAdmin implements IAdminCommandHandler {
         }
         
         /**
-         * 特殊設定處理頁 - 來自rates.properties檔案資料
+         * 倍率設定處理 - 來自rates.properties檔案資料
          * @param activeChar
+         * @param command 
          */
-        public void showRateConfigPage(L2PcInstance activeChar)
+        public void showRateConfigPage(L2PcInstance activeChar, String command)
         {
             NpcHtmlMessage adminReply = new NpcHtmlMessage(5);
             
-            TextBuilder replyMSG = new TextBuilder("<html><body>");
+            TextBuilder replyMSG = new TextBuilder("<html><title>組態設定</title><body>");
             
-            replyMSG.append("<center><table width=270><tr><td width=60><button value=\"首頁\" action=\"bypass -h admin_admin\" width=60 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td><td width=150><center><font color=\"LEVEL\">特殊設定處理</font></center></td><td width=60><button value=\"返回\" action=\"bypass -h admin_config_option\" width=60 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr></table></center><br>");
+            replyMSG.append("<center><table width=270><tr>");
+            replyMSG.append("<td width=60><button value=\"首頁\" action=\"bypass -h admin_admin\" width=60 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
+            replyMSG.append("<td width=150><center><font color=\"LEVEL\">倍率設定</font></center></td>");
+            replyMSG.append("<td width=60><button value=\"返回\" action=\"bypass -h admin_config_option\" width=60 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
+            replyMSG.append("</tr></table></center><br>");
+
             replyMSG.append("<center><table width=260><tr>");
             replyMSG.append("<td width=60>");
             replyMSG.append("<button value=\"選擇設定\" action=\"bypass -h admin_config_option\" width=60 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");

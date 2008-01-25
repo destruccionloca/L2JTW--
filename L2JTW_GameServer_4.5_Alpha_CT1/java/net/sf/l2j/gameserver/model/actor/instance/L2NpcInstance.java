@@ -33,6 +33,7 @@ import net.sf.l2j.gameserver.datatables.ClanTable;
 import net.sf.l2j.gameserver.datatables.DoorTable;
 import net.sf.l2j.gameserver.datatables.HelperBuffTable;
 import net.sf.l2j.gameserver.datatables.ItemTable;
+import net.sf.l2j.gameserver.datatables.MapRegionTable;
 import net.sf.l2j.gameserver.datatables.NpcTable;
 import net.sf.l2j.gameserver.datatables.SkillTable;
 import net.sf.l2j.gameserver.datatables.SpawnTable;
@@ -1377,7 +1378,7 @@ public class L2NpcInstance extends L2Character
                 html.replace("%playername%", player.getName());
                 player.sendPacket(html);
             }
-            else if (command.equalsIgnoreCase("TerritoryStatus"))
+          else if (command.equalsIgnoreCase("TerritoryStatus"))
             {
 
             	NpcHtmlMessage html = new NpcHtmlMessage(getObjectId()); 
@@ -1394,7 +1395,7 @@ public class L2NpcInstance extends L2Character
             			html.setFile("data/html/territorynoclan.htm"); 
             		} 
             	} 
-            	html.replace("%castlename%", getCastle().getName()); 
+            	html.replace("%castlename%", MapRegionTable.getInstance().getAreaName(player)); 
             	html.replace("%taxpercent%", "" + getCastle().getTaxPercent()); 
             	html.replace("%objectId%", String.valueOf(getObjectId())); 
             	{ 

@@ -14,7 +14,6 @@
  */
 package net.sf.l2j.gameserver.clientpackets;
 
-import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -84,7 +83,6 @@ public class EnterWorld extends L2GameClientPacket
 {
     private static final String _C__03_ENTERWORLD = "[C] 03 EnterWorld";
     private static Logger _log = Logger.getLogger(EnterWorld.class.getName());
-	private static String Welcome_Path = "welcome" ;
     public TaskPriority getPriority() { return TaskPriority.PR_URGENT; }
 
 
@@ -237,31 +235,27 @@ public class EnterWorld extends L2GameClientPacket
         activeChar.sendPacket(esmc);
         sendPacket(new FriendList(activeChar));
 
-        SystemMessage sms = new SystemMessage(SystemMessageId.S1_S2);
-        sms.addString(getText("TDJKVFcgNC41IEFscGhhIGNvZGVuYW1lOiBLYW1hZWw="));check =1;
-        sendPacket(sms);
-        
         SystemMessage sm = new SystemMessage(SystemMessageId.WELCOME_TO_LINEAGE);
         sendPacket(sm);
 
-
-
-        Welcome_Path = "data/html/servnews.htm";
-        File mainText = new File(Config.DATAPACK_ROOT, Welcome_Path);        // Return the pathfile of the HTML file
-        if (mainText.exists())
-        {   
-            NpcHtmlMessage html = new NpcHtmlMessage(1);
-            html.setFile(Welcome_Path);
-            sendPacket(html);
+        if (Config.SHOW_L2J_LICENSE)
+        {
+            sm = new SystemMessage(SystemMessageId.S1_S2);
+            sm.addString(getText("TDJKVFcgNC41IEFscGhhIGNvZGVuYW1lOiBLYW1hZWw="));check =1;
+            sendPacket(sm);
         }
 
         sm = null;
 
-
-
         SevenSigns.getInstance().sendCurrentPeriodMsg(activeChar);
         Announcements.getInstance().showAnnouncements(activeChar);
 
+        if (Config.SERVER_NEWS)
+        {
+            String serverNews = HtmCache.getInstance().getHtm("data/html/servnews.htm");
+            if (serverNews != null)
+                sendPacket(new NpcHtmlMessage(1, serverNews));
+        }
 
 		Quest.playerEnter(activeChar);
 
