@@ -4422,10 +4422,10 @@ public final class L2PcInstance extends L2PlayableInstance
                 if (answer == 1)
                 {
                     CoupleManager.getInstance().createCouple(ptarget, L2PcInstance.this);
-                    ptarget.sendMessage("挑戰被 >接受<");
+                    ptarget.sendMessage("訂婚已被接受。");
                 }
                 else
-                    ptarget.sendMessage("挑戰被 >拒絕<");
+                    ptarget.sendMessage("訂婚已被拒絕。");
             }
         }
     }

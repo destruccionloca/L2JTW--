@@ -2214,20 +2214,7 @@ public class L2NpcInstance extends L2Character
                       doCast(skill);
               }
            }
-// L2JTW addon start =======================================
-           else
-               if(player_level>=helperBuffItem.getLowerLevel() && player_level<=helperBuffItem.getUpperLevel())
-               {
-                   skill = SkillTable.getInstance().getInfo(helperBuffItem.getSkillID(),helperBuffItem.getSkillLevel());
-                   if (skill.getSkillType() == SkillType.SUMMON)
-                       player.doCast(skill);
-                   else
-                       this.doCast(skill);
-               }
-// L2JTW addon end =========================================
         }
-        
-        
     }
     
     public void showChatWindow(L2PcInstance player)

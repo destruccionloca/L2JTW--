@@ -18,16 +18,16 @@ import java.util.List;
 import java.util.concurrent.Future;
 
 import net.sf.l2j.Config;
-import net.sf.l2j.gameserver.datatables.SkillTable;
+import net.sf.l2j.gameserver.GameTimeController;
 import net.sf.l2j.gameserver.ThreadPoolManager;
 import net.sf.l2j.gameserver.ai.CtrlIntention;
+import net.sf.l2j.gameserver.datatables.SkillTable;
 import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
-import net.sf.l2j.gameserver.GameTimeController;
 
 /**
  * This class manages all RaidBoss.
@@ -36,6 +36,7 @@ import net.sf.l2j.gameserver.GameTimeController;
  */
 public final class L2BossInstance extends L2MonsterInstance
 {
+// L2J_JP addon start ======================================
 	//protected static Logger _log = Logger.getLogger(L2BossInstance.class.getName());
 	private boolean _teleportedToNest;
 
@@ -59,9 +60,7 @@ public final class L2BossInstance extends L2MonsterInstance
     {
         _isInSocialAction = value;
     }
-    
-    // [L2J_JP ADD END SANDMAN]
-
+// L2J_JP addon end ========================================
     /**
      * Constructor for L2BossInstance. This represent all grandbosses:
      * <ul>
@@ -142,7 +141,6 @@ public final class L2BossInstance extends L2MonsterInstance
     @Override
 	public void reduceCurrentHp(double damage, L2Character attacker, boolean awake)
     {
-
         // [L2J_JP ADD SANDMAN]
         if (this.IsInSocialAction() || this.isInvul()) return;
 
