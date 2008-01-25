@@ -1,22 +1,4 @@
 /*
-<<<<<<< .mine
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General PublicA License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
- * 02111-1307, USA.
- *
- * http://www.gnu.org/copyleft/gpl.html
-=======
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
@@ -29,7 +11,6 @@
  * 
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
->>>>>>> .r1534
  */
 package net.sf.l2j.gameserver.model.actor.instance;
 
@@ -47,11 +28,7 @@ import net.sf.l2j.gameserver.SevenSigns;
 import net.sf.l2j.gameserver.SevenSignsFestival;
 import net.sf.l2j.gameserver.ThreadPoolManager;
 import net.sf.l2j.gameserver.ai.CtrlIntention;
-//import net.sf.l2j.gameserver.ai.L2AttackableAI;
-//import net.sf.l2j.gameserver.ai.L2NpcAI;
-//import net.sf.l2j.gameserver.ai.L2CharacterAI;
 import net.sf.l2j.gameserver.cache.HtmCache;
-import net.sf.l2j.gameserver.clientpackets.Say2;
 import net.sf.l2j.gameserver.datatables.ClanTable;
 import net.sf.l2j.gameserver.datatables.DoorTable;
 import net.sf.l2j.gameserver.datatables.HelperBuffTable;
@@ -72,23 +49,22 @@ import net.sf.l2j.gameserver.model.L2Clan;
 import net.sf.l2j.gameserver.model.L2DropCategory;
 import net.sf.l2j.gameserver.model.L2DropData;
 import net.sf.l2j.gameserver.model.L2ItemInstance;
-import net.sf.l2j.gameserver.model.L2NpcCharData;
-import net.sf.l2j.gameserver.model.L2NpcAIData;
 import net.sf.l2j.gameserver.model.L2Multisell;
+import net.sf.l2j.gameserver.model.L2NpcAIData;
+import net.sf.l2j.gameserver.model.L2NpcCharData;
 import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.model.L2Spawn;
 import net.sf.l2j.gameserver.model.L2Summon;
 import net.sf.l2j.gameserver.model.L2World;
 import net.sf.l2j.gameserver.model.MobGroupTable;
-//import net.sf.l2j.gameserver.model.L2Character.AIAccessor;
 import net.sf.l2j.gameserver.model.L2Skill.SkillType;
 import net.sf.l2j.gameserver.model.actor.knownlist.NpcKnownList;
 import net.sf.l2j.gameserver.model.actor.stat.NpcStat;
 import net.sf.l2j.gameserver.model.actor.status.NpcStatus;
+import net.sf.l2j.gameserver.model.entity.CTF;
 import net.sf.l2j.gameserver.model.entity.Castle;
 import net.sf.l2j.gameserver.model.entity.L2Event;
-import net.sf.l2j.gameserver.model.entity.CTF;
 import net.sf.l2j.gameserver.model.quest.Quest;
 import net.sf.l2j.gameserver.model.quest.QuestState;
 import net.sf.l2j.gameserver.model.quest.State;
@@ -96,7 +72,6 @@ import net.sf.l2j.gameserver.model.zone.type.L2TownZone;
 import net.sf.l2j.gameserver.network.L2GameClient;
 import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.ActionFailed;
-import net.sf.l2j.gameserver.serverpackets.CreatureSay;
 import net.sf.l2j.gameserver.serverpackets.ExShowVariationCancelWindow;
 import net.sf.l2j.gameserver.serverpackets.ExShowVariationMakeWindow;
 import net.sf.l2j.gameserver.serverpackets.InventoryUpdate;
@@ -116,8 +91,6 @@ import net.sf.l2j.gameserver.templates.L2Item;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
 import net.sf.l2j.gameserver.templates.L2Weapon;
 import net.sf.l2j.gameserver.util.Broadcast;
-//import net.sf.l2j.gameserver.model.L2WorldRegion;
-
 import net.sf.l2j.util.Rnd;
 /**
  * This class represents a Non-Player-Character in the world. It can be a monster or a friendly character.
@@ -155,8 +128,10 @@ public class L2NpcInstance extends L2Character
     /** The castle index in the array of L2Castle this L2NpcInstance belongs to */
     private int _castleIndex = -2;
 
-    public boolean isEventMob = false,
-    			   _isEventMobCTFJoiner = false;
+    public boolean isEventMob = false;
+//L2JTW addon start ========================================
+    public boolean _isEventMobCTFJoiner = false;
+//L2JTW addon end ==========================================
     private boolean _isInTown = false;
 
     private int _isSpoiledBy = 0;
@@ -166,6 +141,7 @@ public class L2NpcInstance extends L2Character
     private int _currentRHandId;  // normally this shouldn't change from the template, but there exist exceptions
     private int _currentCollisionHeight; // used for npc grow effect skills
     private int _currentCollisionRadius; // used for npc grow effect skills
+//l2JTW addon start ========================================
     protected RandomPathTask _rPathTask = null;
     
     public boolean _soulshotcharged = false;
@@ -174,13 +150,8 @@ public class L2NpcInstance extends L2Character
     private int _spiritshotamount = 0;
     public boolean _ssrecharged = true;
     public boolean _spsrecharged = true;
-    
-    
-    
-    
-    //-----------------------------------------------------
-    // L2NpcInstance act like L2Attackable
 
+    // L2NpcInstance act like L2Attackable
     // This is part of L2JTW 5.0 Implement Function, will not complete in 4.5
     protected class RandomPathTask implements Runnable 
     {
@@ -207,8 +178,8 @@ public class L2NpcInstance extends L2Character
             catch (Throwable a) {}
         }
     }
-    
-    
+//l2JTW addon end ==========================================
+
     /** Task launching the function onRandomAnimation() */
     protected class RandomAnimationTask implements Runnable
     {
@@ -448,19 +419,18 @@ public class L2NpcInstance extends L2Character
         return getTemplate().factionRange;
     }
 
-
-
+// L2JTW addon start =======================================
     public int getBaseAtkSpd()
     {
         return getTemplate().basePAtkSpd;
     }
+
     /**
      * This Data are use by Specialize NPC only, still underconstructtion...
      * therefore dont expect it to work perfectly or more...
      * @return
      */
-    
-    
+
     public int getIsChar()
     {
     	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
@@ -693,13 +663,7 @@ public class L2NpcInstance extends L2Character
     	}
         return 0;
     }
-    
-    
-    
-    //-----------------------------------------------------------------------
     //AI Recall
-    
-    
     public int getSoulShot()
     {
     	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
@@ -902,7 +866,8 @@ public class L2NpcInstance extends L2Character
     	}
         return 0;
     }
-    
+//L2JTW addon end ==========================================
+
     /**
      * Return True if this L2NpcInstance is undead in function of the L2NpcTemplate.<BR><BR>
      */
@@ -912,8 +877,6 @@ public class L2NpcInstance extends L2Character
         return getTemplate().isUndead;
     }
 
-    
-    
     /**
      * Send a packet NpcInfo with state of abnormal effect to all L2PcInstance in the _KnownPlayers of the L2NpcInstance.<BR><BR>
      */
@@ -991,7 +954,6 @@ public class L2NpcInstance extends L2Character
         return false;
     }
 
-    
     /**
      * Return the Identifier of the item in the left hand of this L2NpcInstance contained in the L2NpcTemplate.<BR><BR>
      */
@@ -1174,7 +1136,6 @@ public class L2NpcInstance extends L2Character
                     player.sendPacket(new ActionFailed());
                 }
             }
-
             else if(!isAutoAttackable(player)) 
             {
                 // Calculate the distance between the L2PcInstance and the L2NpcInstance
@@ -1191,14 +1152,12 @@ public class L2NpcInstance extends L2Character
                     broadcastPacket(sa);
 
                     // Open a chat window on client with the text of the L2NpcInstance
-
                     if(isEventMob){ L2Event.showEventHtml(player, String.valueOf(getObjectId())); }
-
+//L2JTW addon start ========================================
                     else if (this._isEventMobCTFJoiner)
                     	CTF.showEventHtml(player, String.valueOf(this.getObjectId()));
-
-                    else 
-
+//L2JTW addon end ==========================================
+                    else
                     {
                         Quest[] qlst = getTemplate().getEventQuests(Quest.QuestEventType.NPC_FIRST_TALK);
                         if ( (qlst != null) && qlst.length == 1)
@@ -1206,7 +1165,6 @@ public class L2NpcInstance extends L2Character
                         else
                             showChatWindow(player, 0);
                     }
-
                 }
             }
             else
@@ -1262,23 +1220,19 @@ public class L2NpcInstance extends L2Character
 
             // Send a Server->Client NpcHtmlMessage() containing the GM console about this L2NpcInstance
             NpcHtmlMessage html = new NpcHtmlMessage(0);
-
             TextBuilder html1 = new TextBuilder("<html><body><center><font color=\"LEVEL\">NPC 資訊</font></center>");
             String className = getClass().getName().substring(43);
-            
             html1.append("<br1>型態：" + className + "<br1>種類：" + getFactionId() + "<br1>位置：" + (getSpawn() != null ? getSpawn().getLocation() : 0) + "<br1>");
-            
+
             if (this instanceof L2ControllableMobInstance)
                 html1.append("群組：" + MobGroupTable.getInstance().getGroupForMob((L2ControllableMobInstance)this).getGroupId() + "<br>");
             else
-                html1.append("重生時間：" + (getSpawn()!=null ? (getSpawn().getRespawnDelay() / 1000)+"  秒<br>" : "?  秒<br>"));
-            
+            html1.append("重生時間：" + (getSpawn()!=null ? (getSpawn().getRespawnDelay() / 1000)+"  秒<br>" : "?  秒<br>"));
             html1.append("<table border=\"0\" width=\"100%\">");
             html1.append("<tr><td>物件</td><td>"+getObjectId()+"</td><td>NPC ID</td><td>"+getTemplate().npcId+"</td></tr>");
             html1.append("<tr><td>區域</td><td>"+getCastle().getCastleId()+"</td><td>位置</td><td>"+getX()+","+getY()+","+getZ()+"</td></tr>");
             html1.append("<tr><td>等級</td><td>"+getLevel()+"</td><td>主動性</td><td>"+((this instanceof L2Attackable)? ((L2Attackable)this).getAggroRange() : 0)+"</td></tr>");
             html1.append("</table><br>");
-            
             html1.append("<font color=\"LEVEL\">狀態</font>");
             html1.append("<table border=\"0\" width=\"100%\">");
             html1.append("<tr><td>目前HP</td><td>"+getCurrentHp()+"</td><td>目前MP</td><td>"+getCurrentMp()+"</td></tr>");
@@ -1290,13 +1244,11 @@ public class L2NpcInstance extends L2Character
             html1.append("<tr><td>攻速</td><td>"+getPAtkSpd()+"</td><td>施展</td><td>"+getMAtkSpd()+"</td></tr>");
             html1.append("<tr><td>種族</td><td>"+getTemplate().race+"</td><td></td><td></td></tr>");
             html1.append("</table><br>");
-            
             html1.append("<font color=\"LEVEL\">基本屬性</font>");
             html1.append("<table border=\"0\" width=\"100%\">");
             html1.append("<tr><td>STR</td><td>"+getSTR()+"</td><td>DEX</td><td>"+getDEX()+"</td><td>CON</td><td>"+getCON()+"</td></tr>");
             html1.append("<tr><td>INT</td><td>"+getINT()+"</td><td>WIT</td><td>"+getWIT()+"</td><td>MEN</td><td>"+getMEN()+"</td></tr>");
             html1.append("</table>");
-
             html1.append("<br><center><table><tr><td><button value=\"編輯\" action=\"bypass -h admin_edit_npc " + getTemplate().npcId + "\" width=100 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"><br1></td>");
             html1.append("<td><button value=\"消滅\" action=\"bypass -h admin_kill\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td><br1></tr>");
             html1.append("<tr><td><button value=\"掉落清單\" action=\"bypass -h admin_show_droplist " + getTemplate().npcId + "\" width=100 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");			
@@ -1329,7 +1281,6 @@ public class L2NpcInstance extends L2Character
 
             NpcHtmlMessage html = new NpcHtmlMessage(0);
             TextBuilder html1 = new TextBuilder("<html><body>");
-
             html1.append("<br><center><font color=\"LEVEL\">[戰鬥狀態]</font></center>");
             html1.append("<table border=0 width=\"100%\">");
             html1.append("<tr><td>最大HP</td><td>"+(int)(getMaxHp()/getStat().calcStat(Stats.MAX_HP , 1, this, null))+"*"+(int) getStat().calcStat(Stats.MAX_HP , 1, this, null)+"</td><td>最大MP</td><td>"+getMaxMp()+"</td></tr>");
@@ -1340,13 +1291,11 @@ public class L2NpcInstance extends L2Character
             html1.append("<tr><td>攻速</td><td>"+getPAtkSpd()+"</td><td>施展</td><td>"+getMAtkSpd()+"</td></tr>");
             html1.append("<tr><td>種族</td><td>"+getTemplate().race+"</td><td></td><td></td></tr>");
             html1.append("</table>");
-
             html1.append("<br><center><font color=\"LEVEL\">[基本能力]</font></center>");
             html1.append("<table border=0 width=\"100%\">");
             html1.append("<tr><td>STR</td><td>"+getSTR()+"</td><td>DEX</td><td>"+getDEX()+"</td><td>CON</td><td>"+getCON()+"</td></tr>");
             html1.append("<tr><td>INT</td><td>"+getINT()+"</td><td>WIT</td><td>"+getWIT()+"</td><td>MEN</td><td>"+getMEN()+"</td></tr>");
             html1.append("</table>");
-
             html1.append("<br><center><font color=\"LEVEL\">[掉落資訊]</font></center>");
             html1.append("機率︰<font color=\"ff0000\">50%+</font> <font color=\"00ff00\">30%+</font> <font color=\"0000ff\">低於 30%</font>");
             html1.append("<table border=0 width=\"100%\">");
@@ -1379,9 +1328,7 @@ public class L2NpcInstance extends L2Character
     public final Castle getCastle()
     {
         // Get castle this NPC belongs to (excluding L2Attackable)
-
 		if (_castleIndex < 0)
-
 		{
 			L2TownZone town = TownManager.getInstance().getTown(getX(), getY(), getZ());
 
@@ -1398,7 +1345,6 @@ public class L2NpcInstance extends L2Character
 		if (_castleIndex < 0) return null;
 
 		return CastleManager.getInstance().getCastles().get(_castleIndex);
-
     }
 
     public final boolean getIsInTown()
@@ -1431,7 +1377,6 @@ public class L2NpcInstance extends L2Character
                 html.replace("%playername%", player.getName());
                 player.sendPacket(html);
             }
-
             else if (command.equalsIgnoreCase("TerritoryStatus"))
             {
 
@@ -1463,7 +1408,6 @@ public class L2NpcInstance extends L2Character
             		} 
             	} 
             	player.sendPacket(html); 
-
             }
             else if (command.startsWith("Quest"))
             {
@@ -1574,11 +1518,9 @@ public class L2NpcInstance extends L2Character
                         player.sendPacket(new RadarControl(0,1,spawn.getLocx(),spawn.getLocy(),spawn.getLocz()));
                 } catch (NumberFormatException nfe)
                 { 
-                	player.sendMessage("指令錯誤。");
+                    player.sendMessage("指令錯誤。");
                 }
-
             }
-
             else if (command.startsWith("EnterRift"))
             {
                 try
@@ -1610,7 +1552,7 @@ public class L2NpcInstance extends L2Character
                     DimensionalRiftManager.getInstance().handleCheat(player, this);
                 }
             }
-
+//L2JTW addon start ========================================
             else if (command.startsWith("open_gate"))
             {
                 final DoorTable _doorTable = DoorTable.getInstance();
@@ -1639,7 +1581,7 @@ public class L2NpcInstance extends L2Character
             	setTarget(player);
                 BaiumManager.getInstance().spawnBaium(this);
             }
-
+//L2JTW addon end ==========================================
         }
     }
     
@@ -1777,7 +1719,7 @@ public class L2NpcInstance extends L2Character
     {
         TextBuilder sb = new TextBuilder();
         
-        sb.append("<html><body><title>關於︰</title><br>");
+        sb.append("<html><body><title>關於:</title><br>");
         
         for (Quest q : quests) 
         {
@@ -1968,7 +1910,6 @@ public class L2NpcInstance extends L2Character
             filename = (getHtmlPath(npcId, 1));
             html.setFile(filename);
         }
-
         else if (val >= 1 && val <= 21) // 1-20 - buttons, 21 - second buy lottery ticket window
         {
         	if (!Lottery.getInstance().isStarted())
@@ -2028,7 +1969,6 @@ public class L2NpcInstance extends L2Character
             
             if (count == 5)
             {
-
                 String search = "0\">返回";
                 String replace = "22\">選擇上面的號碼";
                 html.replace(search, replace);
@@ -2074,7 +2014,6 @@ public class L2NpcInstance extends L2Character
             sm.addNumber(lotonumber);
             sm.addItemName(4442);
             player.sendPacket(sm);
-
             
             L2ItemInstance item = new L2ItemInstance(IdFactory.getInstance().getNextId(), 4442);
 			item.setCount(1);
@@ -2183,7 +2122,7 @@ public class L2NpcInstance extends L2Character
         if (getNpcId() != 31225 && getNpcId() != 31226) return;
         if (player.isCursedWeaponEquiped())
         {
-        	player.sendMessage("請離開，這裡不歡迎你。");
+        	player.sendMessage("快離開，這裡不歡迎你。");
         	return;
         }
 
@@ -2275,6 +2214,7 @@ public class L2NpcInstance extends L2Character
                       doCast(skill);
               }
            }
+// L2JTW addon start =======================================
            else
                if(player_level>=helperBuffItem.getLowerLevel() && player_level<=helperBuffItem.getUpperLevel())
                {
@@ -2284,6 +2224,7 @@ public class L2NpcInstance extends L2Character
                    else
                        this.doCast(skill);
                }
+// L2JTW addon end =========================================
         }
         
         
@@ -2330,6 +2271,12 @@ public class L2NpcInstance extends L2Character
      */
     public void showChatWindow(L2PcInstance player, int val)
     {
+    	if(player.isCursedWeaponEquiped() && ( !(player.getTarget() instanceof L2ClanHallManagerInstance)
+    			    						|| !(player.getTarget() instanceof L2DoormenInstance)))
+    	{
+    		player.setTarget(player);
+    		return;
+    	}
     	if (player.getKarma() > 0)
         {	
 			if (!Config.ALT_GAME_KARMA_PLAYER_CAN_SHOP && this instanceof L2MerchantInstance)
@@ -2659,10 +2606,10 @@ public class L2NpcInstance extends L2Character
         if (this instanceof L2MerchantInstance)
             if (Config.LIST_PET_RENT_NPC.contains(npcId))
                 html.replace("_Quest", "_RentPet\">出租寵物</a><br><a action=\"bypass -h npc_%objectId%_Quest");
-        
-        
+// L2JTW addon start =======================================
         html.replace("%npcname%", getName());
         html.replace("%playername%", player.getName());
+// L2JTW addon end =========================================
         html.replace("%objectId%", String.valueOf(getObjectId()));
         html.replace("%festivalMins%", SevenSignsFestival.getInstance().getTimeToNextFestivalStr());        
         player.sendPacket(html);
@@ -2670,6 +2617,7 @@ public class L2NpcInstance extends L2Character
         // Send a Server->Client ActionFailed to the L2PcInstance in order to avoid that the client wait another packet
         player.sendPacket( new ActionFailed() );
     }
+    
     /**
      * Open a chat window on client with the text specified by the given file name and path,<BR>
      * relative to the datapack root.
@@ -2762,7 +2710,6 @@ public class L2NpcInstance extends L2Character
         if (getTemplate().getEventQuests(Quest.QuestEventType.NPC_SPAWNED) != null)
             for (Quest quest: getTemplate().getEventQuests(Quest.QuestEventType.NPC_SPAWNED))
                 quest.notifySpawn(this);
-
     }
     
     /**
@@ -2885,4 +2832,3 @@ public class L2NpcInstance extends L2Character
     	return _currentCollisionRadius;
     }
 }
-
