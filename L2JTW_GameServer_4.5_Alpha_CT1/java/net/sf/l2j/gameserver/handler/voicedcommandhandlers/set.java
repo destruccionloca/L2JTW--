@@ -36,7 +36,6 @@ public class set implements IVoicedCommandHandler
     			if(activeChar.getClan().getClanId()==pc.getClan().getClanId()&&(activeChar.getClanPrivileges()>n)||activeChar.isClanLeader()){
     				pc.setClanPrivileges(n);
     				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-    				sm.addString("SYS");
     	            sm.addString("血盟權限設置為 " + n + " | 修改者 " + activeChar.getName());
     	            activeChar.sendPacket(sm);
     			}

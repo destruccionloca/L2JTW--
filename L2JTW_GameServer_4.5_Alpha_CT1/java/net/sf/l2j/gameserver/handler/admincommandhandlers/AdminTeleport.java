@@ -264,7 +264,6 @@ public class AdminTeleport implements IAdminCommandHandler
             activeChar.teleToLocation(x, y, z, false);
 
             SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-            sm.addString("SYS");
             sm.addString("傳送至 " + Cords);
             activeChar.sendPacket(sm);
         } catch (NoSuchElementException nsee)
@@ -460,7 +459,6 @@ public class AdminTeleport implements IAdminCommandHandler
                 spawn.init();
 
                 //SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-                //sm.addString("SYS");
                 //sm.addString("創造 " + template1.name + " 在 " + target.getObjectId() + ".");
                 //activeChar.sendPacket(sm);
 

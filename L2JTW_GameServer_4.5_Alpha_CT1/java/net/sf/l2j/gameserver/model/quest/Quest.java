@@ -386,7 +386,6 @@ public class Quest extends ManagedScript
 		}
 		else {
 			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-			sm.addString("SYS");
 			sm.addString(res);
 			player.sendPacket(sm);
 		}

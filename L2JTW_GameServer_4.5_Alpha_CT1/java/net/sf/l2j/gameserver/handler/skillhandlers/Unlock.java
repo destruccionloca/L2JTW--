@@ -61,8 +61,7 @@ public class Unlock implements ISkillHandler
 					door.openMe();
 					door.onOpen();
 					SystemMessage systemmessage = new SystemMessage(SystemMessageId.S1_S2);
-					systemmessage.addString("SYS");
-					systemmessage.addString("無法開啟");
+					systemmessage.addString("門已開啟。");
 					activeChar.sendPacket(systemmessage);
 				}
 				else

@@ -189,7 +189,6 @@ public final class RequestRestartPoint extends L2GameClientPacket
 			{
 				// Schedule respawn delay for attacker
 				ThreadPoolManager.getInstance().scheduleGeneral(new DeathTask(activeChar), castle.getSiege().getAttackerRespawnDelay());
-				sm.addString("SYS");
 				sm.addString("將在 " + castle.getSiege().getAttackerRespawnDelay()/1000 + " 秒後復活");
 				activeChar.sendPacket(sm);
 			}
@@ -197,7 +196,6 @@ public final class RequestRestartPoint extends L2GameClientPacket
 			{
 				// Schedule respawn delay for defender with penalty for CT lose
 				ThreadPoolManager.getInstance().scheduleGeneral(new DeathTask(activeChar), castle.getSiege().getDefenderRespawnDelay());
-				sm.addString("SYS");
 				sm.addString("將在 " + castle.getSiege().getDefenderRespawnDelay()/1000 + " 秒後復活");
 				activeChar.sendPacket(sm);
 			}

@@ -27,7 +27,6 @@ import net.sf.l2j.gameserver.model.actor.instance.L2SiegeSummonInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2SummonInstance;
 import net.sf.l2j.gameserver.model.base.Experience;
 import net.sf.l2j.gameserver.network.SystemMessageId;
-import net.sf.l2j.gameserver.serverpackets.PetInfo;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
 import net.sf.l2j.gameserver.templates.StatsSet;
@@ -63,7 +62,6 @@ public class L2SkillSummon extends L2Skill {
 				int count = player.getCubics().size();
 				if (count > mastery) {
 					SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-					sm.addString("SYS");
 					sm.addString("已召喚"+count+"個晶體。");
 					activeChar.sendPacket(sm);
 					return false;
@@ -74,7 +72,6 @@ public class L2SkillSummon extends L2Skill {
 				if (player.getPet() != null)
 				{
 					SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-					sm.addString("SYS");
 					sm.addString("已召喚使魔。");
 					activeChar.sendPacket(sm);
 					return false;
@@ -94,8 +91,7 @@ public class L2SkillSummon extends L2Skill {
 
 		if (_npcId == 0) {
             SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-            sm.addString("SYS");
-            sm.addString("召喚技能 "+getId()+" 尚未設定完整。");
+            sm.addString("召喚技能 "+getId()+"尚未設定完整。");
 			activeChar.sendPacket(sm);
 			return;
 		}

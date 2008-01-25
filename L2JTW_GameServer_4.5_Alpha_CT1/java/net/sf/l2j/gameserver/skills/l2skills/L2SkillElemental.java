@@ -43,8 +43,8 @@ public class L2SkillElemental extends L2Skill {
 			_seedAny = true;
 		else
 			_seedAny = false;
-	
 	}
+
 	@Override
 	public void useSkill(L2Character activeChar, L2Object[] targets) {
 		if (activeChar.isAlikeDead())
@@ -55,8 +55,18 @@ public class L2SkillElemental extends L2Skill {
 
 		L2ItemInstance weaponInst = activeChar.getActiveWeaponInstance();
 
+		if (activeChar instanceof L2PcInstance)
+        {
+			if (weaponInst == null)
+			{
+				SystemMessage sm2 = new SystemMessage(SystemMessageId.S1_S2);
+				sm2.addString("You must equip one weapon before cast spell.");
+				activeChar.sendPacket(sm2);
+				return;
+			}
+		}
 
-		if (weaponInst != null) 
+		if (weaponInst != null)
         {
 			if (weaponInst.getChargedSpiritshot() == L2ItemInstance.CHARGED_BLESSED_SPIRITSHOT)
 			{
@@ -93,12 +103,10 @@ public class L2SkillElemental extends L2Skill {
 				continue;
 
 			boolean charged = true;
-
 			if (!_seedAny){
 				for (int i=0;i<_seeds.length;i++){
 					if (_seeds[i]!=0){
 						L2Effect e = target.getFirstEffect(_seeds[i]);
-
 						if (e==null || !e.getInUse()){
 							charged = false;
 							break;
@@ -108,11 +116,9 @@ public class L2SkillElemental extends L2Skill {
 			}
 			else {
 				charged = false;
-
 				for (int i=0;i<_seeds.length;i++){
 					if (_seeds[i]!=0){
 						L2Effect e = target.getFirstEffect(_seeds[i]);
-
 						if (e!=null && e.getInUse()){
 							charged = true;
 							break;
@@ -122,9 +128,7 @@ public class L2SkillElemental extends L2Skill {
 			}
 			if (!charged){
 				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-				sm.addString("SYS"); 
-				sm.addString("所需的元素不足。");
-
+				sm.addString("Target is not charged by elements.");
 				activeChar.sendPacket(sm);
 				continue;
 			}
@@ -154,4 +158,4 @@ public class L2SkillElemental extends L2Skill {
             getEffects(activeChar, target);
 		}
 	}
-	}
+}

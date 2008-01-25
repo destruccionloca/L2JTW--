@@ -95,22 +95,18 @@ public class SiegeFlag implements ISkillHandler
 
         if (castle == null || castle.getCastleId() <= 0)
         {
-            sm.addString("SYS");
             sm.addString("必須在城堡周圍放置陣旗。");
         }
         else if (!castle.getSiege().getIsInProgress())
         {
-            sm.addString("SYS");
             sm.addString("只能再攻城戰期間放置陣旗。");
         }
         else if (castle.getSiege().getAttackerClan(player.getClan()) == null)
         {
-            sm.addString("SYS");
             sm.addString("必須是攻城方才能放置陣旗。");
         }
         else if (player.getClan() == null || !player.isClanLeader())
         {
-            sm.addString("SYS");
             sm.addString("必須是血盟盟主。");
         }
 

@@ -78,10 +78,7 @@ public class ChristmasTree implements IItemHandler
         }
         catch (Exception e)
         {
-            SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-			sm.addString( "SYS" ); 
-			sm.addString( "¥Ø¼Ð¿ù»~¡C" ); 
-            activeChar.sendPacket(sm);
+            activeChar.sendPacket(new SystemMessage(SystemMessageId.TARGET_IS_INCORRECT));
         }
     }
 

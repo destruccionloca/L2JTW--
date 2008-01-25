@@ -83,7 +83,6 @@ public class AdminDelete implements IAdminCommandHandler
             }
 
             SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-            //sm.addString("SYS");
             sm.addString("§R°£ " + target.getName() + " ±q " + target.getObjectId() + "¡C");
             //activeChar.sendPacket(sm);
         }

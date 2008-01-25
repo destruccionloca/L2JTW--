@@ -675,11 +675,17 @@ public enum SystemMessageId
         */
         S1_NOT_ON_YOUR_FRIENDS_LIST(171),
 
-        /**
-    * ID: 176<br>
-    * Message: That person is in message refusal mode.
+    /**
+    * ID: 175<br>
+    * Message: That skill has been de-activated as HP was fully recovered.
     */
-    THE_PERSON_IS_IN_MESSAGE_REFUSAL_MODE(176),
+    SKILL_HAS_BEEN_DEACTIVATED_AS_HP_WAS_FULLY_RECOVERED(175),
+
+    /**
+     * ID: 176<br>
+     * Message: That person is in message refusal mode.
+     */
+     THE_PERSON_IS_IN_MESSAGE_REFUSAL_MODE(176),
 
     /**
     * ID: 177<br>

@@ -40,7 +40,7 @@ public class L2WyvernManagerInstance extends L2CastleChamberlainInstance
         {
         	if (!player.isClanLeader())
         	{
-        		player.sendMessage("Only clan leaders are allowed.");
+        		player.sendMessage("只有盟主才可召喚飛龍。");
         		return;
         	}
         	if(player.getPet() == null)
@@ -48,19 +48,14 @@ public class L2WyvernManagerInstance extends L2CastleChamberlainInstance
         		if(player.isMounted())
         		{
         			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-                    sm.addString("SYS");
-                    sm.addString("已召喚使魔。");
-
+        			sm.addString("已有召喚使魔。");
         			player.sendPacket(sm);
         			return;
         		}
         		else
         		{
         			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-
-                    sm.addString("SYS");
-                    sm.addString("請先招喚座龍。");
-
+        			sm.addString("請先召喚座龍。");
         			player.sendPacket(sm);
         			return;
         		}
@@ -72,9 +67,7 @@ public class L2WyvernManagerInstance extends L2CastleChamberlainInstance
         			if (player.getPet().getLevel() < 55)
         			{
         				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-                        sm.addString("SYS");
-                        sm.addString("座龍尚未達到需求的等級。");
-
+                		sm.addString("座龍尚未達到需求的等級。");
                 		player.sendPacket(sm);
                 		return;
         			}
@@ -88,28 +81,25 @@ public class L2WyvernManagerInstance extends L2CastleChamberlainInstance
         				player.broadcastPacket(mount);
         				player.setMountType(mount.getMountType());
         				player.addSkill(SkillTable.getInstance().getInfo(4289, 1));
-        				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-                        sm.addString("SYS");
-                        sm.addString("使魔召喚。");
-                		player.sendPacket(sm);
+        				//SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
+                		//sm.addString("The Wyvern has been summoned successfully!");
+                		//player.sendPacket(sm);
                 		return;
         			}
         		}
         		else
         		{
-        			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-                    sm.addString("SYS");
-                    sm.addString("召喚飛龍，須要結晶-B級10個。");
+        			SystemMessage sm = new SystemMessage(SystemMessageId.SUMMONING_SERVITOR_COSTS_S2_S1);
+                    sm.addItemName(1460);
+            		sm.addString("10");
             		player.sendPacket(sm);
             		return;
         		}
             }
-
         	else
         	{
         		SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-                sm.addString("SYS");
-                sm.addString("使魔反召喚。");
+        		sm.addString("無法召喚寵物。");
         		player.sendPacket(sm);
         		return;
         	}

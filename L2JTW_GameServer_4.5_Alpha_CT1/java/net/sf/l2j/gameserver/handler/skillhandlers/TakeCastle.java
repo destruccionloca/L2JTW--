@@ -84,27 +84,22 @@ public class TakeCastle implements ISkillHandler
 
         if (castle == null || castle.getCastleId() <= 0)
         {
-            sm.addString("SYS");
             sm.addString("必須在城堡地面使用此技能。");
         }
         else if (player.getTarget() == null && !(player.getTarget() instanceof L2ArtefactInstance))
         {
-            sm.addString("SYS");
             sm.addString("目標必須是守護者封印。");
         }
         else if (!castle.getSiege().getIsInProgress())
         {
-            sm.addString("SYS");
             sm.addString("此技能只能在攻城戰期間使用。");
         }
         else if (!Util.checkIfInRange(200, player, player.getTarget(), true))
         {
-            sm.addString("SYS");
             sm.addString("守護者封印距離太遠。");
         }
         else if (castle.getSiege().getAttackerClan(player.getClan()) == null)
         {
-            sm.addString("SYS");
             sm.addString("你必須是攻城方才能使用此技能。");
         }
         else

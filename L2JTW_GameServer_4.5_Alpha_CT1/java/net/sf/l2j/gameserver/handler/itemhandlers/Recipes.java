@@ -79,7 +79,6 @@ public class Recipes implements IItemHandler
 					SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2); 
         			activeChar.registerDwarvenRecipeList(rp);
         			activeChar.destroyItem("Consume", item.getObjectId(), 1, null, false);
-        			sm.addString("SYS"); 
         			sm.addString("登記 \"" + rp.getRecipeName() + "\" 為製作卷軸。"); 
         			activeChar.sendPacket(sm);
 
@@ -113,7 +112,6 @@ public class Recipes implements IItemHandler
         			activeChar.registerCommonRecipeList(rp); 
         			activeChar.destroyItem("Consume", item.getObjectId(), 1, null, false); 
         			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2); 
-        			sm.addString("SYS"); 
         			sm.addString("登記 \"" + rp.getRecipeName() + "\" 為製作卷軸。"); 
         			activeChar.sendPacket(sm); 
 			    }

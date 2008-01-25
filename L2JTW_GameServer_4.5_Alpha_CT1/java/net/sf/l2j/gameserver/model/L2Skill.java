@@ -1352,7 +1352,7 @@ public abstract class L2Skill
         }
 
         
-        SystemMessage message = new SystemMessage(SystemMessage.S1_CANNOT_BE_USED);
+        SystemMessage message = new SystemMessage(SystemMessageId.S1_CANNOT_BE_USED);
         message.addSkillName(getId());
 
         activeChar.sendPacket(message);
@@ -1464,7 +1464,7 @@ public abstract class L2Skill
             if (activeChar instanceof L2PcInstance && skillreuse==100) 
             {
             	
-                SystemMessage sm = new SystemMessage(SystemMessage.S1_PREPARED_FOR_REUSE);
+                SystemMessage sm = new SystemMessage(SystemMessageId.S1_PREPARED_FOR_REUSE);
                 sm.addSkillName(this.getId());
                 activeChar.sendPacket(sm);
                 //skillreuse = 0;
@@ -1486,7 +1486,7 @@ public abstract class L2Skill
                 		|| !((L2SkillChargeDmg)this).checkCondition(activeChar,activeChar.getTarget(),true))
                 {
                 	
-                    SystemMessage sm = new SystemMessage(113);
+                    SystemMessage sm = new SystemMessage(SystemMessageId.S1_CANNOT_BE_USED);
                     sm.addSkillName(this.getId());
                     activeChar.sendPacket(sm);
 
@@ -1525,7 +1525,7 @@ public abstract class L2Skill
                 // Check for null target or any other invalid target
                 if (target == null || target.isDead() || (target == activeChar && !canTargetSelf))
                     {
-                        activeChar.sendPacket(new SystemMessage(SystemMessage.TARGET_IS_INCORRECT));
+                        activeChar.sendPacket(new SystemMessage(SystemMessageId.TARGET_IS_INCORRECT));
                         return null;
                     }
                     
@@ -2787,8 +2787,7 @@ public abstract class L2Skill
             case TARGET_ITEM:
             {
 
-                SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);          
-                sm.addString("SYS");
+                SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);          
                 sm.addString("此技能尚未支援。");
 
                 activeChar.sendPacket(sm);
@@ -2876,7 +2875,6 @@ public abstract class L2Skill
             default:
             {
                 SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-                sm.addString("SYS");
                 sm.addString("此技能尚未支援。");
                 activeChar.sendPacket(sm);
                 return null;

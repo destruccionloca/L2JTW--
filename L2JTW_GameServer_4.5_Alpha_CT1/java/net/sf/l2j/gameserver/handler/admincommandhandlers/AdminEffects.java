@@ -406,7 +406,6 @@ public class AdminEffects implements IAdminCommandHandler
 						if (teamVal != 0)
 						{
 							SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-							sm.addString("SYS");
 							sm.addString("加入"+ teamVal+"隊伍。");
 							player.sendPacket(sm);
 						}
@@ -432,7 +431,6 @@ public class AdminEffects implements IAdminCommandHandler
 			if (teamVal != 0)
 			{
 				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-				sm.addString("SYS");
 				sm.addString("加入"+ teamVal+"隊伍。");
 				player.sendPacket(sm);
 			}

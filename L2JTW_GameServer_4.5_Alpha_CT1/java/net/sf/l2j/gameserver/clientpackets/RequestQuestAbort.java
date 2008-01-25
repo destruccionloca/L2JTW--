@@ -58,11 +58,6 @@ public final class RequestQuestAbort extends L2GameClientPacket
             if(qs != null)
             {
         		qs.exitQuest(true);
-        		//SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-                //sm.addString("SYS");
-                //sm.addString("任務取消");
-                //activeChar.sendPacket(sm);
-                //sm = null;
         		QuestList ql = new QuestList();
                 activeChar.sendPacket(ql);
             } else

@@ -70,14 +70,12 @@ public class AdminDisconnect implements IAdminCommandHandler {
 		if (player.getObjectId() == activeChar.getObjectId())
 		{
 			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-			sm.addString("SYS");
 			sm.addString("無法登出。");
 			activeChar.sendPacket(sm);
 		}
 		else
 		{
 			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-			sm.addString("SYS");
 			sm.addString("玩家[" + player.getName() + "]從伺服器離線。");
 			activeChar.sendPacket(sm);
 

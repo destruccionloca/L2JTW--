@@ -73,10 +73,7 @@ class EffectRelax extends L2Effect
 		if (getEffected().getCurrentHp()+1 > getEffected().getMaxHp()) {
 			if(getSkill().isToggle())
 			{
-				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-				sm.addString("SYS");
-				sm.addString("完全回復，技能解除。");
-				getEffected().sendPacket(sm);
+				getEffected().sendPacket(new SystemMessage(SystemMessageId.SKILL_HAS_BEEN_DEACTIVATED_AS_HP_WAS_FULLY_RECOVERED));
 				//if (getEffected() instanceof L2PcInstance)
 					//((L2PcInstance)getEffected()).standUp();
 
