@@ -190,7 +190,7 @@ public class PostBBSManager extends BaseBBSManager
         TextBuilder html = new TextBuilder("<html>");
 		html.append("<body><br><br>");
 		html.append("<table border=0 width=610><tr><td width=10></td><td width=600 align=left>");
-		html.append("<a action=\"bypass _bbshome\">HOME</a>&nbsp;>&nbsp;<a action=\"bypass _bbsmemo\">"+forum.getName()+" Form</a>");
+		html.append("<a action=\"bypass _bbshome\">HOME</a>&nbsp;>&nbsp;<a action=\"bypass _bbsmemo\">"+forum.getName()+" ³Æ§Ñ¿ý</a>");
 		html.append("</td></tr>");
 		html.append("</table>");
 		html.append("<img src=\"L2UI.squareblank\" width=\"1\" height=\"10\">");
@@ -246,7 +246,7 @@ public class PostBBSManager extends BaseBBSManager
 		DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.FULL, locale);
         TextBuilder html = new TextBuilder("<html><body><br><br>");
 		html.append("<table border=0 width=610><tr><td width=10></td><td width=600 align=left>");
-		html.append("<a action=\"bypass _bbshome\">HOME</a>&nbsp;>&nbsp;<a action=\"bypass _bbsmemo\">Memo Form</a>");
+		html.append("<a action=\"bypass _bbshome\">HOME</a>&nbsp;>&nbsp;<a action=\"bypass _bbsmemo\">³Æ§Ñ¿ý</a>");
 		html.append("</td></tr>");
 		html.append("</table>");
 		html.append("<img src=\"L2UI.squareblank\" width=\"1\" height=\"10\">");

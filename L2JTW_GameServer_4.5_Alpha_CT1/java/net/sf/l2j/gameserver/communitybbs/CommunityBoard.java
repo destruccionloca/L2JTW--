@@ -52,17 +52,37 @@ public class CommunityBoard
 
         if(Config.COMMUNITY_TYPE.equals("full"))
         {
-        	if (command.startsWith("_bbsclan"))
+        	if(command.startsWith("_bbshome"))//首頁
+        	{
+        		TopBBSManager.getInstance().parsecmd(command,activeChar);
+        	}
+        	else if(command.startsWith("_bbsgetfav"))//書籤
+        	{
+        		TopBBSManager.getInstance().parsecmd(command,activeChar);
+        	}
+        	else if(command.startsWith("_bbsloc"))//領地連結
+        	{
+        		RegionBBSManager.getInstance().parsecmd(command,activeChar);
+        	}
+        	else if (command.startsWith("_bbsclan"))//血盟
         	{
         		ClanBBSManager.getInstance().parsecmd(command,activeChar);
         	}
-        	else if(command.startsWith("_bbsmemo"))
+        	else if(command.startsWith("_bbsmemo"))//備註
         	{
         		TopicBBSManager.getInstance().parsecmd(command,activeChar);
         	}
-        	else if(command.startsWith("_bbstopics"))
+        	else if(command.startsWith("_bbsmail"))//郵件
         	{
-        		TopicBBSManager.getInstance().parsecmd(command,activeChar);
+        		TopBBSManager.getInstance().parsecmd(command,activeChar);
+        	}
+        	else if(command.startsWith("_bbsfriends"))//好友管理
+        	{
+        		TopBBSManager.getInstance().parsecmd(command,activeChar);
+        	}
+        	else if(command.startsWith("bbs_add_fav"))//加入書籤
+        	{
+        		TopBBSManager.getInstance().parsecmd(command,activeChar);
         	}
         	else if(command.startsWith("_bbsposts"))
         	{
@@ -72,17 +92,10 @@ public class CommunityBoard
         	{
         		TopBBSManager.getInstance().parsecmd(command,activeChar);
         	}
-        	else if(command.startsWith("_bbshome"))
-        	{
-        		TopBBSManager.getInstance().parsecmd(command,activeChar);
-        	}
-        	else if(command.startsWith("_bbsloc"))
-        	{
-        		RegionBBSManager.getInstance().parsecmd(command,activeChar);
-        	}
         	else
         	{
-        		ShowBoard sb = new ShowBoard("<html><body><br><br><center>the command: "+command+" is not implemented yet</center><br><br></body></html>","101");
+        		ShowBoard sb = new ShowBoard("<html><body></body></html>","101");
+        		//ShowBoard sb = new ShowBoard("<html><body><br><br><center>the command: "+command+" is not implemented yet</center><br><br></body></html>","101");
     			activeChar.sendPacket(sb);
     			activeChar.sendPacket(new ShowBoard(null,"102"));
     			activeChar.sendPacket(new ShowBoard(null,"103"));
@@ -118,15 +131,20 @@ public class CommunityBoard
 			if (url.equals("Topic"))
 			{
 				TopicBBSManager.getInstance().parsewrite(arg1, arg2, arg3, arg4, arg5, activeChar);
-			} else if (url.equals("Post"))
+			} 
+			else if (url.equals("Post"))
 			{
 				PostBBSManager.getInstance().parsewrite(arg1, arg2, arg3, arg4, arg5, activeChar);
-			} else if (url.equals("Region"))
+			} 
+			else if (url.equals("Region"))
 			{
 				RegionBBSManager.getInstance().parsewrite(arg1, arg2, arg3, arg4, arg5, activeChar);
-			} else
+			} 
+
+			else
 			{
-				ShowBoard sb = new ShowBoard("<html><body><br><br><center>the command: " + url + " is not implemented yet</center><br><br></body></html>", "101");
+				//ShowBoard sb = new ShowBoard("<html><body><br><br><center>the command: " + url + " is not implemented yet</center><br><br></body></html>", "101");
+				ShowBoard sb = new ShowBoard("<html><body></body></html>", "101");
 				activeChar.sendPacket(sb);
 				activeChar.sendPacket(new ShowBoard(null, "102"));
 				activeChar.sendPacket(new ShowBoard(null, "103"));
@@ -136,7 +154,8 @@ public class CommunityBoard
 			RegionBBSManager.getInstance().parsewrite(arg1, arg2, arg3, arg4, arg5, activeChar);
 		} else
 		{
-			ShowBoard sb = new ShowBoard("<html><body><br><br><center>The Community board is currently disable</center><br><br></body></html>", "101");
+			//ShowBoard sb = new ShowBoard("<html><body><br><br><center>The Community board is currently disable</center><br><br></body></html>", "101");
+			ShowBoard sb = new ShowBoard("<html><body></body></html>", "101");
 			activeChar.sendPacket(sb);
 			activeChar.sendPacket(new ShowBoard(null, "102"));
 			activeChar.sendPacket(new ShowBoard(null, "103"));
