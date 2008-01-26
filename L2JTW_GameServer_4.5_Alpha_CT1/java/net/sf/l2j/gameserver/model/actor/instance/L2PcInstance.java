@@ -84,7 +84,6 @@ import net.sf.l2j.gameserver.instancemanager.SiegeManager;
 import net.sf.l2j.gameserver.instancemanager.ValakasManager;
 import net.sf.l2j.gameserver.instancemanager.VanHalterManager;
 import net.sf.l2j.gameserver.model.BlockList;
-//import net.sf.l2j.gameserver.model.CursedWeapon;
 import net.sf.l2j.gameserver.model.FishData;
 import net.sf.l2j.gameserver.model.ForceBuff;
 import net.sf.l2j.gameserver.model.Inventory;
@@ -130,8 +129,8 @@ import net.sf.l2j.gameserver.model.base.Experience;
 import net.sf.l2j.gameserver.model.base.PlayerClass;
 import net.sf.l2j.gameserver.model.base.Race;
 import net.sf.l2j.gameserver.model.base.SubClass;
-import net.sf.l2j.gameserver.model.entity.Castle;
 import net.sf.l2j.gameserver.model.entity.CTF;
+import net.sf.l2j.gameserver.model.entity.Castle;
 import net.sf.l2j.gameserver.model.entity.Duel;
 import net.sf.l2j.gameserver.model.entity.GrandBossState;
 import net.sf.l2j.gameserver.model.entity.L2Event;
@@ -167,6 +166,7 @@ import net.sf.l2j.gameserver.serverpackets.L2GameServerPacket;
 import net.sf.l2j.gameserver.serverpackets.LeaveWorld;
 import net.sf.l2j.gameserver.serverpackets.MagicSkillCanceld;
 import net.sf.l2j.gameserver.serverpackets.MyTargetSelected;
+import net.sf.l2j.gameserver.serverpackets.NicknameChanged;
 import net.sf.l2j.gameserver.serverpackets.NpcHtmlMessage;
 import net.sf.l2j.gameserver.serverpackets.ObservationMode;
 import net.sf.l2j.gameserver.serverpackets.ObservationReturn;
@@ -184,7 +184,6 @@ import net.sf.l2j.gameserver.serverpackets.QuestList;
 import net.sf.l2j.gameserver.serverpackets.RecipeShopSellList;
 import net.sf.l2j.gameserver.serverpackets.RelationChanged;
 import net.sf.l2j.gameserver.serverpackets.Ride;
-import net.sf.l2j.gameserver.serverpackets.TradeDone;
 import net.sf.l2j.gameserver.serverpackets.SetupGauge;
 import net.sf.l2j.gameserver.serverpackets.ShortCutInit;
 import net.sf.l2j.gameserver.serverpackets.SkillList;
@@ -195,7 +194,7 @@ import net.sf.l2j.gameserver.serverpackets.StatusUpdate;
 import net.sf.l2j.gameserver.serverpackets.StopMove;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.serverpackets.TargetSelected;
-import net.sf.l2j.gameserver.serverpackets.NicknameChanged;
+import net.sf.l2j.gameserver.serverpackets.TradeDone;
 import net.sf.l2j.gameserver.serverpackets.TradeStart;
 import net.sf.l2j.gameserver.serverpackets.UserInfo;
 import net.sf.l2j.gameserver.serverpackets.ValidateLocation;
@@ -667,14 +666,13 @@ public final class L2PcInstance extends L2PlayableInstance
     /* Flag to disable equipment/skills while wearing formal wear **/
     private boolean _IsWearingFormalWear = false;
 
-	private int _cursedWeaponEquipedId = 0;
+	private int _cursedWeaponEquippedId = 0;
 
 	private int _reviveRequested = 0;
 	private double _revivePower = 0;
 	private boolean _revivePet = false;
 
 	private int _invisible = 0;
-
 	private double _cpUpdateIncCheck = .0;
 	private double _cpUpdateDecCheck = .0;
 	private double _cpUpdateInterval = .0;
@@ -3455,8 +3453,8 @@ public final class L2PcInstance extends L2PlayableInstance
 				{
 					// Player with lvl < 21 can't attack a cursed weapon holder
 					// And a cursed weapon holder  can't attack players with lvl < 21
-					if ((isCursedWeaponEquiped() && player.getLevel() < 21)
-							|| (player.isCursedWeaponEquiped() && getLevel() < 21))
+					if ((isCursedWeaponEquipped() && player.getLevel() < 21)
+							|| (player.isCursedWeaponEquipped() && getLevel() < 21))
 					{
 						player.sendPacket(new ActionFailed());
 					} else
@@ -4123,7 +4121,9 @@ public final class L2PcInstance extends L2PlayableInstance
     {
         if (this.isTransformed())
         {
-            this.untransform();
+            // You already polymorphed and cannot polymorph again.
+            SystemMessage msg = new SystemMessage(SystemMessageId.YOU_ALREADY_POLYMORPHED_AND_CANNOT_POLYMORPH_AGAIN);
+            this.sendPacket(msg);
         }
         _transformation = transformation;
         transformation.onTransform();
@@ -4526,13 +4526,13 @@ public final class L2PcInstance extends L2PlayableInstance
 			// Clear resurrect xp calculation
 			setExpBeforeDeath(0);
 
-			if (isCursedWeaponEquiped())
+			if (isCursedWeaponEquipped())
 			{
-				CursedWeaponsManager.getInstance().drop(_cursedWeaponEquipedId, killer);
+				CursedWeaponsManager.getInstance().drop(_cursedWeaponEquippedId, killer);
 			}
 			else
 			{
-				if (pk == null || !pk.isCursedWeaponEquiped())
+				if (pk == null || !pk.isCursedWeaponEquipped())
 				{
 					//if (getKarma() > 0)
 						onDieDropItem(killer);  // Check if any item should be dropped
@@ -4752,9 +4752,9 @@ public final class L2PcInstance extends L2PlayableInstance
 		if (targetPlayer == null) return;                                          // Target player is null
 		if (targetPlayer == this) return;                                          // Target player is self
 
-		if (isCursedWeaponEquiped())
+		if (isCursedWeaponEquipped())
 		{
-			CursedWeaponsManager.getInstance().increaseKills(_cursedWeaponEquipedId);
+			CursedWeaponsManager.getInstance().increaseKills(_cursedWeaponEquippedId);
 			// Custom message for time left
 			// CursedWeapon cw = CursedWeaponsManager.getInstance().getCursedWeapon(_cursedWeaponEquipedId);
 			// SystemMessage msg = new SystemMessage(SystemMessageId.THERE_IS_S1_HOUR_AND_S2_MINUTE_LEFT_OF_THE_FIXED_USAGE_TIME);
@@ -4907,7 +4907,6 @@ public final class L2PcInstance extends L2PlayableInstance
 
 	public void updatePvPStatus()
 	{
-
 		if (isInsideZone(ZONE_PVP)) return;
 		setPvpFlagLasts(System.currentTimeMillis() + Config.PVP_NORMAL_TIME);
 
@@ -5537,7 +5536,7 @@ public final class L2PcInstance extends L2PlayableInstance
 	public boolean disarmWeapons()
 	{
         // Don't allow disarming a cursed weapon
-        if (isCursedWeaponEquiped()) return false;
+        if (isCursedWeaponEquipped()) return false;
 
         // Unequip the weapon
         L2ItemInstance wpn = getInventory().getPaperdollItem(Inventory.PAPERDOLL_RHAND);
@@ -8686,7 +8685,7 @@ public final class L2PcInstance extends L2PlayableInstance
 		if (isDead() || isAlikeDead() || (getCurrentHp() < getMaxHp()/2 || getCurrentMp() < getMaxMp()/2)) { _noDuelReason = SystemMessageId.S1_CANNOT_DUEL_BECAUSE_S1S_HP_OR_MP_IS_BELOW_50_PERCENT; return false; }
 		if (isInDuel()) { _noDuelReason = SystemMessageId.S1_CANNOT_DUEL_BECAUSE_S1_IS_ALREADY_ENGAGED_IN_A_DUEL; return false;}
 		if (isInOlympiadMode()) { _noDuelReason = SystemMessageId.S1_CANNOT_DUEL_BECAUSE_S1_IS_PARTICIPATING_IN_THE_OLYMPIAD; return false; }
-		if (isCursedWeaponEquiped()) { _noDuelReason = SystemMessageId.S1_CANNOT_DUEL_BECAUSE_S1_IS_IN_A_CHAOTIC_STATE; return false; }
+		if (isCursedWeaponEquipped()) { _noDuelReason = SystemMessageId.S1_CANNOT_DUEL_BECAUSE_S1_IS_IN_A_CHAOTIC_STATE; return false; }
 		if (getPrivateStoreType() != STORE_PRIVATE_NONE) { _noDuelReason = SystemMessageId.S1_CANNOT_DUEL_BECAUSE_S1_IS_CURRENTLY_ENGAGED_IN_A_PRIVATE_STORE_OR_MANUFACTURE; return false; }
 		if (isMounted() || isInBoat()) { _noDuelReason = SystemMessageId.S1_CANNOT_DUEL_BECAUSE_S1_IS_CURRENTLY_RIDING_A_BOAT_WYVERN_OR_STRIDER; return false; }
 		if (isFishing()) { _noDuelReason = SystemMessageId.S1_CANNOT_DUEL_BECAUSE_S1_IS_CURRENTLY_FISHING; return false; }
@@ -8741,6 +8740,7 @@ public final class L2PcInstance extends L2PlayableInstance
 		return _team;
 	}
 
+//L2JTW addon start =======================================
 	public int getNameColor()
 	{
 		return _nameColor;
@@ -8770,6 +8770,7 @@ public final class L2PcInstance extends L2PlayableInstance
 	{
 		_titleColor = (red & 0xFF) + ((green & 0xFF) << 8) + ((blue & 0xFF) << 16);
 	}
+//L2JTW addon end ==========================================
 
 	public void setWantsPeace(int wantsPeace)
 	{
@@ -9123,8 +9124,8 @@ public final class L2PcInstance extends L2PlayableInstance
             super.removeSkill(oldSkill);
 
         // Yesod: Rebind CursedWeapon passive.
-        if (isCursedWeaponEquiped())
-        	CursedWeaponsManager.getInstance().givePassive(_cursedWeaponEquipedId);
+        if (isCursedWeaponEquipped())
+        	CursedWeaponsManager.getInstance().givePassive(_cursedWeaponEquippedId);
 
         stopAllEffects();
 
@@ -10632,19 +10633,19 @@ public final class L2PcInstance extends L2PlayableInstance
 		_powerGrade = power;
 	}
 
-	public boolean isCursedWeaponEquiped()
+	public boolean isCursedWeaponEquipped()
 	{
-		return _cursedWeaponEquipedId != 0;
+		return _cursedWeaponEquippedId != 0;
 	}
 
-	public void setCursedWeaponEquipedId(int value)
+	public void setCursedWeaponEquippedId(int value)
 	{
-		_cursedWeaponEquipedId = value;
+		_cursedWeaponEquippedId = value;
 	}
 
-	public int getCursedWeaponEquipedId()
+	public int getCursedWeaponEquippedId()
 	{
-		return _cursedWeaponEquipedId;
+		return _cursedWeaponEquippedId;
 	}
 
 	private boolean _charmOfCourage = false;

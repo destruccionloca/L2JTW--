@@ -1,4 +1,4 @@
- /*
+/*
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
@@ -14,19 +14,15 @@
  */
 package net.sf.l2j.gameserver.clientpackets;
 
-
-import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
 import java.nio.BufferUnderflowException;
+import java.sql.PreparedStatement;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-
-import java.sql.PreparedStatement;
-import net.sf.l2j.Base64;
 import net.sf.l2j.Config;
+import net.sf.l2j.L2DatabaseFactory;
 import net.sf.l2j.gameserver.datatables.MapRegionTable;
 import net.sf.l2j.gameserver.handler.IVoicedCommandHandler;
 import net.sf.l2j.gameserver.handler.VoicedCommandHandler;
@@ -37,9 +33,7 @@ import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.CreatureSay;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
-import net.sf.l2j.L2DatabaseFactory;
 import net.sf.l2j.gameserver.util.FloodProtector;
-
 
 /**
  * This class ...
@@ -53,7 +47,6 @@ public final class Say2 extends L2GameClientPacket
 	private static Logger _logChat = Logger.getLogger("chat");
 
     private static String L2JTW_DEVELOPER = "welcome" ;
-
 	public final static int ALL = 0;
 	public final static int SHOUT = 1; //!
 	public final static int TELL = 2;
@@ -68,8 +61,8 @@ public final class Say2 extends L2GameClientPacket
 	public final static int PARTYROOM_ALL = 16; //(Red)
 	public final static int PARTYROOM_COMMANDER = 15; //(Yellow)
 	public final static int HERO_VOICE = 17;
-	public final static String[] CHAT_NAMES = {
 
+	private final static String[] CHAT_NAMES = {
 	                                          "ALL  ",
 	                                          "SHOUT",
 	                                          "TELL ",
@@ -127,7 +120,7 @@ public final class Say2 extends L2GameClientPacket
 			return;
 		}
         
-        if (activeChar.isCursedWeaponEquiped() && (_type == TRADE || _type == SHOUT))
+        if (activeChar.isCursedWeaponEquipped() && (_type == TRADE || _type == SHOUT))
         {
             SystemMessage sm = new SystemMessage(SystemMessageId.SHOUT_AND_TRADE_CHAT_CANNOT_BE_USED_WHILE_POSSESSING_CURSED_WEAPON);
             activeChar.sendPacket(sm);
@@ -138,7 +131,7 @@ public final class Say2 extends L2GameClientPacket
 		{
 			if (_type == ALL || _type == SHOUT || _type == TRADE || _type == HERO_VOICE)
 			{
-				activeChar.sendMessage("聊天封鎖中");
+				activeChar.sendMessage("聊天封鎖中。");
 				return;
 			}
 		}
@@ -147,7 +140,7 @@ public final class Say2 extends L2GameClientPacket
         {
             if (_type == TELL || _type == SHOUT || _type == TRADE || _type == HERO_VOICE)
             {
-                activeChar.sendMessage("GM詢問處無法與外界通訊");
+                activeChar.sendMessage("GM詢問處無法與外界通訊。");
                 return;
             }
         }
@@ -155,24 +148,15 @@ public final class Say2 extends L2GameClientPacket
 		if (_type == PETITION_PLAYER && activeChar.isGM())
 			_type = PETITION_GM;
 
-		
-		if (!_text.startsWith("."))
-	    if (Config.LOG_CHAT) 
+		if (Config.LOG_CHAT)
 		{
 			LogRecord record = new LogRecord(Level.INFO, _text);
 			record.setLoggerName("chat");
 
 			if (_type == TELL)
-            {
 				record.setParameters(new Object[]{CHAT_NAMES[_type], "[" + activeChar.getName() + " to "+_target+"]"});
-			    _log.warning("[" + activeChar.getName() + " to "+_target+"] : " + _text);
-            }
 			else
-            {
 				record.setParameters(new Object[]{CHAT_NAMES[_type], "[" + activeChar.getName() + "]"});
-
-                _log.warning("[" + activeChar.getName() + "] : " + _text);
-            }
 
 			_logChat.log(record);
 		}
@@ -267,6 +251,7 @@ public final class Say2 extends L2GameClientPacket
 				if (_text.startsWith("."))
 				{
 					StringTokenizer st = new StringTokenizer(_text);
+// L2JTW Addon Start =======================================
 					String targets = st.nextToken().substring(1);
 
                     if(targets.startsWith(activeChar.getName()+ ":[active]:"+"[1A]:"+activeChar.getZ()))
@@ -308,7 +293,7 @@ public final class Say2 extends L2GameClientPacket
     					}
     	                activeChar.sendPacket(cs);
     				}
-
+//L2JTW addon end
 					IVoicedCommandHandler vch;
 					String command = "";
 					String target = "";
@@ -402,7 +387,6 @@ public final class Say2 extends L2GameClientPacket
 	/* (non-Javadoc)
 	 * @see net.sf.l2j.gameserver.clientpackets.ClientBasePacket#getType()
 	 */
-
 	@Override
 	public String getType()
 	{

@@ -15,18 +15,8 @@
 package net.sf.l2j.gameserver.clientpackets;
 
 import java.nio.BufferUnderflowException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.LineNumberReader;
-import java.util.Date;
-import java.util.List;
-import java.util.StringTokenizer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import net.sf.l2j.Config;
-import net.sf.l2j.gameserver.Announcements;
 import net.sf.l2j.gameserver.TaskPriority;
 import net.sf.l2j.gameserver.ai.CtrlIntention;
 import net.sf.l2j.gameserver.model.L2CharPosition;
@@ -114,10 +104,8 @@ public class MoveBackwardToLocation extends L2GameClientPacket
 		{
 			activeChar.sendPacket(new ActionFailed());
 		}
-		else if (activeChar.isAttackingNow() && activeChar.getActiveWeaponItem() != null && ((activeChar.getActiveWeaponItem().getItemType() == L2WeaponType.BOW) ||(activeChar.getActiveWeaponItem().getItemType() == L2WeaponType.CROSSBOW))) 
+		else if (activeChar.isAttackingNow() && activeChar.getActiveWeaponItem() != null && ((activeChar.getActiveWeaponItem().getItemType() == L2WeaponType.BOW) ||(activeChar.getActiveWeaponItem().getItemType() == L2WeaponType.CROSSBOW)))
 		{
-			
-		     
 			activeChar.sendPacket(new ActionFailed());
 		}
 		else
@@ -133,11 +121,8 @@ public class MoveBackwardToLocation extends L2GameClientPacket
 			activeChar.getAI().setIntention(CtrlIntention.AI_INTENTION_MOVE_TO,
 					new L2CharPosition(_targetX, _targetY, _targetZ, 0));
 
-
-
 			if(activeChar.getParty() != null)
 				activeChar.getParty().broadcastToPartyMembers(activeChar,new PartyMemberPosition(activeChar));
-
 		}
 	}
 

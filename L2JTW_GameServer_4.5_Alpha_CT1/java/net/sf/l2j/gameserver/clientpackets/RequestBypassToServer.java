@@ -27,9 +27,8 @@ import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2World;
 import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+//import net.sf.l2j.gameserver.model.entity.CTF;
 import net.sf.l2j.gameserver.model.entity.L2Event;
-import net.sf.l2j.gameserver.model.entity.CTF;
-import net.sf.l2j.gameserver.model.entity.TvTEvent;
 import net.sf.l2j.gameserver.serverpackets.ActionFailed;
 import net.sf.l2j.gameserver.serverpackets.NpcHtmlMessage;
 
@@ -101,14 +100,15 @@ public final class RequestBypassToServer extends L2GameClientPacket
 				try
 				{
 					L2Object object = L2World.getInstance().findObject(Integer.parseInt(id));
-					
+
 					if (_command.substring(endOfId+1).startsWith("event_participate")) L2Event.inscribePlayer(activeChar);
 					else if (object != null && object instanceof L2NpcInstance && endOfId > 0 && activeChar.isInsideRadius(object, L2NpcInstance.INTERACTION_DISTANCE, false, false))
 					{
 						((L2NpcInstance)object).onBypassFeedback(activeChar, _command.substring(endOfId+1));
 					}
 					activeChar.sendPacket(new ActionFailed());
-    				
+/*
+					//L2JTW CTF addon start ========================================
     				if (_command.substring(endOfId+1).startsWith("ctf_player_join "))
     				{
     					String teamName = _command.substring(endOfId+1).substring(16); 
@@ -116,7 +116,7 @@ public final class RequestBypassToServer extends L2GameClientPacket
     					if (!CTF._started)
     						CTF.addPlayer(activeChar, teamName);
     					else
-    						activeChar.sendMessage("搶旗競賽進行中,無法加入!");
+    						activeChar.sendMessage("搶旗競賽進行中，無法加入！");
     				}
 
     				if (_command.substring(endOfId+1).startsWith("ctf_player_leave"))
@@ -124,15 +124,17 @@ public final class RequestBypassToServer extends L2GameClientPacket
     					if (!CTF._started)
     						CTF.removePlayer(activeChar);
     					else
-    						activeChar.sendMessage("搶旗競賽進行中,無法離開!");
+    						activeChar.sendMessage("搶旗競賽進行中，無法離開！");
     				}
     				
     				if (object != null && object instanceof L2NpcInstance && endOfId > 0 && activeChar.isInsideRadius(object, L2NpcInstance.INTERACTION_DISTANCE, false, false))
 					{
 						((L2NpcInstance)object).onBypassFeedback(activeChar, _command.substring(endOfId+1));
 					}
-                } catch (NumberFormatException nfe) {}
-
+    				//L2JTW CTF addon End ==========================================
+*/
+				}
+				catch (NumberFormatException nfe) {}
 			}
 			//	Draw a Symbol
 			else if (_command.equals("menu_select?ask=-16&reply=1"))
@@ -164,7 +166,11 @@ public final class RequestBypassToServer extends L2GameClientPacket
 			{
 				CommunityBoard.getInstance().handleCommands(getClient(), _command);
 			}
-            else if (_command.startsWith("Quest "))
+			else if (_command.startsWith("_bbs"))
+			{
+				CommunityBoard.getInstance().handleCommands(getClient(), _command);
+			}
+			else if (_command.startsWith("Quest "))
 			{
 				if(!activeChar.validateBypass(_command))
 					return;

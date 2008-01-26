@@ -37,17 +37,18 @@ import net.sf.l2j.gameserver.instancemanager.CursedWeaponsManager;
 import net.sf.l2j.gameserver.instancemanager.DimensionalRiftManager;
 import net.sf.l2j.gameserver.instancemanager.PetitionManager;
 import net.sf.l2j.gameserver.instancemanager.SiegeManager;
+import net.sf.l2j.gameserver.model.CursedWeapon;
 import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.L2Clan;
 import net.sf.l2j.gameserver.model.L2Effect;
 import net.sf.l2j.gameserver.model.L2ItemInstance;
 import net.sf.l2j.gameserver.model.L2World;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.model.entity.CTF;
 import net.sf.l2j.gameserver.model.entity.ClanHall;
 import net.sf.l2j.gameserver.model.entity.Couple;
 import net.sf.l2j.gameserver.model.entity.Hero;
 import net.sf.l2j.gameserver.model.entity.L2Event;
-import net.sf.l2j.gameserver.model.entity.CTF;
 import net.sf.l2j.gameserver.model.entity.Siege;
 import net.sf.l2j.gameserver.model.entity.TvTEvent;
 import net.sf.l2j.gameserver.model.quest.Quest;
@@ -83,22 +84,21 @@ public class EnterWorld extends L2GameClientPacket
 {
     private static final String _C__03_ENTERWORLD = "[C] 03 EnterWorld";
     private static Logger _log = Logger.getLogger(EnterWorld.class.getName());
+
     public TaskPriority getPriority() { return TaskPriority.PR_URGENT; }
 
+    @Override
+    protected void readImpl()
+    {
+        // this is just a trigger packet. it has no content
+    }
 
-	@Override
-	protected void readImpl()
-	{
-		// this is just a trigger packet. it has no content
-	}
-
-	@Override
-	protected void runImpl()
-	{
+    @Override
+    protected void runImpl()
+    {
 		byte check = 0;
-		
-		L2PcInstance activeChar = getClient().getActiveChar();
 
+        L2PcInstance activeChar = getClient().getActiveChar();
 
         if (activeChar == null)
         {
@@ -106,31 +106,31 @@ public class EnterWorld extends L2GameClientPacket
             getClient().closeNow();
             return;
         }
-		 // Send Macro List 
-	 	activeChar.getMacroses().sendUpdate(); 
-	 	 
-	 	// Send Item List 
-	 	sendPacket(new ItemList(activeChar, false)); 
-	 	 
-	 	// Send gg check (even if we are not going to check for reply) 
-	 	activeChar.queryGameGuard(); 
-	 	 
-	 	// Send Shortcuts 
-	 	sendPacket(new ShortCutInit(activeChar)); 
-	 	 
-	 	// Send Action list 
-	 	activeChar.sendPacket(ExBasicActionList.DEFAULT_ACTION_LIST);
-	 	
-	 	activeChar.sendSkillList(); 
-	 	 
-	 	activeChar.sendPacket(new HennaInfo(activeChar)); 
-	 	 
-	 	sendPacket(new UserInfo(activeChar)); 
-	 	 
-	 	Quest.playerEnter(activeChar); 
-	 	activeChar.sendPacket(new QuestList()); 
-	 	
-	 	
+        
+        // Send Macro List
+        activeChar.getMacroses().sendUpdate();
+        
+        // Send Item List
+        sendPacket(new ItemList(activeChar, false));
+        
+        // Send gg check (even if we are not going to check for reply)
+        activeChar.queryGameGuard();
+        
+        // Send Shortcuts
+        sendPacket(new ShortCutInit(activeChar));
+        
+        // Send Action list
+        activeChar.sendPacket(ExBasicActionList.DEFAULT_ACTION_LIST);
+
+        activeChar.sendSkillList();
+        
+        activeChar.sendPacket(new HennaInfo(activeChar));
+        
+        sendPacket(new UserInfo(activeChar));
+        
+        Quest.playerEnter(activeChar);
+        activeChar.sendPacket(new QuestList());
+        
         // Register in flood protector
         FloodProtector.getInstance().registerNewPlayer(activeChar.getObjectId());
 
@@ -188,7 +188,6 @@ public class EnterWorld extends L2GameClientPacket
         if (Config.STORE_SKILL_COOLTIME)
             activeChar.restoreEffects();
 
-
         // engage and notify Partner
         if(Config.L2JMOD_ALLOW_WEDDING)
         {
@@ -196,9 +195,21 @@ public class EnterWorld extends L2GameClientPacket
             notifyPartner(activeChar,activeChar.getPartnerId());
         }
         
-        if(activeChar.isCursedWeaponEquiped()) 
+        if(activeChar.isCursedWeaponEquipped()) 
         { 
-            CursedWeaponsManager.getInstance().getCursedWeapon(activeChar.getCursedWeaponEquipedId()).giveSkill(); 
+            CursedWeaponsManager.getInstance().getCursedWeapon(activeChar.getCursedWeaponEquippedId()).giveSkill();
+            
+            SystemMessage msg = new SystemMessage(SystemMessageId.S2_OWNER_HAS_LOGGED_INTO_THE_S1_REGION);
+            msg.addZoneName(activeChar.getX(), activeChar.getY(), activeChar.getZ());
+            msg.addItemName(activeChar.getCursedWeaponEquippedId());
+            CursedWeaponsManager.announce(msg);
+            
+            CursedWeapon cw = CursedWeaponsManager.getInstance().getCursedWeapon(activeChar.getCursedWeaponEquippedId());
+            SystemMessage msg2 = new SystemMessage(SystemMessageId.S2_MINUTE_OF_USAGE_TIME_ARE_LEFT_FOR_S1);
+            int timeLeftInHours = (int)(((cw.getTimeLeft()/60000)/60));
+            msg2.addItemName(activeChar.getCursedWeaponEquippedId());
+            msg2.addNumber(timeLeftInHours*60);
+            activeChar.sendPacket(msg2);
         }
 
         if (activeChar.getAllEffects() != null)
@@ -216,16 +227,16 @@ public class EnterWorld extends L2GameClientPacket
                     activeChar.stopEffects(L2Effect.EffectType.COMBAT_POINT_HEAL_OVER_TIME);
                     activeChar.removeEffect(e);
                 }
-                //  Charges are gone after relog. 
-             	if (e.getEffectType() == L2Effect.EffectType.CHARGE) 
-             	{ 
-             		e.exit(); 
-             	} 
+                
+                //  Charges are gone after relog.
+                if (e.getEffectType() == L2Effect.EffectType.CHARGE)
+                {
+                    e.exit();
+                }
             }
         }
 
-        activeChar.sendPacket(new EtcStatusUpdate(activeChar)); 
-        
+        activeChar.sendPacket(new EtcStatusUpdate(activeChar));
         // apply augmentation boni for equipped items
         for (L2ItemInstance temp : activeChar.getInventory().getAugmentedItems())
             if (temp != null && temp.isEquipped()) temp.getAugmentation().applyBoni(activeChar);
@@ -233,7 +244,9 @@ public class EnterWorld extends L2GameClientPacket
         //Expand Skill
         ExStorageMaxCount esmc = new ExStorageMaxCount(activeChar);
         activeChar.sendPacket(esmc);
+        
         sendPacket(new FriendList(activeChar));
+        
 
         SystemMessage sm = new SystemMessage(SystemMessageId.WELCOME_TO_LINEAGE);
         sendPacket(sm);
@@ -257,13 +270,7 @@ public class EnterWorld extends L2GameClientPacket
                 sendPacket(new NpcHtmlMessage(1, serverNews));
         }
 
-		Quest.playerEnter(activeChar);
-
-		activeChar.sendPacket(new QuestList());
-
-
-		PetitionManager.getInstance().checkPetitionMessages(activeChar);
-
+        PetitionManager.getInstance().checkPetitionMessages(activeChar);
 
         // send user info again .. just like the real client
         //sendPacket(ui);
@@ -297,13 +304,13 @@ public class EnterWorld extends L2GameClientPacket
         notifySponsorOrApprentice(activeChar);
 
         activeChar.onPlayerEnter();
-		
-		sendPacket(new SkillCoolTime(activeChar)); 
+        
+        sendPacket(new SkillCoolTime(activeChar));
 
         if (Olympiad.getInstance().playerInStadia(activeChar))
         {
             activeChar.teleToLocation(MapRegionTable.TeleportWhereType.Town);
-            //activeChar.sendMessage("因在奧林匹亞競技場內所以將傳送至最近的村莊");
+            //activeChar.sendMessage("You have been teleported to the nearest town due to you being in an Olympiad Stadium");
         }
 
         if (DimensionalRiftManager.getInstance().checkIfInRiftZone(activeChar.getX(), activeChar.getY(), activeChar.getZ(), false))
@@ -316,10 +323,9 @@ public class EnterWorld extends L2GameClientPacket
             activeChar.sendPacket(new SystemMessage(SystemMessageId.CLAN_MEMBERSHIP_TERMINATED));
         }
 
-
-		if (activeChar.getClan() != null)
-		{
-			activeChar.sendPacket(new PledgeSkillList(activeChar.getClan()));
+        if (activeChar.getClan() != null)
+        {
+            activeChar.sendPacket(new PledgeSkillList(activeChar.getClan()));
 
             for (Siege siege : SiegeManager.getInstance().getSieges())
             {
@@ -338,19 +344,19 @@ public class EnterWorld extends L2GameClientPacket
                 }
             }
         }
-		if (!activeChar.isGM() && activeChar.getSiegeState() < 2 && activeChar.isInsideZone(L2Character.ZONE_SIEGE))
-		{
+
+        if (!activeChar.isGM() && activeChar.getSiegeState() < 2 && activeChar.isInsideZone(L2Character.ZONE_SIEGE))
+        {
             // Attacker or spectator logging in to a siege zone. Actually should be checked for inside castle only?
             activeChar.teleToLocation(MapRegionTable.TeleportWhereType.Town);
-            //activeChar.sendMessage("因為在攻城戰區域內,將傳送至最近的村莊.");
-		}
-
+            //activeChar.sendMessage("You have been teleported to the nearest town due to you being in siege zone");
+        }
         
         RegionBBSManager.getInstance().changeCommunityBoard();
 
         if (CTF._savePlayers.contains(activeChar.getName()))
         	CTF.addDisconnectedPlayer(activeChar);
-
+        
         TvTEvent.onLogin(activeChar);
     }
 

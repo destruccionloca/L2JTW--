@@ -1378,9 +1378,8 @@ public class L2NpcInstance extends L2Character
                 html.replace("%playername%", player.getName());
                 player.sendPacket(html);
             }
-          else if (command.equalsIgnoreCase("TerritoryStatus"))
+            else if (command.equalsIgnoreCase("TerritoryStatus"))
             {
-
             	NpcHtmlMessage html = new NpcHtmlMessage(getObjectId()); 
             	{ 
             		if (getCastle().getOwnerId() > 0) 
@@ -2121,7 +2120,7 @@ public class L2NpcInstance extends L2Character
     public void makeCPRecovery(L2PcInstance player)
     {
         if (getNpcId() != 31225 && getNpcId() != 31226) return;
-        if (player.isCursedWeaponEquiped())
+        if (player.isCursedWeaponEquipped())
         {
         	player.sendMessage("快離開，這裡不歡迎你。");
         	return;
@@ -2157,7 +2156,7 @@ public class L2NpcInstance extends L2Character
     		return;
     	
     	// Prevent a cursed weapon weilder of being buffed
-    	if (player.isCursedWeaponEquiped())
+    	if (player.isCursedWeaponEquipped())
     		return;
     	
         int player_level = player.getLevel();        
@@ -2259,7 +2258,7 @@ public class L2NpcInstance extends L2Character
      */
     public void showChatWindow(L2PcInstance player, int val)
     {
-    	if(player.isCursedWeaponEquiped() && ( !(player.getTarget() instanceof L2ClanHallManagerInstance)
+    	if(player.isCursedWeaponEquipped() && ( !(player.getTarget() instanceof L2ClanHallManagerInstance)
     			    						|| !(player.getTarget() instanceof L2DoormenInstance)))
     	{
     		player.setTarget(player);

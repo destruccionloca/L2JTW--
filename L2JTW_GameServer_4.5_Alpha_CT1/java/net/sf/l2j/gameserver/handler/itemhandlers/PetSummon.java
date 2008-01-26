@@ -88,7 +88,7 @@ public class PetSummon implements IItemHandler
 			return;
         }
         
-        if (activeChar.isCursedWeaponEquiped())
+        if (activeChar.isCursedWeaponEquipped())
         {
         	// You can't mount while weilding a cursed weapon
         	activeChar.sendPacket(new SystemMessage(SystemMessageId.STRIDER_CANT_BE_RIDDEN_WHILE_IN_BATTLE));

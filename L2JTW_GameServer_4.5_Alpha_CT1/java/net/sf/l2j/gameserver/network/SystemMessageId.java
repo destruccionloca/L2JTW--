@@ -4849,6 +4849,30 @@ public enum SystemMessageId
     S1_CANNOT_RECEIVE_A_DUEL_CHALLENGE_BECAUSE_S1_IS_TOO_FAR_AWAY(2028),
 
     /**
+     * ID: 2058<br>
+     * Message: You already polymorphed and cannot polymorph again.
+     */
+    YOU_ALREADY_POLYMORPHED_AND_CANNOT_POLYMORPH_AGAIN(2058),
+    
+    /**
+     * ID: 2060<br>
+     * Message: You cannot polymorph into the desired form in water.
+     */
+    YOU_CANNOT_POLYMORPH_INTO_THE_DESIRED_FORM_IN_WATER(2060),
+    
+    /**
+     * ID: 2062<br>
+     * Message: You cannot polymorph when you have summoned a servitor/pet.
+     */
+    YOU_CANNOT_POLYMORPH_WHEN_YOU_HAVE_SUMMONED_A_SERVITOR(2062),
+    
+    /**
+     * ID: 2063<br>
+     * Message: You cannot polymorph while riding a pet.
+     */
+    YOU_CANNOT_POLYMORPH_WHILE_RIDING_A_PET(2063),
+
+    /**
      * ID: 2085<br>
      * Message: Shout and trade chatting cannot be used while possessing a cursed weapon.
      */
