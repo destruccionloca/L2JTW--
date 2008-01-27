@@ -104,6 +104,15 @@ public class DecayTaskManager
                                 case 29068:     // Antharas
                                     forDecay = 12000;
                                     break;
+                				case 29045:     // Frintezza
+                					forDecay = 9500;
+                					break;
+                				case 29046:     // Scarlet Van Halisha lvl 85 -> Morphing
+                					forDecay = 2000;
+                					break;
+                				case 29047:     // Scarlet Van Halisha lvl 90
+                					forDecay = 7500;
+                					break;
                                 case 29014:     // Orfen
                                     forDecay = 150000;
                                     break;

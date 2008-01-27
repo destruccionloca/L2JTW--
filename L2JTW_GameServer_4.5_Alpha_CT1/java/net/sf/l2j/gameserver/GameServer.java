@@ -216,6 +216,7 @@ import net.sf.l2j.gameserver.instancemanager.CursedWeaponsManager;
 import net.sf.l2j.gameserver.instancemanager.DayNightSpawnManager;
 import net.sf.l2j.gameserver.instancemanager.DimensionalRiftManager;
 import net.sf.l2j.gameserver.instancemanager.FourSepulchersManager;
+import net.sf.l2j.gameserver.instancemanager.FrintezzaManager;
 import net.sf.l2j.gameserver.instancemanager.ItemsOnGroundManager;
 import net.sf.l2j.gameserver.instancemanager.MercTicketManager;
 import net.sf.l2j.gameserver.instancemanager.PetitionManager;
@@ -478,6 +479,7 @@ public class GameServer
 		ValakasManager.getInstance().init();
 		BaiumManager.getInstance().init();
 		VanHalterManager.getInstance().init();
+		FrintezzaManager.getInstance().init();
 
 		_log.config("AutoChatHandler: Loaded " + _autoChatHandler.size() + " handlers in total.");
 		_log.config("AutoSpawnHandler: Loaded " + _autoSpawnHandler.size() + " handlers in total.");

@@ -77,6 +77,7 @@ import net.sf.l2j.gameserver.instancemanager.CursedWeaponsManager;
 import net.sf.l2j.gameserver.instancemanager.DimensionalRiftManager;
 import net.sf.l2j.gameserver.instancemanager.DuelManager;
 import net.sf.l2j.gameserver.instancemanager.FourSepulchersManager;
+import net.sf.l2j.gameserver.instancemanager.FrintezzaManager;
 import net.sf.l2j.gameserver.instancemanager.ItemsOnGroundManager;
 import net.sf.l2j.gameserver.instancemanager.QuestManager;
 import net.sf.l2j.gameserver.instancemanager.SailrenManager;
@@ -4618,6 +4619,10 @@ public final class L2PcInstance extends L2PlayableInstance
     	if (BossZoneManager.getInstance().checkIfInZone("LairofBaium", this))
     	{
     		BaiumManager.getInstance().checkAnnihilated();
+    	}
+    	if (BossZoneManager.getInstance().checkIfInZone("PilgrimsTemple", this))
+    	{
+    		FrintezzaManager.getInstance().checkAnnihilated();
     	}
 		return true;
 	}
@@ -9413,12 +9418,19 @@ public final class L2PcInstance extends L2PlayableInstance
     				teleToLocation(MapRegionTable.TeleportWhereType.Town);
     	    	}
     		}
+	    	else if (zn.equalsIgnoreCase("PilgrimsTemple"))
+			{
+				if(System.currentTimeMillis() - getLastAccess() >= 600000)
+	    			teleToLocation(MapRegionTable.TeleportWhereType.Town);
+	        	else
+	        		FrintezzaManager.getInstance().addPlayerToLair(this);
+			}
 
     		// Sailren
 	    	else if (zn.equalsIgnoreCase("LairofSailren"))
     		{
         		if (getQuestState("sailren") != null) getQuestState("sailren").exitQuest(true);
-    			teleToLocation(MapRegionTable.TeleportWhereType.Town);
+        			teleToLocation(MapRegionTable.TeleportWhereType.Town);
     		}
 //addon end ===============================================
 		}
