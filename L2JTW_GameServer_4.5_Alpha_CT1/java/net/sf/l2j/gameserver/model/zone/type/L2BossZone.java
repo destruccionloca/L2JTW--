@@ -14,7 +14,7 @@
  */
 package net.sf.l2j.gameserver.model.zone.type;
 
-import net.sf.l2j.gameserver.datatables.MapRegionTable;
+//import net.sf.l2j.gameserver.datatables.MapRegionTable;
 import net.sf.l2j.gameserver.instancemanager.VanHalterManager;
 import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
@@ -60,10 +60,12 @@ public class L2BossZone extends L2ZoneType
 	    {
 		   ((L2PcInstance) character).sendMessage("You entered " + _zoneName);
 	    }
+/*
 	    if ((System.currentTimeMillis() - ((L2PcInstance) character).getLastAccess() >= _timeInvade))
 	    {
 		   ((L2PcInstance) character).teleToLocation(MapRegionTable.TeleportWhereType.Town);
 	    }
+*/
 	    //addon ==========================================================================
 	    if (_zoneName.equalsIgnoreCase("AltarofSacrifice"))
         	VanHalterManager.getInstance().intruderDetection((L2PcInstance)character);

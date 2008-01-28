@@ -9340,65 +9340,46 @@ public final class L2PcInstance extends L2PlayableInstance
     		// Antharas
 	    	else if (zn.equalsIgnoreCase("LairofAntharas"))
     		{
-    	    	// Lair of bosses,It is less than 30 minutes from server starting.
-	    		// Player can restart inside lair, but Antharas do not respawn.
-    	    	if(System.currentTimeMillis() - GameServer.dateTimeServerStarted.getTimeInMillis() <= Config.TIMELIMITOFINVADE)
-    	    	{
-	        		if (getQuestState("antharas") != null) getQuestState("antharas").exitQuest(true);
-    	    	}
-        		else if (System.currentTimeMillis() - getLastAccess() >= 600000)
-				{
-	        		if (getQuestState("antharas") != null) getQuestState("antharas").exitQuest(true);
-	    			teleToLocation(MapRegionTable.TeleportWhereType.Town);
-				}
+    	    	if (getQuestState("antharas") != null) 
+    	    		getQuestState("antharas").exitQuest(true);
 				else
-	        		AntharasManager.getInstance().addPlayerToLair(this);
+					AntharasManager.getInstance().addPlayerToLair(this);
     		}
     		
     		// Baium
 	    	else if (zn.equalsIgnoreCase("LairofBaium"))
     		{
-				if (System.currentTimeMillis() - getLastAccess() >= 600000)
-				{
-	        		if (getQuestState("baium") != null) getQuestState("baium").exitQuest(true);
-	    			teleToLocation(MapRegionTable.TeleportWhereType.Town);
-				}
+				if (getQuestState("baium") != null)
+					getQuestState("baium").exitQuest(true);
 				else
-				{
-					// Player can restart inside lair, but can not awake Baium.
-	        		if (getQuestState("baium") != null) getQuestState("baium").exitQuest(true);
 	        		BaiumManager.getInstance().addPlayerToLair(this);
-				}
     		}
 
     		// Lilith
 	    	else if (zn.equalsIgnoreCase("LairofLilith"))
     		{
-				if (System.currentTimeMillis() - getLastAccess() >= 600000)
-	    			teleToLocation(MapRegionTable.TeleportWhereType.Town);
+				//if (System.currentTimeMillis() - getLastAccess() >= 600000)
+    			//teleToLocation(MapRegionTable.TeleportWhereType.Town);
     		}
     		
     		// Anakim
 	    	else if (zn.equalsIgnoreCase("LairofAnakim"))
     		{
-				if (System.currentTimeMillis() - getLastAccess() >= 600000)
-	    			teleToLocation(MapRegionTable.TeleportWhereType.Town);
+				//if (System.currentTimeMillis() - getLastAccess() >= 600000)
+    			//teleToLocation(MapRegionTable.TeleportWhereType.Town);
     		}
     		
     		// Zaken
 	    	else if (zn.equalsIgnoreCase("LairofZaken"))
     		{
-				if (System.currentTimeMillis() - getLastAccess() >= 600000)
-	    			teleToLocation(MapRegionTable.TeleportWhereType.Town);
+				//if (System.currentTimeMillis() - getLastAccess() >= 600000)
+	    			//teleToLocation(MapRegionTable.TeleportWhereType.Town);
     		}
 
     		// High Priestess van Halter
 	    	else if (zn.equalsIgnoreCase("AltarofSacrifice"))
 			{
-				if(System.currentTimeMillis() - getLastAccess() >= 600000)
-	    			teleToLocation(MapRegionTable.TeleportWhereType.Town);
-	        	else
-	        		VanHalterManager.getInstance().intruderDetection(this);
+				VanHalterManager.getInstance().intruderDetection(this);
 			}
     	
     		// 0 minutes
@@ -9408,29 +9389,29 @@ public final class L2PcInstance extends L2PlayableInstance
     	    	// Lair of bosses,It is less than 30 minutes from server starting.
 	    		// Player can restart inside lair, and begin fight against Valakas 30min later.
     	    	if(System.currentTimeMillis() - GameServer.dateTimeServerStarted.getTimeInMillis() <= Config.TIMELIMITOFINVADE &&
-    	    			ValakasManager.getInstance().getState().equals(GrandBossState.StateEnum.ALIVE))
+    	    		ValakasManager.getInstance().getState().equals(GrandBossState.StateEnum.ALIVE))
     			{
 	    			ValakasManager.getInstance().addPlayerToLair(this);
     			}
     	    	else
     	    	{
-    	    		if (getQuestState("valakas") != null) getQuestState("valakas").exitQuest(true);
-    				teleToLocation(MapRegionTable.TeleportWhereType.Town);
+    	    		if (getQuestState("valakas") != null) 
+    	    			getQuestState("valakas").exitQuest(true);
     	    	}
     		}
 	    	else if (zn.equalsIgnoreCase("PilgrimsTemple"))
 			{
-				if(System.currentTimeMillis() - getLastAccess() >= 600000)
-	    			teleToLocation(MapRegionTable.TeleportWhereType.Town);
-	        	else
+    	    	if (getQuestState("frintezza") != null) 
+    	    		getQuestState("frintezza").exitQuest(true);
+				else
 	        		FrintezzaManager.getInstance().addPlayerToLair(this);
 			}
 
     		// Sailren
 	    	else if (zn.equalsIgnoreCase("LairofSailren"))
     		{
-        		if (getQuestState("sailren") != null) getQuestState("sailren").exitQuest(true);
-        			teleToLocation(MapRegionTable.TeleportWhereType.Town);
+        		if (getQuestState("sailren") != null) 
+        			getQuestState("sailren").exitQuest(true);
     		}
 //addon end ===============================================
 		}
