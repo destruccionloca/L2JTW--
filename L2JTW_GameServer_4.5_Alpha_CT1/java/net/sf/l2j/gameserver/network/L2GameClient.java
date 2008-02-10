@@ -74,7 +74,7 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>>
 	private List<Integer> _charSlotMapping = new FastList<Integer>();
 
 	// Task
-	protected /*final*/ ScheduledFuture<?> _autoSaveInDB;
+	protected final ScheduledFuture<?> _autoSaveInDB;
 
 	// Crypt
 	public GameCrypt crypt;
@@ -82,6 +82,8 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>>
 	// Flood protection
 	public byte packetsSentInSec = 0;
 	public int packetsSentStartTick = 0;
+    public byte packetsReceivedInSec = 0;
+    public int packetsReceivedStartTick = 0;
 
 	public L2GameClient(MMOConnection<L2GameClient> con)
 	{
@@ -89,9 +91,17 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>>
 		state = GameClientState.CONNECTED;
 		_connectionStartTime = System.currentTimeMillis();
 		crypt = new GameCrypt();
-		_autoSaveInDB = ThreadPoolManager.getInstance().scheduleGeneralAtFixedRate(
-   				new AutoSaveTask(), 300000L, (Config.CHAR_STORE_INTERVAL*60000L)
-   				);
+        
+        if (Config.CHAR_STORE_INTERVAL > 0)
+        {
+            _autoSaveInDB = ThreadPoolManager.getInstance().scheduleGeneralAtFixedRate( 
+                    new AutoSaveTask(), 300000L, (Config.CHAR_STORE_INTERVAL*60000L)
+            );
+        }
+        else
+        {
+            _autoSaveInDB = null;
+        }
 	}
 
 	public byte[] enableCrypt()
@@ -206,7 +216,7 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>>
 		L2PcInstance character = L2PcInstance.load(objid);
 		if (character.getClanId() != 0)
 			return character;
-
+        character.deleteMe();
 		java.sql.Connection con = null;
 		try
 		{
@@ -248,6 +258,10 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>>
 
 		// [L2J_JP EDIT - TSL] deleteCharByObjId(objid);
 		CleanUpManager.getInstance().deleteCharByObjId(objid);
+
+        character.deleteMe();
+		deleteCharByObjId(objid);
+
 		return null;
 	}
 
@@ -259,6 +273,10 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>>
         try
         {
             cha.store();
+            if (Config.UPDATE_ITEMS_ON_CHAR_STORE)
+            {
+                cha.getInventory().updateDatabase();
+            }
         }
         catch(Exception e)
         {
@@ -543,7 +561,10 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>>
 				}
 
 				// we are going to mannually save the char bellow thus we can force the cancel
-				_autoSaveInDB.cancel(true);
+				if (_autoSaveInDB != null)
+                {
+				    _autoSaveInDB.cancel(true);
+                }
 
 	            L2PcInstance player = L2GameClient.this.getActiveChar();
 				if (player != null)  // this should only happen on connection loss

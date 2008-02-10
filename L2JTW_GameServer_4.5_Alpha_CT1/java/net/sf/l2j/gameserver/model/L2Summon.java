@@ -45,6 +45,7 @@ import net.sf.l2j.gameserver.templates.L2NpcTemplate;
 import net.sf.l2j.gameserver.templates.L2Weapon;
 import net.sf.l2j.gameserver.datatables.NpcTable;
 
+
 public abstract class L2Summon extends L2PlayableInstance
 {
     //private static Logger _log = Logger.getLogger(L2Summon.class.getName());
@@ -66,242 +67,239 @@ public abstract class L2Summon extends L2PlayableInstance
     private int _soulShotsPerHit = 1;
     private int _spiritShotsPerHit = 1;
 	protected boolean _showSummonAnimation;
-
-	
-
-	 public int getIsChar()
-	    {
-	    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
-	    	for (L2NpcCharData npcChar: npcData.getCharData())
-	    	{
-	    		if (npcChar == null)
-	    			return 0;
-	    		else
-	    		return npcChar.getIsChar();
-	    	}
-	    	return 0;
-	    }
-	    
-	    public int getCharClass()
-	    {
-	    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
-	    	for (L2NpcCharData npcChar: npcData.getCharData())
-	    	{
-	    		if (npcChar == null)
-	    			return 0;
-	    		else
-	    		return npcChar.getCharClass();
-	    	}
-	        return 0;
-	    }
-	    
-	    public int getCharRace()
-	    {
-	    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
-	    	for (L2NpcCharData npcChar: npcData.getCharData())
-	    	{
-	    		if (npcChar == null)
-	    			return 0;
-	    		else
-	    		return npcChar.getCharRace();
-	    	}
-	        return 0;
-	    }
-	    
-	    public int getLrhand()
-	    {
-	    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
-	    	for (L2NpcCharData npcChar: npcData.getCharData())
-	    	{
-	    		if (npcChar == null)
-	    			return 0;
-	    		else
-	    		return npcChar.getLrhand();
-	    	}
-	        return 0;
-	    }
-	    public int getArmor()
-	    {
-	    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
-	    	for (L2NpcCharData npcChar: npcData.getCharData())
-	    	{
-	    		if (npcChar == null)
-	    			return 0;
-	    		else
-	    		return npcChar.getArmor();
-	    	}
-	        return 0;
-	    }
-	    public int getPant()
-	    {
-	    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
-	    	for (L2NpcCharData npcChar: npcData.getCharData())
-	    	{
-	    		if (npcChar == null)
-	    			return 0;
-	    		else
-	    		return npcChar.getPant();
-	    	}
-	        return 0;
-	    }
-	    public int getHead()
-	    {
-	    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
-	    	for (L2NpcCharData npcChar: npcData.getCharData())
-	    	{
-	    		if (npcChar == null)
-	    			return 0;
-	    		else
-	    		return npcChar.getHead();
-	    	}
-	        return 0;
-	    }
-	    public int getGlove()
-	    {
-	    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
-	    	for (L2NpcCharData npcChar: npcData.getCharData())
-	    	{
-	    		if (npcChar == null)
-	    			return 0;
-	    		else
-	    		return npcChar.getGlove();
-	    	}
-	        return 0;
-	    }
-	    public int getBoot()
-	    {
-	    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
-	    	for (L2NpcCharData npcChar: npcData.getCharData())
-	    	{
-	    		if (npcChar == null)
-	    			return 0;
-	    		else
-	    		return npcChar.getBoot();
-	    	}
-	        return 0;
-	    }
-	    public int getDHair()
-	    {
-	    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
-	    	for (L2NpcCharData npcChar: npcData.getCharData())
-	    	{
-	    		if (npcChar == null)
-	    			return 0;
-	    		else
-	    		return npcChar.getDHair();
-	    	}
-	        return 0;
-	    }
-	    public int getFace()
-	    {
-	    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
-	    	for (L2NpcCharData npcChar: npcData.getCharData())
-	    	{
-	    		if (npcChar == null)
-	    			return 0;
-	    		else
-	    		return npcChar.getFace();
-	    	}
-	        return 0;
-	    }
-	    public int getHair()
-	    {
-	    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
-	    	for (L2NpcCharData npcChar: npcData.getCharData())
-	    	{
-	    		if (npcChar == null)
-	    			return 0;
-	    		else
-	    		return npcChar.getHair();
-	    	}
-	        return 0;
-	    }
-	    public int getAugmentation()
-	    {
-	    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
-	    	for (L2NpcCharData npcChar: npcData.getCharData())
-	    	{
-	    		if (npcChar == null)
-	    			return 0;
-	    		else
-	    		return npcChar.getAugmentation();
-	    	}
-	        return 0;
-	    }
-	    public int getEnchLvl()
-	    {
-	    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
-	    	for (L2NpcCharData npcChar: npcData.getCharData())
-	    	{
-	    		if (npcChar == null)
-	    			return 0;
-	    		else
-	    		return npcChar.getEnchLvl();
-	    	}
-	        return 0;
-	    }
-	    public int getCharFace()
-	    {
-	    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
-	    	for (L2NpcCharData npcChar: npcData.getCharData())
-	    	{
-	    		if (npcChar == null)
-	    			return 0;
-	    		else
-	    		return npcChar.getCharFace();
-	    	}
-	        return 0;
-	    }
-	    public int getCharHair()
-	    {
-	    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
-	    	for (L2NpcCharData npcChar: npcData.getCharData())
-	    	{
-	    		if (npcChar == null)
-	    			return 0;
-	    		else
-	    		return npcChar.getCharHair();
-	    	}
-	        return 0;
-	    }
-	    public int getCharColor()
-	    {
-	    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
-	    	for (L2NpcCharData npcChar: npcData.getCharData())
-	    	{
-	    		if (npcChar == null)
-	    			return 0;
-	    		else
-	    		return npcChar.getCharColor();
-	    	}
-	    	return 0;
-	    }
-	    public int getCharSex()
-	    {
-	    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
-	    	for (L2NpcCharData npcChar: npcData.getCharData())
-	    	{
-	    		if (npcChar == null)
-	    			return 0;
-	    		else
-	    		return npcChar.getCharSex();
-	    	}
-	        return 0;
-	    }
-	    
-	    public int getCharHero()
-	    {
-	    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
-	    	for (L2NpcCharData npcChar: npcData.getCharData())
-	    	{
-	    		if (npcChar == null)
-	    			return 0;
-	    		else
-	    		return npcChar.getCharHero();
-	    	}
-	        return 0;
-	    }
-	    
+    public int getIsChar()
+    {
+        L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+        for (L2NpcCharData npcChar: npcData.getCharData())
+        {
+            if (npcChar == null)
+                return 0;
+            else
+            return npcChar.getIsChar();
+        }
+        return 0;
+    }
+    
+    public int getCharClass()
+    {
+        L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+        for (L2NpcCharData npcChar: npcData.getCharData())
+        {
+            if (npcChar == null)
+                return 0;
+            else
+            return npcChar.getCharClass();
+        }
+        return 0;
+    }
+    
+    public int getCharRace()
+    {
+        L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+        for (L2NpcCharData npcChar: npcData.getCharData())
+        {
+            if (npcChar == null)
+                return 0;
+            else
+            return npcChar.getCharRace();
+        }
+        return 0;
+    }
+    
+    public int getLrhand()
+    {
+        L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+        for (L2NpcCharData npcChar: npcData.getCharData())
+        {
+            if (npcChar == null)
+                return 0;
+            else
+            return npcChar.getLrhand();
+        }
+        return 0;
+    }
+    public int getArmor()
+    {
+        L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+        for (L2NpcCharData npcChar: npcData.getCharData())
+        {
+            if (npcChar == null)
+                return 0;
+            else
+            return npcChar.getArmor();
+        }
+        return 0;
+    }
+    public int getPant()
+    {
+        L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+        for (L2NpcCharData npcChar: npcData.getCharData())
+        {
+            if (npcChar == null)
+                return 0;
+            else
+            return npcChar.getPant();
+        }
+        return 0;
+    }
+    public int getHead()
+    {
+        L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+        for (L2NpcCharData npcChar: npcData.getCharData())
+        {
+            if (npcChar == null)
+                return 0;
+            else
+            return npcChar.getHead();
+        }
+        return 0;
+    }
+    public int getGlove()
+    {
+        L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+        for (L2NpcCharData npcChar: npcData.getCharData())
+        {
+            if (npcChar == null)
+                return 0;
+            else
+            return npcChar.getGlove();
+        }
+        return 0;
+    }
+    public int getBoot()
+    {
+        L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+        for (L2NpcCharData npcChar: npcData.getCharData())
+        {
+            if (npcChar == null)
+                return 0;
+            else
+            return npcChar.getBoot();
+        }
+        return 0;
+    }
+    public int getDHair()
+    {
+        L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+        for (L2NpcCharData npcChar: npcData.getCharData())
+        {
+            if (npcChar == null)
+                return 0;
+            else
+            return npcChar.getDHair();
+        }
+        return 0;
+    }
+    public int getFace()
+    {
+        L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+        for (L2NpcCharData npcChar: npcData.getCharData())
+        {
+            if (npcChar == null)
+                return 0;
+            else
+            return npcChar.getFace();
+        }
+        return 0;
+    }
+    public int getHair()
+    {
+        L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+        for (L2NpcCharData npcChar: npcData.getCharData())
+        {
+            if (npcChar == null)
+                return 0;
+            else
+            return npcChar.getHair();
+        }
+        return 0;
+    }
+    public int getAugmentation()
+    {
+        L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+        for (L2NpcCharData npcChar: npcData.getCharData())
+        {
+            if (npcChar == null)
+                return 0;
+            else
+            return npcChar.getAugmentation();
+        }
+        return 0;
+    }
+    public int getEnchLvl()
+    {
+        L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+        for (L2NpcCharData npcChar: npcData.getCharData())
+        {
+            if (npcChar == null)
+                return 0;
+            else
+            return npcChar.getEnchLvl();
+        }
+        return 0;
+    }
+    public int getCharFace()
+    {
+        L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+        for (L2NpcCharData npcChar: npcData.getCharData())
+        {
+            if (npcChar == null)
+                return 0;
+            else
+            return npcChar.getCharFace();
+        }
+        return 0;
+    }
+    public int getCharHair()
+    {
+        L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+        for (L2NpcCharData npcChar: npcData.getCharData())
+        {
+            if (npcChar == null)
+                return 0;
+            else
+            return npcChar.getCharHair();
+        }
+        return 0;
+    }
+    public int getCharColor()
+    {
+        L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+        for (L2NpcCharData npcChar: npcData.getCharData())
+        {
+            if (npcChar == null)
+                return 0;
+            else
+            return npcChar.getCharColor();
+        }
+        return 0;
+    }
+    public int getCharSex()
+    {
+        L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+        for (L2NpcCharData npcChar: npcData.getCharData())
+        {
+            if (npcChar == null)
+                return 0;
+            else
+            return npcChar.getCharSex();
+        }
+        return 0;
+    }
+    
+    public int getCharHero()
+    {
+        L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+        for (L2NpcCharData npcChar: npcData.getCharData())
+        {
+            if (npcChar == null)
+                return 0;
+            else
+            return npcChar.getCharHero();
+        }
+        return 0;
+    }
+    
 	public class AIAccessor extends L2Character.AIAccessor
 	{
 		protected AIAccessor() {}
@@ -632,11 +630,12 @@ public abstract class L2Summon extends L2PlayableInstance
                 party.broadcastToPartyMembers(owner, new ExPartyPetWindowDelete(this));
             }
             
-	        if (getWorldRegion() != null) getWorldRegion().removeFromZones(this);
 	        store();
-
 	        giveAllToOwner();
+	        
+	        L2WorldRegion oldRegion = getWorldRegion();
 		    decayMe();
+		    if (oldRegion != null) oldRegion.removeFromZones(this);
             getKnownList().removeAllKnownObjects();
 	        owner.setPet(null);
 	        setTarget(null);
@@ -929,20 +928,20 @@ public abstract class L2Summon extends L2PlayableInstance
 	}
 
 	@Override
-	public void setIsImobilised(boolean value)
+	public void setIsImmobilized(boolean value)
 	{
-		super.setIsImobilised(value);
+		super.setIsImmobilized(value);
 
 		if (value)
 		{
 			_previousFollowStatus = getFollowStatus();
-			// if imobilized temporarly disable follow mode
+			// if immobilized temporarly disable follow mode
 			if (_previousFollowStatus)
 				setFollowStatus(false);
 		}
 		else
 		{
-			// if not more imobilized restore previous follow mode
+			// if not more immobilized restore previous follow mode
 			setFollowStatus(_previousFollowStatus);
 		}
 	}

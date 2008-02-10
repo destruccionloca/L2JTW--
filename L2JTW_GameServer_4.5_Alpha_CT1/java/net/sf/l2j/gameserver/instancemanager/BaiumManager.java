@@ -340,7 +340,7 @@ public class BaiumManager
 		
     	// do social.
         updateKnownList(baium);
-        baium.setIsImobilised(true);
+        baium.setIsImmobilized(true);
         baium.setIsInSocialAction(true);
 
         Earthquake eq = new Earthquake(baium.getX(), baium.getY(), baium.getZ(), 30, 10);
@@ -681,7 +681,7 @@ public class BaiumManager
 
         public void run()
         {
-        	_boss.setIsImobilised(false);
+        	_boss.setIsImmobilized(false);
         	_boss.setIsInSocialAction(false);
             
             // When it is possible to act, a social action is canceled.

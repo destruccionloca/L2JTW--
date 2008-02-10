@@ -275,7 +275,7 @@ public class NpcTable
 			try 
             {
 			    PreparedStatement statement10 = con.prepareStatement("SELECT " + L2DatabaseFactory.getInstance().safetyString(new String[] 
-			    {"npc_id", "primary_attack","skill_chance","canMove","soulshot","spiritshot","sschance","spschance","ischaos","clan","enemyClan","enemyRange","dodge"}) + " FROM npcAIData ORDER BY npc_id");
+			    {"npc_id", "primary_attack","skill_chance","canMove","soulshot","spiritshot","sschance","spschance","minrangeskill","minrangechance","maxrangeskill","maxrangechance","ischaos","clan","enemyClan","enemyRange","dodge"}) + " FROM npcAIData ORDER BY npc_id");
 			    ResultSet NpcAIDataTable = statement10.executeQuery();
 			    L2NpcAIData npcAIDat = null;
 			    L2NpcTemplate npcDat = null;
@@ -299,6 +299,10 @@ public class NpcTable
                     npcAIDat.setSoulShotChance(NpcAIDataTable.getInt("sschance"));
                     npcAIDat.setSpiritShotChance(NpcAIDataTable.getInt("spschance"));
                     npcAIDat.setIsChaos(NpcAIDataTable.getInt("ischaos"));
+                    npcAIDat.setShortRangeSkill(NpcAIDataTable.getInt("minrangeskill"));
+                    npcAIDat.setShortRangeChance(NpcAIDataTable.getInt("minrangechance"));
+                    npcAIDat.setLongRangeSkill(NpcAIDataTable.getInt("maxrangeskill"));
+                    npcAIDat.setLongRangeChance(NpcAIDataTable.getInt("maxrangechance"));
                     npcAIDat.setClan(NpcAIDataTable.getString("clan"));
                     npcAIDat.setEnemyClan(NpcAIDataTable.getString("enemyClan"));
                     npcAIDat.setEnemyRange(NpcAIDataTable.getInt("enemyRange"));

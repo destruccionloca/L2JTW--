@@ -54,8 +54,10 @@ public class L2NpcAIData
     private int _baseShldRate;
     private int _baseShldDef;
     private int _dodge;
-    private int minrangeskill;
-    private int maxrangeskill;
+    private int _longrangeskill;
+    private int _shortrangeskill;
+    private int _longrangechance;
+    private int _shortrangechance;
     
     //Skill AI
     private int _buffskill;
@@ -147,6 +149,34 @@ public class L2NpcAIData
     	
     	_spiritshotchance = spiritshotchance;
     	
+    }
+    
+    public void setShortRangeSkill (int shortrangeskill)
+    {
+        
+        _shortrangeskill = shortrangeskill;
+        
+    }
+    
+    public void setShortRangeChance (int shortrangechance)
+    {
+        
+        _shortrangechance = shortrangechance;
+        
+    }
+    
+    public void setLongRangeSkill (int longrangeskill)
+    {
+        
+        _longrangeskill = longrangeskill;
+        
+    }
+    
+    public void setLongRangeChance (int longrangechance)
+    {
+        
+        _shortrangechance = longrangechance;
+        
     }
     
     public void setIsChaos (int ischaos)
@@ -285,8 +315,33 @@ public class L2NpcAIData
     	return _spiritshotchance;
     	
     }
+    public int getShortRangeSkill()
+    {
+        
+        return _shortrangeskill;
+        
+    }
+    public int getShortRangeChance()
+    {
+        
+        return _shortrangechance;
+        
+    }
+    public int getLongRangeSkill()
+    {
+        
+        return _longrangeskill;
+        
+    }
+    public int getLongRangeChance()
+    {
+        
+        return _longrangechance;
+        
+    }
     public int getIsChaos ()
     {
+        
     	return _ischaos;
     	
     }

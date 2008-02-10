@@ -60,6 +60,7 @@ import net.sf.l2j.gameserver.skills.l2skills.L2SkillChargeAtk;
 import net.sf.l2j.gameserver.skills.l2skills.L2SkillChargeDmg;
 import net.sf.l2j.gameserver.skills.l2skills.L2SkillChargeEffect;
 import net.sf.l2j.gameserver.skills.l2skills.L2SkillCreateItem;
+import net.sf.l2j.gameserver.skills.l2skills.L2SkillDecoy;
 import net.sf.l2j.gameserver.skills.l2skills.L2SkillDefault;
 import net.sf.l2j.gameserver.skills.l2skills.L2SkillDrain;
 import net.sf.l2j.gameserver.skills.l2skills.L2SkillSeed;
@@ -231,7 +232,8 @@ public abstract class L2Skill
     	STRSIEGEASSAULT,
     	ERASE,
     	BETRAY,
-
+    	DECOY(L2SkillDecoy.class),
+    	
     	// Cancel
     	CANCEL,
     	MAGE_BANE,
@@ -261,8 +263,9 @@ public abstract class L2Skill
     	SEED (L2SkillSeed.class),
     	BEAST_FEED,
     	FORCE_BUFF,
-       CHARGESOUL,
-       TRANSFORM,
+        CHARGESOUL,
+        TRANSFORM,
+        TRANSFORMDISPEL,
         
         // Kamael WeaponChange
         CHANGEWEAPON (L2SkillChangeWeapon.class),
@@ -525,9 +528,11 @@ public abstract class L2Skill
     private final boolean _willHit;
     
     private final int _charge;
-    //private final int _minPledgeClass;
-    
-    //private final int _num_charges;
+
+    // Flying support
+    private final String _flyType;
+    private final int _flyRadius;
+
     protected L2Skill(StatsSet set)
     {
 
@@ -629,6 +634,9 @@ public abstract class L2Skill
         _nextDanceCost = set.getInteger("nextDanceCost", 0);
         _sSBoost = set.getFloat("SSBoost", 0.f);
         _aggroPoints = set.getInteger("aggroPoints", 0);
+
+	_flyType = set.getString("flyType", null);
+	_flyRadius = set.getInteger("flyRadius", 200);
 
         String canLearn = set.getString("canLearn", null);
         if (canLearn == null)
@@ -1253,7 +1261,15 @@ public abstract class L2Skill
     {
     	return _directHpDmg;
     }
-    
+    public final String getFlyType()
+    {
+    	return _flyType;
+    }
+
+    public final int getFlyRadius()
+    {
+    	return _flyRadius;
+    }
 
     public final boolean isSkillTypeOffensive()
     {
@@ -1639,7 +1655,8 @@ public abstract class L2Skill
                 L2PcInstance src = null;
                 if (activeChar instanceof L2PcInstance) src = (L2PcInstance)activeChar;
                 if (activeChar instanceof L2Summon) src = ((L2Summon)activeChar).getOwner();
-
+                if (activeChar instanceof L2Decoy) src = ((L2Decoy)activeChar).getOwner();
+                
                 // Go through the L2Character _knownList
                 for (L2Object obj : activeChar.getKnownList().getKnownObjects().values())
                 {
@@ -1719,10 +1736,10 @@ public abstract class L2Skill
                         if (obj == activeChar || obj == src) continue;
                     	if (src != null)
                         {
-				if (!GeoData.getInstance().canSeeTarget(activeChar, obj))
+				if (!((L2Character) obj).isFront(activeChar))
                     			continue;
 
-				if (!((L2Character) obj).isFront(activeChar))
+				if (!GeoData.getInstance().canSeeTarget(activeChar, obj))
                     			continue;
 
 				// check if both attacker and target are L2PcInstances and if they are in same party
@@ -1778,10 +1795,10 @@ public abstract class L2Skill
                         if (obj == activeChar || obj == src) continue;
                     	if (src != null)
                         {
-				if (!GeoData.getInstance().canSeeTarget(activeChar, obj))
+				if (!((L2Character) obj).isBehind(activeChar))
                     			continue;
 
-				if (!((L2Character) obj).isBehind(activeChar))
+				if (!GeoData.getInstance().canSeeTarget(activeChar, obj))
                     			continue;
 
 				// check if both attacker and target are L2PcInstances and if they are in same party
@@ -1986,21 +2003,28 @@ public abstract class L2Skill
 
                 for (L2Object obj : activeChar.getKnownList().getKnownObjects().values())
                 {
-                    if (obj == null) continue;
-                	if (!(obj instanceof L2Attackable || obj instanceof L2PlayableInstance)) continue;
-                    if (obj == cha) continue;
-                    target = (L2Character) obj;
+                    if (obj == null)
+			continue;
 
-                    if (!GeoData.getInstance().canSeeTarget(activeChar, target))
-            			continue;
+		    if (!(obj instanceof L2Attackable
+			|| obj instanceof L2PlayableInstance))
+			continue;
+
+                    if (obj == cha)
+			continue;
+
+                    target = (L2Character) obj;
 
                     if(!target.isAlikeDead() && (target != activeChar))
                     {
                         if (!Util.checkIfInRange(radius, obj, activeChar, true))
-                          continue;
+			   continue;
 
-			if (!target.isFront(activeChar))
-				continue;
+			if (!((L2Character) obj).isFront(activeChar))
+			   continue;
+
+			if (!GeoData.getInstance().canSeeTarget(activeChar, obj))
+			   continue;
 
                         if (src != null) // caster is l2playableinstance and exists
                         {
@@ -2110,16 +2134,16 @@ public abstract class L2Skill
                     if (obj == cha) continue;
                     target = (L2Character) obj;
 
-                    if (!GeoData.getInstance().canSeeTarget(activeChar, target))
-            			continue;
-
                     if(!target.isAlikeDead() && (target != activeChar))
                     {
                         if (!Util.checkIfInRange(radius, obj, activeChar, true))
-                          continue;
+                        	continue;
 
-			if (!target.isBehind(activeChar))
+			if (!((L2Character) obj).isBehind(activeChar))
 				continue;
+
+			if (!GeoData.getInstance().canSeeTarget(activeChar, obj))
+            			continue;
 
                         if (src != null) // caster is l2playableinstance and exists
                         {

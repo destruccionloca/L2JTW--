@@ -236,7 +236,7 @@ public abstract class Inventory extends ItemContainer
     	}
     }
 
-    final class ItemPassiveSkillsListener implements PaperdollListener
+    final class ItemSkillsListener implements PaperdollListener
     {
     	public void notifyUnequiped(int slot, L2ItemInstance item)
     	{
@@ -256,7 +256,11 @@ public abstract class Inventory extends ItemContainer
 
 			if(it instanceof L2Weapon)
 			{
-				passiveSkill = ((L2Weapon)it).getSkill();
+                // Remove augmentation bonuses on unequip
+                if (item.isAugmented() && getOwner() instanceof L2PcInstance)
+                    item.getAugmentation().removeBonus((L2PcInstance)getOwner());
+			    
+			    passiveSkill = ((L2Weapon)it).getSkill();
 				enchant4Skill= ((L2Weapon)it).getEnchant4Skill();
 			}
 			else if(it instanceof L2Armor)
@@ -291,7 +295,11 @@ public abstract class Inventory extends ItemContainer
 			
 			if(it instanceof L2Weapon)
 			{
-				passiveSkill = ((L2Weapon)it).getSkill();
+                // Apply augmentation bonuses on equip
+                if (item.isAugmented() && getOwner() instanceof L2PcInstance)
+                    item.getAugmentation().applyBonus((L2PcInstance)getOwner());
+
+			    passiveSkill = ((L2Weapon)it).getSkill();
 				
 				if(item.getEnchantLevel() >= 4)
 					enchant4Skill= ((L2Weapon)it).getEnchant4Skill();
@@ -526,7 +534,7 @@ public abstract class Inventory extends ItemContainer
 		addPaperdollListener(new ArmorSetListener());
         addPaperdollListener(new CrossBowListener());
 		addPaperdollListener(new BowListener());
-		addPaperdollListener(new ItemPassiveSkillsListener());
+		addPaperdollListener(new ItemSkillsListener());
 		addPaperdollListener(new StatsListener());
 		//addPaperdollListener(new FormalWearListener());
 	}
@@ -616,14 +624,14 @@ public abstract class Inventory extends ItemContainer
      * @param item : L2ItemInstance to be removed from inventory
      */
     @Override
-	protected void removeItem(L2ItemInstance item)
+	protected boolean removeItem(L2ItemInstance item)
     {
     	// Unequip item if equiped
-//    	if (item.isEquipped()) unEquipItemInSlotAndRecord(item.getEquipSlot());
+        // if (item.isEquipped()) unEquipItemInSlotAndRecord(item.getEquipSlot());
         for (int i = 0; i < _paperdoll.length; i++)
             if (_paperdoll[i] == item) unEquipItemInSlot(i);
 
-        super.removeItem(item);
+        return super.removeItem(item);
     }
 
 	/**
@@ -1296,8 +1304,8 @@ public abstract class Inventory extends ItemContainer
 	/**
 	 * Re-notify to paperdoll listeners every equipped item
 	 */
-	public void reloadEquippedItems() {
-		
+	public void reloadEquippedItems() 
+	{
 		L2ItemInstance item;
 		int slot;
 		

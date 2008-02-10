@@ -341,7 +341,7 @@ public class ValakasManager
 	            	L2Spawn valakasSpawn = _MonsterSpawn.get(29028);
 	            	_valakas = (L2BossInstance)valakasSpawn.doSpawn();
 	            	_Monsters.add(_valakas);
-	            	_valakas.setIsImobilised(true);
+	            	_valakas.setIsImmobilized(true);
 	            	_valakas.setIsInSocialAction(true);
 	            	updateKnownList(_valakas);
 
@@ -788,7 +788,7 @@ public class ValakasManager
 
         public void run()
         {
-        	_boss.setIsImobilised(false);
+        	_boss.setIsImmobilized(false);
         	_boss.setIsInSocialAction(false);
             
             // When it is possible to act, a social action is canceled.

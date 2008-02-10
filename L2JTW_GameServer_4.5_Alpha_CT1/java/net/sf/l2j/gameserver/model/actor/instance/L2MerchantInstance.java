@@ -26,7 +26,6 @@ import net.sf.l2j.gameserver.serverpackets.ActionFailed;
 import net.sf.l2j.gameserver.serverpackets.BuyList;
 import net.sf.l2j.gameserver.serverpackets.MyTargetSelected;
 import net.sf.l2j.gameserver.serverpackets.NpcHtmlMessage;
-import net.sf.l2j.gameserver.serverpackets.Ride;
 import net.sf.l2j.gameserver.serverpackets.SellList;
 import net.sf.l2j.gameserver.serverpackets.StatusUpdate;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
@@ -245,10 +244,7 @@ public class L2MerchantInstance extends L2FolkInstance
 
         if (!player.reduceAdena("Rent", (int) price, player.getLastFolkNPC(), true)) return;
 
-        Ride mount = new Ride(player.getObjectId(), Ride.ACTION_MOUNT, petId);
-        player.broadcastPacket(mount);
-
-        player.setMountType(mount.getMountType());
+        player.mount(petId, 0);
         player.startRentPet(time);
     }
 

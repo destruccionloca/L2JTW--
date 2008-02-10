@@ -468,7 +468,7 @@ public class FrintezzaManager
 			{
 				case 1: // spawn.
 					frintezza = (L2BossInstance) frintezzaSpawn.doSpawn();
-					frintezza.setIsImobilised(true);
+					frintezza.setIsImmobilized(true);
 					frintezza.disableAllSkills();
 					frintezza.setIsInSocialAction(true);
 					
@@ -534,32 +534,32 @@ public class FrintezzaManager
 					_task = ThreadPoolManager.getInstance().scheduleEffect(s, 5800);
 					
 					weakScarlet = (L2BossInstance) scarletSpawnWeak.doSpawn();
-					weakScarlet.setIsImobilised(true);
+					weakScarlet.setIsImmobilized(true);
 					weakScarlet.setIsInSocialAction(true);
 					
 					portrait1 = (L2BossInstance) portraitSpawn1.doSpawn();
-					portrait1.setIsImobilised(true);
+					portrait1.setIsImmobilized(true);
 					
 					portrait2 = (L2BossInstance) portraitSpawn2.doSpawn();
-					portrait2.setIsImobilised(true);
+					portrait2.setIsImmobilized(true);
 					
 					portrait3 = (L2BossInstance) portraitSpawn3.doSpawn();
-					portrait3.setIsImobilised(true);
+					portrait3.setIsImmobilized(true);
 					
 					portrait4 = (L2BossInstance) portraitSpawn4.doSpawn();
-					portrait4.setIsImobilised(true);
+					portrait4.setIsImmobilized(true);
 					
 					demon1 = (L2MonsterInstance) demonSpawn1.doSpawn();
-					demon1.setIsImobilised(true);
+					demon1.setIsImmobilized(true);
 					
 					demon2 = (L2MonsterInstance) demonSpawn2.doSpawn();
-					demon2.setIsImobilised(true);
+					demon2.setIsImmobilized(true);
 					
 					demon3 = (L2MonsterInstance) demonSpawn3.doSpawn();
-					demon3.setIsImobilised(true);
+					demon3.setIsImmobilized(true);
 					
 					demon4 = (L2MonsterInstance) demonSpawn4.doSpawn();
-					demon4.setIsImobilised(true);
+					demon4.setIsImmobilized(true);
 					
 					Earthquake eq = new Earthquake(weakScarlet.getX(), weakScarlet.getY(), weakScarlet.getZ(), 50, 6);
 					
@@ -698,22 +698,22 @@ public class FrintezzaManager
 					
 					L2Skill skill = SkillTable.getInstance().getInfo(1086, 1);
 					
-					demon1.setIsImobilised(false);
+					demon1.setIsImmobilized(false);
 					doSkill ds = new doSkill(demon1, skill, _intervalOfFrintezzaSongs, 1000);
 					Future<?> _doSkillTask = ThreadPoolManager.getInstance().scheduleEffect(ds, 4000);
 					ds.setTask(_doSkillTask);
 					
-					demon2.setIsImobilised(false);
+					demon2.setIsImmobilized(false);
 					ds = new doSkill(demon2, skill, _intervalOfFrintezzaSongs, 1000);
 					_doSkillTask = ThreadPoolManager.getInstance().scheduleEffect(ds, 4100);
 					ds.setTask(_doSkillTask);
 					
-					demon3.setIsImobilised(false);
+					demon3.setIsImmobilized(false);
 					ds = new doSkill(demon3, skill, _intervalOfFrintezzaSongs, 1000);
 					_doSkillTask = ThreadPoolManager.getInstance().scheduleEffect(ds, 4200);
 					ds.setTask(_doSkillTask);
 					
-					demon4.setIsImobilised(false);
+					demon4.setIsImmobilized(false);
 					ds = new doSkill(demon4, skill, _intervalOfFrintezzaSongs, 1000);
 					_doSkillTask = ThreadPoolManager.getInstance().scheduleEffect(ds, 4300);
 					ds.setTask(_doSkillTask);
@@ -1345,7 +1345,7 @@ public class FrintezzaManager
 				if (_effected != null && !_effected.isAlikeDead())
 				{
 					_effected.enableAllSkills();
-					_effected.setIsImobilised(false);
+					_effected.setIsImmobilized(false);
 				}
 				
 				_log.warning(t.getMessage());
@@ -1388,7 +1388,7 @@ public class FrintezzaManager
 				return;
 			
 			_effected.enableAllSkills();
-			_effected.setIsImobilised(false);
+			_effected.setIsImmobilized(false);
 			
 			_effected.stopAbnormalEffect(_effected.ABNORMAL_EFFECT_DANCE_STUNNED);
 			
@@ -2049,7 +2049,7 @@ public class FrintezzaManager
 		target.getAI().setIntention(CtrlIntention.AI_INTENTION_IDLE);
 		target.abortAttack();
 		target.abortCast();
-		target.setIsImobilised(true);
+		target.setIsImmobilized(true);
 		target.disableAllSkills();
 	}
 	
@@ -2485,7 +2485,7 @@ public class FrintezzaManager
 		public void run()
 		{
 			_task = cancelTask(_task);
-			_boss.setIsImobilised(false);
+			_boss.setIsImmobilized(false);
 			_boss.setIsInSocialAction(false);
 		}
 	}

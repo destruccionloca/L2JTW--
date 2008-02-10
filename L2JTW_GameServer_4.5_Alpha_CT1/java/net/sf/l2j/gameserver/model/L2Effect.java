@@ -25,8 +25,8 @@ import net.sf.l2j.gameserver.GameTimeController;
 import net.sf.l2j.gameserver.datatables.SkillTable;
 import net.sf.l2j.gameserver.ThreadPoolManager;
 import net.sf.l2j.gameserver.network.SystemMessageId;
-import net.sf.l2j.gameserver.serverpackets.ExOlympiadSpelledInfo;
 import net.sf.l2j.gameserver.serverpackets.AbnormalStatusUpdate;
+import net.sf.l2j.gameserver.serverpackets.ExOlympiadSpelledInfo;
 import net.sf.l2j.gameserver.serverpackets.PartySpelled;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.skills.Env;
@@ -76,6 +76,7 @@ public abstract class L2Effect
         SILENCE_MAGIC_PHYSICAL,
         BETRAY,
         NOBLESSE_BLESSING,
+        PHOENIX_BLESSING,
         PETRIFICATION,
         BLUFF,
         BATTLE_FORCE,
@@ -84,8 +85,12 @@ public abstract class L2Effect
         INVINCIBLE,
         
         //-------------
-        SLAM, CANCEL_TARGET,CANCEL_TARGET_DISARM,CANCEL_TARGET_SHOCK,CURSE_DOOM,SOULSHOT, CHARGE_SELF,BUFF_SELF,DISARM
+        SLAM, CANCEL_TARGET,CANCEL_TARGET_DISARM,CANCEL_TARGET_SHOCK,CURSE_DOOM,SOULSHOT, CHARGE_SELF,BUFF_SELF,
 
+
+        DISARM,
+        TRANSFORMATION,
+        IMMOBILEUNTILATTACKED,
     }
 
 

@@ -21,7 +21,6 @@ import net.sf.l2j.gameserver.datatables.NpcTable;
 import net.sf.l2j.gameserver.instancemanager.CursedWeaponsManager;
 import net.sf.l2j.gameserver.model.Inventory;
 import net.sf.l2j.gameserver.model.L2Character;
-import net.sf.l2j.gameserver.model.actor.appearance.PcAppearance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
 import net.sf.l2j.gameserver.model.L2Summon; 
@@ -56,11 +55,10 @@ public class CharInfo extends L2GameServerPacket
 
 	private static final String _S__03_CHARINFO = "[S] 31 CharInfo";
 	private L2PcInstance _activeChar;
-	private PcAppearance _appearance;
 	private Inventory _inv;
 	private int _x, _y, _z, _heading;
 	private int _mAtkSpd, _pAtkSpd;
-	private int _runSpd, _walkSpd, _flRunSpd, _flWalkSpd, _flyRunSpd, _flyWalkSpd;
+	private int _runSpd, _walkSpd, _swimRunSpd, _swimWalkSpd, _flRunSpd, _flWalkSpd, _flyRunSpd, _flyWalkSpd;
     private float _moveMultiplier, _attackSpeedMultiplier;
     private int _maxCp;
 
@@ -80,13 +78,10 @@ public class CharInfo extends L2GameServerPacket
     	_moveMultiplier  = _activeChar.getMovementSpeedMultiplier();
     	_attackSpeedMultiplier = _activeChar.getAttackSpeedMultiplier();
     	_runSpd         = (int)(_activeChar.getRunSpeed()/_moveMultiplier);
-    	_walkSpd        = (int)(_activeChar.getWalkSpeed()/_moveMultiplier);  
-    	_flRunSpd = _flyRunSpd = _runSpd = _flWalkSpd = _flyWalkSpd = _walkSpd; 
+    	_walkSpd        = (int)(_activeChar.getWalkSpeed()/_moveMultiplier);    
+        _swimRunSpd = _flRunSpd = _flyRunSpd = _runSpd;
+        _swimWalkSpd = _flWalkSpd = _flyWalkSpd = _walkSpd;
     	_maxCp = _activeChar.getMaxCp();
-    }
-    public CharInfo(PcAppearance appearance)
-    {
-        _appearance = appearance;
     }
 
 	@Override
@@ -109,7 +104,7 @@ public class CharInfo extends L2GameServerPacket
 
 			if (template != null)
 			{
-				writeC(0x16);
+				writeC(0x0c);
 				writeD(_activeChar.getObjectId());
 				writeD(_activeChar.getPoly().getPolyId()+1000000);  // npctype id
 				writeD(_activeChar.getKarma() > 0 ? 1 : 0);
@@ -120,10 +115,10 @@ public class CharInfo extends L2GameServerPacket
 				writeD(0x00);
 				writeD(_mAtkSpd);
 				writeD(_pAtkSpd);
-				writeD(_runSpd);
+				writeD(_runSpd); // TODO: the order of the speeds should be confirmed
 				writeD(_walkSpd);
-				writeD(50);  // swimspeed
-				writeD(50);  // swimspeed
+				writeD(_swimRunSpd); // swim speed
+	            writeD(_swimWalkSpd); // swim speed
 				writeD(_flRunSpd);
 				writeD(_flWalkSpd);
 				writeD(_flyRunSpd);
@@ -149,7 +144,7 @@ public class CharInfo extends L2GameServerPacket
 					writeC(_activeChar.getAppearance().getInvisible()? 1 : 0); // invisible ?? 0=false  1=true   2=summoned (only works if model has a summon animation)
 				}
 
-				writeS(_appearance.getVisibleName());
+				writeS(_activeChar.getAppearance().getVisibleName());
 
 				if (gmSeeInvis)
 				{
@@ -157,7 +152,7 @@ public class CharInfo extends L2GameServerPacket
 				}
 				else
 				{
-					writeS(_appearance.getVisibleTitle());
+					writeS(_activeChar.getAppearance().getVisibleTitle());
 				}
 
 				writeD(0);
@@ -178,7 +173,15 @@ public class CharInfo extends L2GameServerPacket
 				writeD(0);  // C2
 				writeD(0);  // C2
 				writeC(0);  // C2
-			} else
+                writeC(0x00);  // C3  team circle 1-blue, 2-red
+                writeF(template.collisionRadius);
+                writeF(template.collisionHeight);
+                writeD(0x00);  // C4
+                writeD(0x00);  // C6
+                writeD(0x00);
+                writeD(0x00);
+			}
+            else
 			{
 				_log.warning("Character "+_activeChar.getName()+" ("+_activeChar.getObjectId()+") morphed in a Npc ("+_activeChar.getPoly().getPolyId()+") w/o template.");
 			}
@@ -279,10 +282,10 @@ public class CharInfo extends L2GameServerPacket
 			writeD(_activeChar.getPvpFlag());
 			writeD(_activeChar.getKarma());
 
-			writeD(_runSpd);
+			writeD(_runSpd); // TODO: the order of the speeds should be confirmed
 			writeD(_walkSpd);
-			writeD(50);  // swimspeed
-			writeD(50);  // swimspeed
+	        writeD(_swimRunSpd); // swim speed
+	        writeD(_swimWalkSpd); // swim speed
 			writeD(_flRunSpd);
 			writeD(_flWalkSpd);
 			writeD(_flyRunSpd);
@@ -362,7 +365,7 @@ public class CharInfo extends L2GameServerPacket
 
 			writeC(_activeChar.getRecomLeft());                       //Changed by Thorgrim
 			writeH(_activeChar.getRecomHave()); //Blue value for name (0 = white, 255 = pure blue)
-			writeD(_activeChar.getClassId().getId());
+			writeD(_activeChar.getMountNpcId() + 1000000);
 
 			writeD(_maxCp);
 			writeD((int) _activeChar.getCurrentCp());

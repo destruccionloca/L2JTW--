@@ -3388,7 +3388,7 @@ public enum SystemMessageId
 
         /**
          * ID: 1441<br>
-         * Message: You have failed to enchant the skill $s1.
+         * Message: Skill enchant failed. The skill will be initialized.
          */
         YOU_HAVE_FAILED_TO_ENCHANT_THE_SKILL_S1(1441),
 
@@ -4841,13 +4841,13 @@ public enum SystemMessageId
      * Message: $s1 cannot duel because $s1 is currently riding a boat, wyvern, or strider.
      */
     S1_CANNOT_DUEL_BECAUSE_S1_IS_CURRENTLY_RIDING_A_BOAT_WYVERN_OR_STRIDER(2027),
-
+    
     /**
      * ID: 2028<br>
      * Message: $s1 cannot receive a duel challenge because $s1 is too far away.
      */
     S1_CANNOT_RECEIVE_A_DUEL_CHALLENGE_BECAUSE_S1_IS_TOO_FAR_AWAY(2028),
-
+    
     /**
      * ID: 2058<br>
      * Message: You already polymorphed and cannot polymorph again.
@@ -4871,8 +4871,50 @@ public enum SystemMessageId
      * Message: You cannot polymorph while riding a pet.
      */
     YOU_CANNOT_POLYMORPH_WHILE_RIDING_A_PET(2063),
-
+    
     /**
+     * ID: 2068<br>
+     * Message: You do not have all of the items needed to untrain the enchant skill.
+     */
+    YOU_DONT_HAVE_ALL_ITENS_NEEDED_TO_UNTRAIN_SKILL_ENCHANT(2068),
+    
+    /**
+     * ID: 2069<br>
+     * Message: Untrain of enchant skill was successful. Current level of enchant skill $s1 has been decreased by 1.
+     */
+    UNTRAIN_SUCCESSFUL_SKILL_S1_ENCHANT_LEVEL_DECREASED_BY_ONE(2069),
+    
+    /**
+     * ID: 2070<br>
+     * Message: Untrain of enchant skill was successful. Current level of enchant skill $s1 became 0 and enchant skill will be initialized.
+     */
+    UNTRAIN_SUCCESSFUL_SKILL_S1_ENCHANT_LEVEL_RESETED(2070),
+    
+    /**
+     * ID: 2071<br>
+     * Message: You do not have all of the items needed to enchant skill route change.
+     */
+    YOU_DONT_HAVE_ALL_ITENS_NEEDED_TO_CHANGE_SKILL_ENCHANT_ROUTE(2071),
+    
+    /**
+     * ID: 2072<br>
+     * Message: Enchant skill route change was successful. Lv of enchant skill $s1 has been decreased by $s2.
+     */
+    SKILL_ENCHANT_CHANGE_SUCCESSFUL_S1_LEVEL_WAS_DECREASED_BY_S2(2072),
+    
+    /**
+     * ID: 2073<br>
+     * Message: Enchant skill route change was successful. Lv of enchant skill $s1 will remain.
+     */
+    SKILL_ENCHANT_CHANGE_SUCCESSFUL_S1_LEVEL_WILL_REMAIN(2073),
+    
+    /**
+     * ID: 2074<br>
+     * Message: Skill enchant failed. Current level of enchant skill $s1 will remain unchanged.
+     */
+    SKILL_ENCHANT_FAILED_S1_LEVEL_WILL_REMAIN(2074),
+
+        /**
      * ID: 2085<br>
      * Message: Shout and trade chatting cannot be used while possessing a cursed weapon.
      */
@@ -4934,10 +4976,82 @@ public enum SystemMessageId
    NOT_ENOUGH_BOLTS(2226),
 
    /**
-    * ID: 2226<br>
+    * ID: 2229<br>
     * Message: There is no instance zone under a time limit.
     */
-   NO_INSTANCEZONE_TIME_LIMIT(2226);
+   NO_INSTANCEZONE_TIME_LIMIT(2229),
+   
+   /**
+    * ID: 2247<br>
+    * Message: You cannot mount a steed while transformed.
+    */
+   YOU_CANNOT_MOUNT_A_STEED_WHILE_TRANSFORMED(2247),
+   
+   /**
+    * ID: 2248<br>
+    * Message: You cannot mount a steed while petrified.
+    */
+   YOU_CANNOT_MOUNT_A_STEED_WHILE_PETRIFIED(2248),
+   
+   /**
+    * ID: 2249<br>
+    * Message: You cannot mount a steed while dead.
+    */
+   YOU_CANNOT_MOUNT_A_STEED_WHILE_DEAD(2249),
+   
+   /**
+    * ID: 2250<br>
+    * Message: You cannot mount a steed while fishing.
+    */
+   YOU_CANNOT_MOUNT_A_STEED_WHILE_FISHING(2250),
+   
+   /**
+    * ID: 2251<br>
+    * Message: You cannot mount a steed while in battle.
+    */
+   YOU_CANNOT_MOUNT_A_STEED_WHILE_BATTLE(2251),
+   
+   /**
+    * ID: 2252<br>
+    * Message: You cannot mount a steed while in a duel.
+    */
+   YOU_CANNOT_MOUNT_A_STEED_WHILE_IN_A_DUEL(2252),
+   
+   /**
+    * ID: 2253<br>
+    * Message: You cannot mount a steed while sitting.
+    */
+   YOU_CANNOT_MOUNT_A_STEED_WHILE_SITTING(2253),
+   
+   /**
+    * ID: 2254<br>
+    * Message: You cannot mount a steed while skill casting.
+    */
+   YOU_CANNOT_MOUNT_A_STEED_WHILE_SKILL_CASTING(2254),
+   
+   /**
+    * ID: 2255<br>
+    * Message: You cannot mount a steed while a cursed weapon is equipped.
+    */
+   YOU_CANNOT_MOUNT_A_STEED_WHILE_A_CURSED_WEAPON_IS_EQUIPPED(2255),
+   
+   /**
+    * ID: 2256<br>
+    * Message: You cannot mount a steed while holding a flag.
+    */
+   YOU_CANNOT_MOUNT_A_STEED_WHILE_HOLDING_A_FLAG(2256),
+   
+   /**
+    * ID: 2257<br>
+    * Message: You cannot mount a steed while a pet or a servitor is summoned.
+    */
+   YOU_CANNOT_MOUNT_A_STEED_WHILE_A_PET_OR_A_SERVITOR_IS_SUMMONED(2257),
+   
+   /**
+    * ID: 2258<br>
+    * Message: You have already mounted another steed
+    */
+   YOU_HAVE_ALREADY_MOUNTED_ANOTHER_STEED(2258);
 
 
     private int _id;

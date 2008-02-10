@@ -38,10 +38,10 @@ import net.sf.l2j.gameserver.instancemanager.DimensionalRiftManager;
 import net.sf.l2j.gameserver.instancemanager.PetitionManager;
 import net.sf.l2j.gameserver.instancemanager.SiegeManager;
 import net.sf.l2j.gameserver.model.CursedWeapon;
+import net.sf.l2j.gameserver.instancemanager.TransformationManager;
 import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.L2Clan;
 import net.sf.l2j.gameserver.model.L2Effect;
-import net.sf.l2j.gameserver.model.L2ItemInstance;
 import net.sf.l2j.gameserver.model.L2World;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.entity.CTF;
@@ -195,22 +195,14 @@ public class EnterWorld extends L2GameClientPacket
             notifyPartner(activeChar,activeChar.getPartnerId());
         }
         
-        if(activeChar.isCursedWeaponEquipped()) 
-        { 
-            CursedWeaponsManager.getInstance().getCursedWeapon(activeChar.getCursedWeaponEquippedId()).giveSkill();
-            
-            SystemMessage msg = new SystemMessage(SystemMessageId.S2_OWNER_HAS_LOGGED_INTO_THE_S1_REGION);
-            msg.addZoneName(activeChar.getX(), activeChar.getY(), activeChar.getZ());
-            msg.addItemName(activeChar.getCursedWeaponEquippedId());
-            CursedWeaponsManager.announce(msg);
-            
-            CursedWeapon cw = CursedWeaponsManager.getInstance().getCursedWeapon(activeChar.getCursedWeaponEquippedId());
-            SystemMessage msg2 = new SystemMessage(SystemMessageId.S2_MINUTE_OF_USAGE_TIME_ARE_LEFT_FOR_S1);
-            int timeLeftInHours = (int)(((cw.getTimeLeft()/60000)/60));
-            msg2.addItemName(activeChar.getCursedWeaponEquippedId());
-            msg2.addNumber(timeLeftInHours*60);
-            activeChar.sendPacket(msg2);
+        if((activeChar.isCursedWeaponEquipped() && activeChar.transformId() > 0) || activeChar.isCursedWeaponEquipped()) 
+        {
+            CursedWeaponsManager.getInstance().getCursedWeapon(activeChar.getCursedWeaponEquippedId()).cursedOnLogin();
         }
+        else if (activeChar.transformId() > 0)
+            {
+            TransformationManager.getInstance().transformPlayer(activeChar.transformId(), activeChar, Long.MAX_VALUE);
+            }
 
         if (activeChar.getAllEffects() != null)
         {
@@ -237,9 +229,6 @@ public class EnterWorld extends L2GameClientPacket
         }
 
         activeChar.sendPacket(new EtcStatusUpdate(activeChar));
-        // apply augmentation boni for equipped items
-        for (L2ItemInstance temp : activeChar.getInventory().getAugmentedItems())
-            if (temp != null && temp.isEquipped()) temp.getAugmentation().applyBoni(activeChar);
 
         //Expand Skill
         ExStorageMaxCount esmc = new ExStorageMaxCount(activeChar);
@@ -286,9 +275,6 @@ public class EnterWorld extends L2GameClientPacket
             // no broadcast needed since the player will already spawn dead to others
             sendPacket(new Die(activeChar));
         }
-
-        if (Config.ALLOW_WATER)
-            activeChar.checkWaterState();
 
         if (Hero.getInstance().getHeroes() != null &&
                 Hero.getInstance().getHeroes().containsKey(activeChar.getObjectId()))
@@ -353,7 +339,6 @@ public class EnterWorld extends L2GameClientPacket
         }
         
         RegionBBSManager.getInstance().changeCommunityBoard();
-
         if (CTF._savePlayers.contains(activeChar.getName()))
         	CTF.addDisconnectedPlayer(activeChar);
         

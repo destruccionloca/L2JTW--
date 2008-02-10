@@ -32,7 +32,6 @@ import net.sf.l2j.gameserver.serverpackets.Earthquake;
 import net.sf.l2j.gameserver.serverpackets.ExRedSky;
 import net.sf.l2j.gameserver.serverpackets.InventoryUpdate;
 import net.sf.l2j.gameserver.serverpackets.ItemList;
-import net.sf.l2j.gameserver.serverpackets.Ride;
 import net.sf.l2j.gameserver.serverpackets.SocialAction;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.templates.L2Item;
@@ -282,6 +281,26 @@ public class CursedWeapon
 		sm.addItemName(_itemId);
 		CursedWeaponsManager.announce(sm); // in the Hot Spring region
 	}
+	
+	public void cursedOnLogin()
+	{
+	    disableAllSkills();
+	    doTransform();
+        giveSkill();
+        
+        SystemMessage msg = new SystemMessage(SystemMessageId.S2_OWNER_HAS_LOGGED_INTO_THE_S1_REGION);
+        msg.addZoneName(_player.getX(), _player.getY(), _player.getZ());
+        msg.addItemName(_player.getCursedWeaponEquippedId());
+        CursedWeaponsManager.announce(msg);
+        
+        CursedWeapon cw = CursedWeaponsManager.getInstance().getCursedWeapon(_player.getCursedWeaponEquippedId());
+        SystemMessage msg2 = new SystemMessage(SystemMessageId.S2_MINUTE_OF_USAGE_TIME_ARE_LEFT_FOR_S1);
+        int timeLeftInHours = (int)(((cw.getTimeLeft()/60000)/60));
+        msg2.addItemName(_player.getCursedWeaponEquippedId());
+        msg2.addNumber(timeLeftInHours*60);
+        _player.sendPacket(msg2);
+	}
+	
 
 	/**
 	 * Yesod:<br>
@@ -290,7 +309,7 @@ public class CursedWeapon
 	 */
 	public void giveSkill()
 	{
-		int level = 1+(_nbKills/_stageKills);
+	    int level = 1+(_nbKills/_stageKills);
 		if (level > _skillMaxLevel)
 			level = _skillMaxLevel;
 
@@ -308,7 +327,10 @@ public class CursedWeapon
 		if (Config.DEBUG)
 			_log.info("Player "+_player.getName() +" has been awarded with skill "+skill);
 		_player.sendSkillList();
-        
+	}
+	
+	public void doTransform()
+	{
         if (_itemId == 8689)
         {
             transformationId = 302;
@@ -339,8 +361,31 @@ public class CursedWeapon
 		_player.removeSkill(SkillTable.getInstance().getInfo(_skillId, _player.getSkillLevel(_skillId)), false);
 		_player.removeSkill(SkillTable.getInstance().getInfo(3630, 1), false);
 		_player.removeSkill(SkillTable.getInstance().getInfo(3631, 1), false);
-		_player.sendSkillList();
 		_player.untransform();
+		if (_player.transformId() > 0)
+		{
+            TransformationManager.getInstance().transformPlayer(_player.transformId(), _player, Long.MAX_VALUE);
+            return;
+		}
+		else
+		{
+	        for (L2Skill sk : _player.getAllSkills())
+	        {
+	        	if (sk != null && !sk.isPassive())
+	            _player.addSkill(sk, false);
+	        }
+		}
+		_player.sendSkillList();
+	}
+	
+	public void disableAllSkills()
+	{
+        for (L2Skill sk : _player.getAllSkills())
+        {
+        	if (sk != null && !sk.isPassive())
+        		_player.removeSkill(sk, false);
+        }
+        _player.sendSkillList();
 	}
 
 
@@ -379,13 +424,7 @@ public class CursedWeapon
 		// the zariche if unmounting is successful.
 		if (player.isMounted())
 		{
-			if (_player.setMountType(0))
-			{
-				Ride dismount = new Ride(_player.getObjectId(), Ride.ACTION_DISMOUNT, 0);
-				_player.broadcastPacket(dismount);
-				_player.setMountObjectID(0);
-			}
-			else
+			if (!_player.dismount())
 			{
 				// TODO: correct this custom message.
 				player.sendMessage("You may not pick up this item while riding in this territory");
@@ -409,7 +448,10 @@ public class CursedWeapon
 		if (_player.isInParty())
 			_player.getParty().oustPartyMember(_player);
 
-
+		// Disable All Skills
+        disableAllSkills();
+		// Do Transform
+		doTransform();
 		// Add skill
 		giveSkill();
 

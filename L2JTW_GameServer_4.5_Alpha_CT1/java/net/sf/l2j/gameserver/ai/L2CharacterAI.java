@@ -35,7 +35,6 @@ import net.sf.l2j.gameserver.model.actor.instance.L2DoorInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.serverpackets.AutoAttackStop;
-import net.sf.l2j.gameserver.serverpackets.MoveToLocation;
 import net.sf.l2j.gameserver.taskmanager.AttackStanceTaskManager;
 
 /**
@@ -380,7 +379,7 @@ public class L2CharacterAI extends AbstractAI
             return;
         }
 
-        if (_actor.isImobilised() || _actor.isRooted())
+        if (_actor.isImmobilized() || _actor.isRooted())
         {
             // Cancel action client side by sending Server->Client packet ActionFailed to the L2PcInstance actor
             clientActionFailed();

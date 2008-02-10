@@ -29,7 +29,7 @@ import net.sf.l2j.gameserver.ThreadPoolManager;
 import net.sf.l2j.gameserver.ai.CtrlIntention;
 import net.sf.l2j.gameserver.datatables.ItemTable;
 import net.sf.l2j.gameserver.instancemanager.ItemsOnGroundManager;
-import net.sf.l2j.gameserver.model.Location;
+import net.sf.l2j.gameserver.instancemanager.MercTicketManager;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.actor.knownlist.NullKnownList;
 import net.sf.l2j.gameserver.network.SystemMessageId;
@@ -292,13 +292,28 @@ public final class L2ItemInstance extends L2Object
 	 */
 	public void changeCount(String process, int count, L2PcInstance creator, L2Object reference)
 	{
-        if (count == 0) return;
-        if ( count > 0 && getCount() > Integer.MAX_VALUE - count) setCount(Integer.MAX_VALUE);
-        else setCount(getCount() + count);
-        if (getCount() < 0) setCount(0);
+        if (count == 0) 
+        {
+            return;
+        }
+        
+        if ( count > 0 && getCount() > Integer.MAX_VALUE - count) 
+        {
+            setCount(Integer.MAX_VALUE);
+        }
+        else 
+        {
+            setCount(getCount() + count);
+        }
+        
+        if (getCount() < 0) 
+        {
+            setCount(0);
+        }
+        
         _storedInDb = false;
 
-		if (Config.LOG_ITEMS)
+		if (Config.LOG_ITEMS && process != null)
 		{
 			LogRecord record = new LogRecord(Level.INFO, "CHANGE:" + process);
 			record.setLoggerName("item");
@@ -308,13 +323,9 @@ public final class L2ItemInstance extends L2Object
 	}
 
 	// No logging (function designed for shots only)
-	public void changeCountWithoutTrace(String process, int count, L2PcInstance creator, L2Object reference)
+	public void changeCountWithoutTrace(int count, L2PcInstance creator, L2Object reference)
 	{
-        if (count == 0) return;
-        if ( count > 0 && getCount() > Integer.MAX_VALUE - count) setCount(Integer.MAX_VALUE);
-        else setCount(getCount() + count);
-        if (getCount() < 0) setCount(0);
-        _storedInDb = false;
+        this.changeCount(null, count, creator, reference);
 	}
 
 	
@@ -570,29 +581,21 @@ public final class L2ItemInstance extends L2Object
 	{
 		// this causes the validate position handler to do the pickup if the location is reached.
 		// mercenary tickets can only be picked up by the castle owner.
-		if (
-				(_itemId >=3960 && _itemId<=4021 && player.isInParty()) ||
-				(_itemId >=3960 && _itemId<=3969 && !player.isCastleLord(1)) ||
-				(_itemId >=3973 && _itemId<=3982 && !player.isCastleLord(2)) ||
-				(_itemId >=3986 && _itemId<=3995 && !player.isCastleLord(3)) ||
-				(_itemId >=3999 && _itemId<=4008 && !player.isCastleLord(4)) ||
-				(_itemId >=4012 && _itemId<=4021 && !player.isCastleLord(5)) ||
-				(_itemId >=5205 && _itemId<=5214 && !player.isCastleLord(6)) ||
-				(_itemId >=6779 && _itemId<=6788 && !player.isCastleLord(7)) ||
-				(_itemId >=7973 && _itemId<=7982 && !player.isCastleLord(8)) ||
-				(_itemId >=7918 && _itemId<=7927 && !player.isCastleLord(9))
-			)
-		{
-			if	(player.isInParty())    //do not allow owner who is in party to pick tickets up
-				player.sendMessage("當組隊時無法撿起傭兵物件.");
-			else
-				player.sendMessage("唯獨城主可以撿起傭兵物件.");
+        int castleId = MercTicketManager.getInstance().getTicketCastleId(_itemId);
+        
+        if (castleId > 0 && 
+                (!player.isCastleLord(castleId) || player.isInParty()))
+        {
+            if  (player.isInParty())    //do not allow owner who is in party to pick tickets up
+                player.sendMessage("當組隊時無法撿起傭兵物件.");
+            else
+                player.sendMessage("唯獨城主可以撿起傭兵物件.");
 
-			player.setTarget(this);
-			player.getAI().setIntention(CtrlIntention.AI_INTENTION_IDLE);
+            player.setTarget(this);
+            player.getAI().setIntention(CtrlIntention.AI_INTENTION_IDLE);
             // Send a Server->Client ActionFailed to the L2PcInstance in order to avoid that the client wait another packet
             player.sendPacket(new ActionFailed());
-		}
+        }
 		else
 			player.getAI().setIntention(CtrlIntention.AI_INTENTION_PICK_UP, this);
 	}
@@ -897,38 +900,48 @@ public final class L2ItemInstance extends L2Object
     {
     	return getItem().getStatFuncs(this, player);
     }
-
+    
     /**
-     * Updates database.<BR><BR>
-     * <U><I>Concept : </I></U><BR>
-     *
-     * <B>IF</B> the item exists in database :
-     * <UL>
-     * 		<LI><B>IF</B> the item has no owner, or has no location, or has a null quantity : remove item from database</LI>
-     * 		<LI><B>ELSE</B> : update item in database</LI>
-     * </UL>
-     *
-     * <B> Otherwise</B> :
-     * <UL>
-     * 		<LI><B>IF</B> the item hasn't a null quantity, and has a correct location, and has a correct owner : insert item in database</LI>
-     * </UL>
+     * Updates the database.<BR>
      */
-	public void updateDatabase()
+    public void updateDatabase()
+    {
+        this.updateDatabase(false);
+    }
+    
+    /**
+     * Updates the database.<BR>
+     * 
+     * @param force if the update should necessarilly be done.
+     */
+	public void updateDatabase(boolean force)
 	{
-		if(isWear()) //avoid saving weared items
+		if (isWear()) //avoid saving weared items
 		{
 			return;
 		}
-		if (_existsInDb) {
-			if (_ownerId == 0 || _loc==ItemLocation.VOID || (getCount() == 0 && _loc!=ItemLocation.LEASE))
+        
+		if (_existsInDb)
+        {
+			if (_ownerId == 0 || _loc == ItemLocation.VOID || (getCount() == 0 && _loc != ItemLocation.LEASE))
+            {
 				removeFromDb();
-			else
+            }
+			else if (!Config.LAZY_ITEMS_UPDATE || force)
+            {
 				updateInDb();
-		} else {
-			if (getCount() == 0 && _loc!=ItemLocation.LEASE)
+            }
+		} 
+        else
+        {
+			if (getCount() == 0 && _loc != ItemLocation.LEASE)
+            {
 				return;
-			if(_loc==ItemLocation.VOID || _ownerId == 0)
+            }
+			if (_loc == ItemLocation.VOID || _ownerId == 0)
+            {
 				return;
+            }
 			insertIntoDb();
 		}
 	}
@@ -966,8 +979,6 @@ public final class L2ItemInstance extends L2Object
 		    return null;
 		}
 		inst = new L2ItemInstance(objectId, item);
-		inst._existsInDb = true;
-		inst._storedInDb = true;
 		inst._ownerId = ownerId;
 		inst.setCount(count);
 		inst._enchantLevel = enchant_level;
@@ -977,6 +988,8 @@ public final class L2ItemInstance extends L2Object
 		inst._locData = loc_data;
 		inst._priceSell = price_sell;
 		inst._priceBuy  = price_buy;
+        inst._existsInDb = true;
+        inst._storedInDb = true;
 		
 		// Setup life time for shadow weapons
 		inst._mana = manaLeft;
@@ -1011,9 +1024,13 @@ public final class L2ItemInstance extends L2Object
 
                 rs.close();
                 statement.close();
-		    } catch (Exception e) {
-		        _log.log(Level.SEVERE, "Could not restore item "+objectId+" from DB:", e);
-		    } finally {
+		    }
+            catch (Exception e)
+            {
+		        _log.log(Level.SEVERE, "Could not restore augmentation for item "+objectId+" from DB: "+e.getMessage(), e);
+		    }
+            finally
+            {
 		        try { con.close(); } catch (Exception e) {}
 		    }
 		}
@@ -1076,9 +1093,11 @@ public final class L2ItemInstance extends L2Object
 	 */
 	private void updateInDb()
     {
-		if (Config.ASSERT) assert _existsInDb;
+        if (Config.ASSERT) assert _existsInDb;
+        
 		if (_wear)
 			return;
+        
 		if (_storedInDb)
 			return;
 
@@ -1104,10 +1123,13 @@ public final class L2ItemInstance extends L2Object
 			_existsInDb = true;
 			_storedInDb = true;
             statement.close();
-        } catch (Exception e) {
-			_log.log(Level.SEVERE, "Could not update item "+getObjectId()+" in DB: Reason: " +
-                    "Duplicate itemId");
-		} finally {
+        }
+        catch (Exception e)
+        {
+			_log.log(Level.SEVERE, "Could not update item "+getObjectId()+" in DB: Reason: "+e.getMessage(), e);
+		}
+        finally
+        {
 			try { con.close(); } catch (Exception e) {}
 		}
 	}
@@ -1143,10 +1165,13 @@ public final class L2ItemInstance extends L2Object
 			_existsInDb = true;
 			_storedInDb = true;
             statement.close();
-        } catch (Exception e) {
-			_log.log(Level.SEVERE, "Could not insert item "+getObjectId()+" into DB: Reason: " +
-                    "Duplicate itemId" );
-		} finally {
+        }
+        catch (Exception e)
+        {
+			_log.log(Level.SEVERE, "Could not insert item "+getObjectId()+" into DB: Reason: "+e.getMessage(), e);
+		}
+        finally
+        {
 			try { con.close(); } catch (Exception e) {}
 		}
 	}
@@ -1154,7 +1179,8 @@ public final class L2ItemInstance extends L2Object
 	/**
 	 * Delete item from database
 	 */
-	private void removeFromDb() {
+	private void removeFromDb()
+    {
 		if (_wear)
 			return;
 		if (Config.ASSERT) assert _existsInDb;
@@ -1173,9 +1199,13 @@ public final class L2ItemInstance extends L2Object
 			_existsInDb = false;
 			_storedInDb = false;
             statement.close();
-        } catch (Exception e) {
-			_log.log(Level.SEVERE, "Could not delete item "+getObjectId()+" in DB:", e);
-		} finally {
+        }
+        catch (Exception e)
+        {
+			_log.log(Level.SEVERE, "Could not delete item "+getObjectId()+" in DB: "+e.getMessage(), e);
+		}
+        finally
+        {
 			try { con.close(); } catch (Exception e) {}
 		}
 	}

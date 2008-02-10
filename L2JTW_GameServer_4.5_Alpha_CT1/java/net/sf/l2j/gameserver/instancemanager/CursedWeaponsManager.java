@@ -189,7 +189,7 @@ public class CursedWeaponsManager
 			PreparedStatement statement = con.prepareStatement("SELECT itemId, playerId, playerKarma, playerPkKills, nbKills, endTime FROM cursed_weapons");
 			ResultSet rset = statement.executeQuery();
 
-			if (rset.next())
+			while(rset.next())
 			{
 				int itemId        = rset.getInt("itemId");
 				int playerId      = rset.getInt("playerId");
@@ -421,7 +421,15 @@ public class CursedWeaponsManager
 			}
 		}
 	}
-
+	
+	public int checkOwnsWeaponId(int ownerId)
+    {
+	    for (CursedWeapon cw : _cursedWeapons.values())
+            if (cw.isActivated() && ownerId == cw.getPlayerId())
+                return cw.getItemId();
+	    return -1;
+    }
+	
     public static void removeFromDb(int itemId)
     {
     	Connection con = null;

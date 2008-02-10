@@ -36,8 +36,8 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.script.SimpleScriptContext;
 
-import net.sf.l2j.Config;
 import javolution.util.FastMap;
+import net.sf.l2j.Config;
 
 /**
  * Caches script engines and provides funcionality for executing and managing scripts.<BR>
@@ -161,7 +161,6 @@ public final class L2ScriptEngineManager
             String line;
             File file;
             
-            
             while ((line = lnr.readLine()) != null)
             {
                 String[] parts = line.trim().split("#");
@@ -169,8 +168,27 @@ public final class L2ScriptEngineManager
                 if (parts.length > 0 && !parts[0].startsWith("#") && parts[0].length() > 0)
                 {
                     line = parts[0];
+                    
+                    if (line.endsWith("/**"))
+                    {
+                        line = line.substring(0,line.length()-3);
+                    }
+                    else if (line.endsWith("/*"))
+                    {
+                        line = line.substring(0,line.length()-2);
+                    }
+                    
                     file = new File(SCRIPT_FOLDER, line);
-                    if (file.isFile())
+                    
+                    if (file.isDirectory() && parts[0].endsWith("/**"))
+                    {
+                        this.executeAllScriptsInDirectory(file, true, 32);
+                    }
+                    else if (file.isDirectory() && parts[0].endsWith("/*"))
+                    {
+                        this.executeAllScriptsInDirectory(file);
+                    }
+                    else if (file.isFile())
                     {
                         try
                         {

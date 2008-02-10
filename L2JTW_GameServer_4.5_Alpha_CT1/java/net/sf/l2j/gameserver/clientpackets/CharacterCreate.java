@@ -22,7 +22,6 @@ import java.util.regex.PatternSyntaxException;
 import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.datatables.CharNameTable;
 import net.sf.l2j.gameserver.datatables.CharTemplateTable;
-import net.sf.l2j.gameserver.datatables.ItemTable;
 import net.sf.l2j.gameserver.datatables.SkillTable;
 import net.sf.l2j.gameserver.datatables.SkillTreeTable;
 import net.sf.l2j.gameserver.idfactory.IdFactory;
@@ -115,8 +114,8 @@ public final class CharacterCreate extends L2GameClientPacket
 		
 		L2PcTemplate template = CharTemplateTable.getInstance().getTemplate(_classId);
 		
-        if (Config.DEBUG || true)
-            _log.fine("charname: " + _name + " classId: " + _classId+" tempalte: "+template);
+        if (Config.DEBUG)
+            _log.fine("charname: " + _name + " classId: " + _classId+" template: "+template);
         
         if(template == null || template.classBaseLevel > 1) 
 		{

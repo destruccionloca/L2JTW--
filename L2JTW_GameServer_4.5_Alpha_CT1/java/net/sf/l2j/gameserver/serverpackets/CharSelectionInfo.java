@@ -22,10 +22,11 @@ import java.util.logging.Logger;
 import javolution.util.FastList;
 import net.sf.l2j.L2DatabaseFactory;
 import net.sf.l2j.gameserver.instancemanager.CleanUpManager;
+import net.sf.l2j.gameserver.datatables.ClanTable;
+import net.sf.l2j.gameserver.instancemanager.CursedWeaponsManager;
 import net.sf.l2j.gameserver.model.CharSelectInfoPackage;
 import net.sf.l2j.gameserver.model.Inventory;
 import net.sf.l2j.gameserver.model.L2Clan;
-import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.network.L2GameClient;
 
 /**
@@ -204,7 +205,7 @@ public class CharSelectionInfo extends L2GameServerPacket
         try
         {
             con = L2DatabaseFactory.getInstance().getConnection();
-            PreparedStatement statement = con.prepareStatement("SELECT account_name, obj_Id, char_name, level, maxHp, curHp, maxMp, curMp, face, hairStyle, hairColor, sex, heading, x, y, z, exp, sp, karma, pvpkills, pkkills, clanid, race, classid, deletetime, cancraft, title, rec_have, rec_left, accesslevel, online, char_slot, lastAccess, base_class FROM characters WHERE account_name=?");
+            PreparedStatement statement = con.prepareStatement("SELECT account_name, obj_Id, char_name, level, maxHp, curHp, maxMp, curMp, face, hairStyle, hairColor, sex, heading, x, y, z, exp, sp, karma, pvpkills, pkkills, clanid, race, classid, deletetime, cancraft, title, rec_have, rec_left, accesslevel, online, char_slot, lastAccess, base_class, transform_id FROM characters WHERE account_name=?");
             statement.setString(1, _loginName);
             ResultSet charList = statement.executeQuery();
             
@@ -270,25 +271,23 @@ public class CharSelectionInfo extends L2GameServerPacket
     private CharSelectInfoPackage restoreChar(ResultSet chardata) throws Exception
     {
         int objectId = chardata.getInt("obj_id");
-        
+        String name = chardata.getString("char_name");
+
         // See if the char must be deleted
         long deletetime = chardata.getLong("deletetime");
         if (deletetime > 0)
         {
             if (System.currentTimeMillis() > deletetime)
             {
-                L2PcInstance cha = L2PcInstance.load(objectId);
-                L2Clan clan = cha.getClan();
+                L2Clan clan = ClanTable.getInstance().getClan(chardata.getInt("clanid"));
                 if(clan != null)
-                    clan.removeClanMember(cha.getName(), 0);
+                    clan.removeClanMember(name, 0);
                 
                 // [L2J_JP EDIT - TSL] L2GameClient.deleteCharByObjId(objectId);
                 CleanUpManager.getInstance().deleteCharByObjId(objectId);
                 return null;
             }
         }
-        
-        String name = chardata.getString("char_name");
         
         CharSelectInfoPackage charInfopackage = new CharSelectInfoPackage(objectId, name);
         charInfopackage.setLevel(chardata.getInt("level"));
@@ -323,14 +322,22 @@ public class CharSelectionInfo extends L2GameServerPacket
         if (weaponObjId < 1)
             weaponObjId = charInfopackage.getPaperdollObjectId(Inventory.PAPERDOLL_RHAND);
         
-        // cursed weapon check
-        int weaponId = charInfopackage.getPaperdollItemId(Inventory.PAPERDOLL_LRHAND);
-        if (weaponId < 1)
-            weaponId = charInfopackage.getPaperdollItemId(Inventory.PAPERDOLL_RHAND);
-        if(weaponId == 8190)
-            charInfopackage.setTransformId(301);
-        else if(weaponId == 8689)
-            charInfopackage.setTransformId(302);
+        // Check Transformation
+        int cursedWeaponId = CursedWeaponsManager.getInstance().checkOwnsWeaponId(objectId);
+        if (cursedWeaponId > 0)
+        {
+            // cursed weapon transformations
+            if(cursedWeaponId == 8190)
+                charInfopackage.setTransformId(301);
+            else if(cursedWeaponId == 8689)
+                charInfopackage.setTransformId(302);
+            else
+                charInfopackage.setTransformId(0);
+        }
+        else if (chardata.getInt("transform_id") > 0)
+        {
+            charInfopackage.setTransformId(chardata.getInt("transform_id"));
+        }
         else
             charInfopackage.setTransformId(0);
         
@@ -373,7 +380,6 @@ public class CharSelectionInfo extends L2GameServerPacket
         
         charInfopackage.setDeleteTimer(deletetime);
         charInfopackage.setLastAccess(chardata.getLong("lastAccess"));
-        
         return charInfopackage;
     }
     

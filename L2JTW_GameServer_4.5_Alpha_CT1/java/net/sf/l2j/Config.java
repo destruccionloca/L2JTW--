@@ -554,6 +554,12 @@ public final class Config
     
     /** Interval that the gameserver will update and store character information */
     public static int CHAR_STORE_INTERVAL;
+    
+    /** Update itens owned by this char when storing the char on DB */
+    public static boolean UPDATE_ITEMS_ON_CHAR_STORE;
+    
+    /** Update itens only when strictly necessary */
+    public static boolean LAZY_ITEMS_UPDATE;
 
     /** Auto destroy nonequipable items dropped by players */
     public static boolean     DESTROY_DROPPED_PLAYER_ITEM;
@@ -1015,8 +1021,10 @@ public final class Config
     public static double   RAID_HP_REGEN_MULTIPLIER;
     /** Mulitplier for Raid boss MP regeneration */
     public static double   RAID_MP_REGEN_MULTIPLIER;
-    /** Multiplier for Raid boss defense multiplier */
-    public static double   RAID_DEFENCE_MULTIPLIER;
+    /** Multiplier for Raid boss power defense multiplier */
+    public static double   RAID_PDEFENCE_MULTIPLIER;
+    /** Multiplier for Raid boss magic defense multiplier */
+    public static double   RAID_MDEFENCE_MULTIPLIER;
     /** Raid Boss Minin Spawn Timer */
     public static double   RAID_MINION_RESPAWN_TIMER;
     /** Mulitplier for Raid boss minimum time respawn */
@@ -1415,6 +1423,10 @@ public final class Config
                 
                 CHAR_STORE_INTERVAL        = Integer.parseInt(optionsSettings.getProperty("CharacterDataStoreInterval", "15"));
                 
+                UPDATE_ITEMS_ON_CHAR_STORE = Boolean.parseBoolean(optionsSettings.getProperty("UpdateItemsOnCharStore", "false"));
+                
+                LAZY_ITEMS_UPDATE          = Boolean.parseBoolean(optionsSettings.getProperty("LazyItemsUpdate", "false"));
+                
                 DESTROY_DROPPED_PLAYER_ITEM        = Boolean.valueOf(optionsSettings.getProperty("DestroyPlayerDroppedItem", "false"));
                 DESTROY_EQUIPABLE_PLAYER_ITEM    = Boolean.valueOf(optionsSettings.getProperty("DestroyEquipableItem", "false"));
                 SAVE_DROPPED_ITEM                = Boolean.valueOf(optionsSettings.getProperty("SaveDroppedItem", "false"));
@@ -1666,7 +1678,8 @@ public final class Config
 
                 RAID_HP_REGEN_MULTIPLIER  = Double.parseDouble(otherSettings.getProperty("RaidHpRegenMultiplier", "100")) /100;
                 RAID_MP_REGEN_MULTIPLIER  = Double.parseDouble(otherSettings.getProperty("RaidMpRegenMultiplier", "100")) /100;
-                RAID_DEFENCE_MULTIPLIER  = Double.parseDouble(otherSettings.getProperty("RaidDefenceMultiplier", "100")) /100;
+                RAID_PDEFENCE_MULTIPLIER  = Double.parseDouble(otherSettings.getProperty("RaidPDefenceMultiplier", "100")) /100;
+                RAID_MDEFENCE_MULTIPLIER  = Double.parseDouble(otherSettings.getProperty("RaidMDefenceMultiplier", "100")) /100;
                 RAID_MINION_RESPAWN_TIMER  = Integer.parseInt(otherSettings.getProperty("RaidMinionRespawnTime", "300000"));
                 RAID_MIN_RESPAWN_MULTIPLIER = Float.parseFloat(otherSettings.getProperty("RaidMinRespawnMultiplier", "1.0"));
                 RAID_MAX_RESPAWN_MULTIPLIER = Float.parseFloat(otherSettings.getProperty("RaidMaxRespawnMultiplier", "1.0"));
@@ -2732,7 +2745,8 @@ public final class Config
 
         else if (pName.equalsIgnoreCase("RaidHpRegenMultiplier")) RAID_HP_REGEN_MULTIPLIER = Double.parseDouble(pValue);
         else if (pName.equalsIgnoreCase("RaidMpRegenMultiplier")) RAID_MP_REGEN_MULTIPLIER = Double.parseDouble(pValue);
-        else if (pName.equalsIgnoreCase("RaidDefenceMultiplier")) RAID_DEFENCE_MULTIPLIER = Double.parseDouble(pValue) /100;
+        else if (pName.equalsIgnoreCase("RaidPDefenceMultiplier")) RAID_PDEFENCE_MULTIPLIER = Double.parseDouble(pValue) /100;
+        else if (pName.equalsIgnoreCase("RaidMDefenceMultiplier")) RAID_MDEFENCE_MULTIPLIER = Double.parseDouble(pValue) /100;
         else if (pName.equalsIgnoreCase("RaidMinionRespawnTime")) RAID_MINION_RESPAWN_TIMER =Integer.parseInt(pValue);
 
         else if (pName.equalsIgnoreCase("StartingAdena")) STARTING_ADENA = Integer.parseInt(pValue);

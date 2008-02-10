@@ -17,8 +17,8 @@
  */
 package net.sf.l2j.gameserver.model.zone.type;
 
-//import net.sf.l2j.gameserver.datatables.MapRegionTable;
-//import net.sf.l2j.gameserver.instancemanager.VanHalterManager;
+import net.sf.l2j.gameserver.datatables.MapRegionTable;
+import net.sf.l2j.gameserver.instancemanager.VanHalterManager;
 import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.zone.L2ZoneType;
@@ -65,14 +65,13 @@ public class L2CustomZone extends L2ZoneType
 			if (((L2PcInstance)character).isGM())
 				((L2PcInstance)character).sendMessage("You entered "+_zoneName);
 
-/*	        
 	        // When the player invades the flight prohibition zone.
 	        // player is banished. 
 	        if (!((L2PcInstance)character).isGM() && ((L2PcInstance)character).isFlying() && !((L2PcInstance)character).isInJail() && !_IsFlyingEnable)
 	        	((L2PcInstance)character).teleToLocation(MapRegionTable.TeleportWhereType.Town);
+	        
 	        if (_zoneName.equalsIgnoreCase("AltarofSacrifice"))
 	        	VanHalterManager.getInstance().intruderDetection((L2PcInstance)character);
-*/
 		}
 	}
 	

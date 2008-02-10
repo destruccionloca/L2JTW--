@@ -375,7 +375,7 @@ public class AntharasManager
 					antharasSpawn = _MonsterSpawn.get(npcId);
 					_antharas = (L2BossInstance) antharasSpawn.doSpawn();
 					_Monsters.add(_antharas);
-					_antharas.setIsImobilised(true);
+					_antharas.setIsImmobilized(true);
 					_antharas.setIsInSocialAction(true);
 
 					_State.setRespawnDate(
@@ -900,7 +900,7 @@ public class AntharasManager
 
         public void run()
         {
-        	_boss.setIsImobilised(false);
+        	_boss.setIsImmobilized(false);
         	_boss.setIsInSocialAction(false);
             
             // When it is possible to act, a social action is canceled.

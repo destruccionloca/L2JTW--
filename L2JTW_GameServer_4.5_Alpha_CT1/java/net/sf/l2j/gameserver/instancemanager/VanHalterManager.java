@@ -697,14 +697,14 @@ public class VanHalterManager
     protected void spawnVanHalter()
     {
     	_vanHalter = (L2RaidBossInstance)_vanHalterSpawn.doSpawn();
-    	_vanHalter.setIsImobilised(true);
+    	_vanHalter.setIsImmobilized(true);
     	_vanHalter.setIsInvul(true);
     	_isHalterSpawned = true;
     }
     
     protected void deleteVanHalter()
     {
-    	_vanHalter.setIsImobilised(false);
+    	_vanHalter.setIsImmobilized(false);
     	_vanHalter.setIsInvul(false);
     	_vanHalter.getSpawn().stopRespawn();
     	_vanHalter.deleteMe();
@@ -766,14 +766,14 @@ public class VanHalterManager
     protected void spawnRitualOffering()
     {
     	_RitualOffering = _RitualOfferingSpawn.doSpawn();
-    	_RitualOffering.setIsImobilised(true);
+    	_RitualOffering.setIsImmobilized(true);
     	_RitualOffering.setIsInvul(true);
     	_RitualOffering.setIsParalyzed(true);
     }
     
     protected void deleteRitualOffering()
     {
-    	_RitualOffering.setIsImobilised(false);
+    	_RitualOffering.setIsImmobilized(false);
     	_RitualOffering.setIsInvul(false);
     	_RitualOffering.setIsParalyzed(false);
     	_RitualOffering.getSpawn().stopRespawn();
@@ -836,7 +836,7 @@ public class VanHalterManager
     protected void spawnRitualSacrifice()
     {
     	_RitualSacrifice = _RitualSacrificeSpawn.doSpawn();
-    	_RitualSacrifice.setIsImobilised(true);
+    	_RitualSacrifice.setIsImmobilized(true);
     	_RitualSacrifice.setIsInvul(true);
     	_isSacrificeSpawned = true;
     }
@@ -857,7 +857,7 @@ public class VanHalterManager
     	{
     		_CameraMarker.put(i, _CameraMarkerSpawn.get(i).doSpawn());
     		_CameraMarker.get(i).getSpawn().stopRespawn();
-    		_CameraMarker.get(i).setIsImobilised(true);
+    		_CameraMarker.get(i).setIsImmobilized(true);
     	}
     }
     
@@ -1018,7 +1018,7 @@ public class VanHalterManager
     	}
     	
     	updateKnownList(_vanHalter);
-    	_vanHalter.setIsImobilised(true);
+    	_vanHalter.setIsImmobilized(true);
     	_vanHalter.setIsInvul(true);
     	spawnCameraMarker();
 
@@ -1630,9 +1630,9 @@ public class VanHalterManager
 					L2Skill skill = SkillTable.getInstance().getInfo(1168, 7);
 	    			_RitualOffering.setIsInvul(false);
 					_vanHalter.setTarget(_RitualOffering);
-	        		_vanHalter.setIsImobilised(false);
+	        		_vanHalter.setIsImmobilized(false);
 	    			_vanHalter.doCast(skill);
-	        		_vanHalter.setIsImobilised(true);
+	        		_vanHalter.setIsImmobilized(true);
 	    			
 					// set next task.
 		            if(_MovieTask != null) _MovieTask.cancel(true);
@@ -1705,7 +1705,7 @@ public class VanHalterManager
 					}
 					deleteRitualSacrifice();
 					deleteCameraMarker();
-			    	_vanHalter.setIsImobilised(false);
+			    	_vanHalter.setIsImmobilized(false);
 			    	_vanHalter.setIsInvul(false);
 
 		            if(_MovieTask != null) _MovieTask.cancel(true);
