@@ -1455,11 +1455,8 @@ public abstract class L2Character extends L2Object
 			return;
 		}
 
-		
-
 		if (isSkillDisabled(skill.getId()))
 		{
-
 			/*
 			if (this instanceof L2PcInstance)
 			{
@@ -1519,7 +1516,6 @@ public abstract class L2Character extends L2Object
 		// Get all possible targets of the skill in a table in function of the skill target type
 		L2Object[] targets = skill.getTargetList(this);
 
-
         if ((targets == null || targets.length == 0)  && skill.getTargetType() != SkillTargetType.TARGET_AURA)
         {
             getAI().notifyEvent(CtrlEvent.EVT_CANCEL);
@@ -1554,7 +1550,7 @@ public abstract class L2Character extends L2Object
 					for (L2PcInstance member : ((L2PcInstance)this).getParty().getPartyMembers())
 						 member.setLastBuffer(this);
 				}
-				}
+			}
 		} else
 			target = (L2Character) getTarget();
 
@@ -1564,15 +1560,13 @@ public abstract class L2Character extends L2Object
 		|| skill.getTargetType() == SkillTargetType.TARGET_BEHIND_AURA)
 			target = this;
 
-		if (target == null && skill.getTargetType() != SkillTargetType.TARGET_AURA)
+		if (target == null)
 		{
 			getAI().notifyEvent(CtrlEvent.EVT_CANCEL);
 			return;
 		}
 
-
         setLastSkillCast(skill);
-
 
 		// Get the Identifier of the skill
 		int magicId = skill.getId();
@@ -3255,6 +3249,31 @@ public abstract class L2Character extends L2Object
 		getAI().notifyEvent(CtrlEvent.EVT_THINK, null);
 		updateAbnormalEffect();
 	}
+	
+	/**
+     * Stop L2Effect: Transformation<BR><BR>
+     *
+     * <B><U> Actions</U> :</B><BR><BR>
+     * <li>Remove Transformation Effect</li>
+     * <li>Notify the L2Character AI</li>
+     * <li>Send Server->Client UserInfo/CharInfo packet</li><BR><BR>
+     *
+     */
+    public final void stopTransformation(L2Effect effect)
+    {
+        if (effect == null)
+            stopEffects(L2Effect.EffectType.TRANSFORMATION);
+        else
+            removeEffect(effect);
+        
+        // if this is a player instance, then untransform.
+        if (this instanceof L2PcInstance)
+        {
+            ((L2PcInstance) this).untransform();
+        }
+        getAI().notifyEvent(CtrlEvent.EVT_THINK, null);
+        updateAbnormalEffect();
+    }
 
 	/**
 	 * Not Implemented.<BR><BR>
