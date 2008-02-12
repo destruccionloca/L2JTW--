@@ -762,6 +762,8 @@ public final class Config
     public static final String  CUSTOM_FILE              = "./config/custom.properties";
     /** Properties file for Four-Sepulchers configuration */
     public static final String  FS_CONFIG_FILE              = "./config/foursepulchers.properties";
+    /** Properties file for Four-Sepulchers configuration */
+    public static final String  FWF_CONFIG_FILE              = "./config/frintezza.properties";
     /** Properties file for Sailren configuration */
     public static final String  FWS_CONFIG_FILE              = "./config/sailren.properties";
     /** Properties file for Antharas configuration */
@@ -1165,6 +1167,17 @@ public final class Config
     public static int FS_TIME_ENTRY;
     public static int FS_TIME_WARMUP;
     public static int FS_PARTY_MEMBER_COUNT;
+
+    /***************************************************************************
+     * frintezza Custom CONFIG                                                 *
+     **************************************************************************/
+    public static int FWF_INTEROFRETARGET;
+    public static int FWF_INTEROFSONG;
+    public static int FWF_FIXINTERVALOFFRINTEZZA;
+    public static int FWF_RANDOMINTERVALOFFRINTEZZA;
+    public static int FWF_ACTIVITYTIMEOFBOSS;
+    public static int FWF_INTERVALOFBREATH;
+    public static int FWF_APPTIMEOFBOSS;
 
     /***************************************************************************
      * fight with sailren Custom CONFIG                                        *
@@ -2379,6 +2392,40 @@ public final class Config
                 e.printStackTrace();
                 throw new Error("Failed to Load "+FS_CONFIG_FILE+" File.");
             }
+            // Frintezza Custom Setting
+            try
+            {
+                Properties Settings   = new Properties();
+                InputStream is          = new FileInputStream(FWF_CONFIG_FILE);  
+                Settings.load(is);
+                is.close();
+                FWF_INTEROFRETARGET = Integer.parseInt(Settings.getProperty("IntervalOfRetarget", "10"));
+                if(FWF_INTEROFRETARGET < 1 || FWF_INTEROFRETARGET > 30) FWF_INTEROFRETARGET = 10;
+                FWF_INTEROFRETARGET = FWF_INTEROFRETARGET * 1000;
+                FWF_INTEROFSONG = Integer.parseInt(Settings.getProperty("IntervalOfSong", "30"));
+                if(FWF_INTEROFSONG < 5 || FWF_INTEROFSONG > 60) FWF_INTEROFSONG = 30;
+                FWF_INTEROFSONG = FWF_INTEROFSONG * 1000;
+                FWF_FIXINTERVALOFFRINTEZZA = Integer.parseInt(Settings.getProperty("FixIntervalOfFrintezza", "11520"));
+                if(FWF_FIXINTERVALOFFRINTEZZA < 5 || FWF_FIXINTERVALOFFRINTEZZA > 20160) FWF_FIXINTERVALOFFRINTEZZA = 11520;
+                FWF_FIXINTERVALOFFRINTEZZA = FWF_FIXINTERVALOFFRINTEZZA * 60000;
+                FWF_RANDOMINTERVALOFFRINTEZZA = Integer.parseInt(Settings.getProperty("RandomIntervalOfFrintezza", "8640"));
+                if(FWF_RANDOMINTERVALOFFRINTEZZA < 5 || FWF_RANDOMINTERVALOFFRINTEZZA > 20160) FWF_RANDOMINTERVALOFFRINTEZZA = 8640;
+                FWF_RANDOMINTERVALOFFRINTEZZA = FWF_RANDOMINTERVALOFFRINTEZZA * 60000;
+                FWF_ACTIVITYTIMEOFBOSS = Integer.parseInt(Settings.getProperty("ActivityTimeOfBoss", "120"));
+                if(FWF_ACTIVITYTIMEOFBOSS < 120 || FWF_ACTIVITYTIMEOFBOSS > 720) FWF_ACTIVITYTIMEOFBOSS = 120;
+                FWF_ACTIVITYTIMEOFBOSS = FWF_ACTIVITYTIMEOFBOSS * 60000;
+                FWF_INTERVALOFBREATH = Integer.parseInt(Settings.getProperty("IntervalOfBreath", "1"));
+                if(FWF_INTERVALOFBREATH < 1 || FWF_INTERVALOFBREATH > 10) FWF_INTERVALOFBREATH = 1;
+                FWF_INTERVALOFBREATH = FWF_INTERVALOFBREATH * 60000;
+                FWF_APPTIMEOFBOSS = Integer.parseInt(Settings.getProperty("AppTimeOfBoss", "10"));
+                if(FWF_APPTIMEOFBOSS < 5 || FWF_APPTIMEOFBOSS > 60) FWF_APPTIMEOFBOSS = 10;
+                FWF_APPTIMEOFBOSS = FWF_APPTIMEOFBOSS * 60000;
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                throw new Error("Failed to Load "+FWF_CONFIG_FILE+" File.");
+            }
             // fight with sailren Custom Setting
             try
             {
@@ -2898,6 +2945,14 @@ public final class Config
         else if (pName.equalsIgnoreCase("TimeOfEntry")) FS_TIME_ENTRY = Integer.parseInt(pValue);
         else if (pName.equalsIgnoreCase("TimeOfWarmUp")) FS_TIME_WARMUP = Integer.parseInt(pValue);
         else if (pName.equalsIgnoreCase("NumberOfNecessaryPartyMembers")) FS_PARTY_MEMBER_COUNT = Integer.parseInt(pValue);
+        // Frintezza Custom Setting
+        else if (pName.equalsIgnoreCase("IntervalOfRetarget")) FWF_INTEROFRETARGET = Integer.parseInt(pValue);
+        else if (pName.equalsIgnoreCase("IntervalOfSong")) FWF_INTEROFSONG = Integer.parseInt(pValue);
+        else if (pName.equalsIgnoreCase("FixIntervalOfFrintezza")) FWF_FIXINTERVALOFFRINTEZZA = Integer.parseInt(pValue);
+        else if (pName.equalsIgnoreCase("RandomIntervalOfFrintezza")) FWF_RANDOMINTERVALOFFRINTEZZA = Integer.parseInt(pValue);
+        else if (pName.equalsIgnoreCase("ActivityTimeOfBoss")) FWF_ACTIVITYTIMEOFBOSS = Integer.parseInt(pValue);
+        else if (pName.equalsIgnoreCase("IntervalOfBreath")) FWF_INTERVALOFBREATH = Integer.parseInt(pValue);
+        else if (pName.equalsIgnoreCase("AppTimeOfBoss")) FWF_APPTIMEOFBOSS = Integer.parseInt(pValue);
         // JP fight with sailren Custom Setting
         else if (pName.equalsIgnoreCase("EnableSinglePlayer")) FWS_ENABLESINGLEPLAYER = Boolean.parseBoolean(pValue);
         else if (pName.equalsIgnoreCase("FixIntervalOfSailrenSpawn")) FWS_FIXINTERVALOFSAILRENSPAWN = Integer.parseInt(pValue);

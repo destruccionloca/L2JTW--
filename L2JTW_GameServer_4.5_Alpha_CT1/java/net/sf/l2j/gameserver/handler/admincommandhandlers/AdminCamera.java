@@ -21,10 +21,10 @@ package net.sf.l2j.gameserver.handler.admincommandhandlers;
 import java.util.StringTokenizer;
 
 import net.sf.l2j.gameserver.handler.IAdminCommandHandler;
+import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
-import net.sf.l2j.gameserver.serverpackets.CameraMode;
-import net.sf.l2j.gameserver.serverpackets.ObservationMode;
-import net.sf.l2j.gameserver.serverpackets.SpecialCamera;
+import net.sf.l2j.gameserver.network.SystemMessageId;
+import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
 
 /**
@@ -35,115 +35,55 @@ public class AdminCamera implements IAdminCommandHandler
 {
 
 
- private static final String[] ADMIN_COMMANDS = {
-	 "admin_camera",
-	 "admin_camera_menu",
-	 "admin_camera_cord_menu",
-	 "admin_camera_on",
-	 "admin_camera_off",
-	 "admin_camera_cord"
-	 };
-
+	private static final String[] ADMIN_COMMANDS = {
+	"admin_camera",
+	"admin_camset",
+	};
 
 	public boolean useAdminCommand(String command, L2PcInstance activeChar) 
 	{
 
-        if (command.equals("admin_camera_menu"))
-           AdminHelpPage.showHelpPage(activeChar, "camera_menu.htm");
+	if (command.equals("admin_camera"))
+		AdminHelpPage.showHelpPage(activeChar, "camera_menu.htm");
 
-        if (command.equals("admin_camera_cord_menu"))
-            AdminHelpPage.showHelpPage(activeChar, "camera_cord.htm");
-
-           if (command.equals("admin_camera_on"))
-           {
-        	   CameraMode(activeChar, 1);
-           }
-
-           else if (command.equals("admin_camera_off"))
-           {
-        	   CameraMode(activeChar, 0);
-           }
-           else if(command.startsWith("admin_camera"))
-           {
-               StringTokenizer st = new StringTokenizer(command);
-               if(st.countTokens() == 5)
-               {
-                  try
-                  {
-                      int scdist = Integer.parseInt(st.nextToken());
-                      int scyaw = Integer.parseInt(st.nextToken());
-                      int scpitch = Integer.parseInt(st.nextToken());
-                      int sctime = Integer.parseInt(st.nextToken());
-                      int scduration = Integer.parseInt(st.nextToken());
-                      specialCamera(activeChar, scdist, scyaw, scpitch, sctime, scduration);
-                  }
-                  catch(Exception e) 
-                  { 
-                      activeChar.sendMessage("使用方法: //admin_camera dist yaw pitch time duration");
-                  }
-               } 
-               else
-               {
-                  activeChar.sendMessage("使用方法: //admin_camera dist yaw pitch time duration");
-               }
-           }
-           else if(command.startsWith("admin_camera_cord"))
-           {
-               StringTokenizer st = new StringTokenizer(command);
-               if(st.countTokens() == 3)
-               {
-                   try
-                   {
-                       int x = Integer.parseInt(st.nextToken());
-                       int y = Integer.parseInt(st.nextToken());
-                       int z = Integer.parseInt(st.nextToken());
-                       CameraModeCord(activeChar, x, y, z);
-                   }
-                   catch(Exception e) 
-                   {
-                       activeChar.sendMessage("使用方法: //admin_camera_cord x y z");
-                   }
-               } 
-               else
-               {
-                   activeChar.sendMessage("使用方法: //admin_camera_cord x y z");
-               }
-           }
-
-          return true;
-	}
-
-	/**
-	 * @param activeChar
-	 * @param scdist
-	 * @param scyaw
-	 * @param scpitch
-	 * @param sctime
-	 * @param scduration
-	 */
-	private void specialCamera(L2PcInstance activeChar, int scdist, int scyaw, int scpitch, int sctime, int scduration)
-	{
-        int objid = activeChar.getTarget().getObjectId();
-        int dist = scdist;
-        int yaw = scyaw;
-        int pitch = scpitch;
-        int time = sctime;
-        int duration = scduration;
-        SpecialCamera sc = new SpecialCamera(objid, dist, yaw, pitch, time, duration);
-        activeChar.broadcastPacket(sc);
-	}
-
-	private void CameraMode(L2PcInstance activeChar, int mode)
-	{
-        CameraMode cam = new CameraMode(mode);
-        activeChar.sendPacket(cam);
-	}
-
-    private void CameraModeCord(L2PcInstance activeChar, int x, int y, int z)
+	// 測試 Camera Debug 使用
+	else if(command.startsWith("admin_camset"))
     {
-        ObservationMode om = new ObservationMode(x, y, z);
-        activeChar.broadcastPacket(om);
-    }
+        if(activeChar.getTarget() == null)
+        {
+            activeChar.sendPacket(new SystemMessage(SystemMessageId.TARGET_IS_INCORRECT));
+        }
+        else
+        {
+            StringTokenizer st = new StringTokenizer(command);
+            st.nextToken();
+
+            try
+            {
+            	L2Object target = activeChar.getTarget();
+            	int scDist = Integer.parseInt(st.nextToken());
+            	int scYaw = Integer.parseInt(st.nextToken());
+            	int scPitch = Integer.parseInt(st.nextToken());
+            	int scTime = Integer.parseInt(st.nextToken());
+            	int scDuration = Integer.parseInt(st.nextToken());
+                activeChar.sendMessage("camera " + scDist + "," + scYaw + "," + scPitch + "," + scTime + "," + scDuration);
+            	activeChar.enterMovieMode();
+            	activeChar.specialCamera(target, scDist, scYaw, scPitch, scTime, scDuration);
+            }
+            catch(Exception e)
+            {
+                activeChar.sendMessage("使用方法: //camera dist yaw pitch time duration");
+            }
+            finally
+            {
+            	activeChar.leaveMovieMode();
+            }
+            
+        }
+	}
+	return true;
+	}
+
 	public String[] getAdminCommandList()
 	{
 		return ADMIN_COMMANDS;

@@ -19,6 +19,7 @@
 
 package net.sf.l2j.gameserver.instancemanager;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
@@ -26,6 +27,7 @@ import java.util.logging.Logger;
 
 import javolution.util.FastList;
 import javolution.util.FastMap;
+import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.ThreadPoolManager;
 import net.sf.l2j.gameserver.ai.CtrlIntention;
 import net.sf.l2j.gameserver.datatables.NpcTable;
@@ -43,6 +45,7 @@ import net.sf.l2j.gameserver.model.actor.instance.L2BossInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2MonsterInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.model.entity.GrandBossState;
 import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.Earthquake;
 import net.sf.l2j.gameserver.serverpackets.MagicSkillUse;
@@ -76,15 +79,6 @@ public class FrintezzaManager
 	// demons and portraits.
 	private static L2MonsterInstance demon1, demon2, demon3, demon4;
 	
-	// Interval time of Monsters.
-	protected int _intervalOfBoss, _intervalOfDemons, _intervalOfRetarget, _intervalOfFrintezzaSongs, _callForHelpInterval;
-	
-	// Delay of appearance time of Boss.
-	protected int _appTimeOfBoss;
-	
-	// Activity time of Boss.
-	protected int _activityTimeOfBoss;
-	
 	// list of intruders.
 	protected List<L2PcInstance> _playersInLair = new FastList<L2PcInstance>();
 	
@@ -92,13 +86,14 @@ public class FrintezzaManager
 	protected Map<Integer, Point3D> _lastLocation = new FastMap<Integer, Point3D>();
 	
 	// status in lair.
-	protected boolean _isBossSpawned = false, _isIntervalForNextSpawn = false, _respawningDemon1 = false, _respawningDemon2 = false, _respawningDemon3 = false, _respawningDemon4 = false, _scarletIsWeakest = true;
+	protected boolean _respawningDemon1 = false, _respawningDemon2 = false, _respawningDemon3 = false, _respawningDemon4 = false, _scarletIsWeakest = true;
 	
 	protected Future<?> _monsterSpawnTask = null, _activityTimeEndTask = null;
 	
 	// Actually questname should be "Last Imperial Prince" or "Journey to a Settlement"
-	protected String _questName = "frintezza";
-    protected String _ZoneType = "PilgrimsTemple";
+	protected String _QuestName;
+    protected String _ZoneType;
+    protected GrandBossState _State = new GrandBossState(29045);
 	
 	// location of banishment
 	private final Point3D[] _banishmentLocation	= { 
@@ -110,20 +105,14 @@ public class FrintezzaManager
 
 	private Func _DecreaseRegHp = null;
 	private int _debuffPeriod = 0;
+
+	protected int APPTIMEOFBOSS;
 	
-	/** ************************************ Initial Functions ************************************* */
-	
-	/**
-	 * Empty constructor Does nothing
-	 */
 	public FrintezzaManager()
 	{
-		// nothing.
+
 	}
 	
-	/**
-	 * returns an instance of <b>this</b> InstanceManager.
-	 */
 	public static FrintezzaManager getInstance()
 	{
 		if (_instance == null)
@@ -132,23 +121,15 @@ public class FrintezzaManager
 		return _instance;
 	}
 	
-	/**
-	 * initialize <b>this</b> Frintezza Manager
-	 */
 	public void init()
 	{
-		_callForHelpInterval = 2000;
-		_intervalOfRetarget = 10000;
-		_intervalOfFrintezzaSongs = 30000;
-		_intervalOfDemons = 60000;
-		_intervalOfBoss = 17280000;
-		_appTimeOfBoss = 60000;
-		_activityTimeOfBoss = 7200000;
+		APPTIMEOFBOSS = 60000;
 
 		// initialize status in lair.
+		_QuestName = "frintezza";
+		_ZoneType = "PilgrimsTemple";
 		_scarletIsWeakest = true;
-		_isBossSpawned = false;
-		_isIntervalForNextSpawn = false;
+
 		_playersInLair.clear();
 
 		// setting spawn data of monsters.
@@ -161,26 +142,39 @@ public class FrintezzaManager
 			_log.warning(t.getMessage());
 		}
 		_log.info("FrintezzaManager:Init FrintezzaManager.");
+        _log.info("FrintezzaManager : State of Frintezza is " + _State.getState() + ".");
+        if (!_State.getState().equals(GrandBossState.StateEnum.NOTSPAWN))
+        	setInetrvalEndTask();
+
+		Date dt = new Date(_State.getRespawnDate());
+        _log.info("FrintezzaManager : Next spawn date of Frintezza is " + dt + ".");
+		_log.info("FrintezzaManager: Init FrintezzaManager.");
 	}
 
+    // return Antaras state.
+    public GrandBossState.StateEnum getState()
+    {
+    	return _State.getState();
+    }
+    
 	private void createMonsterSpawns()
 	{
 		// The boss of all bosses ofcourse
-		frintezzaSpawn = createNewSpawn(29045, 174240, -89805, -5022, 16048, _intervalOfBoss);
+		frintezzaSpawn = createNewSpawn(29045, 174240, -89805, -5022, 16048, Config.FWF_ACTIVITYTIMEOFBOSS);
 		// weak Scarlet Van Halisha.
-		scarletSpawnWeak = createNewSpawn(29046, 173203, -88484, -3513, 48028, _intervalOfBoss);
+		scarletSpawnWeak = createNewSpawn(29046, 173203, -88484, -3513, 48028, Config.FWF_ACTIVITYTIMEOFBOSS);
 		// Strong Scarlet Van Halisha -> x , y , z , heading, and Hp are set when the morph actually
-		scarletSpawnStrong = createNewSpawn(29047, 174234, -88015, -5116, 48028, _intervalOfBoss);
+		//scarletSpawnStrong = createNewSpawn(29047, 174234, -88015, -5116, 48028, _intervalOfBoss);
 		// Portrait spawns - 4 portraits = 4 spawns
-		portraitSpawn1 = createNewSpawn(29048, 175833, -87165, -4972, 35048, _intervalOfBoss);
-		portraitSpawn2 = createNewSpawn(29049, 175876, -88713, -4972, 28205, _intervalOfBoss);
-		portraitSpawn3 = createNewSpawn(29048, 172608, -88702, -4972, 64817, _intervalOfBoss);
-		portraitSpawn4 = createNewSpawn(29049, 172634, -87165, -4972, 57730, _intervalOfBoss);
+		portraitSpawn1 = createNewSpawn(29048, 175833, -87165, -4972, 35048, Config.FWF_ACTIVITYTIMEOFBOSS);
+		portraitSpawn2 = createNewSpawn(29049, 175876, -88713, -4972, 28205, Config.FWF_ACTIVITYTIMEOFBOSS);
+		portraitSpawn3 = createNewSpawn(29048, 172608, -88702, -4972, 64817, Config.FWF_ACTIVITYTIMEOFBOSS);
+		portraitSpawn4 = createNewSpawn(29049, 172634, -87165, -4972, 57730, Config.FWF_ACTIVITYTIMEOFBOSS);
 		// Demon spawns - 4 portraits = 4 demons (?)
-		demonSpawn1 = createNewSpawn(29050, 175833, -87165, -4972, 35048, _intervalOfDemons);
-		demonSpawn2 = createNewSpawn(29051, 175876, -88713, -4972, 28205, _intervalOfDemons);
-		demonSpawn3 = createNewSpawn(29051, 172608, -88702, -4972, 64817, _intervalOfDemons);
-		demonSpawn4 = createNewSpawn(29050, 172634, -87165, -4972, 57730, _intervalOfDemons);
+		demonSpawn1 = createNewSpawn(29050, 175833, -87165, -4972, 35048, Config.FWF_INTERVALOFBREATH);
+		demonSpawn2 = createNewSpawn(29051, 175876, -88713, -4972, 28205, Config.FWF_INTERVALOFBREATH);
+		demonSpawn3 = createNewSpawn(29051, 172608, -88702, -4972, 64817, Config.FWF_INTERVALOFBREATH);
+		demonSpawn4 = createNewSpawn(29050, 172634, -87165, -4972, 57730, Config.FWF_INTERVALOFBREATH);
 	}
 	
 	private L2Spawn createNewSpawn(int templateId, int x, int y, int z, int heading, int respawnDelay)
@@ -212,47 +206,36 @@ public class FrintezzaManager
 		return _playersInLair;
 	}
 	
-	/**
-	 * Checks if a player is in this zone (Frintezza's Lair)
-	 * 
-	 * @param pc
-	 *            L2PcInstance of the player
-	 * @return boolean true if the player is inside this zone.
-	 */
 	public boolean checkIfInZone(L2PcInstance pc)
 	{
-		return BossZoneManager.getInstance().checkIfInZone(_ZoneType, pc);
+		return pc.isInsideRadius(174234, -88015, -5116, 2100, true, false);
 	}
 
-	// Whether it lairs is confirmed.
-	public boolean isEnableEnterToLair()
-	{
-		return (_isBossSpawned == false && _isIntervalForNextSpawn == false);
-	}
+    // Whether it lairs is confirmed. 
+    public boolean isEnableEnterToLair()
+    {
+    	if(_State.getState().equals(GrandBossState.StateEnum.NOTSPAWN))
+    	{
+    		return true;
+    	}
+    	else
+    	{
+    		return false;
+    	}
+    }
 	
-	/**
-	 * Update the list of intruders.
-	 * 
-	 * @param pc
-	 *            L2PcInstance of the player
-	 */
 	public void addPlayerToLair(L2PcInstance pc)
 	{
 		if (!_playersInLair.contains(pc))
 			_playersInLair.add(pc);
 	}
 	
-	/**
-	 * Checks whether the players were annihilated. If all players in the lair are dead, return boolean <b>true</b> else returns boolean <b>false</b>
-	 */
 	public synchronized boolean isPlayersAnnihilated()
 	{
 		for (L2PcInstance pc : _playersInLair)
 		{
 			// player is must be alive and stay inside of lair.
-			//if (!pc.isDead() && checkIfInZone(pc))
-			if (!pc.isDead()
-					&& BossZoneManager.getInstance().checkIfInZone(_ZoneType, pc))
+			if (!pc.isDead() && checkIfInZone(pc))
 			{
 				// 1 alive is enough.
 				return false;
@@ -261,18 +244,16 @@ public class FrintezzaManager
 		return true;
 	}
 	
-	/**
-	 * Banishes all players from the lair
-	 */
 	public void banishesPlayers()
 	{
 		if (_playersInLair == null || _playersInLair.isEmpty())
 			return;
-/*		
+
 		for (L2PcInstance pc : _playersInLair)
 		{
 			if(pc.getQuestState(_QuestName) != null) pc.getQuestState(_QuestName).exitQuest(true);
 			
+			/*		
 			if(BossZoneManager.getInstance().checkIfInZone(_ZoneType, pc));
 			{
 				int driftX = Rnd.get(-80, 80);
@@ -280,14 +261,11 @@ public class FrintezzaManager
 				int loc = Rnd.get(4);
 				pc.teleToLocation(_banishmentLocation[loc].getX() + driftX, _banishmentLocation[loc].getY() + driftY, _banishmentLocation[loc].getZ());
 			}
-		}
 */
+		}
 		_playersInLair.clear();
 	}
 	
-	/**
-	 * When the party is annihilated, they are banished.
-	 */
 	public void checkAnnihilated()
 	{
 		if (isPlayersAnnihilated())
@@ -298,9 +276,6 @@ public class FrintezzaManager
 		}
 	}
 	
-	/**
-	 * When the party is annihilated, they are banished.
-	 */
 	private class OnPlayersAnnihilatedTask implements Runnable
 	{
 		private Future<?> _task;
@@ -323,19 +298,22 @@ public class FrintezzaManager
 		}
 	}
 
-	/**
-	 * setting Scarlet Van Halisha spawn task which also starts the whole Frintezza battle.
-	 */
-	public void setScarletSpawnTask()
+    public void setBossDead()
+    {
+    	_State.setState(GrandBossState.StateEnum.DEAD);
+    	_State.update();
+    }
+
+    public void setScarletSpawnTask()
 	{
 		// When someone has already invaded the lair, nothing is done.
-		if (_playersInLair.size() >= 1 || _isIntervalForNextSpawn)
+		if (_playersInLair.size() >= 1)
 			return;
 		
 		if (_monsterSpawnTask == null)
 		{
-			_monsterSpawnTask = ThreadPoolManager.getInstance().scheduleEffect(new ScarletWeakSpawn(1), _appTimeOfBoss);
-			_isIntervalForNextSpawn = true;
+			//_monsterSpawnTask = ThreadPoolManager.getInstance().scheduleEffect(new ScarletWeakSpawn(1), Config.FWF_APPTIMEOFBOSS);
+			_monsterSpawnTask = ThreadPoolManager.getInstance().scheduleEffect(new ScarletWeakSpawn(1), APPTIMEOFBOSS);
 		}
 	}
 	
@@ -374,13 +352,6 @@ public class FrintezzaManager
 		}
 	}
 	
-	/**
-	 * Cancels a given task if it's still active and returns null.
-	 * 
-	 * @param task
-	 *            Future task that is still active
-	 * @return null Future value to reset that task
-	 */
 	private Future cancelTask(Future<?> task)
 	{
 		if (task != null)
@@ -388,10 +359,6 @@ public class FrintezzaManager
 		return null;
 	}
 	
-	/**
-	 * I noticed that if the players do not stand at a certain position, they can not watch the entire movie, so I set them to the center during the entire
-	 * movie.
-	 */
 	private void teleportToStart()
 	{
 		
@@ -416,9 +383,6 @@ public class FrintezzaManager
 		}
 	}
 	
-	/**
-	 * Teleports the players back to their last positions before the movie started
-	 */
 	private void teleportToFinish()
 	{
 		if (_lastLocation == null || _lastLocation.isEmpty() || _playersInLair == null)
@@ -442,13 +406,10 @@ public class FrintezzaManager
 		}
 	}
 	
-	/**
-	 * Spawns Frintezza, the weak version of Scarlet Van Halisha, the minions, and all that is shown in a movie to the observing players.
-	 */
 	private class ScarletWeakSpawn implements Runnable
 	{
-		private int			_taskId	= 0;
-		private Future<?>	_task;
+		private int _taskId	= 0;
+		private Future<?> _task;
 		public ScarletWeakSpawn(int taskId)
 		{
 			_taskId = taskId;
@@ -474,6 +435,12 @@ public class FrintezzaManager
 					
 					updateKnownList(frintezza);
 					teleportToStart();
+
+					_State.setRespawnDate(
+			    			Rnd.get(Config.FWF_FIXINTERVALOFFRINTEZZA,Config.FWF_FIXINTERVALOFFRINTEZZA + Config.FWF_RANDOMINTERVALOFFRINTEZZA)
+			    			+ Config.FWF_ACTIVITYTIMEOFBOSS);
+			    	_State.setState(GrandBossState.StateEnum.ALIVE);
+					_State.update();
 					
 					// set next task.
 					s = new ScarletWeakSpawn(2);
@@ -527,7 +494,7 @@ public class FrintezzaManager
 				case 6:
 					// show movie
 					showSocialActionMovie(frintezza, 240, 90, 3, 300, 6000, 0);
-					frintezza.broadcastPacket(new MagicSkillUse(frintezza, frintezza, 5006, 1, _intervalOfFrintezzaSongs, 0), 360000/* 600 */);
+					frintezza.broadcastPacket(new MagicSkillUse(frintezza, frintezza, 5006, 1, Config.FWF_INTEROFSONG, 0), 360000/* 600 */);
 					
 					// set next task.
 					s = new ScarletWeakSpawn(7);
@@ -680,7 +647,7 @@ public class FrintezzaManager
 					
 					// set delete task.
 					ActivityTimeEnd ate = new ActivityTimeEnd();
-					_activityTimeEndTask = ThreadPoolManager.getInstance().scheduleEffect(ate, _activityTimeOfBoss);
+					_activityTimeEndTask = ThreadPoolManager.getInstance().scheduleEffect(ate, Config.FWF_ACTIVITYTIMEOFBOSS);
 					
 					break;
 				
@@ -699,22 +666,22 @@ public class FrintezzaManager
 					L2Skill skill = SkillTable.getInstance().getInfo(1086, 1);
 					
 					demon1.setIsImmobilized(false);
-					doSkill ds = new doSkill(demon1, skill, _intervalOfFrintezzaSongs, 1000);
+					doSkill ds = new doSkill(demon1, skill, Config.FWF_INTEROFSONG, 1000);
 					Future<?> _doSkillTask = ThreadPoolManager.getInstance().scheduleEffect(ds, 4000);
 					ds.setTask(_doSkillTask);
 					
 					demon2.setIsImmobilized(false);
-					ds = new doSkill(demon2, skill, _intervalOfFrintezzaSongs, 1000);
+					ds = new doSkill(demon2, skill, Config.FWF_INTEROFSONG, 1000);
 					_doSkillTask = ThreadPoolManager.getInstance().scheduleEffect(ds, 4100);
 					ds.setTask(_doSkillTask);
 					
 					demon3.setIsImmobilized(false);
-					ds = new doSkill(demon3, skill, _intervalOfFrintezzaSongs, 1000);
+					ds = new doSkill(demon3, skill, Config.FWF_INTEROFSONG, 1000);
 					_doSkillTask = ThreadPoolManager.getInstance().scheduleEffect(ds, 4200);
 					ds.setTask(_doSkillTask);
 					
 					demon4.setIsImmobilized(false);
-					ds = new doSkill(demon4, skill, _intervalOfFrintezzaSongs, 1000);
+					ds = new doSkill(demon4, skill, Config.FWF_INTEROFSONG, 1000);
 					_doSkillTask = ThreadPoolManager.getInstance().scheduleEffect(ds, 4300);
 					ds.setTask(_doSkillTask);
 					
@@ -724,16 +691,16 @@ public class FrintezzaManager
 					
 					// Start random attacks on players for Frintezza
 					ReTarget _retarget = new ReTarget(frintezza);
-					Future<?> _reTargetTask = ThreadPoolManager.getInstance().scheduleEffect(_retarget, _intervalOfRetarget);
+					Future<?> _reTargetTask = ThreadPoolManager.getInstance().scheduleEffect(_retarget, Config.FWF_INTEROFRETARGET);
 					_retarget.setTask(_reTargetTask);
 					
 					// Start random attacks on players for Scarlet
 					_retarget = new ReTarget(weakScarlet);
-					_reTargetTask = ThreadPoolManager.getInstance().scheduleEffect(_retarget, _intervalOfRetarget + 16);
+					_reTargetTask = ThreadPoolManager.getInstance().scheduleEffect(_retarget, Config.FWF_INTEROFRETARGET + 16);
 					_retarget.setTask(_reTargetTask);
 					
 					Music music = new Music();
-					Future<?> _MusicTask = ThreadPoolManager.getInstance().scheduleEffect(music, Rnd.get(_intervalOfFrintezzaSongs));
+					Future<?> _MusicTask = ThreadPoolManager.getInstance().scheduleEffect(music, Rnd.get(Config.FWF_INTEROFSONG));
 					music.setTask(_MusicTask);
 					
 					startAttackListeners();
@@ -750,27 +717,10 @@ public class FrintezzaManager
 		
 	}
 	
-	/** ******************************************************************************************** */
-	
-	/***********************************************************************************************************************************************************
-	 * ****** M M PPPPPPP TTTTTTTTT Y Y /* MM MM P P T Y Y /* M M M M P P T Y Y /******* M M M M P P T Y /* M M M PPPPPPP T Y /* M M P T Y /* M M P T Y
-	 * /******** M M P T Y /*********************************************************************************************** /** Frintezza's songs, needed
-	 * special implementation since core doesn't support 3 stage skills * /
-	 **********************************************************************************************************************************************************/
-	
-	/**
-	 * @author Darki699 Three stages of casts: 1. Song, cast on Frintezza, for the music to play (skill 5007, levels 1-5) Each level is a different tune =) 2.
-	 *         Visual Effect, cast on targets, to show the effect (skill 5008, levels 1-5) Each level has a different animation effect and different targets and
-	 *         purpose 3. Actual skill, which is different since NCSoft has a different skill system. I used other skill Ids to implement these effects: song
-	 *         effects: 1. skill 1217 - Greater Heal (5007,1 -> 5008,1 -> 1217,33) 2. skill 1204 - Wind Walk (5007,2 -> 5008,2 -> 1204,2) 3. skill 1086 - Haste
-	 *         Buff (5007,3 -> 5008,3 -> 1086,2) 4. skill 406 - Angelic Icon (5007,4 -> 5008,4 -> 406,3 only gainHp*0.2 func added) 5. no skill only immobilize
-	 *         (5007,5 -> 5008,5 -> dance+stun animation + Immobilizes)
-	 */
-	
 	private class Music implements Runnable
 	{
 		
-		private Future<?>	_MusicTask;
+		private Future<?> _MusicTask;
 		
 		public Music()
 		{
@@ -794,7 +744,7 @@ public class FrintezzaManager
 			else if (song > 5)
 				song = 5;
 			
-			frintezza.broadcastPacket(new MagicSkillUse(frintezza, frintezza, 5007, song, _intervalOfFrintezzaSongs, 0), 10000);
+			frintezza.broadcastPacket(new MagicSkillUse(frintezza, frintezza, 5007, song, Config.FWF_INTEROFSONG, 0), 10000);
 			
 			int currentHp = (int) (frintezza.getStatus().getCurrentHp());
 			
@@ -805,18 +755,11 @@ public class FrintezzaManager
 			
 			// Schedule a new song to be played in 30-40 seconds...
 			Music music = new Music();
-			_MusicTask = ThreadPoolManager.getInstance().scheduleEffect(music, _intervalOfFrintezzaSongs + Rnd.get(10000));
+			_MusicTask = ThreadPoolManager.getInstance().scheduleEffect(music, Config.FWF_INTEROFSONG + Rnd.get(10000));
 			music.setTask(_MusicTask);
 			
 		}
 		
-		/**
-		 * Depending on the song, returns the song's targets (either mobs or players)
-		 * 
-		 * @param songId
-		 *            (1-5 songs)
-		 * @return L2Object[] targets
-		 */
 		private L2Object[] getSongTargets(int songId)
 		{
 			
@@ -878,13 +821,6 @@ public class FrintezzaManager
 			return targets.toArray(new L2Object[targets.size()]);
 		}
 		
-		/**
-		 * returns the chosen symphony for Frintezza to play If the minions are injured he has 40% to play a healing song If they are all dead, he will only
-		 * play harmful player symphonies
-		 * 
-		 * @return
-		 */
-		
 		private int getSong()
 		{
 			
@@ -897,12 +833,6 @@ public class FrintezzaManager
 			return Rnd.get(2, 6);
 			
 		}
-		
-		/**
-		 * Checks if the main minions are dead (not including demons, only Scarlet and Portraits)
-		 * 
-		 * @return boolean true if all main minions are dead
-		 */
 		
 		private boolean minionsAreDead()
 		{
@@ -929,11 +859,6 @@ public class FrintezzaManager
 			
 		}
 		
-		/**
-		 * Checks if Frintezza's minions need heal (only major minions are checked) Return a "need heal" = true only 40% of the time
-		 * 
-		 * @return boolean value true if need to play a healing minion song
-		 */
 		private boolean minionsNeedHeal()
 		{
 			
@@ -963,32 +888,14 @@ public class FrintezzaManager
 		
 	}
 	
-	/**
-	 * The song was played, this class checks it's affects (if any)
-	 * 
-	 * @author Darki699
-	 */
 	private class SongEffectLaunched implements Runnable
 	{
 		
-		private L2Object[]	_targets;
+		private L2Object[] _targets;
+		private int _song, _previousHp, _currentTime;
 		
-		private int			_song, _previousHp, _currentTime;
+		private Future<?> _songLaunchedTask;
 		
-		private Future<?>	_songLaunchedTask;
-		
-		/**
-		 * Constructor
-		 * 
-		 * @param targets -
-		 *            song's targets L2Object[]
-		 * @param song -
-		 *            song id 1-5
-		 * @param previousHp -
-		 *            Frintezza's HP when he started to play
-		 * @param currentTimeOfSong -
-		 *            skills during music play are consecutive, repeating
-		 */
 		public SongEffectLaunched(L2Object[] targets, int song, int previousHp, int currentTimeOfSong)
 		{
 			_targets = targets;
@@ -1010,13 +917,13 @@ public class FrintezzaManager
 				return;
 			
 			// If the song time is over stop this loop
-			else if (frintezza.isDead() || _currentTime > _intervalOfFrintezzaSongs)
+			else if (frintezza.isDead() || _currentTime > Config.FWF_INTEROFSONG)
 				return;
 			
 			// Skills are consecutive, so call them again
 			SongEffectLaunched songLaunched = new SongEffectLaunched(_targets, _song, (int) frintezza.getStatus().getCurrentHp(), _currentTime
-					+ _intervalOfFrintezzaSongs / 10);
-			_songLaunchedTask = ThreadPoolManager.getInstance().scheduleGeneral(songLaunched, _intervalOfFrintezzaSongs / 10);
+					+ Config.FWF_INTEROFSONG / 10);
+			_songLaunchedTask = ThreadPoolManager.getInstance().scheduleGeneral(songLaunched, Config.FWF_INTEROFSONG / 10);
 			songLaunched.setTask(_songLaunchedTask);
 			
 			// If Frintezza got injured harder than his regen rate, do not launch the song.
@@ -1054,12 +961,6 @@ public class FrintezzaManager
 			
 		}
 		
-		/**
-		 * Calculates the music damage according to the current song played
-		 * 
-		 * @param target -
-		 *            L2Character affected by the music
-		 */
 		private void calculateSongEffects(L2Character target)
 		{
 			
@@ -1121,12 +1022,6 @@ public class FrintezzaManager
 		
 	}
 	
-	/**
-	 * Decreases the HP Regeneration of the <b>target</b>
-	 * 
-	 * @param target
-	 *            L2Character who's HP Regeneration is decreased.
-	 */
 	private void decreaseEffectOfHpReg(L2Character target)
 	{
 		
@@ -1152,15 +1047,6 @@ public class FrintezzaManager
 		
 	}
 	
-	/**
-	 * Returns the duration of the <b>skill</b> on the <b>target</b>.
-	 * 
-	 * @param skill
-	 *            L2Skill to calculate it's duration
-	 * @param target
-	 *            L2Character to calculate the duration on it
-	 * @return int value of skill duration before exit
-	 */
 	private int getDebuffPeriod(L2Skill skill, L2Character target)
 	{
 		
@@ -1198,12 +1084,6 @@ public class FrintezzaManager
 		return _debuffPeriod;
 	}
 	
-	/**
-	 * This function simulates the functions of "Angelic Icon". Takes the 5th function which is gainHp*0.2 and adds it to the skill id 5007, level 4 to decrease
-	 * gainHP
-	 * 
-	 * @return <b>Func</b> the functions needed to decrease the Hp Regeneration from the targets
-	 */
 	private Func getDecreaseRegHpFunc()
 	{
 		
@@ -1240,20 +1120,14 @@ public class FrintezzaManager
 		
 	}
 	
-	/**
-	 * Class made to exit the debuff effect of the DecreaseRegHp symphony
-	 * 
-	 * @author Darki699
-	 */
-	
 	private class exitDecreaseRegHp implements Runnable
 	{
 		
-		private Future<?>	_task;
+		private Future<?> _task;
 		
-		private Func		_func;
+		private Func _func;
 		
-		private L2Character	_char;
+		private L2Character _char;
 		
 		public exitDecreaseRegHp(L2Character character, Func func)
 		{
@@ -1279,20 +1153,14 @@ public class FrintezzaManager
 		
 	}
 	
-	/**
-	 * Further implementation into the core is needed. But this will do for now ;] Class needed to implement the start Frintezza dance+stun effect on a target.
-	 * 
-	 * @author Darki699
-	 */
-	
 	private class startStunDanceEffect implements Runnable
 	{
 		
-		private final L2Character	_effected;
+		private final L2Character _effected;
 		
-		private final L2Skill		_skill;
+		private final L2Skill _skill;
 		
-		private Future<?>			_task;
+		private Future<?> _task;
 		
 		public startStunDanceEffect(L2Character target, L2Skill skill)
 		{
@@ -1356,18 +1224,12 @@ public class FrintezzaManager
 		
 	}
 	
-	/**
-	 * Ends the dance+stun effect on the target
-	 * 
-	 * @author Darki699
-	 */
-	
 	private class exitStunDanceEffect implements Runnable
 	{
 		
-		private final L2Character	_effected;
+		private final L2Character _effected;
 		
-		private Future<?>			_task;
+		private Future<?> _task;
 		
 		public exitStunDanceEffect(L2Character target)
 		{
@@ -1395,18 +1257,6 @@ public class FrintezzaManager
 		}
 		
 	}
-	
-	/** ************************** End of Frintezza's Musical effects ******************************** */
-	
-	/***********************************************************************************************************************************************************
-	 * ****** M M PPPPPPP TTTTTTTTT Y Y /* MM MM P P T Y Y /* M M M M P P T Y Y /******* M M M M P P T Y /* M M M PPPPPPP T Y /* M M P T Y /* M M P T Y
-	 * /******** M M P T Y /************************ Minion Control Attack + Respawn + Polymorph
-	 **********************************************************************************************************************************************************/
-	
-	/**
-	 * Initializes the Attack Listeners for <b>all</b> monsters in this zone. Sends a thread loop (tasks canceled ofcourse) with the mob to be listened to, and
-	 * the amount of hate it sends to all other mobs regarding it's attacker.
-	 */
 	
 	private void startAttackListeners()
 	{
@@ -1459,22 +1309,14 @@ public class FrintezzaManager
 		// be added when and if he's spawned.
 	}
 	
-	/**
-	 * Class is recalled at an interval for a monster's life time. Once the monster is <b>deleted</b> (null), this class is not called anymore If the monster
-	 * is <b>dead</b>, this class is still called at the interval, but it does nothing until next respawn. If the monster is <b>alive</b> and is being
-	 * attacked, it "tells" the other monsters that it's attacked.
-	 * 
-	 * @author Darki699
-	 */
-	
 	private class attackerListener implements Runnable
 	{
 		
-		private Future<?>	_task;
+		private Future<?> _task;
 		
-		private L2Character	_mob;
+		private L2Character _mob;
 		
-		private int			_aggroDamage;
+		private int _aggroDamage;
 		
 		public attackerListener(L2Character controller, int hate)
 		{
@@ -1504,7 +1346,7 @@ public class FrintezzaManager
 			
 			// Set next listener.
 			attackerListener al = new attackerListener(_mob, _aggroDamage);
-			Future<?> task = ThreadPoolManager.getInstance().scheduleGeneral(al, _callForHelpInterval + Rnd.get(500));
+			Future<?> task = ThreadPoolManager.getInstance().scheduleGeneral(al, 2000 + Rnd.get(500));
 			al.setTask(task);
 			
 			// If the mob is dead, we do nothing until next respawn
@@ -1591,14 +1433,6 @@ public class FrintezzaManager
 		
 	}
 	
-	/**
-	 * If the dead boss is a Portrait, we delete it from the world, and it's demon as well If the dead boss is Scarlet or Frintezza, we do a bossesAreDead()
-	 * check to see if both Frintezza and Scarlet are dead.
-	 * 
-	 * @param mob -
-	 *            L2BossInstance that is (or is set as) dead.
-	 */
-	
 	public void bossDeadCheck(L2BossInstance mob)
 	{
 		
@@ -1671,17 +1505,6 @@ public class FrintezzaManager
 		}
 	}
 	
-	/**
-	 * controls the assistance for all 3 bosses: 1. if Frintezza needs help, all (including Scarlet van Halisha) help him 2. if Scarlet needs help, all
-	 * (including Frintezza) come to his help 3. if Strong Scarlet is already spawned, then he teleports to help Frintezza
-	 * 
-	 * @param L2Character
-	 *            attacker - The player that attacked the boss
-	 * @param int
-	 *            hate - Damage hate to add to the attacker 1. Frintezza adds 200 hate 2. Weak Scarlet adds 100 hate 3. Stronger Scarlet adds 125 hate 4.
-	 *            Strongest Scarlet adds 150 hate 5. Portraits adds 50 hate 6. Demons adds 1 hate
-	 */
-	
 	public void callMinionsToAssist(L2Character attacker, int hate)
 	{
 		
@@ -1726,14 +1549,6 @@ public class FrintezzaManager
 		else
 			bossesAreDead();
 	}
-	
-	/**
-	 * Checks on a killed demon to set it's respawn time (only done if the <b>Portrait</b> of <b>Demon</b> was not killed)
-	 * 
-	 * @param mob -
-	 *            L2MonsterInstance mob of the Demon that was killed
-	 * @return int value of the demon that should be respawned. -1 is returned if the demon should not respawn now.
-	 */
 	
 	public int checkRespawnTime(L2MonsterInstance mob)
 	{
@@ -1781,24 +1596,18 @@ public class FrintezzaManager
 		}
 		
 		respawnDemon r = new respawnDemon(mob);
-		Future<?> task = ThreadPoolManager.getInstance().scheduleEffect(r, _intervalOfDemons);
+		Future<?> task = ThreadPoolManager.getInstance().scheduleEffect(r, Config.FWF_INTERVALOFBREATH);
 		r.setTask(task);
 		
 		return -1;
 	}
 	
-	/**
-	 * Class respawns a demon if it's portrait is not dead.
-	 * 
-	 * @author Darki699
-	 */
-	
 	private class respawnDemon implements Runnable
 	{
 		
-		private Future<?>			_task;
+		private Future<?> _task;
 		
-		private L2MonsterInstance	_mob;
+		private L2MonsterInstance _mob;
 		
 		public respawnDemon(L2MonsterInstance mob)
 		{
@@ -1866,10 +1675,6 @@ public class FrintezzaManager
 		}
 	}
 	
-	/**
-	 * Listens to the weaker Scarlet Van Halisha HP status. If it's weakened enough, we spawn the Stronger version of Scarlet and delete the weaker one.
-	 */
-	
 	public void weakScarletHpListener()
 	{
 		
@@ -1896,10 +1701,6 @@ public class FrintezzaManager
 			}
 		}
 	}
-	
-	/**
-	 * Does the 3rd and last polymorph for Scarlet Van Halisha. Now he looks entirely different... (he is different)
-	 */
 	
 	private void doThirdMorph()
 	{
@@ -1962,7 +1763,7 @@ public class FrintezzaManager
 		
 		// add retarget Listener
 		ReTarget _retarget = new ReTarget(strongScarlet);
-		Future<?> _reTargetTask = ThreadPoolManager.getInstance().scheduleEffect(_retarget, _intervalOfRetarget);
+		Future<?> _reTargetTask = ThreadPoolManager.getInstance().scheduleEffect(_retarget, Config.FWF_INTEROFRETARGET);
 		_retarget.setTask(_reTargetTask);
 		
 		// mobilize Strong Scarlet
@@ -1972,20 +1773,10 @@ public class FrintezzaManager
 		
 		// set teleport speed
 		L2Skill skill = SkillTable.getInstance().getInfo(1086, 1);
-		doSkill ds = new doSkill(strongScarlet, skill, _intervalOfRetarget, 300);
+		doSkill ds = new doSkill(strongScarlet, skill, Config.FWF_INTEROFRETARGET, 300);
 		Future<?> _doSkillTask = ThreadPoolManager.getInstance().scheduleEffect(ds, 4016);
 		ds.setTask(_doSkillTask);
 	}
-	
-	/**
-	 * Receives a target and a list of players in _playersInLair that should target this target
-	 * 
-	 * @param target
-	 *            L2Character
-	 * @param targeted
-	 *            boolean[]
-	 * @return void
-	 */
 	
 	private void setTargeted(L2Character target, boolean[] targeted)
 	{
@@ -2012,14 +1803,6 @@ public class FrintezzaManager
 		}
 	}
 	
-	/**
-	 * Receives a target and returns the _playersInLair that target this target
-	 * 
-	 * @param target
-	 *            L2Object
-	 * @return boolean[] targeted players (true = target , false = not target)
-	 */
-	
 	private boolean[] getTargeted(L2Object target)
 	{
 		boolean[] targeted = new boolean[_playersInLair.size()];
@@ -2037,12 +1820,6 @@ public class FrintezzaManager
 		return targeted;
 	}
 	
-	/**
-	 * Sets a L2Character to idle state. Disables all skills, aborts attack and cast, immoblizies
-	 * 
-	 * @param target
-	 *            L2Character
-	 */
 	public void setIdle(L2Character target)
 	{
 		
@@ -2053,17 +1830,13 @@ public class FrintezzaManager
 		target.disableAllSkills();
 	}
 	
-	/**
-	 * Does the 2nd Morph for Scarlet Van Halisha. Now he's bigger and he teleports to his targets
-	 */
-	
 	private void doSecondMorph()
 	{
 		_scarletIsWeakest = false;
 		
 		//weakScarlet.getTemplate().setRhand(7903);
 		
-		L2Spawn scarletSpawnTemp = createNewSpawn(29046, weakScarlet.getX(), weakScarlet.getY(), weakScarlet.getZ(), weakScarlet.getHeading(), _intervalOfBoss);
+		L2Spawn scarletSpawnTemp = createNewSpawn(29046, weakScarlet.getX(), weakScarlet.getY(), weakScarlet.getZ(), weakScarlet.getHeading(), Config.FWF_ACTIVITYTIMEOFBOSS);
 		
 		L2BossInstance tempScarlet = (L2BossInstance) scarletSpawnTemp.doSpawn();
 		tempScarlet.getStatus().setCurrentHp(weakScarlet.getStatus().getCurrentHp());
@@ -2093,12 +1866,12 @@ public class FrintezzaManager
 		
 		// add a NEW retarget Listener
 		ReTarget _retarget = new ReTarget(weakScarlet);
-		Future _reTargetTask = ThreadPoolManager.getInstance().scheduleEffect(_retarget, _intervalOfRetarget * 2 / 3);
+		Future _reTargetTask = ThreadPoolManager.getInstance().scheduleEffect(_retarget, Config.FWF_INTEROFRETARGET * 2 / 3);
 		_retarget.setTask(_reTargetTask);
 		
 		// start teleporting fast
 		L2Skill skill = SkillTable.getInstance().getInfo(1086, 1);
-		doSkill ds = new doSkill(weakScarlet, skill, _intervalOfRetarget, 200);
+		doSkill ds = new doSkill(weakScarlet, skill, Config.FWF_INTEROFRETARGET, 200);
 		Future _doSkillTask = ThreadPoolManager.getInstance().scheduleEffect(ds, 50);
 		ds.setTask(_doSkillTask);
 		
@@ -2117,31 +1890,12 @@ public class FrintezzaManager
 		}
 	}
 	
-	/**
-	 * Starts the skill effects for Scarlet Van Halisha. He moves like the wind ;] Continuous skills cast at _intervalOfRetarget
-	 * 
-	 * @author Darki699
-	 */
-	
 	private class doSkill implements Runnable
 	{
-		private L2Character	_caster;
-		private Future		_task;
-		private L2Skill		_skill;
-		private int			_interval, _range;
-		
-		/**
-		 * Shows skill animation effect and teleports to the target if it's out of range
-		 * 
-		 * @param caster -
-		 *            the monster
-		 * @param skill -
-		 *            the skill to animate
-		 * @param interval -
-		 *            the time between leaps
-		 * @param range -
-		 *            the range minimum to teleport
-		 */
+		private L2Character _caster;
+		private Future _task;
+		private L2Skill _skill;
+		private int _interval, _range;
 		
 		public doSkill(L2Character caster, L2Skill skill, int interval, int range)
 		{
@@ -2204,13 +1958,11 @@ public class FrintezzaManager
 		}
 	}
 	
-	/** * Re-Target Class to update a monster's known list and to re-target it again at an interval ** */
-	
 	private class ReTarget implements Runnable
 	{
 		
-		private L2NpcInstance	_mob;
-		private Future			_task;
+		private L2NpcInstance _mob;
+		private Future _task;
 		
 		public ReTarget(L2NpcInstance mob)
 		{
@@ -2257,16 +2009,11 @@ public class FrintezzaManager
 			}
 			
 			ReTarget retarget = new ReTarget(_mob);
-			_task = ThreadPoolManager.getInstance().scheduleEffect(retarget, _intervalOfRetarget);
+			_task = ThreadPoolManager.getInstance().scheduleEffect(retarget, Config.FWF_INTEROFRETARGET);
 			retarget.setTask(_task);
 		}
 	}
 	
-	/** *********************************** End of re-target class *************************************** */
-	
-	/**
-	 * starts the unspawn in 20 seconds.
-	 */
 	private void doUnspawn()
 	{
 		Unspawn unspawn = new Unspawn();
@@ -2277,11 +2024,11 @@ public class FrintezzaManager
 	private class Unspawn implements Runnable
 	{
 		
-		private Future	_task;
+		private Future _task;
 		
 		public Unspawn()
 		{
-			// Nothing.
+
 		}
 		
 		public void setTask(Future task)
@@ -2295,12 +2042,6 @@ public class FrintezzaManager
 			setUnspawn();
 		}
 	}
-	
-	/**
-	 * Checks if Frintezza and Scarlet Van Halisha are <b>both</b> dead
-	 * 
-	 * @return boolean true if <b>all</b> bosses are dead.
-	 */
 	
 	private boolean bossesAreDead()
 	{
@@ -2326,7 +2067,7 @@ public class FrintezzaManager
 	private class ActivityTimeEnd implements Runnable
 	{
 		public ActivityTimeEnd()
-		{ /* Nothing */
+		{
 		}
 		
 		public void run()
@@ -2334,10 +2075,6 @@ public class FrintezzaManager
 			setUnspawn();
 		}
 	}
-	
-	/**
-	 * Clean Frintezza's lair.
-	 */
 	
 	public void setUnspawn()
 	{
@@ -2348,11 +2085,8 @@ public class FrintezzaManager
 		
 		// delete monsters.
 		bossDeadCheck(portrait1); // Deletes portrait and demon
-		
 		bossDeadCheck(portrait2); // Deletes portrait and demon
-		
 		bossDeadCheck(portrait3); // Deletes portrait and demon
-		
 		bossDeadCheck(portrait4); // Deletes portrait and demon
 		
 		try
@@ -2384,36 +2118,35 @@ public class FrintezzaManager
 		
 		// delete spawns
 		frintezzaSpawn = scarletSpawnWeak = scarletSpawnStrong =
-
 		portraitSpawn1 = portraitSpawn2 = portraitSpawn3 = portraitSpawn4 =
-
 		demonSpawn1 = demonSpawn2 = demonSpawn3 = demonSpawn4 = null;
 		
 		// not executed tasks are canceled.
 		_monsterSpawnTask = cancelTask(_monsterSpawnTask);
 		_activityTimeEndTask = cancelTask(_activityTimeEndTask);
 		
-		// init state of Frintezza's lair.
-		_isBossSpawned = false;
-		_isIntervalForNextSpawn = true;
-		
 		// interval begin.... Count until Frintezza is ready to respawn again.
 		setInetrvalEndTask();
 	}
 	
-	/**
-	 * Creates a thread to initialize Frintezza again... until this loops ends, no one can enter the lair.
-	 */
 	public void setInetrvalEndTask()
 	{
+		// init state of Antharas's lair.
+		if (!_State.getState().equals(GrandBossState.StateEnum.INTERVAL))
+		{
+			_State.setRespawnDate(Rnd.get(Config.FWF_FIXINTERVALOFFRINTEZZA,Config.FWF_FIXINTERVALOFFRINTEZZA + Config.FWF_RANDOMINTERVALOFFRINTEZZA));
+			_State.setState(GrandBossState.StateEnum.INTERVAL);
+			_State.update();
+		}
+
 		IntervalEnd ie = new IntervalEnd();
-		Future _intervalEndTask = ThreadPoolManager.getInstance().scheduleEffect(ie, _intervalOfBoss);
+		Future _intervalEndTask = ThreadPoolManager.getInstance().scheduleEffect(ie, _State.getInterval());
 		ie.setTask(_intervalEndTask);
 	}
 	
 	private class IntervalEnd implements Runnable
 	{
-		private Future	_task;
+		private Future _task;
 		
 		public IntervalEnd()
 		{ /* Nothing */
@@ -2426,7 +2159,10 @@ public class FrintezzaManager
 		
 		public void run()
 		{
-			_isIntervalForNextSpawn = false;
+    		_playersInLair.clear();
+    		_State.setState(GrandBossState.StateEnum.NOTSPAWN);
+    		_State.update();
+
 			_task = cancelTask(_task);
 			init();
 		}
@@ -2444,7 +2180,7 @@ public class FrintezzaManager
 				continue;
 			
 			// If the player is in the Frintezza lair:
-			else if (BossZoneManager.getInstance().checkIfInZone(_ZoneType, pc))
+			else if (checkIfInZone(pc))
 			{
 				// add the player to the list
 				if (!_playersInLair.contains(pc))
@@ -2462,15 +2198,15 @@ public class FrintezzaManager
 		
 		for (L2PcInstance pc : _playersInLair)
 		{
-			if (!BossZoneManager.getInstance().checkIfInZone(_ZoneType, pc))
+			if (!checkIfInZone(pc))
 				_playersInLair.remove(pc);
 		}
 	}
 	
 	private class SetMobilised implements Runnable
 	{
-		private L2BossInstance	_boss;
-		private Future			_task;
+		private L2BossInstance _boss;
+		private Future _task;
 		
 		public SetMobilised(L2BossInstance boss)
 		{
@@ -2492,8 +2228,8 @@ public class FrintezzaManager
 	
 	private class MoveToPos implements Runnable
 	{
-		private L2NpcInstance	_npc;
-		L2CharPosition			_pos;
+		private L2NpcInstance _npc;
+		L2CharPosition _pos;
 		
 		public MoveToPos(L2NpcInstance npc, L2CharPosition pos)
 		{

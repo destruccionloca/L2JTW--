@@ -29,9 +29,11 @@ import net.sf.l2j.gameserver.instancemanager.ClanHallManager;
 import net.sf.l2j.gameserver.model.L2Clan;
 import net.sf.l2j.gameserver.model.entity.Auction;
 import net.sf.l2j.gameserver.model.entity.Auction.Bidder;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.ActionFailed;
 import net.sf.l2j.gameserver.serverpackets.MyTargetSelected;
 import net.sf.l2j.gameserver.serverpackets.NpcHtmlMessage;
+import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.serverpackets.ValidateLocation;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
 
@@ -92,13 +94,13 @@ public final class L2AuctioneerInstance extends L2FolkInstance
         if (condition == COND_ALL_FALSE)
         {
         	//TODO: html
-        	player.sendMessage("無法參加拍賣。");
+        	player.sendPacket(new SystemMessage(SystemMessageId.YOU_CANNOT_PARTICIPATE_IN_AN_AUCTION));// 不能參加拍賣。
         	return;
         }
         if (condition == COND_BUSY_BECAUSE_OF_SIEGE)
         {
         	//TODO: html
-        	player.sendMessage("攻城戰期間無法參加拍賣。");
+        	player.sendPacket(new SystemMessage(SystemMessageId.YOU_CANNOT_PARTICIPATE_IN_AN_AUCTION));// 不能參加拍賣。
         	return;
         }
         else if (condition == COND_REGULAR)
@@ -240,14 +242,16 @@ public final class L2AuctioneerInstance extends L2FolkInstance
             {
                 if (player.getClan() == null || player.getClan().getLevel() < 2)
                 {
-                    player.sendMessage("血盟必須達到2級才可進行投標。");
+                	// 根據地拍賣僅限血盟等級2以上的血盟盟主參加。
+                	player.sendPacket(new SystemMessage(SystemMessageId.ONLY_A_CLAN_LEADER_WHOSE_CLAN_IS_OF_LEVEL_2));
                     return;
                 }
 
                 if (val == "") return;
                 if ((player.getClan().getAuctionBiddedAt() > 0 && player.getClan().getAuctionBiddedAt() != Integer.parseInt(val)) || player.getClan().getHasHideout() > 0)
                 {
-                    player.sendMessage("無法同時投標兩個以上的商品。");
+                	// 目前正在投標中，因此無法參加其他拍賣。
+                	player.sendPacket(new SystemMessage(SystemMessageId.SINCE_YOU_HAVE_ALREADY_SUBMITTED_A_BID));
                     return;
                 }
 
@@ -361,7 +365,8 @@ public final class L2AuctioneerInstance extends L2FolkInstance
                     NpcHtmlMessage html = new NpcHtmlMessage(1);
                     html.setFile(filename);
                     Auction a = AuctionManager.getInstance().getAuction(player.getClan().getAuctionBiddedAt());
-                    if(a != null){
+                    if(a != null)
+                    {
 		                html.replace("%AGIT_NAME%", a.getItemName());
 		                html.replace("%OWNER_PLEDGE_NAME%", a.getSellerClanName());
 		                html.replace("%OWNER_PLEDGE_MASTER%", a.getSellerName());
@@ -375,8 +380,12 @@ public final class L2AuctioneerInstance extends L2FolkInstance
 		                html.replace("%AGIT_AUCTION_DESC%", ClanHallManager.getInstance().getClanHallById(a.getItemId()).getDesc());
 		                html.replace("%objectId%", String.valueOf(getObjectId()));
 		                html.replace("%AGIT_LINK_BACK%", "bypass -h npc_"+getObjectId()+"_start");
-                    }else{
+                    }
+                    else
+                    {
                     	_log.warning("Auctioneer Auction null for AuctionBiddedAt : "+player.getClan().getAuctionBiddedAt());
+                    	player.sendPacket(new SystemMessage(SystemMessageId.THIS_IS_THE_INITIAL_PERIOD)); //沒有我所擁有或投標的商品。
+                        return;
                     }
 		            player.sendPacket(html);
                     return;
@@ -422,7 +431,7 @@ public final class L2AuctioneerInstance extends L2FolkInstance
 	                    html.replace("%AGIT_SIZE%", "30 ");
 	                    html.replace("%AGIT_LEASE%", String.valueOf(ClanHallManager.getInstance().getClanHallById(ItemId).getLease()));
 	                    html.replace("%AGIT_LOCATION%", ClanHallManager.getInstance().getClanHallById(ItemId).getLocation());
-	                    html.replace("%AGIT_LINK_BACK%", "bypass -h npc_"+getObjectId()+"_start");
+	                    html.replace("%AGIT_LINK_BACK%", "bypass -h npc_"+getObjectId()+"_bidding "+val);
 	                    html.replace("%objectId%", String.valueOf(getObjectId()));
                     }else
                     	_log.warning("Clan Hall ID NULL : "+ItemId+" Can be caused by concurent write in ClanHallManager");
@@ -448,7 +457,7 @@ public final class L2AuctioneerInstance extends L2FolkInstance
                 if (AuctionManager.getInstance().getAuction(player.getClan().getAuctionBiddedAt()) != null)
                 {
                     AuctionManager.getInstance().getAuction(player.getClan().getAuctionBiddedAt()).cancelBid(player.getClanId());
-                    player.sendMessage("成功取消投標。");
+                    player.sendPacket(new SystemMessage(SystemMessageId.YOU_HAVE_CANCELED_YOUR_BID)); // 取消投標。
                 }
                 return;
             }
@@ -473,7 +482,7 @@ public final class L2AuctioneerInstance extends L2FolkInstance
                 if (AuctionManager.getInstance().getAuction(player.getClan().getHasHideout()) != null)
                 {
                     AuctionManager.getInstance().getAuction(player.getClan().getHasHideout()).cancelAuction();
-                    player.sendMessage("投標取消。");
+                    player.sendPacket(new SystemMessage(SystemMessageId.YOU_HAVE_CANCELED_YOUR_BID)); // 取消投標。
                 }
                 return;
             }

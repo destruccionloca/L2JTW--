@@ -168,10 +168,7 @@ public class L2OlympiadManagerInstance extends L2FolkInstance
                 case 1:
                     String[] matches = Olympiad.getInstance().getMatchList();
 
-                    replyMSG.append("奧林匹亞簡介<br><br>" +
-                            "警告︰請先閱讀說明，如果你想觀賞奧林匹亞比賽，所有召喚或者寵物將會被解除。請小心！" +
-                            "" +
-                            "<br>");
+                    replyMSG.append("<br>觀看偉大的奧林匹亞競賽<br>*注意：觀看奧林匹亞競賽的話，使魔或寵物會被解除召喚。請注意。<br><br>");
 
                     if (matches == null)
                         replyMSG.append("<br>目前沒有任何競賽。");
@@ -193,7 +190,7 @@ public class L2OlympiadManagerInstance extends L2FolkInstance
                     int classId = Integer.parseInt(command.substring(11));
                     if ((classId >= 88 && classId <= 118) || (classId >= 131 && classId <= 134) || classId == 136) 
                     {
-                        replyMSG.append("<center>奧林匹亞排行");
+                        replyMSG.append("<center><br>偉大的奧林匹亞排名");
                         replyMSG.append("<img src=\"L2UI.SquareWhite\" width=270 height=1><img src=\"L2UI.SquareBlank\" width=1 height=3>");
 
                         List<String> names = Olympiad.getInstance().getClassLeaderBoard(classId);

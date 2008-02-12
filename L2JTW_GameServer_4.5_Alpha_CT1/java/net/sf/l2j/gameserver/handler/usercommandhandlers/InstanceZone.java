@@ -46,7 +46,7 @@ public class InstanceZone implements IUserCommandHandler
         if (id != COMMAND_IDS[0])
             return false;
         
-        activeChar.sendPacket(new SystemMessage(SystemMessageId.NO_INSTANCEZONE_TIME_LIMIT));
+        activeChar.sendPacket(new SystemMessage(SystemMessageId.NOT_ENOUGH_BOLTS));
         
         return true;
     }

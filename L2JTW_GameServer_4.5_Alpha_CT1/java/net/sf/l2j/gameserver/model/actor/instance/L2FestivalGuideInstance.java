@@ -312,7 +312,7 @@ public final class L2FestivalGuideInstance extends L2FolkInstance
                     if (overallData != null)
                         overallScore = overallData.getInteger("score");
 
-                    strBuffer.append(SevenSignsFestival.getFestivalName(_festivalType) + " festival.<br>");
+                    strBuffer.append(SevenSignsFestival.getFestivalName(_festivalType) + "<br>");
 
                     if (dawnScore > 0)
                         strBuffer.append("¾¤¥Á¡G" + calculateDate(dawnData.getString("date")) + "¡C¤À¼Æ " + dawnScore + "<br>" + dawnData.getString("members") + "<br>");

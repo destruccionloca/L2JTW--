@@ -2000,6 +2000,30 @@ public enum SystemMessageId
     */
     DISSAPEARED_ADENA(672),
 
+	/**
+	 * ID: 673<br>
+	 * Message: Only a clan leader whose clan is of level 2 or higher is allowed to participate in a clan hall auction.
+	 */
+	ONLY_A_CLAN_LEADER_WHOSE_CLAN_IS_OF_LEVEL_2(673),
+
+	/**
+	 * ID: 676<br>
+	 * Message: Since you have already submitted a bid, you are not allowed to participate in another auction at this time.
+	 */
+	SINCE_YOU_HAVE_ALREADY_SUBMITTED_A_BID(676),
+
+	/**
+	 * ID: 679<br>
+	 * Message: You have canceled your bid.
+	 */
+	YOU_HAVE_CANCELED_YOUR_BID(679),
+
+	/**
+	 * ID: 680<br>
+	 * Message: You cannot participate in an auction.
+	 */
+	YOU_CANNOT_PARTICIPATE_IN_AN_AUCTION(680),
+
     /**
     * ID: 681<br>
     * Message: The clan does not own a clan hall.
@@ -4460,6 +4484,12 @@ public enum SystemMessageId
             * Message: Your opponent's MP was reduced by $s1.
             */
         YOUR_OPPONENTS_MP_WAS_REDUCED_BY_S1(1867),
+
+    	/**
+    	 * ID: 1883<br>
+    	 * Message: This is the initial period.
+    	 */
+    	THIS_IS_THE_INITIAL_PERIOD(1883),
 
         /**
          * ID: 1898<br>

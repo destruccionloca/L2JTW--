@@ -172,7 +172,7 @@ public class L2FolkInstance extends L2NpcInstance
         {
         	NpcHtmlMessage html = new NpcHtmlMessage(getObjectId());
             TextBuilder sb = new TextBuilder();
-            sb.append("<html><body>必須完成第3次轉職任務。</body></html>");
+            sb.append("<html><body>昇華技能：<br>完成3次轉職的角色才可以昇華技能。</body></html>");
             html.setHtml(sb.toString());
             player.sendPacket(html);
 

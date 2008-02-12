@@ -2568,7 +2568,7 @@ public class L2NpcInstance extends L2Character
                 if (player.isHero())
                     filename = Olympiad.OLYMPIAD_HTML_FILE + "hero_main.htm";
                 else
-                    filename = (getHtmlPath(npcId, val));
+                    filename = Olympiad.OLYMPIAD_HTML_FILE + "monument.htm";
                 break;
             default:
                 if (npcId >= 31865 && npcId <= 31918)
@@ -2576,6 +2576,11 @@ public class L2NpcInstance extends L2Character
                     filename += "rift/GuardianOfBorder.htm";
                     break;
                 }
+            	if (npcId >= 31494 && npcId <= 31507)
+            	{
+            		filename += "rift/DimsGatekeeper.htm";
+            		break;
+            	}
                 if ((npcId >= 31093 && npcId <= 31094) ||
                         (npcId >= 31172 && npcId <= 31201) ||
                         (npcId >= 31239 && npcId <= 31254))
@@ -2748,7 +2753,7 @@ public class L2NpcInstance extends L2Character
         try { decayMe(); } catch (Throwable t) {_log.severe("deletedMe(): " + t); }
         
         if (oldRegion != null) oldRegion.removeFromZones(this);
-        
+
         // Remove all L2Object from _knownObjects and _knownPlayer of the L2Character then cancel Attak or Cast and notify AI
         try { getKnownList().removeAllKnownObjects(); } catch (Throwable t) {_log.severe("deletedMe(): " + t); }
         
