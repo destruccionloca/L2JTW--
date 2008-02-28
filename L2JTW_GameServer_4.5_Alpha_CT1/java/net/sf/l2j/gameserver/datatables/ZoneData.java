@@ -26,9 +26,9 @@ import javolution.util.FastList;
 import net.sf.l2j.Config;
 import net.sf.l2j.L2DatabaseFactory;
 import net.sf.l2j.gameserver.instancemanager.ArenaManager;
-import net.sf.l2j.gameserver.instancemanager.BossZoneManager;
 //import net.sf.l2j.gameserver.instancemanager.CustomZoneManager;
 import net.sf.l2j.gameserver.instancemanager.FishingZoneManager;
+import net.sf.l2j.gameserver.instancemanager.GrandBossManager;
 import net.sf.l2j.gameserver.instancemanager.OlympiadStadiaManager;
 import net.sf.l2j.gameserver.instancemanager.TownManager;
 import net.sf.l2j.gameserver.model.L2World;
@@ -319,7 +319,7 @@ public class ZoneData
 							else if (temp instanceof L2OlympiadStadiumZone)
 								OlympiadStadiaManager.getInstance().addStadium((L2OlympiadStadiumZone)temp);
 						    else if (temp instanceof L2BossZone)
-						        BossZoneManager.getInstance().addZone((L2BossZone) temp);
+						        GrandBossManager.getInstance().addZone((L2BossZone) temp);
 
 							// Increase the counter
 							zoneCount++;
@@ -343,6 +343,8 @@ public class ZoneData
 			{
 			}
 		}
+        
+        GrandBossManager.getInstance().initZones();
 
 		_log.info("Done: loaded "+zoneCount+" zones.");
 	}

@@ -50,8 +50,8 @@ public class L2AdventurerInstance extends L2FolkInstance
                     case ALIVE:
                     case DEAD:
                         L2Spawn spawn = RaidBossSpawnManager.getInstance().getSpawns().get(bossId);
-                        player.sendPacket(new RadarControl(0, 1, spawn.getLocx(), spawn.getLocy(),
-                                                           spawn.getLocz()));
+                        player.sendPacket(new RadarControl(2, 2, spawn.getLocx(), spawn.getLocy(), spawn.getLocz()));
+                        player.sendPacket(new RadarControl(0, 1, spawn.getLocx(), spawn.getLocy(), spawn.getLocz()));
                         break;
                     case UNDEFINED:
                     	player.sendPacket(new SystemMessage(SystemMessageId.TARGET_IS_NOT_FOUND_IN_THE_GAME));

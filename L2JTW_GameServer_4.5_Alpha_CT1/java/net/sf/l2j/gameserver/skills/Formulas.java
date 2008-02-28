@@ -1092,6 +1092,7 @@ public final class Formulas
 	/** Calculate blow damage based on cAtk */
 	public double calcBlowDamage(L2Character attacker, L2Character target, L2Skill skill, boolean shld, boolean ss)
 	{
+		if (target.isInvul()) return 0;
 		double power = skill.getPower();
 		double damage = attacker.getPAtk(target);
 		double defence = target.getPDef(attacker);
@@ -1149,6 +1150,7 @@ public final class Formulas
 	public final double calcPhysDam(L2Character attacker, L2Character target, L2Skill skill,
 									boolean shld, boolean crit, boolean dual, boolean ss)
 	{
+		if (target.isInvul()) return 0;
 		if (attacker instanceof L2PcInstance)
 		{
 			L2PcInstance pcInst = (L2PcInstance)attacker;
@@ -1189,12 +1191,13 @@ public final class Formulas
 			damage += attacker.getPAtk(target);
 		}
 		// In C5 summons make 10 % less dmg in PvP.
-		if(attacker instanceof L2Summon && target instanceof L2PcInstance) damage *= 0.9;
+		if(attacker instanceof L2Summon && target instanceof L2PcInstance) 
+			damage *= 0.9;
 
 		// defence modifier depending of the attacker weapon
 		L2Weapon weapon = attacker.getActiveWeaponItem();
 		Stats stat = null;
-		if (weapon != null && attacker.getFirstEffect(L2Effect.EffectType.TRANSFORMATION) == null)
+		if (weapon != null && !attacker.charIsTransformed())
 		{
 			switch (weapon.getItemType())
 			{
@@ -1278,29 +1281,6 @@ public final class Formulas
 			if (damage < 0) damage = 0;
 		}
 
-		// Sami: These values are a quick fix to balance dagger gameplay and give
-		// armor resistances vs dagger. daggerWpnRes could also be used if a skill 
-		// was given to all classes. The values here try to be a compromise.
-		// They were added in a late C4 rev (2289).
-		if (target instanceof L2PcInstance && weapon != null && weapon.getItemType() == L2WeaponType.DAGGER && skill != null)
-		{
-			L2Armor armor = ((L2PcInstance)target).getActiveChestArmorItem();
-			if (armor != null)
-			{
-				if(((L2PcInstance)target).isWearingHeavyArmor())
-					damage /= 2; // originally 2.2, 2.5 during early C5
-                else if(((L2PcInstance)target).isWearingLightArmor())
-					damage /= 2.35;
-                else if(((L2PcInstance)target).isWearingMagicArmor())
-					damage /= 2.1;
-                else damage /= 2;
-                    
-                
-
-			}            
-		}
-
-
 		if (attacker instanceof L2NpcInstance)
 		{
 			//Skill Race : Undead
@@ -1337,14 +1317,7 @@ public final class Formulas
 					break;
 			}
 		}
-        if (shld)
-        {
-            if (100 - Config.ALT_PERFECT_SHLD_BLOCK < Rnd.get(100)) 
-            {
-                damage = 1;
-                target.sendPacket(new SystemMessage(SystemMessageId.YOUR_EXCELLENT_SHIELD_DEFENSE_WAS_A_SUCCESS));
-            }
-        }
+
 		if (damage > 0 && damage < 1)
 		{
 			damage = 1;
@@ -1353,22 +1326,6 @@ public final class Formulas
 		{
 			damage = 0;
 		}
-          if (shld)  
-          {  
-               int PBlock = 0;  
-              for (int degrees = 55; degrees < 125; degrees++)   
-              {  
-                   if (target instanceof L2PcInstance && attacker.isInFront(target,degrees))  
-                       PBlock +=2 ;  
-               }  
-              if (PBlock <= Rnd.nextInt(100))  
-                   {  
-                       damage = 1;  
-                       target.sendPacket(new SystemMessage(1281)); //SHIELD_DEFENCE faultless 
-                   }
-              else
-            	  target.sendPacket(new SystemMessage(111)); 
-           }  
 
 
 		
@@ -1382,7 +1339,6 @@ public final class Formulas
 				damage *= attacker.calcStat(Stats.PVP_PHYS_SKILL_DMG, 1, null, null);	
 		}
 		
-
 		return damage;
 	}
 
@@ -1390,6 +1346,7 @@ public final class Formulas
 										boolean ss, boolean bss, boolean mcrit)
 	{
 
+		if (target.isInvul()) return 0;
 		if (attacker instanceof L2PcInstance)
 		{
 			L2PcInstance pcInst = (L2PcInstance)attacker;
@@ -1722,30 +1679,22 @@ public final class Formulas
 	}
 
 	/** Returns true if shield defence successfull */
-
-
-    public boolean calcShldUse(L2Character attacker, L2Character target)
-    {
-        int DEX = (target.getDEX()/3);
-        L2Weapon at_weapon = attacker.getActiveWeaponItem();
-		double shldRate = target.calcStat(Stats.SHIELD_RATE, 0, attacker, null)* DEXbonus[target.getDEX()];
+	public boolean calcShldUse(L2Character attacker, L2Character target)
+	{
+		L2Weapon at_weapon = attacker.getActiveWeaponItem();
+		double shldRate = target.calcStat(Stats.SHIELD_RATE, 0, attacker, null)
+			* DEXbonus[target.getDEX()];
 		if (shldRate == 0.0) return false;
-
-		// Check for passive skill Aegis (316) or Aegis Stance (318)
-		if (target.getKnownSkill(316) == null && target.getFirstEffect(318) == null)
-			if (!target.isFront(attacker)) return false;
-		// if attacker use bow and target wear shield, shield block rate is multiplied by 1.3 (30%)
-
-		if (at_weapon != null && at_weapon.getItemType() == L2WeaponType.BOW)
-			shldRate *= 1.3;
-		double degreeside = target.calcStat(Stats.SHIELD_DEFENCE_ANGLE, 120, null, null);
-        if (degreeside < 180)
+        int degreeside = (int)target.calcStat(Stats.SHIELD_DEFENCE_ANGLE, 0, null, null) + 120;
+        if (degreeside < 360 && (!target.isInFront(attacker, degreeside)))
         {
-        if ((!target.isInFront(attacker, (int)attacker.calcStat(Stats.SHIELD_DEFENCE_ANGLE, 120, null, null))))
             return false;
         }
-        return Rnd.get(100 - DEX) < shldRate  ;
-
+        // if attacker 
+		// if attacker use bow and target wear shield, shield block rate is multiplied by 1.3 (30%)
+		if (at_weapon != null && at_weapon.getItemType() == L2WeaponType.BOW)
+			shldRate *= 1.3;
+		return shldRate > Rnd.get(100);
 	}
 
 	public boolean calcMagicAffected(L2Character actor, L2Character target, L2Skill skill)

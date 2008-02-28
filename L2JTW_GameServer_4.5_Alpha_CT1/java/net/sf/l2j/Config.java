@@ -254,8 +254,11 @@ public final class Config
     /** Number of days before creating a new alliance when dissolved an alliance */
     public static int ALT_CREATE_ALLY_DAYS_WHEN_DISSOLVED;
 
-    /** Alternative gaming - all new characters always are newbies. */
-    public static boolean ALT_GAME_NEW_CHAR_ALWAYS_IS_NEWBIE;
+    /** Alternative gaming - DEPRECATED: all new characters are always 'newbies' since C5.
+     * Database field and player methods related with this old setting are now used for 
+     * newbie rewards tracking from quest scripts and should not be altered by any other way.
+     */
+    public final static boolean ALT_GAME_NEW_CHAR_ALWAYS_IS_NEWBIE = true;
 
     /** Alternative gaming - clan members with see privilege can also withdraw from clan warehouse. */
     public static boolean ALT_MEMBERS_CAN_WITHDRAW_FROM_CLANWH;
@@ -901,7 +904,9 @@ public final class Config
     /**define L2JMODS */
     /** Champion Mod*/
     public static boolean L2JMOD_CHAMPION_ENABLE;
+    public static boolean L2JMOD_CHAMPION_PASSIVE;
     public static int L2JMOD_CHAMPION_FREQUENCY;
+    public static String L2JMOD_CHAMP_TITLE;
     public static int L2JMOD_CHAMP_MIN_LVL;
     public static int L2JMOD_CHAMP_MAX_LVL;
     public static int L2JMOD_CHAMPION_HP;
@@ -1882,8 +1887,6 @@ public final class Config
                 ALT_GAME_ATKSPD                  		     		= Integer.parseInt(altSettings.getProperty("AltGameAtkSpd", "1200"));
                 ALLOW_3RD_CLASS                  		     		= Boolean.parseBoolean(altSettings.getProperty("Allow3rdClass", "False"));
 
-                ALT_GAME_NEW_CHAR_ALWAYS_IS_NEWBIE                  = Boolean.parseBoolean(altSettings.getProperty("AltNewCharAlwaysIsNewbie", "False"));
-
                 ALT_MEMBERS_CAN_WITHDRAW_FROM_CLANWH                = Boolean.parseBoolean(altSettings.getProperty("AltMembersCanWithdrawFromClanWH", "False"));
 
                 ALT_MAX_NUM_OF_CLANS_IN_ALLY                        = Integer.parseInt(altSettings.getProperty("AltMaxNumOfClansInAlly", "3"));
@@ -2060,19 +2063,21 @@ public final class Config
                 L2JModSettings.load(is);
                 is.close();
 
-                L2JMOD_CHAMPION_ENABLE              = Boolean.parseBoolean(L2JModSettings.getProperty("ChampionEnable", "false"));
-                L2JMOD_CHAMPION_FREQUENCY              = Integer.parseInt(L2JModSettings.getProperty("ChampionFrequency", "0"));
-                L2JMOD_CHAMP_MIN_LVL                = Integer.parseInt(L2JModSettings.getProperty("ChampionMinLevel", "20"));
-                L2JMOD_CHAMP_MAX_LVL                = Integer.parseInt(L2JModSettings.getProperty("ChampionMaxLevel", "60"));
-                L2JMOD_CHAMPION_HP                     = Integer.parseInt(L2JModSettings.getProperty("ChampionHp", "7"));
-                L2JMOD_CHAMPION_HP_REGEN               = Float.parseFloat(L2JModSettings.getProperty("ChampionHpRegen", "1."));
-                L2JMOD_CHAMPION_REWARDS                = Integer.parseInt(L2JModSettings.getProperty("ChampionRewards", "8"));
-                L2JMOD_CHAMPION_ADENAS_REWARDS         = Integer.parseInt(L2JModSettings.getProperty("ChampionAdenasRewards", "1"));
-                L2JMOD_CHAMPION_ATK                 = Float.parseFloat(L2JModSettings.getProperty("ChampionAtk", "1."));
-                L2JMOD_CHAMPION_SPD_ATK             = Float.parseFloat(L2JModSettings.getProperty("ChampionSpdAtk", "1."));
-                L2JMOD_CHAMPION_REWARD                 = Integer.parseInt(L2JModSettings.getProperty("ChampionRewardItem", "0"));
-                L2JMOD_CHAMPION_REWARD_ID             = Integer.parseInt(L2JModSettings.getProperty("ChampionRewardItemID", "6393"));
-                L2JMOD_CHAMPION_REWARD_QTY            = Integer.parseInt(L2JModSettings.getProperty("ChampionRewardItemQty", "1"));
+                L2JMOD_CHAMPION_ENABLE              	= Boolean.parseBoolean(L2JModSettings.getProperty("ChampionEnable", "false"));
+                L2JMOD_CHAMPION_PASSIVE					= Boolean.parseBoolean(L2JModSettings.getProperty("ChampionPassive", "false"));
+                L2JMOD_CHAMPION_FREQUENCY              	= Integer.parseInt(L2JModSettings.getProperty("ChampionFrequency", "0"));
+                L2JMOD_CHAMP_TITLE                      = L2JModSettings.getProperty("ChampionTitle", "Champion");
+                L2JMOD_CHAMP_MIN_LVL                	= Integer.parseInt(L2JModSettings.getProperty("ChampionMinLevel", "20"));
+                L2JMOD_CHAMP_MAX_LVL                	= Integer.parseInt(L2JModSettings.getProperty("ChampionMaxLevel", "60"));
+                L2JMOD_CHAMPION_HP                     	= Integer.parseInt(L2JModSettings.getProperty("ChampionHp", "7"));
+                L2JMOD_CHAMPION_HP_REGEN               	= Float.parseFloat(L2JModSettings.getProperty("ChampionHpRegen", "1."));
+                L2JMOD_CHAMPION_REWARDS                	= Integer.parseInt(L2JModSettings.getProperty("ChampionRewards", "8"));
+                L2JMOD_CHAMPION_ADENAS_REWARDS         	= Integer.parseInt(L2JModSettings.getProperty("ChampionAdenasRewards", "1"));
+                L2JMOD_CHAMPION_ATK                 	= Float.parseFloat(L2JModSettings.getProperty("ChampionAtk", "1."));
+                L2JMOD_CHAMPION_SPD_ATK             	= Float.parseFloat(L2JModSettings.getProperty("ChampionSpdAtk", "1."));
+                L2JMOD_CHAMPION_REWARD                 	= Integer.parseInt(L2JModSettings.getProperty("ChampionRewardItem", "0"));
+                L2JMOD_CHAMPION_REWARD_ID             	= Integer.parseInt(L2JModSettings.getProperty("ChampionRewardItemID", "6393"));
+                L2JMOD_CHAMPION_REWARD_QTY            	= Integer.parseInt(L2JModSettings.getProperty("ChampionRewardItemQty", "1"));
 
                 TVT_EVENT_ENABLED                        = Boolean.parseBoolean(L2JModSettings.getProperty("TvTEventEnabled", "false"));
                 TVT_EVENT_INTERVAL                        = Integer.parseInt(L2JModSettings.getProperty("TvTEventInterval", "18000"));
@@ -2864,7 +2869,7 @@ public final class Config
         else if (pName.equalsIgnoreCase("AltRequireClanCastle")) ALT_GAME_REQUIRE_CLAN_CASTLE = Boolean.valueOf(pValue);
         else if (pName.equalsIgnoreCase("AltFreeTeleporting")) ALT_GAME_FREE_TELEPORT = Boolean.valueOf(pValue);
         else if (pName.equalsIgnoreCase("AltSubClassWithoutQuests")) ALT_GAME_SUBCLASS_WITHOUT_QUESTS = Boolean.valueOf(pValue);
-        else if (pName.equalsIgnoreCase("AltNewCharAlwaysIsNewbie")) ALT_GAME_NEW_CHAR_ALWAYS_IS_NEWBIE = Boolean.valueOf(pValue);
+        //else if (pName.equalsIgnoreCase("AltNewCharAlwaysIsNewbie")) ALT_GAME_NEW_CHAR_ALWAYS_IS_NEWBIE = Boolean.valueOf(pValue);
         else if (pName.equalsIgnoreCase("AltMembersCanWithdrawFromClanWH")) ALT_MEMBERS_CAN_WITHDRAW_FROM_CLANWH = Boolean.valueOf(pValue);
         else if (pName.equalsIgnoreCase("DwarfRecipeLimit")) DWARF_RECIPE_LIMIT = Integer.parseInt(pValue);
         else if (pName.equalsIgnoreCase("CommonRecipeLimit")) COMMON_RECIPE_LIMIT = Integer.parseInt(pValue);

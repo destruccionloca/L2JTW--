@@ -214,14 +214,14 @@ public class Mdam implements ISkillHandler
       						else
       							sm.addNpcName(((L2Summon)target).getTemplate().idTemplate);
       						}
+                            sm.addSkillName(skill.getId());
       						activeChar.sendPacket(sm);
       					}
       					else
       					{
-                         SystemMessage sms = new SystemMessage(SystemMessageId.S1_WAS_UNAFFECTED_BY_S2);
-                         sms.addString(target.getName());
-                         sms.addSkillName(skill.getDisplayId());
-                         activeChar.sendPacket(sms);
+                         sm.addString(target.getName());
+                         sm.addSkillName(skill.getId());
+                         activeChar.sendPacket(sm);
       					}
                         }
                 	}

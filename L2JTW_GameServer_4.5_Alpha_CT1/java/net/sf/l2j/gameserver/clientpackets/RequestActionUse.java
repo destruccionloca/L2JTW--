@@ -84,6 +84,20 @@ public final class RequestActionUse extends L2GameClientPacket
             return;
         }
         
+        // don't do anything if player is transformed
+        if (activeChar.isTransformed())
+        {
+            getClient().sendPacket(new ActionFailed());
+            return;
+        }
+        
+        // don't do anything if player is casting
+        if (activeChar.isCastingNow())
+        {
+        	getClient().sendPacket(new ActionFailed());
+            return;
+        }
+        
         L2Summon pet = activeChar.getPet();
         L2Object target = activeChar.getTarget();
         
@@ -214,6 +228,14 @@ public final class RequestActionUse extends L2GameClientPacket
                         SystemMessage msg = new SystemMessage(SystemMessageId.STRIDER_CANT_BE_RIDDEN_WHILE_DEAD);
                         activeChar.sendPacket(msg);
                         msg = null;
+                    }
+                    if (activeChar.isTransformed())
+                    {
+                        // You cannot mount a steed while transformed.
+                        getClient().sendPacket(new ActionFailed());
+                        SystemMessage msg = new SystemMessage(SystemMessageId.YOU_CANNOT_MOUNT_A_STEED_WHILE_TRANSFORMED);
+                        activeChar.sendPacket(msg);
+                        return;
                     }
                     else if (pet.isDead())
                     {

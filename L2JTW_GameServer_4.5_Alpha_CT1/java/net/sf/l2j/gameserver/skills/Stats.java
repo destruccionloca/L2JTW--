@@ -192,7 +192,7 @@ public enum Stats
     CRIT_PENALTY		("critpenalty"),
     CRIT_POWER_BONUS	("critpowerbonus"),
     CRIT_POWER_PENALTY	("critpowerpenalty"),
-    
+
     //T1 stats 
     defenceAttrFire     ("defenceAttrFire"), 
     defenceAttrWater    ("defenceAttrWater"), 
@@ -203,7 +203,7 @@ public enum Stats
     transformId ("transformId") 
 
 
-    
+
 	;
 
 	public static final int NUM_STATS = values().length;

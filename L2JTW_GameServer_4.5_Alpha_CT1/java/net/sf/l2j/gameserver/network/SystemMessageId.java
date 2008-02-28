@@ -378,7 +378,7 @@ public enum SystemMessageId
     /**
     * ID: 104<br>
     * Message: You may not equip items while casting or performing a skill.
-        */
+	*/
     CANNOT_USE_ITEM_WHILE_USING_MAGIC(104),
 
     /**
@@ -2087,83 +2087,104 @@ public enum SystemMessageId
         NO_PORT_THAT_IS_IN_SIGE(707),
 
     /**
-    * ID: 709<br>
-    * Message: You do not have the right to use the clan warehouse.
-    */
-    YOU_DO_NOT_HAVE_THE_RIGHT_TO_USE_CLAN_WAREHOUSE(709),
-
-        /**
-        * ID: 710<br>
-        * Message: Only clans of clan level 1 or higher can use a clan warehouse.
-        */
-        ONLY_LEVEL_1_CLAN_OR_HIGHER_CAN_USE_WAREHOUSE(710),
+	 * ID: 709<br>
+	 * Message: You do not have the right to use the clan warehouse.
+	 */
+	YOU_DO_NOT_HAVE_THE_RIGHT_TO_USE_CLAN_WAREHOUSE(709),
+	
+	
+	/**
+	 * ID: 710<br>
+	 * Message: Only clans of clan level 1 or higher can use a clan warehouse.
+	 */
+	ONLY_LEVEL_1_CLAN_OR_HIGHER_CAN_USE_WAREHOUSE(710),
+	
+	/**
+	 * ID: 714
+	 * Message: A trap device has been tripped.
+	 * 
+	 */
+	A_TRAP_DEVICE_HAS_BEEN_STOPPED(714),
+	
+	/**
+	 * ID: 720<br>
+	 * Message: The purchase price is higher than the amount of money that you
+	 * have and so you cannot open a personal store.
+	 */
+	THE_PURCHASE_PRICE_IS_HIGHER_THAN_MONEY(720),
+	
+	
+	/**
+	 * ID: 722<br>
+	 * Message: You cannot dissolve an alliance while an affiliated clan is
+	 * participating in a siege battle.
+	 */
+	CANNOT_DISSOLVE_ALLY_WHILE_IN_SIEGE(722),
+	
+	
+	/**
+	 * ID: 723<br>
+	 * Message: The opposing clan is participating in a siege battle.
+	 */
+	OPPOSING_CLAN_IS_PARTICIPATING_IN_SIEGE(723),
+	
+	
+	/**
+	 * ID: 730<br>
+	 * Message: - You have submitted your $s1th petition. - You may submit $s2
+	 * more petition(s) today.
+	 */
+	SUBMITTED_YOU_S1_TH_PETITION_S2_LEFT(730),
+	
+	
+	/**
+	 * ID: 733<br>
+	 * Message: We have received $s1 petitions from you today and that is the
+	 * maximum that you can submit in one day. You cannot submit any more
+	 * petitions.
+	 */
+	WE_HAVE_RECEIVED_S1_PETITIONS_TODAY(733),
+	
+	
+	/**
+	 * ID: 736<br>
+	 * Message: The petition was canceled. You may submit $s1 more petition(s)
+	 * today.
+	 */
+	PETITION_CANCELED_SUBMIT_S1_MORE_TODAY(736),
+	
+	
+	/**
+	 * ID: 738<br>
+	 * Message: You have not submitted a petition.
+	 */
+	PETITION_NOT_SUBMITTED(738),
+	
+	
+	/**
+	 * ID: 745<br>
+	 * Message: You are currently not in a petition chat.
+	 */
+	YOU_ARE_NOT_IN_PETITION_CHAT(745),
+	
+	
+	/**
+	 * ID: 749<br>
+	 * Message: The effect of $s1 has been removed.
+	 */
+	EFFECT_S1_DISAPPEARED(749),
 
     /**
-    * ID: 720<br>
-    * Message: The purchase price is higher than the amount
-    * of money that you have and so you cannot open a personal store.
-    */
-    THE_PURCHASE_PRICE_IS_HIGHER_THAN_MONEY(720),
-
-        /**
-        * ID: 722<br>
-        * Message: You cannot dissolve an alliance while an affiliated clan is participating in a siege battle.
-        */
-        CANNOT_DISSOLVE_ALLY_WHILE_IN_SIEGE(722),
-
-        /**
-        * ID: 723<br>
-        * Message: The opposing clan is participating in a siege battle.
-        */
-        OPPOSING_CLAN_IS_PARTICIPATING_IN_SIEGE(723),
-
-        /**
-        * ID: 730<br>
-        * Message: - You have submitted your $s1th petition. - You may submit $s2 more petition(s) today.
-        */
-        SUBMITTED_YOU_S1_TH_PETITION_S2_LEFT(730),
-
-        /**
-        * ID: 733<br>
-        * Message: We have received $s1 petitions from you today and that is
-        * the maximum that you can submit in one day. You cannot submit any more petitions.
-        */
-        WE_HAVE_RECEIVED_S1_PETITIONS_TODAY(733),
-
-        /**
-        * ID: 736<br>
-        * Message: The petition was canceled. You may submit $s1 more petition(s) today.
-        */
-        PETITION_CANCELED_SUBMIT_S1_MORE_TODAY(736),
-
-        /**
-        * ID: 738<br>
-        * Message: You have not submitted a petition.
-        */
-        PETITION_NOT_SUBMITTED(738),
-
-        /**
-        * ID: 745<br>
-        * Message: You are currently not in a petition chat.
-        */
-        YOU_ARE_NOT_IN_PETITION_CHAT(745),
-
-        /**
-    * ID: 749<br>
-    * Message: The effect of $s1 has been removed.
-    */
-    EFFECT_S1_DISAPPEARED(749),
-
-    /**
-    * ID: 750<br>
-    * Message: There are no other skills to learn.
-    */
+	 * ID: 750<br>
+	 * Message: There are no other skills to learn.
+	 */
     NO_MORE_SKILLS_TO_LEARN(750),
 
     /**
-    * ID: 760<br>
-    * Message: $s1 cannot join the clan because one day has not yet passed since he/she left another clan.
-    */
+	 * ID: 760<br>
+	 * Message: $s1 cannot join the clan because one day has not yet passed
+	 * since he/she left another clan.
+	 */
     S1_MUST_WAIT_BEFORE_JOINING_ANOTHER_CLAN(760),
 
     /**
@@ -2336,6 +2357,12 @@ public enum SystemMessageId
         * Message: You may not throw the dice at this time. Try again later.
         */
         YOU_MAY_NOT_THROW_THE_DICE_AT_THIS_TIME_TRY_AGAIN_LATER(835),
+
+        /**
+        * ID: 836<br>
+        * Message: You have exceeded your inventory volume limit and cannot take this item.
+        */
+        YOU_HAVE_EXCEEDED_YOUR_INVENTORY_VOLUME_LIMIT_AND_CANNOT_TAKE_THIS_ITEM(836),
 
     /**
     * ID: 837<br>
@@ -4775,6 +4802,12 @@ public enum SystemMessageId
     S1S_REMAINING_MANA_IS_NOW_0(1982),
 
     /**
+     * ID: 1983<br>
+     * Message: $s1
+     */
+    S1(1983),
+    
+    /**
      * ID: 1984<br>
      * Message: Press the Augment button to begin.
      */
@@ -4949,6 +4982,12 @@ public enum SystemMessageId
      * Message: Shout and trade chatting cannot be used while possessing a cursed weapon.
      */
     SHOUT_AND_TRADE_CHAT_CANNOT_BE_USED_WHILE_POSSESSING_CURSED_WEAPON(2085),
+    
+    /**
+     * ID: 2167<BR>
+     * Message: A malicious skill cannot be used in a peace zone.
+     */
+    A_MALICIOUS_SKILL_CANNOT_BE_USED_IN_PEACE_ZONE(2167),
 
     /**
      * ID: 2259<br>

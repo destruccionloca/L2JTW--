@@ -1302,6 +1302,7 @@ public class L2NpcInstance extends L2Character
             html1.append("機率︰<font color=\"ff0000\">50%+</font> <font color=\"00ff00\">30%+</font> <font color=\"0000ff\">低於 30%</font>");
             html1.append("<table border=0 width=\"100%\">");
 
+            if (getTemplate().getDropData()!=null)
             for(L2DropCategory cat:getTemplate().getDropData())
 	    	    for(L2DropData drop : cat.getAllDrops())
 	    	    {
@@ -1512,15 +1513,19 @@ public class L2NpcInstance extends L2Character
             else if (command.startsWith("npcfind_byid"))
             {
                 try
-                {
-                    L2Spawn spawn = SpawnTable.getInstance().getTemplate(Integer.parseInt(command.substring(12).trim()));
-                    
-                    if(spawn!=null) 
-                        player.sendPacket(new RadarControl(0,1,spawn.getLocx(),spawn.getLocy(),spawn.getLocz()));
-                } catch (NumberFormatException nfe)
-                { 
-                    player.sendMessage("指令錯誤。");
-                }
+				{
+					L2Spawn spawn = SpawnTable.getInstance().getTemplate(Integer.parseInt(command.substring(12).trim()));
+					
+					if (spawn != null)
+					{
+						player.sendPacket(new RadarControl(2, 2, spawn.getLocx(), spawn.getLocy(), spawn.getLocz()));
+						player.sendPacket(new RadarControl(0, 1, spawn.getLocx(), spawn.getLocy(), spawn.getLocz()));
+					}
+				}
+				catch (NumberFormatException nfe)
+				{
+					player.sendMessage("指令錯誤");
+				}
             }
             else if (command.startsWith("EnterRift"))
             {

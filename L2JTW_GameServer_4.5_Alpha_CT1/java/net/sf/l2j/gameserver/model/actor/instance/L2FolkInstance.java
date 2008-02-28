@@ -370,6 +370,9 @@ public class L2FolkInstance extends L2NpcInstance
 	@Override
 	public void onBypassFeedback(L2PcInstance player, String command)
 	{
+		if (player.isTransformed())
+        	return;
+		
 		if (command.startsWith("SkillList"))
 		{
 			if (Config.ALT_GAME_SKILL_LEARN)
@@ -408,14 +411,13 @@ public class L2FolkInstance extends L2NpcInstance
 
 					if (!own_class)
                     {
-						String mages = player.getClassId().isMage() ? "fighters" : "mages";
+						String charType = player.getClassId().isMage() ? "fighter" : "mage";
 						text +=
 
-
-							 "所屬職業技能是最簡單學習的，<br>\n"+
+								"所屬職業技能是最簡單學習的，<br>\n"+
 	                            "相同種族的其他職業技能則會有點困難，<br>\n"+
 	                            "其他種族的技能將會更難學習，<br>\n"+
-	                            "當然，你也可以學習"+mages+"的技能，但是它們是最難學習的！"+
+	                            "當然，你也可以學習"+charType+"的技能，但是它們是最難學習的！"+
 	                            "<br>"+
 	                            "<br>";
 

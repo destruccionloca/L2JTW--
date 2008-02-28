@@ -16,7 +16,6 @@ package net.sf.l2j.gameserver.serverpackets;
 
 import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.L2Object;
-import net.sf.l2j.gameserver.model.L2Skill;
 
 /**
  *
@@ -39,7 +38,6 @@ public class MagicSkillLaunched extends L2GameServerPacket
 	private int _numberOfTargets;
 	private L2Object[] _targets;
 	private int _singleTargetId;
-	private int _flags;
 
 
 	public MagicSkillLaunched(L2Character cha, int skillId, int skillLevel, L2Object[] targets)
@@ -50,7 +48,6 @@ public class MagicSkillLaunched extends L2GameServerPacket
 		_numberOfTargets = targets.length;
 		_targets = targets;
 		_singleTargetId = 0;
-        _flags |= 0x20;
 	}
 
 	public MagicSkillLaunched(L2Character cha, int skillId, int skillLevel)
@@ -60,7 +57,6 @@ public class MagicSkillLaunched extends L2GameServerPacket
 		_skillLevel = skillLevel;
 		_numberOfTargets = 1;
 		_singleTargetId = cha.getTargetId();
-        _flags |= 0x20;
 	}
 
 	@Override
@@ -79,8 +75,6 @@ public class MagicSkillLaunched extends L2GameServerPacket
 		{
             writeD(target.getObjectId());
 		}
-        if (L2Skill.CRIT_ATTACK==1)
-            writeC(_flags);
 	}
 
 	/* (non-Javadoc)

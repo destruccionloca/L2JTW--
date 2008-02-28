@@ -14,6 +14,8 @@
  */
 package net.sf.l2j.gameserver.serverpackets;
 
+import java.util.logging.Logger;
+
 import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.L2Skill;
 
@@ -30,6 +32,7 @@ import net.sf.l2j.gameserver.model.L2Skill;
  */
 public final class MagicSkillUse extends L2GameServerPacket
 {
+    protected static final Logger _log = Logger.getLogger(L2Character.class.getName());
 	private static final String _S__5A_MAGICSKILLUSER = "[S] 48 MagicSkillUser";
 	private int _targetId;
 	private int _skillId;
@@ -80,16 +83,21 @@ public final class MagicSkillUse extends L2GameServerPacket
 		writeD(_x);
 		writeD(_y);
 		writeD(_z);
+        if (L2Character.CRIT_ATTACK==1)
+        {
+            _log.warning("2");
+            writeC(_flags);
+        }
+        //for()
 		writeH(0x00); // unknown loop but not AoE
 		writeH(0x00);
-		//for()
+
 		//{
-			writeH(0x00);
-			writeH(0x00);
-			writeH(0x00);
+			//writeH(0x00);
+			//writeH(0x00);
+			//writeH(0x00);
 		//}
-	        if (L2Skill.CRIT_ATTACK==1)
-	            writeC(_flags);
+
 	}
 
 	/* (non-Javadoc)

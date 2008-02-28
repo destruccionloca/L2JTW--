@@ -60,7 +60,7 @@ public final class MultiSellList extends L2GameServerPacket
         writeD(_page);		// page
         writeD(_finished);	// finished
         writeD(0x28);	// size of pages
-        writeD(_list == null ? 0 : _list.getEntries().size()); //list lenght
+        writeD(_list == null ? 0 : _list.getEntries().size()); //list length
 
         if(_list != null)
         {
@@ -105,7 +105,7 @@ public final class MultiSellList extends L2GameServerPacket
                 {
                 	int items = i.getItemId();
                 	int typeE = 65535;
-                	if (items != 65336)
+                	if (items != -200)
                 		typeE = ItemTable.getInstance().getTemplate(i.getItemId()).getType2();
                     writeD(items);      //ID
                     writeH(typeE);

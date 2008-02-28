@@ -23,13 +23,14 @@ import net.sf.l2j.gameserver.ThreadPoolManager;
 /**
  * @author FBIagent
  */
-public class TvTManager implements Runnable
+public class TvTManager
 {
     protected static final Logger _log = Logger.getLogger(TvTManager.class.getName());
     
 	/** The one and only instance of this class<br> */
 	private static TvTManager _instance = null;
 
+	/** Task for event cycles<br> */
     private TvTStartTask _task;
     
 	/**
@@ -57,28 +58,26 @@ public class TvTManager implements Runnable
 	 */
 	public static TvTManager getInstance()
 	{
-		if (_instance == null)
-			_instance = new TvTManager();
-
-		return _instance;
+	    return _instance == null ? ( _instance = new TvTManager() ) : _instance;
 	}
-    
+
+	/**
+	 * Starts TvTStartTask
+	 */
     public void scheduleEventStart()
     {
         _task = new TvTStartTask(System.currentTimeMillis() + Config.TVT_EVENT_INTERVAL*60*1000);
         ThreadPoolManager.getInstance().executeTask(_task);
     }
 
-	/**
-	 * The task method to handle cycles of the event<br><br>
-	 *
-	 * @see java.lang.Runnable#run()<br>
-	 */
-	public void run()
+    /**
+     * Method to start participation
+     */
+	public void startReg()
 	{
 	    if (!TvTEvent.startParticipation())
 	    {
-	        Announcements.getInstance().announceToAll("TvT Event: Event was canceled.");
+	        Announcements.getInstance().announceToAll("TvT Event: Event was cancelled.");
 	        _log.warning("TvTEventEngine[TvTManager.run()]: Error spawning event npc for participation.");
 	        
 	        this.scheduleEventStart();
@@ -93,11 +92,14 @@ public class TvTManager implements Runnable
 	    }
 	}
 
+	/**
+	 * Method to start the fight
+	 */
     public void startEvent()
     {
         if (!TvTEvent.startFight())
         {
-            Announcements.getInstance().announceToAll("TvT Event: Event canceled due to lack of Participation.");
+            Announcements.getInstance().announceToAll("TvT Event: Event cancelled due to lack of Participation.");
             _log.info("TvTEventEngine[TvTManager.run()]: Lack of registration, abort event.");
             
             this.scheduleEventStart();
@@ -109,7 +111,10 @@ public class TvTManager implements Runnable
             ThreadPoolManager.getInstance().executeTask(_task);
         }
     }
-    
+
+    /**
+     * Method to end the event and reward
+     */
     public void endEvent()
     {
         Announcements.getInstance().announceToAll(TvTEvent.calculateRewards());
@@ -118,7 +123,10 @@ public class TvTManager implements Runnable
         
         this.scheduleEventStart();
     }
-    
+
+    /**
+     * Class for TvT cycles
+     */
     class TvTStartTask implements Runnable
     {
         private long _startTime;
@@ -183,7 +191,7 @@ public class TvTManager implements Runnable
                 // start
                 if (TvTEvent.isInactive())
                 {
-                    TvTManager.this.run();
+                    TvTManager.this.startReg();
                 }
                 else if (TvTEvent.isParticipating())
                 {
@@ -207,7 +215,7 @@ public class TvTManager implements Runnable
             {
                 if (TvTEvent.isParticipating())
                 {
-                    Announcements.getInstance().announceToAll("TvT Event: "+(time/60/60)+" hour(s) umtil registration is closed!");
+                    Announcements.getInstance().announceToAll("TvT Event: "+(time/60/60)+" hour(s) until registration is closed!");
                 }
                 else if (TvTEvent.isStarted())
                 {
@@ -238,34 +246,4 @@ public class TvTManager implements Runnable
             }
         }
     }
-
-	/**
-	 * This method waits for a period time delay<br><br>
-	 *
-	 * @param interval<br>
-	 */
-	void waiter(int seconds)
-	{
-		while (seconds > 1)
-		{
-			seconds--; // here because we don't want to see two time announce at the same time
-
-			if (TvTEvent.isParticipating() || TvTEvent.isStarted())
-			{
-				
-			}
-
-			long oneSecWaitStart = System.currentTimeMillis();
-
-			while (oneSecWaitStart + 1000L > System.currentTimeMillis())
-			{
-				try
-				{
-					Thread.sleep(1);
-				}
-				catch (InterruptedException ie)
-				{}
-			}
-		}
-	}
 }

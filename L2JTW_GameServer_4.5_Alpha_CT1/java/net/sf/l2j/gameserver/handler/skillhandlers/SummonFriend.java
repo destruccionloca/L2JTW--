@@ -17,7 +17,7 @@ package net.sf.l2j.gameserver.handler.skillhandlers;
 import javolution.util.FastList;
 import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.handler.ISkillHandler;
-import net.sf.l2j.gameserver.instancemanager.BossZoneManager;
+import net.sf.l2j.gameserver.instancemanager.GrandBossManager;
 import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2Skill;
@@ -56,7 +56,7 @@ public class SummonFriend implements ISkillHandler
         	return;
         }
 
-        if (BossZoneManager.getInstance().getZone(activePlayer) != null && !activePlayer.isGM())
+        if (GrandBossManager.getInstance().getZone(activePlayer) != null && !activePlayer.isGM())
         {
             activePlayer.sendMessage("You may not use Summon Friend Skill inside a Boss Zone.");
             activePlayer.sendPacket(new ActionFailed());
@@ -133,7 +133,7 @@ public class SummonFriend implements ISkillHandler
                     }
 
                     // Check for the the target's Inside Boss Zone
-                    if (BossZoneManager.getInstance().getZone(targetChar) != null && !targetChar.isGM())
+                    if (GrandBossManager.getInstance().getZone(targetChar) != null && !targetChar.isGM())
                     {
                         activeChar.sendPacket(new SystemMessage(SystemMessageId.CANNOT_USE_SUMMON_SKILL_ON_SELECTED_TARGET));
                     	continue;
@@ -157,18 +157,22 @@ public class SummonFriend implements ISkillHandler
                     	activeChar.sendPacket(new SystemMessage(SystemMessageId.YOUR_TARGET_IS_IN_AN_AREA_WHICH_BLOCKS_SUMMONING));
                         continue;
                     }
-
+                    
                     // Requires a Summoning Crystal
-                    if (targetChar.getInventory().getItemByItemId(8615) == null)
-                    {
-                    	((L2PcInstance)activeChar).sendMessage("目標無法召喚,對方並無擁有召喚水晶");
-                    	targetChar.sendMessage("目標無法召喚,並無擁有召喚水晶");
-                    	continue;
-                    }
+                    if(skill.getTargetConsume() != 0)
+                        if (targetChar.getInventory().getInventoryItemCount(skill.getTargetConsumeId(), 0) < skill.getTargetConsume())
+                        {
+                        	((L2PcInstance)activeChar).sendMessage("目標無法召喚,對方並無擁有召喚水晶");
+                        	targetChar.sendMessage("目標無法召喚,並無擁有召喚水晶");
+                            continue;
+                        }
+
 
                     if (!Util.checkIfInRange(0, activeChar, target, false))
                     {
-                    	targetChar.getInventory().destroyItemByItemId("Consume", 8615, 1, targetChar, activeChar);
+                        if(skill.getTargetConsume() != 0)
+                    	targetChar.getInventory().destroyItemByItemId("Consume", skill.getTargetConsumeId(), skill.getTargetConsume(), targetChar, activeChar);
+                    	
                     	targetChar.sendPacket(SystemMessage.sendString("隊伍成員成功召喚"));
 
                     	targetChar.teleToLocation(activeChar.getX(),activeChar.getY(),activeChar.getZ(), true);

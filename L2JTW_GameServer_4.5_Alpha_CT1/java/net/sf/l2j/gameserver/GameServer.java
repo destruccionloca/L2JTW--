@@ -186,6 +186,7 @@ import net.sf.l2j.gameserver.handler.skillhandlers.SummonTreasureKey;
 import net.sf.l2j.gameserver.handler.skillhandlers.Sweep;
 import net.sf.l2j.gameserver.handler.skillhandlers.TakeCastle;
 import net.sf.l2j.gameserver.handler.skillhandlers.TransformDispel;
+import net.sf.l2j.gameserver.handler.skillhandlers.Trap;
 import net.sf.l2j.gameserver.handler.skillhandlers.Unlock;
 import net.sf.l2j.gameserver.handler.usercommandhandlers.ChannelDelete;
 import net.sf.l2j.gameserver.handler.usercommandhandlers.ChannelLeave;
@@ -217,6 +218,7 @@ import net.sf.l2j.gameserver.instancemanager.DayNightSpawnManager;
 import net.sf.l2j.gameserver.instancemanager.DimensionalRiftManager;
 import net.sf.l2j.gameserver.instancemanager.FourSepulchersManager;
 import net.sf.l2j.gameserver.instancemanager.FrintezzaManager;
+import net.sf.l2j.gameserver.instancemanager.GrandBossManager;
 import net.sf.l2j.gameserver.instancemanager.ItemsOnGroundManager;
 import net.sf.l2j.gameserver.instancemanager.MercTicketManager;
 import net.sf.l2j.gameserver.instancemanager.PetitionManager;
@@ -414,6 +416,7 @@ public class GameServer
         SpawnTable.getInstance();
         RaidBossSpawnManager.getInstance();
         DayNightSpawnManager.getInstance().notifyChangeMode();
+        GrandBossManager.getInstance();
         DimensionalRiftManager.getInstance();
 		Announcements.getInstance();
 		MapRegionTable.getInstance();
@@ -556,6 +559,7 @@ public class GameServer
         _skillHandler.registerSkillHandler(new Signets());
         _skillHandler.registerSkillHandler(new GetPlayer());
         _skillHandler.registerSkillHandler(new TransformDispel());
+        _skillHandler.registerSkillHandler(new Trap());
         _log.config("SkillHandler: Loaded " + _skillHandler.size() + " handlers.");
 
 		_adminCommandHandler = AdminCommandHandler.getInstance();
@@ -705,14 +709,15 @@ public class GameServer
 		_loginThread = LoginServerThread.getInstance();
 		_loginThread.start();
 
-		 L2GamePacketHandler gph = new L2GamePacketHandler(); 
-		 SelectorConfig<L2GameClient> sc = new SelectorConfig<L2GameClient>(null, gph); 
-		 sc.setMaxSendPerPass(12); 
-		 sc.setSelectorSleepTime(20); 
-		 
-		 _selectorThread = new SelectorThread<L2GameClient>(sc, null, gph, gph, gph, null); 
-		 _selectorThread.openServerSocket(null, Config.PORT_GAME); 
-		 _selectorThread.start();
+        
+        L2GamePacketHandler gph = new L2GamePacketHandler();
+		SelectorConfig<L2GameClient> sc = new SelectorConfig<L2GameClient>(null, null, gph, gph);
+        sc.setMaxSendPerPass(12);
+        sc.setSelectorSleepTime(20);
+        
+		_selectorThread = new SelectorThread<L2GameClient>(sc, gph, gph, null);
+		_selectorThread.openServerSocket(null, Config.PORT_GAME);
+		_selectorThread.start();
 		_log.config("Maximum Numbers of Connected Players: " + Config.MAXIMUM_ONLINE_USERS);
 	}
 

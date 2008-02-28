@@ -26,9 +26,9 @@ import net.sf.l2j.gameserver.ThreadPoolManager;
 import net.sf.l2j.gameserver.ai.CtrlIntention;
 import net.sf.l2j.gameserver.datatables.SkillTable;
 import net.sf.l2j.gameserver.handler.IVoicedCommandHandler;
-import net.sf.l2j.gameserver.instancemanager.BossZoneManager;
 import net.sf.l2j.gameserver.instancemanager.CastleManager;
 import net.sf.l2j.gameserver.instancemanager.CoupleManager;
+import net.sf.l2j.gameserver.instancemanager.GrandBossManager;
 import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.model.L2World;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
@@ -223,8 +223,9 @@ public class Wedding implements IVoicedCommandHandler
         }
 
         ptarget.setEngageRequest(true, activeChar.getObjectId());
-        //ptarget.sendMessage("Player "+activeChar.getName()+" wants to engage with you.");
-        ptarget.sendPacket(new ConfirmDlg(614,activeChar.getName()+" asking you to engage. Do you want to start a new relationship?"));
+                                       // $s1
+        ConfirmDlg dlg = new ConfirmDlg(SystemMessageId.S1.getId()).addString(activeChar.getName()+" is asking to engage you. Do you want to start a new relationship?");
+        ptarget.sendPacket(dlg);
         return true;
     }
 
@@ -235,7 +236,7 @@ public class Wedding implements IVoicedCommandHandler
             activeChar.sendMessage("You're not married.");
             return false;
         }
-        if (BossZoneManager.getInstance().getZone(activeChar) != null)
+        if (GrandBossManager.getInstance().getZone(activeChar) != null)
         {
             activeChar.sendMessage("You are inside a Boss Zone.");
             return false;
@@ -260,7 +261,7 @@ public class Wedding implements IVoicedCommandHandler
             activeChar.sendMessage("Your partner is in Jail.");
             return false;
         }
-        else if (BossZoneManager.getInstance().getZone(partner) != null)
+        else if (GrandBossManager.getInstance().getZone(partner) != null)
         {
             activeChar.sendMessage("Your partner is inside a Boss Zone.");
             return false;

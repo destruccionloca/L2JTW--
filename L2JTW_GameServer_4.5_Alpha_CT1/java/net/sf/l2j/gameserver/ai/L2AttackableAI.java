@@ -380,6 +380,9 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
             // unless they are already following those players from outside the peacezone.
             if (!Config.ALT_MOB_AGRO_IN_PEACEZONE && target.isInsideZone(L2Character.ZONE_PEACE))
                 return false;
+            
+            if (me.isChampion() && Config.L2JMOD_CHAMPION_PASSIVE)
+            	return false;
 
             // Check if the actor is Aggressive
 
@@ -655,9 +658,6 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
                     x1 = _actor.getX() + (int) ((x1 - _actor.getX()) / delay);
                     y1 = _actor.getY() + (int) ((y1 - _actor.getY()) / delay);
                 }
-                else
-                	npc.setisReturningToSpawnPoint(false);
-
             }
             else
             {
@@ -1015,7 +1015,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 
             L2Weapon weapon = _actor.getActiveWeaponItem();
             
-            if ((weapon != null && weapon.getItemType() == L2WeaponType.BOW)|| Rnd.get(100) <= ((L2Attackable)_actor).getCanDodge() )
+            if ((weapon != null && weapon.getItemType() == L2WeaponType.BOW)|| Rnd.get(100) < ((L2Attackable)_actor).getCanDodge() )
             {
                 // Micht: kepping this one otherwise we should do 2 sqrt
                 double distance2 = _actor.getPlanDistanceSq(getAttackTarget().getX(), getAttackTarget().getY());

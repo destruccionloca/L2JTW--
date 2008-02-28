@@ -375,6 +375,7 @@ public class CursedWeapon
 	            _player.addSkill(sk, false);
 	        }
 		}
+		_player.regiveTemporarySkills();
 		_player.sendSkillList();
 	}
 	
@@ -443,7 +444,7 @@ public class CursedWeapon
 
 		// Change player stats
 		_player.setCursedWeaponEquippedId(_itemId);
-		_player.setKarma(9000000);
+		_player.setKarma(9999999);
 		_player.setPkKills(0);
 		if (_player.isInParty())
 			_player.getParty().oustPartyMember(_player);

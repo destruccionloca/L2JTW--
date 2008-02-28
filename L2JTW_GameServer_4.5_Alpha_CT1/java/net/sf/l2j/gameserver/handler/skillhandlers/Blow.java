@@ -57,7 +57,7 @@ public class Blow implements ISkillHandler
 				_successChance = SIDE;
 			//If skill requires Crit or skill requires behind,
 			//calculate chance based on DEX, Position and on self BUFF
-			if(((skill.getCondition() & L2Skill.COND_CRIT) != 0) && L2Skill.CRIT_ATTACK==1)
+			if(((skill.getCondition() & L2Skill.COND_CRIT) != 0) && L2Character.CRIT_ATTACK==1)
 			{
 				if (skill.hasEffects())
 				{
@@ -144,7 +144,7 @@ public class Blow implements ISkillHandler
 			Formulas.getInstance().calcLethalHit(activeChar, target, skill);
             
 
-			if(L2Skill.CRIT_ATTACK==1)
+			if(L2Character.CRIT_ATTACK==1)
 			{
             L2Effect effect = activeChar.getFirstEffect(skill.getId());    
             //Self Effect
@@ -157,7 +157,7 @@ public class Blow implements ISkillHandler
 			//activeChar.getAI().setIntention(CtrlIntention.AI_INTENTION_ATTACK, target, null);
             
             
-            L2Skill.CRIT_ATTACK = 0;
+			L2Character.CRIT_ATTACK = 0;
 
         }
 	}

@@ -38,6 +38,7 @@ import net.sf.l2j.gameserver.datatables.SkillTable;
 import net.sf.l2j.gameserver.model.actor.instance.L2BossInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2DoorInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2FolkInstance;
+import net.sf.l2j.gameserver.model.actor.instance.L2GrandBossInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2MinionInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2MonsterInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
@@ -457,9 +458,16 @@ public class L2Attackable extends L2NpcInstance
 
         // Notify the Quest Engine of the L2Attackable death if necessary
         try {
-            if (killer instanceof L2PcInstance || killer instanceof L2Summon)
+            if (killer instanceof L2PcInstance || killer instanceof L2Summon || killer instanceof L2Trap)
             {
-                L2PcInstance player = killer instanceof L2PcInstance?(L2PcInstance)killer:((L2Summon)killer).getOwner();
+                L2PcInstance player = null;
+                
+                if (killer instanceof L2PcInstance)
+                	player = (L2PcInstance)killer;
+                else if (killer instanceof L2Summon)
+                	player = ((L2Summon)killer).getOwner();
+                else if (killer instanceof L2Trap)
+                	player = ((L2Trap)killer).getOwner();
 
             	if (getTemplate().getEventQuests(Quest.QuestEventType.MOBKILLED) != null)
             		for (Quest quest: getTemplate().getEventQuests(Quest.QuestEventType.MOBKILLED))
@@ -471,7 +479,7 @@ public class L2Attackable extends L2NpcInstance
         if (Config.L2JMOD_CHAMPION_ENABLE)
         {
         	//Set champion on next spawn
-        	if (!(this instanceof L2BossInstance) && this instanceof L2MonsterInstance && Config.L2JMOD_CHAMPION_FREQUENCY > 0 && getLevel()>=Config.L2JMOD_CHAMP_MIN_LVL && getLevel()<=Config.L2JMOD_CHAMP_MAX_LVL)
+        	if (!(this instanceof L2GrandBossInstance) && this instanceof L2MonsterInstance && Config.L2JMOD_CHAMPION_FREQUENCY > 0 && getLevel()>=Config.L2JMOD_CHAMP_MIN_LVL && getLevel()<=Config.L2JMOD_CHAMP_MAX_LVL)
         	{
         		int random = Rnd.get(100);
         		if (random < Config.L2JMOD_CHAMPION_FREQUENCY)
@@ -1291,16 +1299,16 @@ public class L2Attackable extends L2NpcInstance
          L2PcInstance player = null;
          if (lastAttacker instanceof L2PcInstance) player = (L2PcInstance)lastAttacker;
          else if (lastAttacker instanceof L2Summon) player = ((L2Summon)lastAttacker).getOwner();
+         else if (lastAttacker instanceof L2Trap) player = ((L2Trap)lastAttacker).getOwner();
 
          if (player == null) return; // Don't drop anything if the last attacker or ownere isn't L2PcInstance
 
          int levelModifier = calculateLevelModifierForDrop(player);          // level modifier in %'s (will be subtracted from drop chance)
 
-         // Check the drop of a cursed weapon
-         if (levelModifier == 0 && player.getLevel() > 20) // Not deep blue mob
-         	CursedWeaponsManager.getInstance().checkDrop(this, player);
+         CursedWeaponsManager.getInstance().checkDrop(this, player);
 
          // now throw all categorized drops and handle spoil.
+         if (npcTemplate.getDropData()!=null)
     	 for(L2DropCategory cat:npcTemplate.getDropData())
     	 {
     		 RewardItem item = null;
@@ -1542,6 +1550,8 @@ public class L2Attackable extends L2NpcInstance
              player = (L2PcInstance)lastAttacker;
          else if (lastAttacker instanceof L2Summon)
              player = ((L2Summon)lastAttacker).getOwner();
+         else if (lastAttacker instanceof L2Trap)
+        	 player = ((L2Trap)lastAttacker).getOwner();
 
          if (player == null) return; // Don't drop anything if the last attacker or ownere isn't L2PcInstance
 
@@ -2292,7 +2302,7 @@ public class L2Attackable extends L2NpcInstance
     @Override
 	public boolean hasRandomAnimation()
     {
-        return ((Config.MAX_MONSTER_ANIMATION > 0) && !(this instanceof L2BossInstance));
+        return ((Config.MAX_MONSTER_ANIMATION > 0) && !(this instanceof L2GrandBossInstance));
     }
 
     @Override

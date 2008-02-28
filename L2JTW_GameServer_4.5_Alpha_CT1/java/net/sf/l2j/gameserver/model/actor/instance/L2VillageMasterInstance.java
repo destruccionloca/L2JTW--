@@ -575,9 +575,8 @@ public final class L2VillageMasterInstance extends L2FolkInstance
 
     public void createSubPledge(L2PcInstance player, String clanName, String leaderName, int pledgeType, int minClanLvl)
     {
-        //if (Config.DEBUG)
-            _log.fine(player.getObjectId() + "(" + player.getName() + ") requested sub clan creation from "
-                + getObjectId() + "(" + getName() + ")");
+    	if (Config.DEBUG)
+            _log.fine(player.getObjectId() + "(" + player.getName() + ") requested sub clan creation from " + getObjectId() + "(" + getName() + ")");
 
         if (!player.isClanLeader())
         {
@@ -817,7 +816,11 @@ public final class L2VillageMasterInstance extends L2FolkInstance
     {
         if (Config.DEBUG)
             _log.fine("PledgeSkillList activated on: "+getObjectId());
-        if(player.getClan() == null) return;
+        if(player.getClan() == null)
+        	return;
+        
+        if (player.isTransformed())
+        	return;
 
         L2PledgeSkillLearn[] skills = SkillTreeTable.getInstance().getAvailablePledgeSkills(player);
         AcquireSkillList asl = new AcquireSkillList(AcquireSkillList.skillType.Clan);
@@ -873,7 +876,7 @@ public final class L2VillageMasterInstance extends L2FolkInstance
 
     private final Race getVillageMasterRace()
     {
-        String npcClass = getTemplate().getStatsSet().getString("jClass").toLowerCase();
+        String npcClass = getTemplate().jClass.toLowerCase();
 
         if (npcClass.indexOf("human") > -1) return Race.Human;
 
@@ -890,7 +893,7 @@ public final class L2VillageMasterInstance extends L2FolkInstance
 
     private final ClassType getVillageMasterTeachType()
     {
-        String npcClass = getTemplate().getStatsSet().getString("jClass");
+        String npcClass = getTemplate().jClass.toLowerCase();
 
         if (npcClass.indexOf("sanctuary") > -1 || npcClass.indexOf("clergyman") > -1)
             return ClassType.Priest;

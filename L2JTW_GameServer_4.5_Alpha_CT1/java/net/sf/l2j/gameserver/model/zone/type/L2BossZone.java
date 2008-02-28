@@ -21,6 +21,7 @@ import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.zone.L2ZoneType;
 import net.sf.l2j.gameserver.instancemanager.VanHalterManager;
+import net.sf.l2j.util.L2FastList;
 
 /**
  * @author DaRkRaGe
@@ -28,19 +29,24 @@ import net.sf.l2j.gameserver.instancemanager.VanHalterManager;
 public class L2BossZone extends L2ZoneType
 {
     private String _zoneName;
+    private int _timeInvade;
     
     // track the times that players got disconnected. Players are allowed
     // to log back into the zone as long as their log-out was within _timeInvade
     // time...
-    private int _timeInvade;
-    
     // <player objectId, expiration time in milliseconds>
-    private FastMap<Integer, Long> _playerAllowedEntryExpirationTimes;
+    private FastMap<Integer, Long> _playerAllowedReEntryTimes;
+
+    // track the players admitted to the zone who should be allowed back in 
+    // after reboot/server downtime (outside of their control), within 30 
+    // of server restart
+    private L2FastList<Integer> _playersAllowed;
     
     public L2BossZone(int id)
     {
         super(id);
-        _playerAllowedEntryExpirationTimes = new FastMap<Integer, Long>();
+        _playerAllowedReEntryTimes = new FastMap<Integer, Long>();
+        _playersAllowed = new L2FastList<Integer>();
     }
     
     @Override
@@ -73,52 +79,54 @@ public class L2BossZone extends L2ZoneType
      * 
      * There exists one more case in which the player will be allowed to enter.
      * That is if the server recently rebooted (boot-up time more recent than
-     * currentTime - _timeInvade) AND the player's last access is not too old
-     * (to prevent players camping until reboot for easy entry). 4*_timeInvade
-     * should be plenty of time to allow for some server downtime. Ideally it
-     * should be (lastServerShutDownTime - _timeInvade) but we do not track the
-     * time for the last shutdown, so just (bootup -4*_timeInvade) will be a
-     * good compromise.
+     * currentTime - _timeInvade) AND the player was in the zone prior to reboot.
      */
     protected void onEnter(L2Character character)
     {
         if (character instanceof L2PcInstance)
         {
-            if (((L2PcInstance) character).isGM())
+            //Thread.dumpStack();
+            L2PcInstance player = (L2PcInstance) character;
+            if (player.isGM())
             {
-                ((L2PcInstance) character).sendMessage("進入了 " + _zoneName);
+                (player).sendMessage("進入了" + _zoneName);
+
+                return;
             }
-            else
+            // if player has been (previously) cleared by npc/ai for entry and the zone is 
+            // set to receive players (aka not waiting for boss to respawn)
+            if (_playersAllowed.contains(character.getObjectId()))
             {
                 // Get the information about this player's last logout-exit from
                 // this zone.
-                Long expirationTime = _playerAllowedEntryExpirationTimes.get(character.getObjectId());
+                Long expirationTime = _playerAllowedReEntryTimes.get(character.getObjectId());
                 
                 // with legal entries, do nothing.
                 if (expirationTime == null) // legal null expirationTime entries
                 {
                     long serverStartTime = GameServer.dateTimeServerStarted.getTimeInMillis();
-                    long playerLastAccess = ((L2PcInstance) character).getLastAccess();
-                    if ((serverStartTime > (System.currentTimeMillis() - _timeInvade))
-                            && (playerLastAccess < serverStartTime)
-                            && (playerLastAccess > (serverStartTime - 4 * _timeInvade)))
+                    //long playerLastAccess = player.getLastAccess();
+                    if ((serverStartTime > (System.currentTimeMillis() - _timeInvade)))
+                            //&& (playerLastAccess < serverStartTime)
+                            //&& (playerLastAccess > (serverStartTime - 4 * _timeInvade)))
                         return;
                 }
-                else
-                // legal non-null logoutTime entries
+                else 
                 {
-                    _playerAllowedEntryExpirationTimes.remove(character.getObjectId());
+                    // legal non-null logoutTime entries
+                    _playerAllowedReEntryTimes.remove(character.getObjectId());
                     if (expirationTime.longValue() > System.currentTimeMillis())
                         return;
                 }
-                // teleport out all players who attempt "illegal" (re-)entry
-                ((L2PcInstance) character).teleToLocation(MapRegionTable.TeleportWhereType.Town);
+                _playersAllowed.remove(_playersAllowed.indexOf(character.getObjectId()));
             }
             if (_zoneName.equalsIgnoreCase("AltarofSacrifice"))
-                VanHalterManager.getInstance().intruderDetection((L2PcInstance)character);
+                VanHalterManager.getInstance().intruderDetection(player);
             // teleport out all players who attempt "illegal" (re-)entry
-            ((L2PcInstance) character).teleToLocation(MapRegionTable.TeleportWhereType.Town);
 
+
+            // teleport out all players who attempt "illegal" (re-)entry
+            player.teleToLocation(MapRegionTable.TeleportWhereType.Town);
         }
     }
     
@@ -127,22 +135,22 @@ public class L2BossZone extends L2ZoneType
     {
         if (character instanceof L2PcInstance)
         {
-            if (((L2PcInstance) character).isGM())
+            //Thread.dumpStack();
+            L2PcInstance player = (L2PcInstance) character;
+            if (player.isGM())
             {
-                ((L2PcInstance) character).sendMessage("離開了 " + _zoneName);
+                player.sendMessage("離開了" + _zoneName);
+                return;
             }
-            else
+            // if the player just got disconnected/logged out, store the dc
+            // time so that
+            // decisions can be made later about allowing or not the player
+            // to log into the zone
+            if (player.isOnline() == 0 && _playersAllowed.contains(character.getObjectId()))
             {
-                // if the player just got disconnected/logged out, store the dc
-                // time so that
-                // decisions can be made later about allowing or not the player
-                // to log into the zone
-                if (((L2PcInstance) character).isOnline() == 0)
-                {
-                    // mark the time that the player left the zone
-                    _playerAllowedEntryExpirationTimes.put(character.getObjectId(), System.currentTimeMillis()
-                            + _timeInvade);
-                }
+                // mark the time that the player left the zone
+                _playerAllowedReEntryTimes.put(character.getObjectId(), System.currentTimeMillis()
+                        + _timeInvade);
             }
         }
     }
@@ -156,9 +164,33 @@ public class L2BossZone extends L2ZoneType
     {
         return _timeInvade;
     }
+
+    public void setAllowedPlayers(L2FastList<Integer> players)
+    {
+        if (players != null)
+            _playersAllowed = players;
+    }
+
+    public L2FastList<Integer> getAllowedPlayers()
+    {
+        return _playersAllowed;
+    }
+    
+    public boolean isPlayerAllowed(L2PcInstance player)
+    {
+        if (player.isGM())
+            return true;
+        else if (_playersAllowed.contains(player.getObjectId()))
+            return true;
+        else
+        {
+            player.teleToLocation(MapRegionTable.TeleportWhereType.Town);
+            return false;
+        }
+     }
     
     /**
-     * occasionally, all players need to be sent out of the zone (for example,
+     * Occasionally, all players need to be sent out of the zone (for example,
      * if the players are just running around without fighting for too long, or
      * if all players die, etc). This call sends all online players to town and
      * marks offline players to be teleported (by clearing their relog
@@ -167,9 +199,11 @@ public class L2BossZone extends L2ZoneType
      */
     public void oustAllPlayers()
     {
-        L2Character[] charList = (L2Character[]) _characterList.values().toArray();
-        for (L2Character character : charList)
+        if (_characterList == null) return;
+        if (_characterList.isEmpty()) return;
+        for (L2Character character : _characterList.values())
         {
+            if (character == null) continue;
             if (character instanceof L2PcInstance)
             {
                 L2PcInstance player = (L2PcInstance) character;
@@ -177,8 +211,8 @@ public class L2BossZone extends L2ZoneType
                     player.teleToLocation(MapRegionTable.TeleportWhereType.Town);
             }
         }
-        charList = null;
-        _playerAllowedEntryExpirationTimes.clear();
+        _playerAllowedReEntryTimes.clear();
+        _playersAllowed.clear();
     }
     
     /**
@@ -191,7 +225,12 @@ public class L2BossZone extends L2ZoneType
      */
     public void allowPlayerEntry(L2PcInstance player, int durationInSec)
     {
-        _playerAllowedEntryExpirationTimes.put(player.getObjectId(), System.currentTimeMillis() + durationInSec*1000);
+        if (!player.isGM())
+        {
+            _playersAllowed.add(player.getObjectId());
+            _playerAllowedReEntryTimes.put(player.getObjectId(), System.currentTimeMillis() + durationInSec*1000);
+
+        }
     }
     
     @Override

@@ -802,7 +802,7 @@ public final class SystemMessage extends L2GameServerPacket
 		_messageId = messageId.getId();
 	}
 
-	@Deprecated
+	//@Deprecated
 	public SystemMessage(int messageId)
 	{
 		_messageId = messageId;

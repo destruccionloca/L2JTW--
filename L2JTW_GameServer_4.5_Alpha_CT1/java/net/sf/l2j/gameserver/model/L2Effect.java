@@ -91,6 +91,7 @@ public abstract class L2Effect
         DISARM,
         TRANSFORMATION,
         IMMOBILEUNTILATTACKED,
+        CHARMOFCOURAGE
     }
 
 
@@ -356,7 +357,7 @@ public abstract class L2Effect
      *
      * <B><U> Actions</U> :</B><BR><BR>
      * <li>Cancel the effect in the the abnormal effect map of the L2Character </li>
-     * <li>Stop the task of the L2Effect, remove it and update client magic icone </li><BR><BR>
+     * <li>Stop the task of the L2Effect, remove it and update client magic icon </li><BR><BR>
      *
      */
     public final void exit()
@@ -372,11 +373,11 @@ public abstract class L2Effect
     }
 
     /**
-     * Stop the task of the L2Effect, remove it and update client magic icone.<BR><BR>
+     * Stop the task of the L2Effect, remove it and update client magic icon.<BR><BR>
      *
      * <B><U> Actions</U> :</B><BR><BR>
      * <li>Cancel the task </li>
-     * <li>Stop and remove L2Effect from L2Character and update client magic icone </li><BR><BR>
+     * <li>Stop and remove L2Effect from L2Character and update client magic icon </li><BR><BR>
      *
      */
     public synchronized void stopEffectTask()
@@ -412,7 +413,7 @@ public abstract class L2Effect
         if (_abnormalEffect != 0) getEffected().stopAbnormalEffect(_abnormalEffect);
     }
 
-    /** Return true for continueation of this effect */
+    /** Return true for continuation of this effect */
     public abstract boolean onActionTime();
 
     public final void rescheduleEffect()
@@ -488,7 +489,7 @@ public abstract class L2Effect
                 smsg3.addSkillName(_skill.getId());
                 getEffected().sendPacket(smsg3);
             }
-            // Stop the task of the L2Effect, remove it and update client magic icone
+            // Stop the task of the L2Effect, remove it and update client magic icon
             stopEffectTask();
 
         }
