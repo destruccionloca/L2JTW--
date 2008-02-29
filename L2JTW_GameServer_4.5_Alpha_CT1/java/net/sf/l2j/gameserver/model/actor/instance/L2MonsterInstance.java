@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 
+import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.ThreadPoolManager;
 
 import net.sf.l2j.gameserver.datatables.NpcTable;
@@ -25,10 +26,12 @@ import net.sf.l2j.gameserver.model.L2Attackable;
 import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.actor.knownlist.MonsterKnownList;
 import net.sf.l2j.gameserver.serverpackets.StopMove;
+import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
 import net.sf.l2j.gameserver.util.MinionList;
 import net.sf.l2j.util.Rnd;
 import net.sf.l2j.gameserver.model.L2Spawn;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 
 /**
  * This class manages all Monsters.
@@ -50,6 +53,7 @@ public class L2MonsterInstance extends L2Attackable
     protected ScheduledFuture<?> _minionMaintainTask = null;
 
     private static final int MONSTER_MAINTENANCE_INTERVAL = 1000;
+    protected static final int NurseAntRespawnDelay = Config.NURSEANT_RESPAWN_DELAY;
 
     // [L2J_JP ADD SANDMAN]
     private ScheduledFuture hideTask;
@@ -236,6 +240,11 @@ public class L2MonsterInstance extends L2Attackable
 
         if (this instanceof L2RaidBossInstance)
         	deleteSpawnedMinions();
+    	if(killer instanceof L2PlayableInstance && (this instanceof L2GrandBossInstance))
+        {
+        	SystemMessage msg = new SystemMessage(SystemMessageId.RAID_WAS_SUCCESSFUL);
+        	broadcastPacket(msg);
+        }
         return true;
     }
 

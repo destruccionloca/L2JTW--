@@ -35,7 +35,7 @@ import net.sf.l2j.gameserver.ThreadPoolManager;
 import net.sf.l2j.gameserver.model.L2Spawn;
 import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
-import net.sf.l2j.gameserver.model.actor.instance.L2BossInstance;
+import net.sf.l2j.gameserver.model.actor.instance.L2GrandBossInstance;
 import net.sf.l2j.gameserver.model.entity.GrandBossState;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
 import net.sf.l2j.gameserver.serverpackets.SocialAction;
@@ -240,7 +240,7 @@ public class ValakasManager
 		{
 			// player is must be alive and stay inside of lair.
 			if (!pc.isDead()
-					&& BossZoneManager.getInstance().checkIfInZone(_ZoneType, pc))
+					&& CustomZoneManager.getInstance().checkIfInZone(_ZoneType, pc))
 			{
 				return false;
 			}
@@ -254,13 +254,13 @@ public class ValakasManager
     	for(L2PcInstance pc : _PlayersInLair)
     	{
     		if(pc.getQuestState(_QuestName) != null) pc.getQuestState(_QuestName).exitQuest(true);
-    		if(BossZoneManager.getInstance().checkIfInZone(_ZoneType, pc));
-    		//{
-        		//int driftX = Rnd.get(-80,80);
-        		//int driftY = Rnd.get(-80,80);
-        		//int loc = Rnd.get(3);
-        		//pc.teleToLocation(_BanishmentLocation[loc][0] + driftX,_BanishmentLocation[loc][1] + driftY,_BanishmentLocation[loc][2]);
-    		//}
+    		if(CustomZoneManager.getInstance().checkIfInZone(_ZoneType, pc))
+    		{
+        		int driftX = Rnd.get(-80,80);
+        		int driftY = Rnd.get(-80,80);
+        		int loc = Rnd.get(3);
+        		pc.teleToLocation(_BanishmentLocation[loc][0] + driftX,_BanishmentLocation[loc][1] + driftY,_BanishmentLocation[loc][2]);
+    		}
     	}
     	_PlayersInLair.clear();
     }
@@ -322,9 +322,9 @@ public class ValakasManager
     {
     	int _distance = 6502500;
     	int _taskId;
-    	L2BossInstance _valakas = null;
+    	L2GrandBossInstance _valakas = null;
     	
-    	ValakasSpawn(int taskId,L2BossInstance valakas)
+    	ValakasSpawn(int taskId,L2GrandBossInstance valakas)
     	{
     		_taskId = taskId;
     		_valakas = valakas;
@@ -339,7 +339,7 @@ public class ValakasManager
 	    		case 1:
 	            	// do spawn.
 	            	L2Spawn valakasSpawn = _MonsterSpawn.get(29028);
-	            	_valakas = (L2BossInstance)valakasSpawn.doSpawn();
+	            	_valakas = (L2GrandBossInstance)valakasSpawn.doSpawn();
 	            	_Monsters.add(_valakas);
 	            	_valakas.setIsImmobilized(true);
 	            	_valakas.setIsInSocialAction(true);
@@ -780,8 +780,8 @@ public class ValakasManager
     // action is enabled the boss.
     private class SetMobilised implements Runnable
     {
-        private L2BossInstance _boss;
-        public SetMobilised(L2BossInstance boss)
+        private L2GrandBossInstance _boss;
+        public SetMobilised(L2GrandBossInstance boss)
         {
         	_boss = boss;
         }
@@ -853,7 +853,7 @@ public class ValakasManager
         		_MonsterSpawnTask.cancel(true);
         		_MonsterSpawnTask = null;
             }
-        	_MonsterSpawnTask = ThreadPoolManager.getInstance().scheduleGeneral(new ValakasSpawn(1,null),15000);
+        	_MonsterSpawnTask = ThreadPoolManager.getInstance().scheduleGeneral(	new ValakasSpawn(1,null),15000);
     	}
     }
 }

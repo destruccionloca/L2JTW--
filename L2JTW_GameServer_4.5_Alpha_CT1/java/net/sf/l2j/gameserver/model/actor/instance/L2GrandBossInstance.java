@@ -14,7 +14,14 @@
  */
 package net.sf.l2j.gameserver.model.actor.instance;
 
+import java.util.List;
+import java.util.concurrent.Future;
+
+import net.sf.l2j.gameserver.ThreadPoolManager;
+import net.sf.l2j.gameserver.ai.CtrlIntention;
+import net.sf.l2j.gameserver.datatables.SkillTable;
 import net.sf.l2j.gameserver.model.L2Character;
+import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
 
 /**
@@ -25,6 +32,11 @@ import net.sf.l2j.gameserver.templates.L2NpcTemplate;
 public final class L2GrandBossInstance extends L2MonsterInstance
 {
     private static final int BOSS_MAINTENANCE_INTERVAL = 10000;
+    protected boolean _isInSocialAction = false;
+ // L2J_JP addon start ======================================
+	//protected static Logger _log = Logger.getLogger(L2BossInstance.class.getName());
+	private boolean _teleportedToNest;
+    protected Future minionMaintainTask = null;
 
      /**
      * Constructor for L2GrandBossInstance. This represent all grandbosses.
@@ -43,6 +55,8 @@ public final class L2GrandBossInstance extends L2MonsterInstance
     @Override
 	public void onSpawn()
     {
+
+    	getKnownList().getKnownPlayers().clear();
     	super.onSpawn();
     }
 
@@ -53,12 +67,32 @@ public final class L2GrandBossInstance extends L2MonsterInstance
     @Override
 	public void reduceCurrentHp(double damage, L2Character attacker, boolean awake)
     {
+    	if (this.IsInSocialAction() || this.isInvul()) return;
+
         super.reduceCurrentHp(damage, attacker, awake);
+    }
+    public boolean getTeleported()
+    {
+        return _teleportedToNest;
+    }
+
+    public void setTeleported(boolean flag)
+    {
+        _teleportedToNest = flag;
     }
 
     @Override
 	public boolean isRaid()
     {
         return true;
+    }
+    public void setIsInSocialAction(boolean value)
+    {
+        _isInSocialAction = value;
+    }
+    
+    public boolean IsInSocialAction()
+    {
+        return _isInSocialAction;
     }
 }

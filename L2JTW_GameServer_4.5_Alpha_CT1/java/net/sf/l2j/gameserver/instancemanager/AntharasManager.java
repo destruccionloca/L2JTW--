@@ -37,7 +37,7 @@ import net.sf.l2j.gameserver.model.L2Spawn;
 import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
-import net.sf.l2j.gameserver.model.actor.instance.L2BossInstance;
+import net.sf.l2j.gameserver.model.actor.instance.L2GrandBossInstance;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
 import net.sf.l2j.gameserver.serverpackets.SocialAction;
 import net.sf.l2j.util.Rnd;
@@ -252,7 +252,7 @@ public class AntharasManager
 		{
 			// player is must be alive and stay inside of lair.
 			if (!pc.isDead()
-					&& BossZoneManager.getInstance().checkIfInZone(_ZoneType, pc))
+					&& CustomZoneManager.getInstance().checkIfInZone(_ZoneType, pc))
 			{
 				return false;
 			}
@@ -266,13 +266,13 @@ public class AntharasManager
     	for(L2PcInstance pc : _PlayersInLair)
     	{
     		if(pc.getQuestState(_QuestName) != null) pc.getQuestState(_QuestName).exitQuest(true);
-    		if(BossZoneManager.getInstance().checkIfInZone(_ZoneType, pc));
-    		//{
-        		//int driftX = Rnd.get(-80,80);
-        		//int driftY = Rnd.get(-80,80);
-        		//int loc = Rnd.get(4);
-        		//pc.teleToLocation(_BanishmentLocation[loc][0] + driftX,_BanishmentLocation[loc][1] + driftY,_BanishmentLocation[loc][2]);
-    		//}
+    		if(CustomZoneManager.getInstance().checkIfInZone(_ZoneType, pc))
+    		{
+        		int driftX = Rnd.get(-80,80);
+        		int driftY = Rnd.get(-80,80);
+        		int loc = Rnd.get(4);
+        		pc.teleToLocation(_BanishmentLocation[loc][0] + driftX,_BanishmentLocation[loc][1] + driftY,_BanishmentLocation[loc][2]);
+    		}
     	}
     	_PlayersInLair.clear();
     }
@@ -343,9 +343,9 @@ public class AntharasManager
 	{
     	int _distance = 6502500;
     	int _taskId = 0;
-		L2BossInstance _antharas = null;
+		L2GrandBossInstance _antharas = null;
 
-		AntharasSpawn(int taskId,L2BossInstance antharas)
+		AntharasSpawn(int taskId,L2GrandBossInstance antharas)
 		{
 			_taskId = taskId;
 			_antharas = antharas;
@@ -373,7 +373,7 @@ public class AntharasManager
 	
 					// do spawn.
 					antharasSpawn = _MonsterSpawn.get(npcId);
-					_antharas = (L2BossInstance) antharasSpawn.doSpawn();
+					_antharas = (L2GrandBossInstance) antharasSpawn.doSpawn();
 					_Monsters.add(_antharas);
 					_antharas.setIsImmobilized(true);
 					_antharas.setIsInSocialAction(true);
@@ -892,8 +892,8 @@ public class AntharasManager
     // action is enabled the boss.
     private class SetMobilised implements Runnable
     {
-        private L2BossInstance _boss;
-        public SetMobilised(L2BossInstance boss)
+        private L2GrandBossInstance _boss;
+        public SetMobilised(L2GrandBossInstance boss)
         {
         	_boss = boss;
         }

@@ -41,7 +41,7 @@ import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.model.L2Spawn;
 import net.sf.l2j.gameserver.model.L2World;
-import net.sf.l2j.gameserver.model.actor.instance.L2BossInstance;
+import net.sf.l2j.gameserver.model.actor.instance.L2GrandBossInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2MonsterInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
@@ -70,7 +70,7 @@ public class FrintezzaManager
 	// So there is no point to place them in an array
 	private static L2Spawn frintezzaSpawn, scarletSpawnWeak, scarletSpawnStrong, portraitSpawn1, portraitSpawn2, portraitSpawn3, portraitSpawn4, demonSpawn1, demonSpawn2, demonSpawn3, demonSpawn4;
 	
-	private static L2BossInstance frintezza, weakScarlet, strongScarlet, portrait1, portrait2, portrait3, portrait4;
+	private static L2GrandBossInstance frintezza, weakScarlet, strongScarlet, portrait1, portrait2, portrait3, portrait4;
 	
 	// The minions be used as L2MonsterInstance, instead of L2MinionInstance, since they
 	// have 3 Bosses: weak scarlet, strong scarlet, and frintezza. All 3 bosses control
@@ -428,7 +428,7 @@ public class FrintezzaManager
 			switch (_taskId)
 			{
 				case 1: // spawn.
-					frintezza = (L2BossInstance) frintezzaSpawn.doSpawn();
+					frintezza = (L2GrandBossInstance) frintezzaSpawn.doSpawn();
 					frintezza.setIsImmobilized(true);
 					frintezza.disableAllSkills();
 					frintezza.setIsInSocialAction(true);
@@ -500,20 +500,20 @@ public class FrintezzaManager
 					s = new ScarletWeakSpawn(7);
 					_task = ThreadPoolManager.getInstance().scheduleEffect(s, 5800);
 					
-					weakScarlet = (L2BossInstance) scarletSpawnWeak.doSpawn();
+					weakScarlet = (L2GrandBossInstance) scarletSpawnWeak.doSpawn();
 					weakScarlet.setIsImmobilized(true);
 					weakScarlet.setIsInSocialAction(true);
 					
-					portrait1 = (L2BossInstance) portraitSpawn1.doSpawn();
+					portrait1 = (L2GrandBossInstance) portraitSpawn1.doSpawn();
 					portrait1.setIsImmobilized(true);
 					
-					portrait2 = (L2BossInstance) portraitSpawn2.doSpawn();
+					portrait2 = (L2GrandBossInstance) portraitSpawn2.doSpawn();
 					portrait2.setIsImmobilized(true);
 					
-					portrait3 = (L2BossInstance) portraitSpawn3.doSpawn();
+					portrait3 = (L2GrandBossInstance) portraitSpawn3.doSpawn();
 					portrait3.setIsImmobilized(true);
 					
-					portrait4 = (L2BossInstance) portraitSpawn4.doSpawn();
+					portrait4 = (L2GrandBossInstance) portraitSpawn4.doSpawn();
 					portrait4.setIsImmobilized(true);
 					
 					demon1 = (L2MonsterInstance) demonSpawn1.doSpawn();
@@ -1357,14 +1357,14 @@ public class FrintezzaManager
 				{
 					
 					// if this is a demon, decay it until next respawn.
-					if (!(_mob instanceof L2BossInstance))
+					if (!(_mob instanceof L2GrandBossInstance))
 						_mob.decayMe();
 					
 					else
 						// if this is a boss, we need to do a few checks:
 						// portraits - unspawn demons, set both to null
 						// Scarlet, Frintezza - check if all bosses are dead.
-						bossDeadCheck((L2BossInstance) _mob);
+						bossDeadCheck((L2GrandBossInstance) _mob);
 					
 				}
 				
@@ -1433,7 +1433,7 @@ public class FrintezzaManager
 		
 	}
 	
-	public void bossDeadCheck(L2BossInstance mob)
+	public void bossDeadCheck(L2GrandBossInstance mob)
 	{
 		
 		if (mob == null)
@@ -1724,7 +1724,7 @@ public class FrintezzaManager
 		scarletSpawnStrong.stopRespawn();
 		
 		// spawn Strong Scarlet and set his HP to the weaker version:
-		strongScarlet = (L2BossInstance) scarletSpawnStrong.doSpawn();
+		strongScarlet = (L2GrandBossInstance) scarletSpawnStrong.doSpawn();
 		double newHp = weakScarlet.getStatus().getCurrentHp();
 		strongScarlet.getStatus().setCurrentHp(newHp);
 		
@@ -1838,7 +1838,7 @@ public class FrintezzaManager
 		
 		L2Spawn scarletSpawnTemp = createNewSpawn(29046, weakScarlet.getX(), weakScarlet.getY(), weakScarlet.getZ(), weakScarlet.getHeading(), Config.FWF_ACTIVITYTIMEOFBOSS);
 		
-		L2BossInstance tempScarlet = (L2BossInstance) scarletSpawnTemp.doSpawn();
+		L2GrandBossInstance tempScarlet = (L2GrandBossInstance) scarletSpawnTemp.doSpawn();
 		tempScarlet.getStatus().setCurrentHp(weakScarlet.getStatus().getCurrentHp());
 		tempScarlet.setTarget(weakScarlet.getTarget());
 		boolean[] targeted = getTargeted(weakScarlet);
@@ -2205,10 +2205,10 @@ public class FrintezzaManager
 	
 	private class SetMobilised implements Runnable
 	{
-		private L2BossInstance _boss;
+		private L2GrandBossInstance _boss;
 		private Future _task;
 		
-		public SetMobilised(L2BossInstance boss)
+		public SetMobilised(L2GrandBossInstance boss)
 		{
 			_boss = boss;
 		}

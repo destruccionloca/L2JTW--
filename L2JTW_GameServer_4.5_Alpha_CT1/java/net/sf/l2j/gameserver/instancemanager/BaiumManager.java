@@ -34,7 +34,7 @@ import net.sf.l2j.gameserver.datatables.SpawnTable;
 import net.sf.l2j.gameserver.ThreadPoolManager;
 import net.sf.l2j.gameserver.model.L2CharPosition;
 import net.sf.l2j.gameserver.model.L2Spawn;
-import net.sf.l2j.gameserver.model.actor.instance.L2BossInstance;
+import net.sf.l2j.gameserver.model.actor.instance.L2GrandBossInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.entity.GrandBossState;
@@ -122,7 +122,7 @@ public class BaiumManager
     protected String _ZoneType;
     protected String _QuestName;
     protected long _LastAttackTime = 0;
-    protected String _Words = ",≥∫¥±ß´√™ß⁄™∫∫ŒØv°I•h¶∫ßa°I";
+    protected String _Words = ",?ÇÃñ∞ÇËÇñWÇ∞ÇÈÇ∆ÇÕÅIÅA?Ç Ç™Ç¢Ç¢ÅI";
     //protected String _Words = ",Don't obstruct my sleep! Die!";
     
     // location of banishment
@@ -326,7 +326,7 @@ public class BaiumManager
         // delete statue.
 		_npcbaium.deleteMe();
 
-        L2BossInstance baium = (L2BossInstance)baiumSpawn.doSpawn();
+        L2GrandBossInstance baium = (L2GrandBossInstance)baiumSpawn.doSpawn();
         _Monsters.add(baium);
 
         _State.setRespawnDate(
@@ -409,7 +409,7 @@ public class BaiumManager
 		{
 			// player is must be alive and stay inside of lair.
 			if (!pc.isDead()
-					&& BossZoneManager.getInstance().checkIfInZone(_ZoneType, pc))
+					&& CustomZoneManager.getInstance().checkIfInZone(_ZoneType, pc))
 			{
 				return false;
 			}
@@ -423,13 +423,13 @@ public class BaiumManager
     	for(L2PcInstance pc : _PlayersInLair)
     	{
     		if(pc.getQuestState(_QuestName) != null) pc.getQuestState(_QuestName).exitQuest(true);
-    		if(BossZoneManager.getInstance().checkIfInZone(_ZoneType, pc));
-    		//{
-        		//int driftX = Rnd.get(-80,80);
-        		//int driftY = Rnd.get(-80,80);
-        		//int loc = Rnd.get(3);
-        		//pc.teleToLocation(_BanishmentLocation[loc][0] + driftX,_BanishmentLocation[loc][1] + driftY,_BanishmentLocation[loc][2]);
-    		//}
+    		if(CustomZoneManager.getInstance().checkIfInZone(_ZoneType, pc))
+    		{
+        		int driftX = Rnd.get(-80,80);
+        		int driftY = Rnd.get(-80,80);
+        		int loc = Rnd.get(3);
+        		pc.teleToLocation(_BanishmentLocation[loc][0] + driftX,_BanishmentLocation[loc][1] + driftY,_BanishmentLocation[loc][2]);
+    		}
     	}
     	_PlayersInLair.clear();
     }
@@ -673,8 +673,8 @@ public class BaiumManager
     // action is enabled the boss.
     private class SetMobilised implements Runnable
     {
-        private L2BossInstance _boss;
-        public SetMobilised(L2BossInstance boss)
+        private L2GrandBossInstance _boss;
+        public SetMobilised(L2GrandBossInstance boss)
         {
         	_boss = boss;
         }
@@ -742,8 +742,8 @@ public class BaiumManager
     private class KillPc implements Runnable
     {
     	L2PcInstance _target;
-    	L2BossInstance _boss;
-    	public KillPc(L2PcInstance target,L2BossInstance boss)
+    	L2GrandBossInstance _boss;
+    	public KillPc(L2PcInstance target,L2GrandBossInstance boss)
     	{
     		_target = target;
     		_boss = boss;
@@ -802,9 +802,9 @@ public class BaiumManager
     private class Speak implements Runnable
     {
     	L2PcInstance _target;
-    	L2BossInstance _boss;
+    	L2GrandBossInstance _boss;
 
-    	public Speak(L2PcInstance target,L2BossInstance boss)
+    	public Speak(L2PcInstance target,L2GrandBossInstance boss)
     	{
     		_target = target;
     		_boss = boss;
