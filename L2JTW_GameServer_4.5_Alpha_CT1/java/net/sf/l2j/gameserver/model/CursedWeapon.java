@@ -247,7 +247,7 @@ public class CursedWeapon
 
 		if (fromMonster)
 		{
-			_item = attackable.DropItem(player, _itemId, 1);
+			_item = attackable.dropItem(player, _itemId, 1);
 			_item.setDropTime(0); // Prevent item from being removed by ItemsAutoDestroy
 
 			// RedSky and Earthquake
@@ -425,10 +425,11 @@ public class CursedWeapon
 		// the zariche if unmounting is successful.
 		if (player.isMounted())
 		{
-			if (!_player.dismount())
+			if (!player.dismount())
 			{
 				// TODO: correct this custom message.
 				player.sendMessage("You may not pick up this item while riding in this territory");
+				player.dropItem("InvDrop", item, null, true);
 				return;
 			}
 		}

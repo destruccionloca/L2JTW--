@@ -73,11 +73,11 @@ public class Pdam implements ISkillHandler
             Formulas f = Formulas.getInstance();
             L2ItemInstance weapon = activeChar.getActiveWeaponInstance();
             if (activeChar instanceof L2PcInstance && target instanceof L2PcInstance
-                && target.isAlikeDead() && target.isFakeDeath())
+                && target.isFakeDeath())
             {
                 target.stopFakeDeath(null);
             }
-            else if (target.isAlikeDead()) continue;
+            else if (target.isDead()) continue;
 
             boolean dual = activeChar.isUsingDualWeapon();
             boolean shld = f.calcShldUse(activeChar, target);
@@ -312,10 +312,7 @@ public class Pdam implements ISkillHandler
         }
 
         if (skill.isSuicideAttack())
-        {
         	activeChar.doDie(null);
-        	activeChar.setCurrentHp(0);
-        }
     }
 
     public SkillType[] getSkillIds()

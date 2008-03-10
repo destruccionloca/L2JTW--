@@ -28,6 +28,7 @@ import net.sf.l2j.gameserver.model.L2Summon;
 import net.sf.l2j.gameserver.model.L2Skill.SkillType;
 import net.sf.l2j.gameserver.model.actor.instance.L2ClanHallManagerInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2DoorInstance;
+import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PlayableInstance;
 import net.sf.l2j.gameserver.network.SystemMessageId;
@@ -163,26 +164,32 @@ public class Continuous implements ISkillHandler
 			                activeSummon.setChargedSoulShot(L2ItemInstance.CHARGED_NONE);
 			            }
 		        }
+		        else if (activeChar instanceof L2NpcInstance)
+		        {
+		        	bss = ((L2NpcInstance)activeChar).isUsingShot(false);
+		        	ss = ((L2NpcInstance)activeChar).isUsingShot(true);
+		        }
 
 				acted = Formulas.getInstance().calcSkillSuccess(activeChar, target, skill, ss, sps, bss);
 			}
 
 			if (acted)
 			{
-				boolean stopped = false;
-				L2Effect[] effects = target.getAllEffects();
-				if (effects != null)
+		
+				if (skill.isToggle())
 				{
-					for (L2Effect e : effects) {
-	                    if (e != null && skill != null)
-	                        if (e.getSkill().getId() == skill.getId()) {
-							e.exit();
-							stopped = true;
+					L2Effect[] effects = target.getAllEffects();
+					if (effects != null)
+					{
+						for (L2Effect e : effects) {
+		                    if (e != null && skill != null)
+		                        if (e.getSkill().getId() == skill.getId()) {
+								e.exit();
+								return;
+							}
 						}
 					}
 				}
-				if (skill.isToggle() && stopped)
-					return;
 
 				// if this is a debuff let the duel manager know about it
 				// so the debuff can be removed after the duel

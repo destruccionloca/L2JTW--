@@ -45,7 +45,7 @@ public class StrSiegeAssault implements ISkillHandler
 
         L2PcInstance player = (L2PcInstance)activeChar;
 
-        if (!activeChar.isRiding()) return;
+        if (!activeChar.isRidingStrider()) return;
         if (!(player.getTarget() instanceof L2DoorInstance)) return;
 
         Castle castle = CastleManager.getInstance().getCastle(player);
@@ -64,12 +64,12 @@ public class StrSiegeAssault implements ISkillHandler
             {
                 L2Character target = (L2Character)targets[index];
                 L2ItemInstance weapon = activeChar.getActiveWeaponInstance();
-                if (activeChar instanceof L2PcInstance && target instanceof L2PcInstance &&
-                		target.isAlikeDead() && target.isFakeDeath())
+                if (activeChar instanceof L2PcInstance && target instanceof L2PcInstance 
+                		&& target.isFakeDeath())
                 {
                 	target.stopFakeDeath(null);
                 }
-                else if (target.isAlikeDead())
+                else if (target.isDead())
                     continue;
 
                 boolean dual  = activeChar.isUsingDualWeapon();
@@ -132,7 +132,7 @@ public class StrSiegeAssault implements ISkillHandler
             sm.addString("You can only use strider siege assault during a siege.");
         else if (!(player.getTarget() instanceof L2DoorInstance))
             sm.addString("You can only use strider siege assault on doors and walls.");
-        else if (!activeChar.isRiding())
+        else if (!activeChar.isRidingStrider())
             sm.addString("You can only use strider siege assault when on strider.");
         else
             return true;

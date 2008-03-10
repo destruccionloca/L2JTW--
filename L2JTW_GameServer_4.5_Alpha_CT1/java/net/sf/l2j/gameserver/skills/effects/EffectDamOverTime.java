@@ -13,12 +13,13 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package net.sf.l2j.gameserver.skills.effects;
-import net.sf.l2j.gameserver.skills.Env;
+
 import net.sf.l2j.gameserver.model.L2Attackable;
 import net.sf.l2j.gameserver.model.L2Effect;
 import net.sf.l2j.gameserver.model.L2Skill.SkillTargetType;
 import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
+import net.sf.l2j.gameserver.skills.Env;
 
 class EffectDamOverTime extends L2Effect
 {
@@ -32,7 +33,6 @@ class EffectDamOverTime extends L2Effect
 	{
 		return EffectType.DMG_OVER_TIME;
 	}
-
 
 	@Override
 	public boolean onActionTime()
@@ -60,21 +60,7 @@ class EffectDamOverTime extends L2Effect
         							&& getSkill().isToggle());
 
 
-/*
-        if((getSkill().getSkillType() == SkillType.POISON || getSkill().getSkillType() == SkillType.BLEED || getSkill().getSkillType() == SkillType.DOT)&& getEffected().getCurrentHp() > damage)
-        {
-            getEffected().reduceCurrentHp(damage, getEffector(),awake,true);
-        }
-        else
-        {
-            getEffected().reduceCurrentHp(damage, getEffector());
-        }
-*/
-
-        
-
-        getEffected().reduceCurrentHp(damage, getEffector(),awake,true);
-
+        getEffected().reduceCurrentHp(damage, getEffector(),awake);
 
 		return true;
 	}

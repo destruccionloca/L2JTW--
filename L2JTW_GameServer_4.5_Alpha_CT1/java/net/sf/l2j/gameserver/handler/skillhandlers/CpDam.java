@@ -21,6 +21,7 @@ import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.model.L2Summon;
 import net.sf.l2j.gameserver.model.L2Skill.SkillType;
+import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.skills.Formulas;
 
@@ -85,17 +86,22 @@ public class CpDam implements ISkillHandler
                 activeSummon.setChargedSpiritShot(L2ItemInstance.CHARGED_NONE);
             }
         }
+        else if (activeChar instanceof L2NpcInstance)
+        {
+        	bss = ((L2NpcInstance)activeChar).isUsingShot(false);
+        	ss = ((L2NpcInstance)activeChar).isUsingShot(true);
+        }
 
         for (int index = 0; index < targets.length; index++)
         {
             L2Character target = (L2Character) targets[index];
 
             if (activeChar instanceof L2PcInstance && target instanceof L2PcInstance
-                && target.isAlikeDead() && target.isFakeDeath())
+                && target.isFakeDeath())
             {
                 target.stopFakeDeath(null);
             }
-            else if (target.isAlikeDead())
+            else if (target.isDead())
             {
                 continue;
             }

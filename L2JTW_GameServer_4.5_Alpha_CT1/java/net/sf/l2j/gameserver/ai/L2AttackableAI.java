@@ -1622,7 +1622,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
                      {
                          if(((L2Attackable) _actor).getNpcId() == ((L2Attackable) obj).getNpcId()
                               ||(((L2Attackable) _actor).getFactionId() == ((L2Attackable) obj).getFactionId())   )
-                         if ((((L2MinionInstance) _actor).getCurrentHp() > (((L2Attackable) obj).getCurrentHp())) &&(((L2Attackable) obj).getCurrentHp()<(((L2Attackable) obj).getMaxHp())))
+                         if ((((L2Attackable) _actor).getCurrentHp() > (((L2Attackable) obj).getCurrentHp())) &&(((L2Attackable) obj).getCurrentHp()<(((L2Attackable) obj).getMaxHp())))
                          {
                              clientStopMoving(null);
                              _actor.setTarget(obj);

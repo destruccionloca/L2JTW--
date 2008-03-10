@@ -507,12 +507,6 @@ public class CharStat
 	{
     	if (_activeChar == null)
     		return 1;
-
-
-		  
-	      
-	
-
     	float bonusAtk = 1;
         if  (Config.L2JMOD_CHAMPION_ENABLE && _activeChar.isChampion())
     		bonusAtk = Config.L2JMOD_CHAMPION_SPD_ATK;
@@ -584,9 +578,14 @@ public class CharStat
 			val += Config.WYVERN_SPEED;
 			return val;
 		}
-		if (_activeChar.isRiding())
+		if (_activeChar.isRidingStrider())
 		{
 			val += Config.STRIDER_SPEED;
+			return val;
+		}
+		if (_activeChar.isRidingGreatWolf())
+		{
+			val += Config.GREAT_WOLF_SPEED;
 			return val;
 		}
 		// TODO: check if sharks/fish should be affected ;)

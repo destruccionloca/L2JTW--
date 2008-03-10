@@ -62,6 +62,27 @@ L2Character activeChar, L2Skill skill, L2Object[] targets)
 			weaponInst.setChargedSpiritshot(L2ItemInstance.CHARGED_NONE);
 		}
 	}
+	// If there is no weapon equipped, check for an active summon.
+	else if (activeChar instanceof L2Summon)
+	{
+		L2Summon activeSummon = (L2Summon) activeChar;
+			
+		if (activeSummon.getChargedSpiritShot() == L2ItemInstance.CHARGED_BLESSED_SPIRITSHOT)
+		{
+			bss = true;
+			activeSummon.setChargedSpiritShot(L2ItemInstance.CHARGED_NONE);
+		}
+		else if (activeSummon.getChargedSpiritShot() == L2ItemInstance.CHARGED_SPIRITSHOT)
+		{
+			ss = true;
+			activeSummon.setChargedSpiritShot(L2ItemInstance.CHARGED_NONE);
+		}
+	}
+	else if (activeChar instanceof L2NpcInstance)
+	{
+		bss = ((L2NpcInstance)activeChar).isUsingShot(false);
+		ss = ((L2NpcInstance)activeChar).isUsingShot(true);
+	}
 	for (int index = 0; index < targets.length; index++)
 	{
 		target = (L2Character) targets[index];
@@ -93,17 +114,24 @@ L2Character activeChar, L2Skill skill, L2Object[] targets)
 
 			StatusUpdate sump = new StatusUpdate(target.getObjectId());
 			sump.addAttribute(StatusUpdate.CUR_MP, (int) target.getCurrentMp());
-			// [L2J_JP EDIT START - TSL]
 			target.sendPacket(sump);
 			SystemMessage sm = new SystemMessage(SystemMessageId.S2_MP_HAS_BEEN_DRAINED_BY_S1);
 			if (activeChar instanceof L2NpcInstance)
 			{
-				int mobId = ((L2NpcInstance) activeChar).getNpcId();
-				sm.addNpcName(mobId);
+					if (((L2NpcInstance)target).getTemplate().serverSideName)
+						{
+							sm.addString(target.getName());
+						}
+						else
+							sm.addNpcName(((L2NpcInstance)target).getTemplate().idTemplate);
 			} else if (activeChar instanceof L2Summon)
 			{
-				int mobId = ((L2Summon) activeChar).getNpcId();
-				sm.addNpcName(mobId);
+					if (((L2Summon)target).getTemplate().serverSideName)
+						{
+							sm.addString(target.getName());
+						}
+					else
+							sm.addNpcName(((L2Summon)target).getTemplate().idTemplate);
 			} else
 			{
 				sm.addString(activeChar.getName());
@@ -116,7 +144,6 @@ L2Character activeChar, L2Skill skill, L2Object[] targets)
 				sm2.addNumber((int) mp);
 				activeChar.sendPacket(sm2);
 			}
-			// [L2J_JP EDIT END - TSL]
 		}
 	}
 }

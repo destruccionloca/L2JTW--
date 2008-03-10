@@ -97,17 +97,22 @@ public class Mdam implements ISkillHandler
                 activeSummon.setChargedSpiritShot(L2ItemInstance.CHARGED_NONE);
             }
         }
+        else if (activeChar instanceof L2NpcInstance)
+        {
+        	bss = ((L2NpcInstance)activeChar).isUsingShot(false);
+        	ss = ((L2NpcInstance)activeChar).isUsingShot(true);
+        }
 
         for (int index = 0; index < targets.length; index++)
         {
             L2Character target = (L2Character) targets[index];
 
             if (activeChar instanceof L2PcInstance && target instanceof L2PcInstance
-                && target.isAlikeDead() && target.isFakeDeath())
+                && target.isFakeDeath())
             {
                 target.stopFakeDeath(null);
             }
-            else if (target.isAlikeDead())
+            else if (target.isDead())
             {
                 continue;
             }
@@ -242,10 +247,8 @@ public class Mdam implements ISkillHandler
         skill.getEffectsSelf(activeChar);
 
         if (skill.isSuicideAttack())
-        {
         	activeChar.doDie(null);
-        	activeChar.setCurrentHp(0);
-        }
+
     }
 
     public SkillType[] getSkillIds()

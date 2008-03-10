@@ -160,12 +160,13 @@ public abstract class L2Character extends L2Object
 	private boolean _isFlying                               = false; //Is flying Wyvern?
 	private boolean _isMuted                                = false; // Cannot use magic
 	private boolean _isPsychicalMuted                       = false; // Cannot use psychical skills
-	private boolean _isKilledAlready                        = false;
+	private boolean _isDead			                        = false;
 	private boolean _isImmobilized                          = false;
 	private boolean _isOverloaded                           = false; // the char is carrying too much
 	private boolean _isParalyzed                            = false;
     private boolean _isDisarmed                             = false;
-	private boolean _isRiding                               = false; //Is Riding strider?
+	private boolean _isRidingGreatWolf						= false;
+	private boolean _isRidingStrider						= false;
 	private boolean _isPendingRevive                        = false;
 	private boolean _isRooted                               = false; // Cannot move until root timed out
 	private boolean _isRunning                              = false;
@@ -895,7 +896,9 @@ public abstract class L2Character extends L2Object
         // Verify if soulshots are charged.
         boolean wasSSCharged;
 
-        if (this instanceof L2Summon && !(this instanceof L2PetInstance))
+        if (this instanceof L2NpcInstance)
+        	wasSSCharged = ((L2NpcInstance)this).rechargeAutoSoulShot(true, false);
+        else if (this instanceof L2Summon && !(this instanceof L2PetInstance))
             wasSSCharged = (((L2Summon)this).getChargedSoulShot() != L2ItemInstance.CHARGED_NONE);
         else
             wasSSCharged = (weaponInst != null && weaponInst.getChargedSoulshot() != L2ItemInstance.CHARGED_NONE);
@@ -918,7 +921,12 @@ public abstract class L2Character extends L2Object
         int ssGrade = 0;
 
         if (weaponItem != null && !(this instanceof L2Attackable))
-            ssGrade = weaponItem.getCrystalType();
+        {
+        	ssGrade = weaponItem.getCrystalType();
+        	if (ssGrade == 6)
+        		ssGrade = 5;
+        }
+            
 
         // Create a Server->Client packet Attack
 		Attack attack = new Attack(this, wasSSCharged, ssGrade);
@@ -1533,14 +1541,16 @@ public abstract class L2Character extends L2Object
         //Recharge AutoSoulShot
         if (skill.useSoulShot())
         {
-            if (this instanceof L2PcInstance)
+        	if (this instanceof L2NpcInstance)
+        		((L2NpcInstance)this).rechargeAutoSoulShot(true, false);
+        	else if (this instanceof L2PcInstance)
                 ((L2PcInstance)this).rechargeAutoSoulShot(true, false, false);
             else if (this instanceof L2Summon)
                 ((L2Summon)this).getOwner().rechargeAutoSoulShot(true, false, true);
         }
         else if (skill.useSpiritShot())
         {
-            if (this instanceof L2PcInstance)
+        	if (this instanceof L2PcInstance)
                 ((L2PcInstance)this).rechargeAutoSoulShot(false, true, false);
             else if (this instanceof L2Summon)
                 ((L2Summon)this).getOwner().rechargeAutoSoulShot(false, true, true);
@@ -1700,6 +1710,14 @@ public abstract class L2Character extends L2Object
 				}
 			}
 		}
+		else if (this instanceof L2NpcInstance && skill.useSpiritShot() && !forceBuff)
+        {
+    		if(((L2NpcInstance)this).rechargeAutoSoulShot(false, true))
+    		{
+    			hitTime = (int)(0.70 * hitTime);
+    			coolTime = (int)(0.70 * coolTime);
+    		}
+        }
 
 		if(this instanceof L2Attackable)
 		{
@@ -1871,8 +1889,11 @@ public abstract class L2Character extends L2Object
 		// killing is only possible one time
         synchronized (this)
         {
-            if (isKilledAlready()) return false;
-            setIsKilledAlready(true);
+            if (isDead()) return false;
+            // now reset currentHp to zero
+            setCurrentHp(0);
+            if (isFakeDeath()) stopFakeDeath(null);
+            setIsDead(true);
         }
 		// Set target to null and cancel Attack or Cast
 		setTarget(null);
@@ -1944,10 +1965,11 @@ public abstract class L2Character extends L2Object
 	/** Sets HP, MP and CP and revives the L2Character. */
 	public void doRevive()
 	{
+		if (!isDead()) return;
 		if (!isTeleporting())
 		{
 			setIsPendingRevive(false);
-			
+			setIsDead(false);
 			if (this instanceof L2PlayableInstance && ((L2PlayableInstance)this).isPhoenixBlessed())
 			{
 			    ((L2PlayableInstance)this).stopPhoenixBlessing(null);
@@ -2070,9 +2092,6 @@ public abstract class L2Character extends L2Object
 	public final boolean isAfraid() { return _isAfraid; }
 	public final void setIsAfraid(boolean value) { _isAfraid = value; }
 
-	/** Return True if the L2Character is dead or use fake death.  */
-	public final boolean isAlikeDead() { return isFakeDeath() || !(getCurrentHp() > 0.5); }
-
 	/** Return True if the L2Character can't use its skills (ex : stun, sleep...). */
 	public final boolean isAllSkillsDisabled() { return _allSkillsDisabled || isImmobileUntilAttacked() || isStunned() || isSleeping() || isParalyzed()|| _castEndTime > GameTimeController.getGameTicks(); }
 
@@ -2085,9 +2104,13 @@ public abstract class L2Character extends L2Object
 	public final boolean isConfused() { return _isConfused; }
 	public final void setIsConfused(boolean value) { _isConfused = value; }
 
-	/** Return True if the L2Character is dead. */
-	public final boolean isDead() { return !(isFakeDeath()) && !(getCurrentHp() > 0.5); }
+	/** Return True if the L2Character is dead or use fake death.  */
+	public final boolean isAlikeDead() { return isFakeDeath() || _isDead; }
 
+	/** Return True if the L2Character is dead. */
+	public final boolean isDead() { return _isDead; }
+	public final void setIsDead(boolean value) { _isDead = value; }
+	
 	public final boolean isFakeDeath() { return _isFakeDeath; }
 	public final void setIsFakeDeath(boolean value) { _isFakeDeath = value; }
 
@@ -2099,18 +2122,20 @@ public abstract class L2Character extends L2Object
 	public boolean isImmobilized() { return _isImmobilized; }
 	public void setIsImmobilized(boolean value){ _isImmobilized = value; }
 
-	public final boolean isKilledAlready() { return _isKilledAlready; }
-	public final void setIsKilledAlready(boolean value) { _isKilledAlready = value; }
-
 	public final boolean isMuted() { return _isMuted; }
 	public final void setIsMuted(boolean value) { _isMuted = value; }
 
 	public final boolean isPsychicalMuted() { return _isPsychicalMuted; }
     public final void setIsPsychicalMuted(boolean value) { _isPsychicalMuted = value; }
 
-    /** Return True if the L2Character can't move (stun, root, sleep, overload, paralyzed). */
-	public boolean isMovementDisabled() { return isStunned() || isRooted() || isSleeping() || isOverloaded() || isParalyzed() || isImmobilized() || isFakeDeath() || _attackEndTime > GameTimeController.getGameTicks() || _castEndTime > GameTimeController.getGameTicks();  }
-	
+
+	/** Return True if the L2Character can't move (stun, root, sleep, overload, paralyzed). */
+	public boolean isMovementDisabled() 
+	{ 
+		// check for isTeleporting to prevent teleport cheating (if appear packet not received)
+		return isStunned() || isRooted() || isSleeping() || isOverloaded() || isParalyzed() 
+			|| isImmobilized() || isFakeDeath() || isTeleporting()  || _attackEndTime > GameTimeController.getGameTicks() || _castEndTime > GameTimeController.getGameTicks(); 
+	}
 
 	/** Return True if the L2Character can be controlled by the player (confused, afraid). */
 	public final boolean isOutOfControl() { return isConfused() || isAfraid(); }
@@ -2135,10 +2160,18 @@ public abstract class L2Character extends L2Object
 	 */
 	public L2Summon getPet() { return null; }
 
-	/** Return True if the L2Character is ridding. */
-	public final boolean isRiding() { return _isRiding; }
+	/** Return True if the L2Character is riding. */
+	public final boolean isRidingGreatWolf()
+	{ 
+		return _isRidingGreatWolf;
+	}
+	public final boolean isRidingStrider()
+	{ 
+		return _isRidingStrider;
+	}
 	/** Set the L2Character riding mode to True. */
-	public final void setIsRiding(boolean mode) { _isRiding = mode; }
+	public final void setIsRidingGreatWolf(boolean mode) { _isRidingGreatWolf = mode; }
+	public final void setIsRidingStrider(boolean mode) { _isRidingStrider = mode; }
 
 	public final boolean isRooted() { return _isRooted; }
 	public final void setIsRooted(boolean value) { _isRooted = value; }
@@ -2535,15 +2568,24 @@ public abstract class L2Character extends L2Object
 		{
 			L2Effect tempEffect = null;
 
-			// Make sure there's no same effect previously
+			// Check for same effects
 			for (int i=0; i<_effects.size(); i++)
 			{
 				if (_effects.get(i).getSkill().getId() == newEffect.getSkill().getId()
-						&& _effects.get(i).getEffectType() == newEffect.getEffectType())
+						&& _effects.get(i).getEffectType() == newEffect.getEffectType()
+						&& _effects.get(i).getStackOrder() == newEffect.getStackOrder())
 				{
-					// Started scheduled timer needs to be canceled. There could be a nicer fix...
-					newEffect.stopEffectTask();
-					return;
+					if (newEffect.getSkill().getSkillType() == L2Skill.SkillType.BUFF)
+					{
+						// renew buffs, exit old
+						_effects.get(i).exit();
+					}
+					else
+					{
+						// Started scheduled timer needs to be canceled.
+						newEffect.stopEffectTask();
+						return;
+					}
 				}
 			}
 
@@ -5937,6 +5979,15 @@ public abstract class L2Character extends L2Object
 		// Remove all its Func objects from the L2Character calculator set
 		if (oldSkill != null)
 		{
+			// Stop casting if this skill is used right now
+			if (this instanceof L2PcInstance)
+			{
+				if (((L2PcInstance)this).getCurrentSkill() != null && isCastingNow())
+				{
+					if (oldSkill.getId() == ((L2PcInstance)this).getCurrentSkill().getSkillId())
+						abortCast();
+				}
+			}
 			removeStatsOwner(oldSkill);
 			stopSkillEffects(oldSkill.getId());
 		}
@@ -6898,7 +6949,7 @@ public abstract class L2Character extends L2Object
 		else
 			getStatus().reduceHp(i, attacker, awake);
 	}
-    public void reduceCurrentHp(double i, L2Character attacker, boolean awake, boolean isDOT) { getStatus().reduceHp(i, attacker, awake, isDOT); }
+    //public void reduceCurrentHp(double i, L2Character attacker, boolean awake, boolean isDOT) { getStatus().reduceHp(i, attacker, awake, isDOT); }
 	public void reduceCurrentMp(double i) { getStatus().reduceMp(i); }
 	public void removeStatusListener(L2Character object) { getStatus().removeStatusListener(object); }
 	protected void stopHpMpRegeneration() { getStatus().stopHpMpRegeneration(); }

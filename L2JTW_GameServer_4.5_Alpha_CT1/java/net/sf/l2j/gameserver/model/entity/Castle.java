@@ -41,11 +41,12 @@ import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.actor.instance.L2DoorInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.zone.type.L2CastleZone;
+import net.sf.l2j.gameserver.serverpackets.PlaySound;
 import net.sf.l2j.gameserver.serverpackets.PledgeShowInfoUpdate;
 
 public class Castle
 {
-    protected static Logger _log = Logger.getLogger(Castle.class.getName());
+    protected static final Logger _log = Logger.getLogger(Castle.class.getName());
 
  // =========================================================
     // Data Field
@@ -276,7 +277,7 @@ public class Castle
 					}
 				}
 				oldOwner.setHasCastle(0);												// Unset has castle flag for old owner
-        		new Announcements().announceToAll(oldOwner.getName() + " 血盟失去了 " + getName() + " 城堡！");
+        		Announcements.getInstance().announceToAll(oldOwner.getName() + " 血盟失去了 " + getName() + " 城堡！");
 			}
 	    }
 
@@ -298,7 +299,8 @@ public class Castle
 				CastleManager.getInstance().removeCirclet(_formerOwner,getCastleId());
 			}
 			clan.setHasCastle(0);
-			new Announcements().announceToAll(clan.getName() + " 血盟失去了 " +getName() + " 城堡！");
+
+			Announcements.getInstance().announceToAll(clan.getName() + " 血盟失去了 " +getName() + " 城堡！");
 			clan.broadcastToOnlineMembers(new PledgeShowInfoUpdate(clan));
 		}
 
@@ -614,9 +616,9 @@ public class Castle
             if (clan != null)
             {
     		    clan.setHasCastle(getCastleId()); // Set has castle flag for new owner
-    		    new Announcements().announceToAll(clan.getName() + " has taken " + getName() + " castle!");
+    		    Announcements.getInstance().announceToAll(clan.getName() + " has taken " + getName() + " castle!");
     		    clan.broadcastToOnlineMembers(new PledgeShowInfoUpdate(clan));
-
+   		    clan.broadcastToOnlineMembers(new PlaySound(1, "Siege_Victory", 0, 0, 0, 0, 0));
     		    ThreadPoolManager.getInstance().scheduleGeneral(new CastleUpdater(clan, 1), 3600000);	// Schedule owner tasks to start running
             }
         }

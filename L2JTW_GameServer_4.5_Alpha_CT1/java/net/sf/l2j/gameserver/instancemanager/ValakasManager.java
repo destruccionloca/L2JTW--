@@ -44,7 +44,7 @@ import net.sf.l2j.gameserver.ai.CtrlIntention;
 import net.sf.l2j.gameserver.model.L2CharPosition;
 
 /**
- * 
+ *
  * This class ...
  * control for sequence of fight against Valakas.
  * @version $Revision: $ $Date: $
@@ -86,32 +86,31 @@ public class ValakasManager
 
     // instance of monsters.
     protected List<L2NpcInstance> _Monsters = new FastList<L2NpcInstance>();
-    
+
     // tasks.
-    protected ScheduledFuture _CubeSpawnTask = null;
-    protected ScheduledFuture _MonsterSpawnTask = null;
-    protected ScheduledFuture _IntervalEndTask = null;
-    protected ScheduledFuture _ActivityTimeEndTask = null;
-    protected ScheduledFuture _OnPlayersAnnihilatedTask = null;
-    protected ScheduledFuture _SocialTask = null;
-    protected ScheduledFuture _MobiliseTask = null;
-    protected ScheduledFuture _MoveAtRandomTask = null;
-    protected ScheduledFuture _RespawnValakasTask = null;
-    
-    
+    protected ScheduledFuture<?> _CubeSpawnTask = null;
+    protected ScheduledFuture<?> _MonsterSpawnTask = null;
+    protected ScheduledFuture<?> _IntervalEndTask = null;
+    protected ScheduledFuture<?> _ActivityTimeEndTask = null;
+    protected ScheduledFuture<?> _OnPlayersAnnihilatedTask = null;
+    protected ScheduledFuture<?> _SocialTask = null;
+    protected ScheduledFuture<?> _MobiliseTask = null;
+    protected ScheduledFuture<?> _MoveAtRandomTask = null;
+    protected ScheduledFuture<?> _RespawnValakasTask = null;
+
     // status in lair.
     protected GrandBossState _State = new GrandBossState(29028);
     protected String _ZoneType;
     protected String _QuestName;
-    
+
     // location of banishment
-    private final int _BanishmentLocation[][] = 
+    private final int _BanishmentLocation[][] =
     	{
     		{150604, -56283, -2980},
     		{144857, -56386, -2980},
     		{147696, -56845, -2780}
     	};
-    
+
     public ValakasManager()
     {
     }
@@ -126,7 +125,7 @@ public class ValakasManager
     // initialize
     public void init()
     {
-    	
+
     	// initialize status in lair.
     	_PlayersInLair.clear();
         _ZoneType = "LairofValakas";
@@ -137,7 +136,7 @@ public class ValakasManager
         {
             L2NpcTemplate template1;
             L2Spawn tempSpawn;
-            
+
             // Valakas.
             template1 = NpcTable.getInstance().getTemplate(29028);
             tempSpawn = new L2Spawn(template1);
@@ -192,13 +191,13 @@ public class ValakasManager
         {
             _log.warning(e.getMessage());
         }
-        
+
         _log.info("ValakasManager : State of Valakas is " + _State.getState() + ".");
         if (_State.getState().equals(GrandBossState.StateEnum.ALIVE))
         	restartValakas();
         else if (!_State.getState().equals(GrandBossState.StateEnum.NOTSPAWN))
         	setInetrvalEndTask();
-        
+
 		Date dt = new Date(_State.getRespawnDate());
         _log.info("ValakasManager : Next spawn date of Valakas is " + dt + ".");
         _log.info("ValakasManager : Init ValakasManager.");
@@ -215,12 +214,12 @@ public class ValakasManager
 	{
 		return _PlayersInLair;
 	}
-    
-    // Whether it lairs is confirmed. 
+
+    // Whether it lairs is confirmed.
     public boolean isEnableEnterToLair()
     {
     	if(_PlayersInLair.size() >= Config.FWV_CAPACITYOFLAIR) return false;
-    	
+
     	if(_State.getState().equals(GrandBossState.StateEnum.NOTSPAWN))
     		return true;
     	else
@@ -232,8 +231,8 @@ public class ValakasManager
     {
         if (!_PlayersInLair.contains(pc)) _PlayersInLair.add(pc);
     }
-    
-    // Whether the players was annihilated is confirmed. 
+
+    // Whether the players was annihilated is confirmed.
     public synchronized boolean isPlayersAnnihilated()
     {
     	for (L2PcInstance pc : _PlayersInLair)
@@ -264,7 +263,7 @@ public class ValakasManager
     	}
     	_PlayersInLair.clear();
     }
-    
+
     // do spawn teleport cube.
     public void spawnCube()
     {
@@ -273,14 +272,14 @@ public class ValakasManager
 			_TeleportCube.add(spawnDat.doSpawn());
 		}
     }
-    
+
 	// When the party is annihilated, they are banished.
     public void checkAnnihilated()
     {
     	if(isPlayersAnnihilated())
     	{
     		_OnPlayersAnnihilatedTask =
-				ThreadPoolManager.getInstance().scheduleGeneral(new OnPlayersAnnihilatedTask(),5000);    			
+				ThreadPoolManager.getInstance().scheduleGeneral(new OnPlayersAnnihilatedTask(),5000);
     	}
     }
 
@@ -290,12 +289,12 @@ public class ValakasManager
 		public OnPlayersAnnihilatedTask()
 		{
 		}
-		
+
 		public void run()
 		{
 		    // banishes players from lair.
 			banishesPlayers();
-			
+
             // clean up task.
             if(_OnPlayersAnnihilatedTask != null)
             {
@@ -316,24 +315,24 @@ public class ValakasManager
         	_MonsterSpawnTask = ThreadPoolManager.getInstance().scheduleGeneral(	new ValakasSpawn(1,null),Config.FWV_APPTIMEOFVALAKAS);
         }
     }
-    
+
     // do spawn Valakas.
     private class ValakasSpawn implements Runnable
     {
     	int _distance = 6502500;
     	int _taskId;
     	L2GrandBossInstance _valakas = null;
-    	
+
     	ValakasSpawn(int taskId,L2GrandBossInstance valakas)
     	{
     		_taskId = taskId;
     		_valakas = valakas;
     	}
-    	
+
     	public void run()
     	{
     		SocialAction sa = null;
-    		
+
     		switch(_taskId)
     		{
 	    		case 1:
@@ -348,7 +347,7 @@ public class ValakasManager
 	            	_State.setRespawnDate(Rnd.get(Config.FWV_FIXINTERVALOFVALAKAS,Config.FWV_FIXINTERVALOFVALAKAS + Config.FWV_RANDOMINTERVALOFVALAKAS) + Config.FWV_ACTIVITYTIMEOFVALAKAS);
 	            	_State.setState(GrandBossState.StateEnum.ALIVE);
 	            	_State.update();
-	            	
+
 					// set next task.
 		            if(_SocialTask != null)
 		            {
@@ -356,15 +355,15 @@ public class ValakasManager
 		            	_SocialTask = null;
 		            }
 					_SocialTask = ThreadPoolManager.getInstance().scheduleGeneral(new ValakasSpawn(2,_valakas), 16);
-	
+
 					break;
-	
+
 	    		case 2:
 	            	// do social.
 	            	updateKnownList(_valakas);
 	                sa = new SocialAction(_valakas.getObjectId(), 1);
 	                _valakas.broadcastPacket(sa);
-					
+
 					// set camera.
 					for (L2PcInstance pc : _PlayersInLair)
 					{
@@ -377,7 +376,7 @@ public class ValakasManager
 							pc.leaveMovieMode();
 						}
 					}
-	
+
 					// set next task.
 		            if(_SocialTask != null)
 		            {
@@ -385,9 +384,9 @@ public class ValakasManager
 		            	_SocialTask = null;
 		            }
 					_SocialTask = ThreadPoolManager.getInstance().scheduleGeneral(new ValakasSpawn(3,_valakas), 1500);
-	
+
 					break;
-	
+
 	    		case 3:
 					// set camera.
 					for (L2PcInstance pc : _PlayersInLair)
@@ -401,7 +400,7 @@ public class ValakasManager
 							pc.leaveMovieMode();
 						}
 					}
-	
+
 					// set next task.
 		            if(_SocialTask != null)
 		            {
@@ -409,9 +408,9 @@ public class ValakasManager
 		            	_SocialTask = null;
 		            }
 					_SocialTask = ThreadPoolManager.getInstance().scheduleGeneral(new ValakasSpawn(4,_valakas), 3300);
-	
+
 					break;
-	
+
 	    		case 4:
 					// set camera.
 					for (L2PcInstance pc : _PlayersInLair)
@@ -425,7 +424,7 @@ public class ValakasManager
 							pc.leaveMovieMode();
 						}
 					}
-	
+
 					// set next task.
 		            if(_SocialTask != null)
 		            {
@@ -433,9 +432,9 @@ public class ValakasManager
 		            	_SocialTask = null;
 		            }
 					_SocialTask = ThreadPoolManager.getInstance().scheduleGeneral(new ValakasSpawn(5,_valakas), 1300);
-	
+
 					break;
-	
+
 	    		case 5:
 					// set camera.
 					for (L2PcInstance pc : _PlayersInLair)
@@ -449,7 +448,7 @@ public class ValakasManager
 							pc.leaveMovieMode();
 						}
 					}
-	
+
 					// set next task.
 		            if(_SocialTask != null)
 		            {
@@ -457,9 +456,9 @@ public class ValakasManager
 		            	_SocialTask = null;
 		            }
 					_SocialTask = ThreadPoolManager.getInstance().scheduleGeneral(new ValakasSpawn(6,_valakas), 1600);
-	
+
 					break;
-	
+
 	    		case 6:
 					// set camera.
 					for (L2PcInstance pc : _PlayersInLair)
@@ -473,7 +472,7 @@ public class ValakasManager
 							pc.leaveMovieMode();
 						}
 					}
-	
+
 					// set next task.
 		            if(_SocialTask != null)
 		            {
@@ -481,9 +480,9 @@ public class ValakasManager
 		            	_SocialTask = null;
 		            }
 					_SocialTask = ThreadPoolManager.getInstance().scheduleGeneral(new ValakasSpawn(7,_valakas), 200);
-	
+
 					break;
-	
+
 	    		case 7:
 					// set camera.
 					for (L2PcInstance pc : _PlayersInLair)
@@ -497,7 +496,7 @@ public class ValakasManager
 							pc.leaveMovieMode();
 						}
 					}
-	
+
 					// set next task.
 		            if(_SocialTask != null)
 		            {
@@ -505,9 +504,9 @@ public class ValakasManager
 		            	_SocialTask = null;
 		            }
 					_SocialTask = ThreadPoolManager.getInstance().scheduleGeneral(new ValakasSpawn(8,_valakas), 5700);
-	
+
 					break;
-	
+
 	    		case 8:
 					// set camera.
 					for (L2PcInstance pc : _PlayersInLair)
@@ -521,7 +520,7 @@ public class ValakasManager
 							pc.leaveMovieMode();
 						}
 					}
-	
+
 					// set next task.
 		            if(_SocialTask != null)
 		            {
@@ -529,9 +528,9 @@ public class ValakasManager
 		            	_SocialTask = null;
 		            }
 					_SocialTask = ThreadPoolManager.getInstance().scheduleGeneral(new ValakasSpawn(9,_valakas), 1400);
-	
+
 					break;
-	
+
 	    		case 9:
 					// set camera.
 					for (L2PcInstance pc : _PlayersInLair)
@@ -545,7 +544,7 @@ public class ValakasManager
 							pc.leaveMovieMode();
 						}
 					}
-	
+
 					// set next task.
 		            if(_SocialTask != null)
 		            {
@@ -553,9 +552,9 @@ public class ValakasManager
 		            	_SocialTask = null;
 		            }
 					_SocialTask = ThreadPoolManager.getInstance().scheduleGeneral(new ValakasSpawn(10,_valakas), 6700);
-	
+
 					break;
-	
+
 	    		case 10:
 					// set camera.
 					for (L2PcInstance pc : _PlayersInLair)
@@ -569,7 +568,7 @@ public class ValakasManager
 							pc.leaveMovieMode();
 						}
 					}
-	
+
 					// set next task.
 		            if(_SocialTask != null)
 		            {
@@ -577,9 +576,9 @@ public class ValakasManager
 		            	_SocialTask = null;
 		            }
 					_SocialTask = ThreadPoolManager.getInstance().scheduleGeneral(new ValakasSpawn(11,_valakas), 3700);
-	
+
 					break;
-	
+
 	    		case 11:
 					// set camera.
 					for (L2PcInstance pc : _PlayersInLair)
@@ -593,7 +592,7 @@ public class ValakasManager
 							pc.leaveMovieMode();
 						}
 					}
-	
+
 					// set next task.
 		            if(_SocialTask != null)
 		            {
@@ -601,9 +600,9 @@ public class ValakasManager
 		            	_SocialTask = null;
 		            }
 					_SocialTask = ThreadPoolManager.getInstance().scheduleGeneral(new ValakasSpawn(12,_valakas), 2000);
-	
+
 					break;
-	
+
 	    		case 12:
 					// reset camera.
 					for (L2PcInstance pc : _PlayersInLair)
@@ -612,19 +611,19 @@ public class ValakasManager
 					}
 
 					_MobiliseTask = ThreadPoolManager.getInstance().scheduleGeneral(new SetMobilised(_valakas),16);
-	
+
 	                // move at random.
 	                if(Config.FWV_MOVEATRANDOM)
 	                {
 	                	L2CharPosition pos = new L2CharPosition(Rnd.get(211080, 214909),Rnd.get(-115841, -112822),-1662,0);
 	                	_MoveAtRandomTask = ThreadPoolManager.getInstance().scheduleGeneral(new MoveAtRandom(_valakas,pos),32);
 	                }
-	                
+
 	                // set delete task.
 	                _ActivityTimeEndTask = ThreadPoolManager.getInstance().scheduleGeneral(new ActivityTimeEnd(),Config.FWV_ACTIVITYTIMEOFVALAKAS);
-	
+
 					break;
-	                
+
     		}
     	}
     }
@@ -635,13 +634,13 @@ public class ValakasManager
     	public ActivityTimeEnd()
     	{
     	}
-    	
+
     	public void run()
     	{
     		setUnspawn();
     	}
     }
-    
+
     // clean Valakas's lair.
     public void setUnspawn()
 	{
@@ -655,7 +654,7 @@ public class ValakasManager
     		mob.deleteMe();
     	}
     	_Monsters.clear();
-    	
+
     	// delete teleport cube.
 		for (L2NpcInstance cube : _TeleportCube)
 		{
@@ -663,7 +662,7 @@ public class ValakasManager
 			cube.deleteMe();
 		}
 		_TeleportCube.clear();
-		
+
 		// not executed tasks is canceled.
 		if(_CubeSpawnTask != null)
 		{
@@ -735,7 +734,7 @@ public class ValakasManager
     	public IntervalEnd()
     	{
     	}
-    	
+
     	public void run()
     	{
     		_PlayersInLair.clear();
@@ -743,7 +742,7 @@ public class ValakasManager
         	_State.update();
     	}
     }
-    
+
     // setting teleport cube spawn task.
     public void setCubeSpawn()
     {
@@ -753,7 +752,7 @@ public class ValakasManager
 
     	_CubeSpawnTask = ThreadPoolManager.getInstance().scheduleGeneral(new CubeSpawn(),10000);
     }
-    
+
     // update knownlist.
     protected void updateKnownList(L2NpcInstance boss)
     {
@@ -763,20 +762,20 @@ public class ValakasManager
 			boss.getKnownList().getKnownPlayers().put(pc.getObjectId(), pc);
 		}
     }
-    
+
     // do spawn teleport cube.
     private class CubeSpawn implements Runnable
     {
     	public CubeSpawn()
     	{
     	}
-    	
+
         public void run()
         {
         	spawnCube();
         }
     }
-    
+
     // action is enabled the boss.
     private class SetMobilised implements Runnable
     {
@@ -790,7 +789,7 @@ public class ValakasManager
         {
         	_boss.setIsImmobilized(false);
         	_boss.setIsInSocialAction(false);
-            
+
             // When it is possible to act, a social action is canceled.
             if (_SocialTask != null)
             {
@@ -799,32 +798,32 @@ public class ValakasManager
             }
         }
     }
-    
+
     // Move at random on after Valakas appears.
     private class MoveAtRandom implements Runnable
     {
     	private L2NpcInstance _npc;
     	L2CharPosition _pos;
-    	
+
     	public MoveAtRandom(L2NpcInstance npc,L2CharPosition pos)
     	{
     		_npc = npc;
     		_pos = pos;
     	}
-    	
+
     	public void run()
     	{
     		_npc.getAI().setIntention(CtrlIntention.AI_INTENTION_MOVE_TO,_pos);
     	}
     }
-    
+
     // when a server restart while fight against Valakas.
     protected void restartValakas()
     {
     	L2Spawn valakasSpawn = _MonsterSpawn.get(32123);
     	L2NpcInstance valakas = valakasSpawn.doSpawn();
     	_Monsters.add(valakas);
-    	
+
     	// set next task.
     	if(_RespawnValakasTask != null)
     	{
@@ -833,7 +832,7 @@ public class ValakasManager
     	}
     	_RespawnValakasTask = ThreadPoolManager.getInstance().scheduleGeneral(new RestartValakas(valakas), Config.TIMELIMITOFINVADE + 1000);
     }
-    
+
     private class RestartValakas implements Runnable
     {
     	private L2NpcInstance _Valakas;
@@ -841,7 +840,7 @@ public class ValakasManager
     	{
     		_Valakas = valakas;
     	}
-    	
+
     	public void run()
     	{
     		_Valakas.getSpawn().stopRespawn();

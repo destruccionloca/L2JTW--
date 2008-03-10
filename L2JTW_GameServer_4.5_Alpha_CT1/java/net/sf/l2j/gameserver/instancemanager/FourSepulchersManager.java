@@ -5,7 +5,7 @@
  * $Date: $
  * $Revision: $
  *
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2, or (at your option)
@@ -44,8 +44,6 @@ import net.sf.l2j.gameserver.ThreadPoolManager;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.L2ItemInstance;
 import net.sf.l2j.gameserver.model.L2World;
-//import net.sf.l2j.gameserver.serverpackets.CreatureSay;
-import net.sf.l2j.gameserver.serverpackets.NpcHtmlMessage;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.util.Util;
 import net.sf.l2j.gameserver.model.L2Spawn;
@@ -57,120 +55,146 @@ import net.sf.l2j.util.Rnd;
 
 /**
  * This class ...
+ * ‚S‘å—ì•_ƒ}ƒl[ƒW?[
  * @version $Revision: $ $Date: $
  * @author  sandman
  */
 public class FourSepulchersManager
 {
+    // ?ƒK[
     protected static Logger _log = Logger.getLogger(FourSepulchersManager.class.getName());
 
+    // ƒC?ƒXƒ^?ƒX
     private static FourSepulchersManager _Instance;
 
+    // ƒNƒGƒXƒgu‚S‚Â‚Ì”tv
     private String _QuestId = "620_FourGoblets";
+    // —ì•_‚Ì’ÊsØ
     private int _EntrancePass = 7075;
     private int _UsedEntrancePass = 7261;
+    // ‰ï“°‚ÌŒ®
     private final int _HallsKey = 7260;
+	// ŒÃ‚¢ƒu?[ƒ`
     private int _OldBrooch = 7262;
 
+    // ó‘Ô‘JˆÚŠÇ?
+    // Q‰Áó•t?ŠÔ‚©‚Ç‚¤‚©H
     protected boolean _InEntryTime = false;
+    // ƒEƒH[?ƒAƒbƒv‚©‚Ç‚¤‚©H
     protected boolean _InWarmUpTime = false;
+    // —ì•_U—ª?ŠÔ‚©‚Ç‚¤‚©H
     protected boolean _InAttackTime = false;
+    // ƒN[?ƒ_ƒE??‚©‚Ç‚¤‚©H
     protected boolean _InCoolDownTime = false;
 
-    protected ScheduledFuture _ChangeCoolDownTimeTask = null;
-    protected ScheduledFuture _ChangeEntryTimeTask = null; 
-    protected ScheduledFuture _ChaneWarmUpTimeTask = null;
-    protected ScheduledFuture _ChangeAttackTimeTask = null;
-    protected ScheduledFuture _OnPartyAnnihilatedTask = null;
-    
-    
-    
+    // ó‘Ô‘JˆÚ—pƒ^ƒXƒN
+    protected ScheduledFuture<?> _ChangeCoolDownTimeTask = null;
+    protected ScheduledFuture<?> _ChangeEntryTimeTask = null;
+    protected ScheduledFuture<?> _ChaneWarmUpTimeTask = null;
+    protected ScheduledFuture<?> _ChangeAttackTimeTask = null;
+    protected ScheduledFuture<?> _OnPartyAnnihilatedTask = null;
+
+
+
+    // ‰ï“°–å”Ô‚ÆƒhƒA‚Ì‘g‚İ?‚í‚¹(<–å”Ô‚ÌIDAƒhƒA‚ÌID>)
     protected static Map<Integer,Integer> _HallGateKeepers = new FastMap<Integer,Integer>();
-    
+
+    // ’jİ‚Ì‰ï“°ƒe?ƒ|[ƒgÀ•W[x,y,z]
     private int[][] _StartHallSpawn =
 	{
-		{181632,-85587,-7218},
-		{179963,-88978,-7218},
-		{173217,-86132,-7218},
-		{175608,-82296,-7218}
+		{181632,-85587,-7218},     // ª?Ò‚Ì—ì•_
+		{179963,-88978,-7218},     // x”zÒ‚Ì—ì•_
+		{173217,-86132,-7218},     // ‘åŒ«Ò‚Ì—ì•_
+		{175608,-82296,-7218}      // R”»Ò‚Ì—ì•_
 	};
-    
+
+    // —ì•_ŠÇ?l‚Æ’jİ‚Ì‰ï“°ƒe?ƒ|[ƒgÀ•W‚Ì‘g‚İ?‚í‚¹(<ŠÇ?l‚ÌIDAÀ•W[x,y,z]>)
     protected static Map<Integer,int[]> _StartHallSpawns = new FastMap<Integer,int[]>();
 
+    // ƒn?ƒV?ƒV?ƒh[‚ÌoŒ»À•W[oŒ»ƒpƒ^[?][—ì•_][npcId,x,y,z,heading]
     private int[][][] _ShadowSpawnLoc =
 	{
+		// oŒ»ƒpƒ^[?‚P
 		{
-			{25339,191231,-85574,-7216,33380},
-			{25349,189534,-88969,-7216,32768},
-			{25346,173195,-76560,-7215,49277},
-			{25342,175591,-72744,-7215,49317}
+			{25339,191231,-85574,-7216,33380},	// ª?Ò
+			{25349,189534,-88969,-7216,32768},	// x”zÒ
+			{25346,173195,-76560,-7215,49277},	// ‘åŒ«Ò
+			{25342,175591,-72744,-7215,49317}	// R”»Ò
 		},
-
+		// oŒ»ƒpƒ^[?‚Q
 		{
-			{25342,191231,-85574,-7216,33380},
-			{25339,189534,-88969,-7216,32768},
-			{25349,173195,-76560,-7215,49277},
-			{25346,175591,-72744,-7215,49317}
+			{25342,191231,-85574,-7216,33380},	// ª?Ò
+			{25339,189534,-88969,-7216,32768},	// x”zÒ
+			{25349,173195,-76560,-7215,49277},	// ‘åŒ«Ò@
+			{25346,175591,-72744,-7215,49317}	// R”»Ò
 		},
-
+		// oŒ»ƒpƒ^[?‚R
 		{
-			{25346,191231,-85574,-7216,33380},
-			{25342,189534,-88969,-7216,32768},
-			{25339,173195,-76560,-7215,49277},
-			{25349,175591,-72744,-7215,49317}
+			{25346,191231,-85574,-7216,33380},	// ª?Ò
+			{25342,189534,-88969,-7216,32768},	// x”zÒ
+			{25339,173195,-76560,-7215,49277},	// ‘åŒ«Ò
+			{25349,175591,-72744,-7215,49317}	// R”»Ò
 		},
-
+		// oŒ»ƒpƒ^[?‚S
 		{
-			{25349,191231,-85574,-7216,33380},
-			{25346,189534,-88969,-7216,32768},
-			{25342,173195,-76560,-7215,49277},
-			{25339,175591,-72744,-7215,49317}
+			{25349,191231,-85574,-7216,33380},	// ª?Ò
+			{25346,189534,-88969,-7216,32768},	// x”zÒ
+			{25342,173195,-76560,-7215,49277},	// ‘åŒ«Ò
+			{25339,175591,-72744,-7215,49317}	// R”»Ò
 		},
 	};
-    
+
+    // Œöİ‚Ì–å”Ô‚Æƒn?ƒV?ƒV?ƒh[‚Ì‘g‚İ?‚í‚¹
     protected Map<Integer,L2Spawn> _ShadowSpawns = new FastMap<Integer,L2Spawn>();
-    
+
+    // —ì•_ŠÇ?l‚Æ—ì•_‚Ì?—pó‘Ô‚Ì‘g‚İ?‚í‚¹(<ŠÇ?l‚ÌIDA?—pó‘Ô(true = ’N‚©‚ªg‚Á‚Ä‚¢‚é)>)
     protected static Map<Integer,Boolean> _HallInUse = new FastMap<Integer,Boolean>();
-    
+
+    // —ì•_ŠÇ?l‚Æ’§íÒƒp[ƒeƒB?[ƒ_[‚Ì‘g‚İ?‚í‚¹
     protected Map<Integer,L2PcInstance> _Challengers = new FastMap<Integer,L2PcInstance>();
-    
+
+    // ŠÇ?lE‰ï“°–å”Ô‚Æ“ä‚Ì?‚Ìspawnƒf[ƒ^‚Ì‘g‚İ?‚í‚¹
     protected Map<Integer,L2Spawn> _MysteriousBoxSpawns = new FastMap<Integer,L2Spawn>();
-    
+
+    // “ä‚Ì?‚ÆoŒ»‚·‚é??ƒXƒ^[‚Ìspawnƒf[ƒ^‚Ì‘g‚İ?‚í‚¹i•¨?Œnj
     protected List<L2Spawn> _PhysicalSpawns;
-    protected Map<Integer,List> _PhysicalMonsters = new FastMap<Integer,List>();
+    protected Map<Integer,List<L2Spawn>> _PhysicalMonsters = new FastMap<Integer,List<L2Spawn>>();
+    // “ä‚Ì?‚ÆoŒ»‚·‚é??ƒXƒ^[‚Ìspawnƒf[ƒ^‚Ì‘g‚İ?‚í‚¹i?–@Œnj
     protected List<L2Spawn> _MagicalSpawns;
-    protected Map<Integer,List> _MagicalMonsters = new FastMap<Integer,List>();
-
+    protected Map<Integer,List<L2Spawn>> _MagicalMonsters = new FastMap<Integer,List<L2Spawn>>();
+    // Œöİ‚Ì‰ï“°‚Ì“ä‚Ì?‚ÆAŸr–ÅŒã‚ÉÄoŒ»‚·‚é??ƒXƒ^[‚Ì‘g‚İ?‚í‚¹
     protected List<L2Spawn> _DukeFinalSpawns;
-    protected Map<Integer,List> _DukeFinalMobs = new FastMap<Integer,List>();
+    protected Map<Integer,List<L2Spawn>> _DukeFinalMobs = new FastMap<Integer,List<L2Spawn>>();
     protected Map<Integer,Boolean> _ArchonSpawned = new FastMap<Integer,Boolean>();
-
+    // ƒn?ƒV?ƒV?ƒh[“¢”°Œã‚Éc’é‚Ì•æ?‚ÅoŒ»‚·‚éNPC‚Ì‘g‚İ?‚í‚¹
     protected List<L2Spawn> _EmperorsGraveSpawns;
-    protected Map<Integer,List> _EmperorsGraveNpcs = new FastMap<Integer,List>();
-    
-    protected Map<Integer,List> _ViscountMobs =
-    	new FastMap<Integer,List>();
-    
-    protected Map<Integer,List> _DukeMobs =
-    	new FastMap<Integer,List>();
-    
+    protected Map<Integer,List<L2Spawn>> _EmperorsGraveNpcs = new FastMap<Integer,List<L2Spawn>>();
+
+    // qİ‚Ì‰ï“°‚Ì“ä‚Ì?‚ÆAoŒ»‚µ‚½??ƒXƒ^[‚Ì‘g‚İ?‚í‚¹
+    protected Map<Integer,List<L2SepulcherMonsterInstance>> _ViscountMobs =
+    	new FastMap<Integer,List<L2SepulcherMonsterInstance>>();
+
+    // Œöİ‚Ì‰ï“°‚Ì“ä‚Ì?‚ÆAoŒ»‚µ‚½??ƒXƒ^[‚Ì‘g‚İ?‚í‚¹
+    protected Map<Integer,List<L2SepulcherMonsterInstance>> _DukeMobs =
+    	new FastMap<Integer,List<L2SepulcherMonsterInstance>>();
+
+    // Œ®‚Ì?‚ğoŒ»‚³‚¹‚é??ƒXƒ^[‚ÆŒ®‚Ì?‚Ì‘g‚İ?‚í‚¹<??ƒXƒ^[‚ÌNpcId,Œ®‚Ì?‚ÌNpcId>
     protected Map<Integer,Integer> _KeyBoxNpc = new FastMap<Integer,Integer>();
     protected Map<Integer,L2Spawn> _KeyBoxSpawns = new FastMap<Integer,L2Spawn>();
-    
+
+    // ƒP[ƒvƒS[ƒg‚Æƒn?ƒV?‚Ì·sÒ‚Ìspawnƒf[ƒ^‚Ì‘g‚İ?‚í‚¹
     protected Map<Integer,Integer> _Victim = new FastMap<Integer,Integer>();
     protected Map<Integer,L2Spawn> _ExecutionerSpawns = new FastMap<Integer,L2Spawn>();
-    
-    protected List<L2NpcInstance> _AllMobs = new FastList<L2NpcInstance>();
-    
-    //private L2NpcInstance _ConquerorsSepulcherManager;
-    //private L2NpcInstance _EmperorsSepulcherManager;
-    //private L2NpcInstance _GreatSagesSepulcherManager;
-    //private L2NpcInstance _JudgesSepulcherManager;
 
+    // —ì•_U—ª?ŠÔ‚É—ì•_“à‚ÉoŒ»‚µ‚½‘S‚Ä‚Ì??ƒXƒ^[
+    protected List<L2NpcInstance> _AllMobs = new FastList<L2NpcInstance>();
+
+    // ƒR?ƒXƒg?ƒNƒ^[
     public FourSepulchersManager()
     {
     }
 
+    // ƒC?ƒXƒ^?ƒXŠÖ?
     public static final FourSepulchersManager getInstance()
     {
         if (_Instance == null)
@@ -179,28 +203,33 @@ public class FourSepulchersManager
         }
         return _Instance;
     }
-    
+
+    // ?Šú‰»
     public void init()
     {
         _log.info("FourSepulchersManager:Init Four-Sepulchers Manager.");
 
+        // ƒ^ƒXƒN‚ğ‚·‚×‚ÄƒL??ƒZ?
         if(_ChangeCoolDownTimeTask != null) _ChangeCoolDownTimeTask.cancel(true);
         if(_ChangeEntryTimeTask != null) _ChangeEntryTimeTask.cancel(true);
         if(_ChaneWarmUpTimeTask != null) _ChaneWarmUpTimeTask.cancel(true);
         if(_ChangeAttackTimeTask != null) _ChangeAttackTimeTask.cancel(true);
 
         _ChangeCoolDownTimeTask = null;
-        _ChangeEntryTimeTask = null; 
+        _ChangeEntryTimeTask = null;
         _ChaneWarmUpTimeTask = null;
         _ChangeAttackTimeTask = null;
-        
+
+        // ƒt?ƒO‚ğ•ÏX‚·‚é(Å?‚ÌƒN[?ƒ_ƒE?‚ªn‚Ü‚é‚Ü‚Å‚Í‚Ç‚Ì?ŠÔ‘Ñ‚Å‚à‚È‚¢)
         _InEntryTime = false;
         _InWarmUpTime = false;
         _InAttackTime = false;
         _InCoolDownTime = false;
 
+        // ŒÅ’èî•ñ‚ğ?Šú‰»
         initFixedInfo();
-        
+
+        // ??ƒXƒ^[”z’u‚Ì?Šú‰»
         LoadMysteriousBox();
         InitKeyBoxSpawns();
         LoadPhysicalMonsters();
@@ -209,101 +238,110 @@ public class FourSepulchersManager
         InitExecutionerSpawns();
         LoadDukeMonsters();
         LoadEmperorsGraveMonsters();
-        
+
+        // Å?‚ÌƒN[?ƒ_ƒE??ŠÔ‚ÉˆÚs‚·‚éƒ^ƒXƒN‚ğd?‚Ş
         _ChangeCoolDownTimeTask =
             ThreadPoolManager.getInstance().scheduleGeneral(new ChangeCoolDownTime(),Config.FS_TIME_ATTACK * 60000);
-        
+
     }
 
+    // ŒÅ’èî•ñ‚Ì?Šú‰»
     protected void initFixedInfo()
     {
+        // —ì•_ŠÇ?l‚Æ’jİ‚Ì‰ï“°ƒe?ƒ|[ƒgÀ•W‚Ì‘g‚İ?‚í‚¹‚ğì¬
         _StartHallSpawns.clear();
-        _StartHallSpawns.put(31921,_StartHallSpawn[0]);
-        _StartHallSpawns.put(31922,_StartHallSpawn[1]);
-        _StartHallSpawns.put(31923,_StartHallSpawn[2]);
-        _StartHallSpawns.put(31924,_StartHallSpawn[3]);
-        
+        _StartHallSpawns.put(31921,_StartHallSpawn[0]);    // ª?Ò‚Ì—ì•_
+        _StartHallSpawns.put(31922,_StartHallSpawn[1]);    // x”zÒ‚Ì—ì•_
+        _StartHallSpawns.put(31923,_StartHallSpawn[2]);    // ‘åŒ«Ò‚Ì—ì•_
+        _StartHallSpawns.put(31924,_StartHallSpawn[3]);    // R”»Ò‚Ì—ì•_
+
+        // ‰ï“°–å”Ô‚ÆƒhƒA‚Ì‘g‚İ?‚í‚¹‚ğì¬
         _HallGateKeepers.clear();
-        _HallGateKeepers.put(31925, 25150012);
-        _HallGateKeepers.put(31926, 25150013);
-        _HallGateKeepers.put(31927, 25150014);
-        _HallGateKeepers.put(31928, 25150015);
-        _HallGateKeepers.put(31929, 25150016);
-        _HallGateKeepers.put(31930, 25150002);
-        _HallGateKeepers.put(31931, 25150003);
-        _HallGateKeepers.put(31932, 25150004);
-        _HallGateKeepers.put(31933, 25150005);
-        _HallGateKeepers.put(31934, 25150006);
-        _HallGateKeepers.put(31935, 25150032);
-        _HallGateKeepers.put(31936, 25150033);
-        _HallGateKeepers.put(31937, 25150034);
-        _HallGateKeepers.put(31938, 25150035);
-        _HallGateKeepers.put(31939, 25150036);
-        _HallGateKeepers.put(31940, 25150022);
-        _HallGateKeepers.put(31941, 25150023);
-        _HallGateKeepers.put(31942, 25150024);
-        _HallGateKeepers.put(31943, 25150025);
-        _HallGateKeepers.put(31944, 25150026);
-        
+        _HallGateKeepers.put(31925, 25150012);  // ª?Ò‚Ì—ì•_F’jİ‚Ì‰ï“°–å”Ô
+        _HallGateKeepers.put(31926, 25150013);  // ª?Ò‚Ì—ì•_Fqİ‚Ì‰ï“°–å”Ô
+        _HallGateKeepers.put(31927, 25150014);  // ª?Ò‚Ì—ì•_F?İ‚Ì‰ï“°–å”Ô
+        _HallGateKeepers.put(31928, 25150015);  // ª?Ò‚Ì—ì•_FŒòİ‚Ì‰ï“°–å”Ô
+        _HallGateKeepers.put(31929, 25150016);  // ª?Ò‚Ì—ì•_FŒöİ‚Ì‰ï“°–å”Ô
+        _HallGateKeepers.put(31930, 25150002);  // x”zÒ‚Ì—ì•_F’jİ‚Ì‰ï“°–å”Ô
+        _HallGateKeepers.put(31931, 25150003);  // x”zÒ‚Ì—ì•_Fqİ‚Ì‰ï“°–å”Ô
+        _HallGateKeepers.put(31932, 25150004);  // x”zÒ‚Ì—ì•_F?İ‚Ì‰ï“°–å”Ô
+        _HallGateKeepers.put(31933, 25150005);  // x”zÒ‚Ì—ì•_FŒòİ‚Ì‰ï“°–å”Ô
+        _HallGateKeepers.put(31934, 25150006);  // x”zÒ‚Ì—ì•_FŒöİ‚Ì‰ï“°–å”Ô
+        _HallGateKeepers.put(31935, 25150032);  // ‘åŒ«Ò‚Ì—ì•_F’jİ‚Ì‰ï“°–å”Ô
+        _HallGateKeepers.put(31936, 25150033);  // ‘åŒ«Ò‚Ì—ì•_Fqİ‚Ì‰ï“°–å”Ô
+        _HallGateKeepers.put(31937, 25150034);  // ‘åŒ«Ò‚Ì—ì•_F?İ‚Ì‰ï“°–å”Ô
+        _HallGateKeepers.put(31938, 25150035);  // ‘åŒ«Ò‚Ì—ì•_FŒòİ‚Ì‰ï“°–å”Ô
+        _HallGateKeepers.put(31939, 25150036);  // ‘åŒ«Ò‚Ì—ì•_FŒöİ‚Ì‰ï“°–å”Ô
+        _HallGateKeepers.put(31940, 25150022);  // R”»Ò‚Ì—ì•_F’jİ‚Ì‰ï“°–å”Ô
+        _HallGateKeepers.put(31941, 25150023);  // R”»Ò‚Ì—ì•_Fqİ‚Ì‰ï“°–å”Ô
+        _HallGateKeepers.put(31942, 25150024);  // R”»Ò‚Ì—ì•_F?İ‚Ì‰ï“°–å”Ô
+        _HallGateKeepers.put(31943, 25150025);  // R”»Ò‚Ì—ì•_FŒòİ‚Ì‰ï“°–å”Ô
+        _HallGateKeepers.put(31944, 25150026);  // R”»Ò‚Ì—ì•_FŒöİ‚Ì‰ï“°–å”Ô
+
+        // Œ®‚Ì?‚ğoŒ»‚³‚¹‚é??ƒXƒ^[‚ÆŒ®‚Ì?‚Ì‘g‚İ?‚í‚¹
         _KeyBoxNpc.clear();
-        _KeyBoxNpc.put(18120,31455);
-        _KeyBoxNpc.put(18121,31455);
-        _KeyBoxNpc.put(18122,31455);
-        _KeyBoxNpc.put(18123,31455);
-        _KeyBoxNpc.put(18124,31456);
-        _KeyBoxNpc.put(18125,31456);
-        _KeyBoxNpc.put(18126,31456);
-        _KeyBoxNpc.put(18127,31456);
-        _KeyBoxNpc.put(18128,31457);
-        _KeyBoxNpc.put(18129,31457);
-        _KeyBoxNpc.put(18130,31457);
-        _KeyBoxNpc.put(18131,31457);
-        _KeyBoxNpc.put(18149,31458);
-        _KeyBoxNpc.put(18150,31459);
-        _KeyBoxNpc.put(18151,31459);
-        _KeyBoxNpc.put(18152,31459);
-        _KeyBoxNpc.put(18153,31459);
-        _KeyBoxNpc.put(18154,31460);
-        _KeyBoxNpc.put(18155,31460);
-        _KeyBoxNpc.put(18156,31460);
-        _KeyBoxNpc.put(18157,31460);
-        _KeyBoxNpc.put(18158,31461);
-        _KeyBoxNpc.put(18159,31461);
-        _KeyBoxNpc.put(18160,31461);
-        _KeyBoxNpc.put(18161,31461);
-        _KeyBoxNpc.put(18162,31462);
-        _KeyBoxNpc.put(18163,31462);
-        _KeyBoxNpc.put(18164,31462);
-        _KeyBoxNpc.put(18165,31462);
-        _KeyBoxNpc.put(18183,31463);
-        _KeyBoxNpc.put(18184,31464);
-        _KeyBoxNpc.put(18212,31465);
-        _KeyBoxNpc.put(18213,31465);
-        _KeyBoxNpc.put(18214,31465);
-        _KeyBoxNpc.put(18215,31465);
-        _KeyBoxNpc.put(18216,31466);
-        _KeyBoxNpc.put(18217,31466);
-        _KeyBoxNpc.put(18218,31466);
-        _KeyBoxNpc.put(18219,31466);
-     
+        _KeyBoxNpc.put(18120,31455);	//ƒn?ƒV?‚Ì?Š¯,Œ®‚Ì?
+        _KeyBoxNpc.put(18121,31455);	//ƒn?ƒV?‚Ì?Š¯,Œ®‚Ì?
+        _KeyBoxNpc.put(18122,31455);	//ƒn?ƒV?‚Ì?Š¯,Œ®‚Ì?
+        _KeyBoxNpc.put(18123,31455);	//ƒn?ƒV?‚Ì?Š¯,Œ®‚Ì?
+        _KeyBoxNpc.put(18124,31456);	//ƒn?ƒV?‚Ì?Š¯,Œ®‚Ì?
+        _KeyBoxNpc.put(18125,31456);	//ƒn?ƒV?‚Ì?Š¯,Œ®‚Ì?
+        _KeyBoxNpc.put(18126,31456);	//ƒn?ƒV?‚Ì?Š¯,Œ®‚Ì?
+        _KeyBoxNpc.put(18127,31456);	//ƒn?ƒV?‚Ì?Š¯,Œ®‚Ì?
+        _KeyBoxNpc.put(18128,31457);	//ƒn?ƒV?‚Ì?Š¯,Œ®‚Ì?
+        _KeyBoxNpc.put(18129,31457);	//ƒn?ƒV?‚Ì?Š¯,Œ®‚Ì?
+        _KeyBoxNpc.put(18130,31457);	//ƒn?ƒV?‚Ì?Š¯,Œ®‚Ì?
+        _KeyBoxNpc.put(18131,31457);	//ƒn?ƒV?‚Ì?Š¯,Œ®‚Ì?
+        _KeyBoxNpc.put(18149,31458);	//•æ’n‚Ìb?,Œ®‚Ì?
+        _KeyBoxNpc.put(18150,31459);	//ƒP[ƒvƒS[ƒg,Œ®‚Ì?
+        _KeyBoxNpc.put(18151,31459);	//ƒP[ƒvƒS[ƒg,Œ®‚Ì?
+        _KeyBoxNpc.put(18152,31459);	//ƒP[ƒvƒS[ƒg,Œ®‚Ì?
+        _KeyBoxNpc.put(18153,31459);	//ƒP[ƒvƒS[ƒg,Œ®‚Ì?
+        _KeyBoxNpc.put(18154,31460);	//ƒP[ƒvƒS[ƒg,Œ®‚Ì?
+        _KeyBoxNpc.put(18155,31460);	//ƒP[ƒvƒS[ƒg,Œ®‚Ì?
+        _KeyBoxNpc.put(18156,31460);	//ƒP[ƒvƒS[ƒg,Œ®‚Ì?
+        _KeyBoxNpc.put(18157,31460);	//ƒP[ƒvƒS[ƒg,Œ®‚Ì?
+        _KeyBoxNpc.put(18158,31461);	//ƒn?ƒV?‚Ì·sÒ,Œ®‚Ì?
+        _KeyBoxNpc.put(18159,31461);	//ƒn?ƒV?‚Ì·sÒ,Œ®‚Ì?
+        _KeyBoxNpc.put(18160,31461);	//ƒn?ƒV?‚Ì·sÒ,Œ®‚Ì?
+        _KeyBoxNpc.put(18161,31461);	//ƒn?ƒV?‚Ì·sÒ,Œ®‚Ì?
+        _KeyBoxNpc.put(18162,31462);	//ƒn?ƒV?‚Ì·sÒ,Œ®‚Ì?
+        _KeyBoxNpc.put(18163,31462);	//ƒn?ƒV?‚Ì·sÒ,Œ®‚Ì?
+        _KeyBoxNpc.put(18164,31462);	//ƒn?ƒV?‚Ì·sÒ,Œ®‚Ì?
+        _KeyBoxNpc.put(18165,31462);	//ƒn?ƒV?‚Ì·sÒ,Œ®‚Ì?
+        _KeyBoxNpc.put(18183,31463);	//ƒn?ƒV?‚ÌŠÄ“ÂŠ¯,Œ®‚Ì?
+        _KeyBoxNpc.put(18184,31464);	//ƒn?ƒV?‚ÌŠÄ“ÂŠ¯,Œ®‚Ì?
+        _KeyBoxNpc.put(18212,31465);	//ƒn?ƒV? ƒAƒhƒ~ƒjƒXƒg?[ƒ^[,Œ®‚Ì?
+        _KeyBoxNpc.put(18213,31465);	//ƒn?ƒV? ƒAƒhƒ~ƒjƒXƒg?[ƒ^[,Œ®‚Ì?
+        _KeyBoxNpc.put(18214,31465);	//ƒn?ƒV? ƒAƒhƒ~ƒjƒXƒg?[ƒ^[,Œ®‚Ì?
+        _KeyBoxNpc.put(18215,31465);	//ƒn?ƒV? ƒAƒhƒ~ƒjƒXƒg?[ƒ^[,Œ®‚Ì?
+        _KeyBoxNpc.put(18216,31466);	//ƒn?ƒV? ƒAƒhƒ~ƒjƒXƒg?[ƒ^[,Œ®‚Ì?
+        _KeyBoxNpc.put(18217,31466);	//ƒn?ƒV? ƒAƒhƒ~ƒjƒXƒg?[ƒ^[,Œ®‚Ì?
+        _KeyBoxNpc.put(18218,31466);	//ƒn?ƒV? ƒAƒhƒ~ƒjƒXƒg?[ƒ^[,Œ®‚Ì?
+        _KeyBoxNpc.put(18219,31466);	//ƒn?ƒV? ƒAƒhƒ~ƒjƒXƒg?[ƒ^[,Œ®‚Ì?
+
+        // ƒP[ƒvƒR[ƒh‚Æƒn?ƒV?‚Ì·sÒ‚Ì‘g‚İ?‚í‚¹
         _Victim.clear();
-        _Victim.put(18150,18158);
-        _Victim.put(18151,18159);
-        _Victim.put(18152,18160);
-        _Victim.put(18153,18161);
-        _Victim.put(18154,18162);
-        _Victim.put(18155,18163);
-        _Victim.put(18156,18164);
-        _Victim.put(18157,18165);
+        _Victim.put(18150,18158);	// ƒP[ƒvƒS[ƒg,ƒn?ƒV?‚Ì·sÒ
+        _Victim.put(18151,18159);	// ƒP[ƒvƒS[ƒg,ƒn?ƒV?‚Ì·sÒ
+        _Victim.put(18152,18160);	// ƒP[ƒvƒS[ƒg,ƒn?ƒV?‚Ì·sÒ
+        _Victim.put(18153,18161);	// ƒP[ƒvƒS[ƒg,ƒn?ƒV?‚Ì·sÒ
+        _Victim.put(18154,18162);	// ƒP[ƒvƒS[ƒg,ƒn?ƒV?‚Ì·sÒ
+        _Victim.put(18155,18163);	// ƒP[ƒvƒS[ƒg,ƒn?ƒV?‚Ì·sÒ
+        _Victim.put(18156,18164);	// ƒP[ƒvƒS[ƒg,ƒn?ƒV?‚Ì·sÒ
+        _Victim.put(18157,18165);	// ƒP[ƒvƒS[ƒg,ƒn?ƒV?‚Ì·sÒ
 
     }
 
+    // “ä‚Ì?‚Ìspawnƒf[ƒ^‚Ì“Ç‚İ?‚İ
     private void LoadMysteriousBox()
     {
         java.sql.Connection con = null;
-        
+
+        // “ä‚Ì?‚ÌoŒ»À•Wî•ñ‚ğƒN?ƒA
         _MysteriousBoxSpawns.clear();
 
+        // “ä‚Ì?‚ÌoŒ»À•Wî•ñ‚ğì¬
         try
         {
             con = L2DatabaseFactory.getInstance().getConnection();
@@ -350,6 +388,7 @@ public class FourSepulchersManager
         }
     }
 
+    // Œ®‚Ì?‚Ìspawnƒf[ƒ^‚Ìì¬
     private void InitKeyBoxSpawns()
     {
     	L2Spawn spawnDat;
@@ -382,24 +421,29 @@ public class FourSepulchersManager
             }
         }
     }
-    
+
+    // •¨?ƒ^ƒCƒv‚Ìspawnƒf[ƒ^‚Ì“Ç‚İ?‚İ
     private void LoadPhysicalMonsters()
     {
 
+    	// ??ƒXƒ^[oŒ»?ƒXƒg‚ğ?Šú‰»
     	_PhysicalMonsters.clear();
 
+    	// “Ç‚İ?‚Ü‚ê‚½oŒ»?ƒXƒg‚Ì?
     	int loaded = 0;
     	java.sql.Connection con = null;
-    	
+
         try
         {
             con = L2DatabaseFactory.getInstance().getConnection();
-            
+
+            // oŒ»‚Ì‚«‚Á‚©‚¯‚Æ‚È‚éNPC‚Ì?[ƒv
             PreparedStatement statement1 = con.prepareStatement("SELECT Distinct key_npc_id FROM four_sepulchers_spawnlist Where spawntype = ? ORDER BY key_npc_id");
             statement1.setInt(1, 1);
             ResultSet rset1 = statement1.executeQuery();
             while (rset1.next())
             {
+            	// oŒ»‚·‚é??ƒXƒ^[‚ÌÀ•W?ƒXƒgì¬‚Ì?[ƒv
             	int keyNpcId = rset1.getInt("key_npc_id");
 
                 PreparedStatement statement2 = con.prepareStatement("SELECT id, count, npc_templateid, locx, locy, locz, heading, respawn_delay, key_npc_id FROM four_sepulchers_spawnlist Where key_npc_id = ? and spawntype = ? ORDER BY id");
@@ -410,6 +454,7 @@ public class FourSepulchersManager
                 L2Spawn spawnDat;
                 L2NpcTemplate template1;
 
+                // ??ƒXƒ^[?ƒXƒg‚ğ?Šú‰»
                 _PhysicalSpawns = new FastList<L2Spawn>();
 
                 while (rset2.next())
@@ -452,25 +497,29 @@ public class FourSepulchersManager
             try { con.close(); } catch (Exception e) {}
         }
     }
-    
+
+    // ?–@ƒ^ƒCƒv‚Ìspawnƒf[ƒ^‚Ì“Ç‚İ?‚İ
     private void LoadMagicalMonsters()
     {
 
+    	// ??ƒXƒ^[oŒ»?ƒXƒg‚ğ?Šú‰»
     	_MagicalMonsters.clear();
 
+    	// “Ç‚İ?‚Ü‚ê‚½oŒ»?ƒXƒg‚Ì?
     	int loaded = 0;
     	java.sql.Connection con = null;
-    	
+
         try
         {
             con = L2DatabaseFactory.getInstance().getConnection();
-            
+
+            // oŒ»‚Ì‚«‚Á‚©‚¯‚Æ‚È‚éNPC‚Ì?[ƒv
             PreparedStatement statement1 = con.prepareStatement("SELECT Distinct key_npc_id FROM four_sepulchers_spawnlist Where spawntype = ? ORDER BY key_npc_id");
             statement1.setInt(1, 2);
             ResultSet rset1 = statement1.executeQuery();
             while (rset1.next())
             {
-
+            	// oŒ»‚·‚é??ƒXƒ^[‚ÌÀ•W?ƒXƒgì¬‚Ì?[ƒv
             	int keyNpcId = rset1.getInt("key_npc_id");
 
                 PreparedStatement statement2 = con.prepareStatement("SELECT id, count, npc_templateid, locx, locy, locz, heading, respawn_delay, key_npc_id FROM four_sepulchers_spawnlist Where key_npc_id = ? and spawntype = ? ORDER BY id");
@@ -481,7 +530,8 @@ public class FourSepulchersManager
                 L2Spawn spawnDat;
                 L2NpcTemplate template1;
 
-                _MagicalSpawns = new FastList<L2Spawn>();            	
+                // ??ƒXƒ^[?ƒXƒg‚ğ?Šú‰»
+                _MagicalSpawns = new FastList<L2Spawn>();
 
                 while (rset2.next())
                 {
@@ -523,25 +573,30 @@ public class FourSepulchersManager
             try { con.close(); } catch (Exception e) {}
         }
     }
-    
+
+    // Œöİ‚Ì‰ï“°‚ÌŸr–ÅŒã‚ÉÄoŒ»‚·‚é??ƒXƒ^[‚Ìspawnƒf[ƒ^‚Ì“Ç‚İ?‚İ
     private void LoadDukeMonsters()
     {
 
+    	// ??ƒXƒ^[oŒ»?ƒXƒg‚ğ?Šú‰»
     	_DukeFinalMobs.clear();
     	_ArchonSpawned.clear();
 
+    	// “Ç‚İ?‚Ü‚ê‚½oŒ»?ƒXƒg‚Ì?
     	int loaded = 0;
     	java.sql.Connection con = null;
-    	
+
         try
         {
             con = L2DatabaseFactory.getInstance().getConnection();
-            
+
+            // oŒ»‚Ì‚«‚Á‚©‚¯‚Æ‚È‚éNPC‚Ì?[ƒv
             PreparedStatement statement1 = con.prepareStatement("SELECT Distinct key_npc_id FROM four_sepulchers_spawnlist Where spawntype = ? ORDER BY key_npc_id");
             statement1.setInt(1, 5);
             ResultSet rset1 = statement1.executeQuery();
             while (rset1.next())
             {
+            	// oŒ»‚·‚é??ƒXƒ^[‚ÌÀ•W?ƒXƒgì¬‚Ì?[ƒv
             	int keyNpcId = rset1.getInt("key_npc_id");
 
                 PreparedStatement statement2 = con.prepareStatement("SELECT id, count, npc_templateid, locx, locy, locz, heading, respawn_delay, key_npc_id FROM four_sepulchers_spawnlist Where key_npc_id = ? and spawntype = ? ORDER BY id");
@@ -552,6 +607,7 @@ public class FourSepulchersManager
                 L2Spawn spawnDat;
                 L2NpcTemplate template1;
 
+                // ??ƒXƒ^[?ƒXƒg‚ğ?Šú‰»
                 _DukeFinalSpawns = new FastList<L2Spawn>();
 
                 while (rset2.next())
@@ -595,24 +651,29 @@ public class FourSepulchersManager
             try { con.close(); } catch (Exception e) {}
         }
     }
-    
+
+    // ƒEƒBƒSƒbƒg‚Ì—H—ì‚Æƒn?ƒV?‚Ì•ó?‚Ìspawnƒf[ƒ^‚Ì“Ç‚İ?‚İ
     private void LoadEmperorsGraveMonsters()
     {
 
+    	// ??ƒXƒ^[oŒ»?ƒXƒg‚ğ?Šú‰»
     	_EmperorsGraveNpcs.clear();
 
+    	// “Ç‚İ?‚Ü‚ê‚½oŒ»?ƒXƒg‚Ì?
     	int loaded = 0;
     	java.sql.Connection con = null;
-    	
+
         try
         {
             con = L2DatabaseFactory.getInstance().getConnection();
-            
+
+            // oŒ»‚Ì‚«‚Á‚©‚¯‚Æ‚È‚éNPC‚Ì?[ƒv
             PreparedStatement statement1 = con.prepareStatement("SELECT Distinct key_npc_id FROM four_sepulchers_spawnlist Where spawntype = ? ORDER BY key_npc_id");
             statement1.setInt(1, 6);
             ResultSet rset1 = statement1.executeQuery();
             while (rset1.next())
             {
+            	// oŒ»‚·‚é??ƒXƒ^[‚ÌÀ•W?ƒXƒgì¬‚Ì?[ƒv
             	int keyNpcId = rset1.getInt("key_npc_id");
 
                 PreparedStatement statement2 = con.prepareStatement("SELECT id, count, npc_templateid, locx, locy, locz, heading, respawn_delay, key_npc_id FROM four_sepulchers_spawnlist Where key_npc_id = ? and spawntype = ? ORDER BY id");
@@ -623,6 +684,7 @@ public class FourSepulchersManager
                 L2Spawn spawnDat;
                 L2NpcTemplate template1;
 
+                // ??ƒXƒ^[?ƒXƒg‚ğ?Šú‰»
                 _EmperorsGraveSpawns = new FastList<L2Spawn>();
 
                 while (rset2.next())
@@ -665,17 +727,20 @@ public class FourSepulchersManager
             try { con.close(); } catch (Exception e) {}
         }
     }
-    
+
+    // ƒn?ƒV?ƒV?ƒh[‚Ìspawnƒf[ƒ^‚Ìì¬
     protected void InitLocationShadowSpawns()
     {
     	int locNo = Rnd.get(4);
     	final int[] gateKeeper = {31929,31934,31939,31944};
-    	
+
     	L2Spawn spawnDat;
         L2NpcTemplate template;
 
+        // oŒ»À•Wî•ñ‚ğƒN?ƒA
         _ShadowSpawns.clear();
 
+        // ¡‰ñ‚ÌoŒ»À•Wî•ñ‚ğì¬
         for(int i=0;i<=3;i++)
     	{
             template = NpcTable.getInstance().getTemplate(_ShadowSpawnLoc[locNo][i][0]);
@@ -705,6 +770,7 @@ public class FourSepulchersManager
     	}
     }
 
+    // ƒn?ƒV?‚Ì·sÒ‚Ìspawnƒf[ƒ^‚Ìì¬
     protected void InitExecutionerSpawns()
     {
     	L2Spawn spawnDat;
@@ -737,151 +803,102 @@ public class FourSepulchersManager
             }
         }
     }
-    
+
+    // ó•t?ŠÔ‚©ƒ`ƒFƒbƒN
     public boolean IsEntryTime()
     {
     	return _InEntryTime;
     }
-    
+
+    // —ì•_U—ª?ŠÔ‚©ƒ`ƒFƒbƒN
     public boolean IsAttackTime()
     {
     	return _InAttackTime;
     }
-    
+
+    // —ì•_‚Ì\‚µ?‚İ‚ª‰Â”\‚©‚Ç‚¤‚©‚ğƒ`ƒFƒbƒN
     public synchronized boolean IsEnableEntry(int npcId,L2PcInstance player)
     {
-        NpcHtmlMessage html = new NpcHtmlMessage(1);
+        // ó•t?ŠÔŠO‚È‚ç‚Îó‚¯•t‚¯‚È‚¢
+        if(!IsEntryTime()) return false;
 
-        if(!IsEntryTime())
-        {
-            html.setFile("data/scripts/quests/"+_QuestId+"/"+npcId+"-02.htm");
-            player.sendPacket(html);
-        	//player.sendMessage("²{¦b¦n¹³¤£¬O¥i¥H¤J³õªº®É¶¡¡Aµ¥¤@·|¨à¦A¸Õ¸Õ§a¡C");
-        	return false;
-        }
-        
-        else if(_HallInUse.get(npcId).booleanValue()) 
-        {
-            html.setFile("data/scripts/quests/"+_QuestId+"/"+npcId+"-07.htm");
-            player.sendPacket(html);
-        	//player.sendMessage("¨ä¥L¶¤¥î¥¿¦b¶i¦æ¤¤¡C¤U¦¸¥i¥H¤J³õªº®É«J¦A¨Ó¬D¾Ô§a¡C");
-        	return false;
-        }
+        // Šù‚É‘¼‚Ìƒv?ƒC?[‚ª\‚µ?‚ñ‚Å‚¢‚éê?‚Íó‚¯•t‚¯‚È‚¢
+        else if(_HallInUse.get(npcId).booleanValue()) return false;
 
-        else if(Config.FS_PARTY_MEMBER_COUNT > 1)
+        // Q‰Ál?‚ÌŠm”F
+        else if(Config.FS_PARTY_MEMBER_COUNT > 1)    // Config‚Åƒ\?‚Å‚Ì’§í‚ª?‚³‚ê‚Ä‚¢‚È‚¢‚Î?‚¢
         {
+        	// ƒv?ƒC?[‚Íƒp[ƒeƒB‚ğ‘g‚ñ‚Å‚¢‚é‚±‚Æ
+        	if(player.getParty() == null) return false;
 
-        	if(player.getParty() == null) 
-            {
-                html.setFile("data/scripts/quests/"+_QuestId+"/"+npcId+"-04.htm");
-                player.sendPacket(html);
-            	//player.sendMessage("·Q°_¨Ó¤F¡A¶¤­û¦Ü¤Ö»İ­n¦³4¦W¤~¦æ¡C­n¦A§ä¶¤­ûµM«á¦A¨Ó¡C");
-            	return false;
-            }
-        		
-        	if(!player.getParty().isLeader(player)) 
-            {
-                html.setFile("data/scripts/quests/"+_QuestId+"/"+npcId+"-03.htm");
-                player.sendPacket(html);
-            	//player.sendMessage("®£©È­n¶¤ªø§â¤â©ñ¦b¥Û¹³¤W¤~¦æ¡C§Ú§â¤â©ñ¤W¥h¤]¨S¦³¤ÏÀ³¡C");
-            	return false;
-            }
-        	
-            if (player.getParty().getMemberCount() < Config.FS_PARTY_MEMBER_COUNT) 
-            {
-                html.setFile("data/scripts/quests/"+_QuestId+"/"+npcId+"-04.htm");
-                player.sendPacket(html);
-            	//player.sendMessage("·Q°_¨Ó¤F¡A¶¤­û¦Ü¤Ö»İ­n¦³4¦W¤~¦æ¡C­n¦A§ä¶¤­ûµM«á¦A¨Ó¡C");
-            	return false;
-            }
+        	// ƒv?ƒC?[‚Íƒp[ƒeƒB?[ƒ_[‚Å?‚é‚±‚Æ
+        	if(!player.getParty().isLeader(player)) return false;
+
+            // ƒv?ƒC?[‚Í‹K’èl?ˆÈã‚Åƒp[ƒeƒB‚ğ‘g‚ñ‚Å‚¢‚é‚±‚Æ
+            if (player.getParty().getMemberCount() < Config.FS_PARTY_MEMBER_COUNT) return false;
 
             else
             {
                 for (L2PcInstance mem : player.getParty().getPartyMembers())
                 {
+                    // ƒp[ƒeƒB??ƒo[‘Sˆõ‚ªƒNƒGƒXƒgu‚S‚Â‚Ì”tv‚ğó‚¯‚Ä‚¢‚é‚±‚Æ
+                    if(mem.getQuestState(_QuestId).get("<state>") == null) return false;
+                    // ƒp[ƒeƒB??ƒo[‘Sˆõ‚ªu—ì•_‚Ì’ÊsØv‚ğ?‚Á‚Ä‚¢‚é‚±‚Æ
+                    if (mem.getInventory().getItemByItemId(_EntrancePass) == null) return false;
 
-                    if(mem.getQuestState(_QuestId).get("<state>") == null) 
-                    {
-                        html.setFile("data/scripts/quests/"+_QuestId+"/"+npcId+"-06.htm");
-                        player.sendPacket(html);
-                    	//player.sendMessage("³o»ò¤@¬İ¡A­ì¨Ó¶¤­û¤¤¦³¤£Å¥±qµL¦WªºÆF»îªºÅñ¦«ªº¡C¬İ¨Ó±oÅı¶¤­û¥h©MµL¦WªºÆF»î½Í¸Ü¡AµM«á¦A¦^¨Ó¡C");
-                    	return false;
-                    }
-
-                    if (mem.getInventory().getItemByItemId(_EntrancePass) == null)
-                    {
-                        html.setFile("data/scripts/quests/"+_QuestId+"/"+npcId+"-05.htm");
-                        player.sendPacket(html);
-                    	//player.sendMessage("³o»ò¤@¬İ¡A­ì¨Ó¶¤­û¤¤¦³¨S±a³®¹Ó³q¦æÃÒªº¡C±oµ¹¶¤­û³®¹Ó³q¦æÃÒ¡A©ÎªÌÅı¥L¥h§Ë¨Ó¡C");
-                    	return false;
-                    }
-
-                    int invLimitCnt = mem.GetInventoryLimit();
+                    // ƒC?ƒx?ƒg?“à‚ÌƒAƒCƒe??‚ª80%–¢?‚Å?‚é‚±‚Æ
+                    int invLimitCnt = mem.getInventoryLimit();
                     int invItemCnt = mem.getInventory().getItems().length;
-                    if((invItemCnt / invLimitCnt) >= 0.8)
-                    {
-                    	player.sendPacket(new SystemMessage(SystemMessageId.INVENTORY_LESS_THAN_80_PERCENT));
-                    	return false;
-                    }
-                    
+                    if((invItemCnt / invLimitCnt) >= 0.8) return false;
+
+                    // ƒC?ƒx?ƒg?‚Ìd—Ê‚ª80%–¢?‚Å?‚é‚±‚Æ
                     int invLimitWeight = mem.getMaxLoad();
                     int invWeight = mem.getInventory().getTotalWeight();
-                    if((invWeight / invLimitWeight) >= 0.8)
-                    {
-                    	player.sendPacket(new SystemMessage(SystemMessageId.INVENTORY_LESS_THAN_80_PERCENT));
-                    	return false;
-                    }
+                    if((invWeight / invLimitWeight) >= 0.8) return false;
                 }
             }
         }
-        else
+        else    // ƒ\?‚Ìê?
         {
+            // ’§íÒ‚ÍƒNƒGƒXƒgu‚S‚Â‚Ì”tv‚ğó‚¯‚Ä‚¢‚é‚±‚Æ
+            if(player.getQuestState(_QuestId).get("<state>") == null) return false;
+            // ’§íÒ‚Íu—ì•_‚Ì’ÊsØv‚ğ?‚Á‚Ä‚¢‚é‚±‚Æ
+            if(player.getInventory().getItemByItemId(_EntrancePass) == null) return false;
 
-            //if(player.getQuestState(_QuestId).get("<state>") == null) return false;
-
-            if(player.getInventory().getItemByItemId(_EntrancePass) == null) 
-            {
-                html.setFile("data/scripts/quests/"+_QuestId+"/"+npcId+"-05.htm");
-                player.sendPacket(html);
-            	//player.sendMessage("³o»ò¤@¬İ¡A­ì¨Ó§A¨S±a³®¹Ó³q¦æÃÒ¡C§Ö¥h§â³®¹Ó³q¦æÃÒ±a¨Ó§a¡C");
-            	return false;
-            }
-
-            int invLimitCnt = player.GetInventoryLimit();
+            // ƒC?ƒx?ƒg?“à‚ÌƒAƒCƒe??‚ª80%–¢?‚Å?‚é‚±‚Æ
+            int invLimitCnt = player.getInventoryLimit();
             int invItemCnt = player.getInventory().getItems().length;
-            if((invItemCnt / invLimitCnt) >= 0.8)
-            {
-            	player.sendPacket(new SystemMessage(SystemMessageId.INVENTORY_LESS_THAN_80_PERCENT));
-            	return false;
-            }
-            
+            if((invItemCnt / invLimitCnt) >= 0.8) return false;
+
+            // ƒC?ƒx?ƒg?‚Ìd—Ê‚ª80%–¢?‚Å?‚é‚±‚Æ
             int invLimitWeight = player.getMaxLoad();
             int invWeight = player.getInventory().getTotalWeight();
-            if((invWeight / invLimitWeight) >= 0.8)
-            {
-            	player.sendPacket(new SystemMessage(SystemMessageId.INVENTORY_LESS_THAN_80_PERCENT));
-            	return false;
-            }
+            if((invWeight / invLimitWeight) >= 0.8) return false;
         }
 
+        // ‚·‚×‚Ä‚Ì”»’è‚ğ’Ê‰ß‚·‚ê‚Î?—p‰Â”\
         return true;
     }
-    
+
+    // ’§íÒƒp[ƒeƒB‚ğ“o˜^‚µA’jİ‚Ì‰ï“°‚Öƒe?ƒ|[ƒg‚³‚¹‚é
     public void Entry(int npcId, L2PcInstance player)
 	{
-
+		// ’§íÒƒp[ƒeƒB‚ğ’jİ‚Ì‰ï“°‚Öƒe?ƒ|[ƒg
+		// ƒe?ƒ|[ƒgÀ•W‚Ìæ“¾
 		int[] Location = _StartHallSpawns.get(npcId);
 		int driftx;
 		int drifty;
 
-		if (Config.FS_PARTY_MEMBER_COUNT > 1)
+		// ƒe?ƒ|[ƒg
+		if (Config.FS_PARTY_MEMBER_COUNT > 1) // Config‚Åƒ\?‚Å‚Ì’§í‚ª?‚³‚ê‚Ä‚¢‚È‚¢‚Î?‚¢
 		{
-
+			// —ì•_‚Ì\‚µ?‚İğ?‚ğÄŠm”F
 			if (IsEnableEntry(npcId, player))
 			{
-				List<L2PcInstance> members = new FastList<L2PcInstance>();
+				List<L2PcInstance> members = new FastList<L2PcInstance>(); // ƒe?ƒ|[ƒg‰Â”\‚È??ƒo[‚Ì?ƒXƒg
 				for (L2PcInstance mem : player.getParty().getPartyMembers())
 				{
+					// ??ƒo[‚ª—ì•_‚Ì’ÊsØ‚ğ?‚Á‚Ä‚¢‚ÄA¶‚«‚Ä‚¢‚ÄAƒp[ƒeƒB?[ƒ_[‚Ì”F¯”ÍˆÍ“à‚É‚¢‚ê‚ÎAƒe?ƒ|[ƒg‚³‚¹‚é
 					if (!mem.isDead() && Util.checkIfInRange(700, player, mem, true))
 					{
 						members.add(mem);
@@ -890,78 +907,90 @@ public class FourSepulchersManager
 
 				for (L2PcInstance mem : members)
 				{
-
+					// ’jİ‚Ì‰ï“°‚Öƒe?ƒ|[ƒg‚·‚é
 					driftx = Rnd.get(-80, 80);
 					drifty = Rnd.get(-80, 80);
 					mem.teleToLocation(Location[0] + driftx, Location[1] + drifty, Location[2]);
-
+					// —ì•_‚Ì’ÊsØ‚ğƒC?ƒx?ƒg?‚©‚çÁ‚·
 					mem.destroyItemByItemId("Quest", _EntrancePass, 1, mem,true);
-
+					// ŒÃ‚¢ƒu?[ƒ`‚ğ?‚Á‚Ä‚¢‚È‚¯‚ê‚Îg—pÏ‚İ—ì•_‚Ì’ÊsØ‚ğƒC?ƒx?ƒg?‚É“ü‚ê‚é
                     if (mem.getInventory().getItemByItemId(_OldBrooch) == null)
                     {
 						mem.addItem("Quest", _UsedEntrancePass, 1, mem, true);
                     }
 
+					// •s³–h~‚Ì‚½‚ßA‰ï“°‚ÌŒ®‚ğ‘S‚ÄÁ‚·
 					L2ItemInstance HallsKey = mem.getInventory().getItemByItemId(_HallsKey);
 	                if(HallsKey != null)
 	                {
+	                    // ‰ï“°‚ÌŒ®‚ğƒC?ƒx?ƒg?‚©‚çÁ‚·
 	                	mem.destroyItemByItemId("Quest", _HallsKey, HallsKey.getCount(), mem, true);
 	                }
 				}
 
+				// —ì•_ŠÇ?l‚Éƒp[ƒeƒB?[ƒ_[‚ğŠÖŒW•t‚¯‚é
 				_Challengers.remove(npcId);
 				_Challengers.put(npcId, player);
 
+				// —ì•_‚Ì?—pó‹µ‚ğXV‚·‚é
 				_HallInUse.remove(npcId);
 				_HallInUse.put(npcId, true);
 			}
 			else
 			{
-            	//player.sendMessage("©|¥¼¹F¨ì©Ò»İ­nªº±ø¥ó¡C");
+				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
+				sm.addString("ğ?‚ğ?‚½‚µ‚Ä‚¢‚È‚¢‚½‚ßA“üê‚ª?”Û‚³‚ê‚Ü‚µ‚½B");
+				player.sendPacket(sm);
 			}
-
 		}
 		else
+		// ƒ\?‚Ìê?
 		{
-
+			// —ì•_‚Ì\‚µ?‚İğ?‚ğÄŠm”F
 			if (IsEnableEntry(npcId, player))
 			{
-
+				// ’jİ‚Ì‰ï“°‚Öƒe?ƒ|[ƒg‚·‚é
 				driftx = Rnd.get(-80, 80);
 				drifty = Rnd.get(-80, 80);
 				player.teleToLocation(Location[0] + driftx, Location[1] + drifty, Location[2]);
-
+				// —ì•_‚Ì’ÊsØ‚ğƒC?ƒx?ƒg?‚©‚çÁ‚·
 				player.destroyItemByItemId("Quest", _EntrancePass, 1, player, true);
-
+				// ŒÃ‚¢ƒu?[ƒ`‚ğ?‚Á‚Ä‚¢‚È‚¯‚ê‚Îg—pÏ‚İ—ì•_‚Ì’ÊsØ‚ğƒC?ƒx?ƒg?‚É“ü‚ê‚é
                 if (player.getInventory().getItemByItemId(_OldBrooch) == null)
                 {
                 	player.addItem("Quest", _UsedEntrancePass, 1, player, true);
                 }
 
+				// •s³–h~‚Ì‚½‚ßA‰ï“°‚ÌŒ®‚ğ‘S‚ÄÁ‚·
 				L2ItemInstance HallsKey = player.getInventory().getItemByItemId(_HallsKey);
                 if(HallsKey != null)
                 {
+                    // ‰ï“°‚ÌŒ®‚ğƒC?ƒx?ƒg?‚©‚çÁ‚·
                 	player.destroyItemByItemId("Quest", _HallsKey, HallsKey.getCount(), player, true);
                 }
 
+                // —ì•_ŠÇ?l‚Éƒp[ƒeƒB?[ƒ_[‚ğŠÖŒW•t‚¯‚é
 				_Challengers.remove(npcId);
 				_Challengers.put(npcId, player);
 
+				// —ì•_‚Ì?—pó‹µ‚ğXV‚·‚é
 				_HallInUse.remove(npcId);
 				_HallInUse.put(npcId, true);
 			}
 			else
 			{
-            	//player.sendMessage("©|¥¼¹F¨ì©Ò»İ­nªº±ø¥ó¡C");
+				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
+				sm.addString("ğ?‚ğ?‚½‚µ‚Ä‚¢‚È‚¢‚½‚ßA“üê‚ª?”Û‚³‚ê‚Ü‚µ‚½B");
+				player.sendPacket(sm);
 			}
-
 		}
 	}
 
+    // “ä‚Ì?‚ğoŒ»‚³‚¹‚é
     public void SpawnMysteriousBox(int npcId)
     {
     	if (!IsAttackTime()) return;
-    	
+
     	L2Spawn spawnDat = _MysteriousBoxSpawns.get(npcId);
     	if(spawnDat != null)
     	{
@@ -970,6 +999,7 @@ public class FourSepulchersManager
     	}
     }
 
+    // ??ƒXƒ^[‚ğoŒ»‚³‚¹‚é
     public void SpawnMonster(int npcId)
     {
     	if (!IsAttackTime()) return;
@@ -977,23 +1007,26 @@ public class FourSepulchersManager
     	FastList<L2Spawn> MonsterList;
     	List<L2SepulcherMonsterInstance> Mobs = new FastList<L2SepulcherMonsterInstance>();
     	L2Spawn KeyBoxMobSpawn;
-    	
-    	if(Rnd.get(2) == 0)
+
+    	// •¨?ŒnA?–@Œn‚Ì‚Ç‚¿‚ç‚©‚ğ?‚ß‚é
+    	if(Rnd.get(2) == 0)	// •¨?Œn
     	{
     		MonsterList = (FastList<L2Spawn>)_PhysicalMonsters.get(npcId);
     	}
-    	else
+    	else				// ?–@Œn
     	{
     		MonsterList = (FastList<L2Spawn>)_MagicalMonsters.get(npcId);
     	}
-    	
+
+    	// ??ƒXƒ^[‚ğoŒ»‚³‚¹‚é
     	if(MonsterList != null)
     	{
     		boolean SpawnKeyBoxMob = false;
     		boolean SpawnedKeyBoxMob = false;
-    		
+
         	for (L2Spawn spawnDat:MonsterList)
         	{
+        		// qİ‚Ì‰ï“°‚ÅŒ®‚Ì?‚ğoŒ»‚³‚¹‚é•æ’n‚Ìb?‚ğoŒ»‚³‚¹‚é‚©”»’è‚·‚éB
         		if(SpawnedKeyBoxMob)
         		{
         			SpawnKeyBoxMob = false;
@@ -1002,6 +1035,7 @@ public class FourSepulchersManager
         		{
             		switch(npcId)
             		{
+            		    // qİ‚Ì‰ï“°‚Ì“ä‚Ì?
             		    case 31469:
             		    case 31474:
             		    case 31479:
@@ -1019,6 +1053,7 @@ public class FourSepulchersManager
 
         		L2SepulcherMonsterInstance mob = null;
 
+        		// Œ®‚Ì?‚ğoŒ»‚³‚¹‚é•æ’n‚Ìb?‚ğoŒ»‚³‚¹‚é??
         		if(SpawnKeyBoxMob)
         		{
                     try
@@ -1045,7 +1080,7 @@ public class FourSepulchersManager
                     {
                         _log.warning("FourSepulchersManager.SpawnMonster: Spawn could not be initialized: " + e);
                     }
-        			
+
         			SpawnedKeyBoxMob = true;
         		}
         		else
@@ -1059,10 +1094,12 @@ public class FourSepulchersManager
             		mob.MysteriousBoxId = npcId;
             		switch(npcId)
             		{
+            		    // qİ‚Ì‰ï“°‚Ì“ä‚Ì?
             		    case 31469:
             		    case 31474:
             		    case 31479:
             		    case 31484:
+            		    // Œöİ‚Ì‰ï“°‚Ì“ä‚Ì?
             		    case 31472:
             		    case 31477:
             		    case 31482:
@@ -1075,13 +1112,15 @@ public class FourSepulchersManager
 
         	switch(npcId)
     		{
+    		    // qİ‚Ì‰ï“°‚Ì“ä‚Ì?
     		    case 31469:
     		    case 31474:
     		    case 31479:
     		    case 31484:
     		    	_ViscountMobs.put(npcId, Mobs);
     		    	break;
-    		    
+
+    		    // Œöİ‚Ì‰ï“°‚Ì“ä‚Ì?
     		    case 31472:
     		    case 31477:
     		    case 31482:
@@ -1092,36 +1131,39 @@ public class FourSepulchersManager
     	}
     }
 
+    // qİ‚Ì‰ï“°‚Ì??ƒXƒ^[‚ÌŸr–Å‚ğŠm”F‚·‚é
     public synchronized boolean IsViscountMobsAnnihilated(int npcId)
     {
     	FastList<L2SepulcherMonsterInstance> Mobs =
     		(FastList<L2SepulcherMonsterInstance>)_ViscountMobs.get(npcId);
-    	
+
     	if(Mobs == null) return true;
-    	
+
     	for(L2SepulcherMonsterInstance mob:Mobs)
     	{
     		if(!mob.isDead()) return false;
     	}
-    	
+
     	return true;
     }
 
+    // Œöİ‚Ì‰ï“°‚Ì??ƒXƒ^[‚ÌŸr–Å‚ğŠm”F‚·‚é
     public synchronized boolean IsDukeMobsAnnihilated(int npcId)
     {
     	FastList<L2SepulcherMonsterInstance> Mobs =
     		(FastList<L2SepulcherMonsterInstance>)_DukeMobs.get(npcId);
-    	
+
     	if(Mobs == null) return true;
-    	
+
     	for(L2SepulcherMonsterInstance mob:Mobs)
     	{
     		if(!mob.isDead()) return false;
     	}
-    	
+
     	return true;
     }
 
+    // Œ®‚Ì?‚ğoŒ»‚³‚¹‚é
     public void SpawnKeyBox(L2NpcInstance activeChar)
     {
     	if (!IsAttackTime()) return;
@@ -1138,10 +1180,11 @@ public class FourSepulchersManager
         	spawnDat.setRespawnDelay(3600);
         	_AllMobs.add(spawnDat.doSpawn());
         	spawnDat.stopRespawn();
-    		
+
     	}
     }
-    
+
+    // ƒn?ƒV?‚Ì·sÒ‚ğoŒ»‚³‚¹‚é
     public void SpawnExecutionerOfHalisha(L2NpcInstance activeChar)
     {
     	if (!IsAttackTime()) return;
@@ -1161,14 +1204,17 @@ public class FourSepulchersManager
     	}
     }
 
+    // ƒn?ƒV?ƒAƒhƒ~ƒjƒXƒg?[ƒ^[‚ğoŒ»‚³‚¹‚é
     public void SpawnArchonOfHalisha(int npcId)
     {
     	if (!IsAttackTime()) return;
-    	
+
+    	// Šù‚ÉoŒ»‚µ‚Ä‚¢‚éê?‚Í–³?
     	if(_ArchonSpawned.get(npcId)) return;
 
     	FastList<L2Spawn> MonsterList = (FastList<L2Spawn>)_DukeFinalMobs.get(npcId);
-    	
+
+    	// ??ƒXƒ^[‚ğoŒ»‚³‚¹‚é
     	if(MonsterList != null)
     	{
         	for (L2Spawn spawnDat:MonsterList)
@@ -1186,12 +1232,14 @@ public class FourSepulchersManager
     	}
     }
 
+    // ƒEƒBƒSƒbƒg‚Ì—H—ì‚Æƒn?ƒV?‚Ì•ó?‚ğoŒ»‚³‚¹‚é
     public void SpawnEmperorsGraveNpc(int npcId)
     {
     	if (!IsAttackTime()) return;
-    	
+
     	FastList<L2Spawn> MonsterList = (FastList<L2Spawn>)_EmperorsGraveNpcs.get(npcId);
-    	
+
+    	// ??ƒXƒ^[‚ğoŒ»‚³‚¹‚é
     	if(MonsterList != null)
     	{
         	for (L2Spawn spawnDat:MonsterList)
@@ -1202,14 +1250,16 @@ public class FourSepulchersManager
     	}
     }
 
+    // ƒn?ƒV?ƒV?ƒh[‚ÌoŒ»À•W‚ğ?’è‚·‚éB
     protected void LocationShadowSpawns()
     {
     	int locNo = Rnd.get(4);
     	_log.info("FourSepulchersManager.LocationShadowSpawns: Location index is " + locNo + ".");
     	final int[] gateKeeper = {31929,31934,31939,31944};
-    	
+
     	L2Spawn spawnDat;
 
+        // ¡‰ñ‚ÌoŒ»À•Wî•ñ‚ğì¬
         for(int i=0;i<=3;i++)
     	{
         	int keyNpcId = gateKeeper[i];
@@ -1222,6 +1272,7 @@ public class FourSepulchersManager
     	}
     }
 
+    // ƒn?ƒV?ƒV?ƒh[‚ğoŒ»‚³‚¹‚é
     public void SpawnShadow(int npcId)
     {
     	if (!IsAttackTime()) return;
@@ -1240,15 +1291,18 @@ public class FourSepulchersManager
     	}
     }
 
+    // ƒp[ƒeƒB‚ª‘S–Å‚µ‚½‚©‚ğŠm”F
     public void checkAnnihilated(L2PcInstance player)
     {
+    	// ‘S–Å‚µ‚½ê?‚Í‚T•bŒã‚É?—çÒ‚Ì?‰@‚Ö”ò‚Î‚·
     	if(IsPartyAnnihilated(player))
     	{
     		_OnPartyAnnihilatedTask =
-				ThreadPoolManager.getInstance().scheduleGeneral(new OnPartyAnnihilatedTask(player),5000);    			
+				ThreadPoolManager.getInstance().scheduleGeneral(new OnPartyAnnihilatedTask(player),5000);
     	}
     }
-    
+
+    // ƒp[ƒeƒB‚ª‘S–Å‚µ‚½‚©‚ğŠm”F
     public synchronized boolean IsPartyAnnihilated(L2PcInstance player)
     {
 		if(player.getParty() != null)
@@ -1267,7 +1321,8 @@ public class FourSepulchersManager
 			return true;
 		}
     }
-    
+
+    // ƒp[ƒeƒB‚ª‘S–Å‚µ‚½ê?‚Ì??A?—çÒ‚Ì?‰@‚Ö”ò‚Î‚·
     public synchronized void OnPartyAnnihilated(L2PcInstance player)
     {
 		if(player.getParty() != null)
@@ -1287,7 +1342,8 @@ public class FourSepulchersManager
     		player.teleToLocation(169589 + driftX,-90493 + driftY,-2914);
     	}
     }
-    
+
+    // —ì•_“à‚Ì??ƒXƒ^[‚ğÁ‚·
     public void DeleteAllMobs()
     {
     	_log.info("FourSepulchersManager.DeleteAllMobs: Try to delete " + _AllMobs.size() + " monsters.");
@@ -1309,7 +1365,8 @@ public class FourSepulchersManager
         _AllMobs.clear();
     	_log.info("FourSepulchersManager.DeleteAllMobs: Deleted " + delCnt + " monsters.");
     }
-    
+
+    // ‚·‚×‚Ä‚Ì‰ï“°‚ÌƒhƒA‚ğ•Â‚¶‚é
     protected void CloseAllDoors()
     {
     	for(int doorId:_HallGateKeepers.values())
@@ -1325,21 +1382,23 @@ public class FourSepulchersManager
     	}
     }
 
+    // Q‰Áó•t?ŠÔ‚É“ü‚é
     protected class ChaneEntryTime implements Runnable
     {
         public void run()
         {
-
             _log.info("FourSepulchersManager:In Entry Time");
-
+            // ƒt?ƒO‚ğ•ÏX‚·‚é
             _InEntryTime = true;
             _InWarmUpTime = false;
             _InAttackTime = false;
             _InCoolDownTime = false;
-            
+
+            // ƒEƒH[?ƒAƒbƒv?ŠÔ‚ÉˆÚs‚·‚éƒ^ƒXƒN‚ğd?‚ñ‚Å‚¨‚­
             _ChaneWarmUpTimeTask =
                 ThreadPoolManager.getInstance().scheduleGeneral(new ChaneWarmUpTime(),Config.FS_TIME_ENTRY * 60000);
 
+            // Às‚³‚ê‚½ƒ^ƒXƒN‚ÌƒN?[?ƒAƒbƒv
             if(_ChangeEntryTimeTask != null)
             {
             	_ChangeEntryTimeTask.cancel(true);
@@ -1347,21 +1406,24 @@ public class FourSepulchersManager
             }
         }
     }
-    
+
+    // ƒEƒH[?ƒAƒbƒv?ŠÔ‚É“ü‚é
     protected class ChaneWarmUpTime implements Runnable
     {
         public void run()
         {
             _log.info("FourSepulchersManager:In Warm-Up Time");
-
+            // ƒt?ƒO‚ğ•ÏX‚·‚é
             _InEntryTime = true;
             _InWarmUpTime = false;
             _InAttackTime = false;
             _InCoolDownTime = false;
-            
+
+            // —ì•_U—ª?ŠÔ‚ÉˆÚs‚·‚éƒ^ƒXƒN‚ğd?‚ñ‚Å‚¨‚­
             _ChangeAttackTimeTask =
                 ThreadPoolManager.getInstance().scheduleGeneral(new ChangeAttackTime(),Config.FS_TIME_WARMUP * 60000);
 
+            // Às‚³‚ê‚½ƒ^ƒXƒN‚ÌƒN?[?ƒAƒbƒv
             if(_ChaneWarmUpTimeTask != null)
             {
             	_ChaneWarmUpTimeTask.cancel(true);
@@ -1369,29 +1431,33 @@ public class FourSepulchersManager
             }
         }
     }
-    
+
+    // —ì•_U—ª?ŠÔ‚É“ü‚é
     protected class ChangeAttackTime implements Runnable
     {
         public void run()
         {
-
             _log.info("FourSepulchersManager:In Attack Time");
-
+            // ƒt?ƒO‚ğ•ÏX‚·‚é
             _InEntryTime = false;
             _InWarmUpTime = false;
             _InAttackTime = true;
             _InCoolDownTime = false;
-            
+
+            // ƒn?ƒV?ƒV?ƒh[‚ÌoŒ»À•W‚ğ?’è‚·‚é
             LocationShadowSpawns();
-            
+
+            // ’jİ‚Ì‰ï“°‚Ì“ä‚Ì?‚ğoŒ»‚³‚¹‚é
             SpawnMysteriousBox(31921);
             SpawnMysteriousBox(31922);
             SpawnMysteriousBox(31923);
             SpawnMysteriousBox(31924);
-            
+
+            // ƒN[?ƒ_ƒE?ƒ^ƒC?‚ÉˆÚs‚·‚éƒ^ƒXƒN‚ğd?‚ñ‚Å‚¨‚­
             _ChangeCoolDownTimeTask =
                 ThreadPoolManager.getInstance().scheduleGeneral(new ChangeCoolDownTime(),Config.FS_TIME_ATTACK * 60000);
 
+            // Às‚³‚ê‚½ƒ^ƒXƒN‚ÌƒN?[?ƒAƒbƒv
             if(_ChangeAttackTimeTask != null)
             {
             	_ChangeAttackTimeTask.cancel(true);
@@ -1400,40 +1466,46 @@ public class FourSepulchersManager
         }
     }
 
+    // ƒN[?ƒ_ƒE?ƒ^ƒC?‚É“ü‚é
     protected class ChangeCoolDownTime implements Runnable
     {
-        
+
         public void run()
         {
-
             _log.info("FourSepulchersManager:In Cool-Down Time");
-
+            // ƒt?ƒO‚ğ•ÏX‚·‚é
             _InEntryTime = false;
             _InWarmUpTime = false;
             _InAttackTime = false;
             _InCoolDownTime = true;
 
+            // U—ª?‚ÌPC‚ğ?—çÒ‚Ì?‰@‚Ö”ò‚Î‚·
             for(L2PcInstance player :L2World.getInstance().getAllPlayers())
             {
-            	if (BossZoneManager.getInstance().checkIfInZone("FourSepulcher", player) &&
-            		(player.getZ() >= -7250 && player.getZ() <= -6841))
+            	if (CustomZoneManager.getInstance().checkIfInZone("FourSepulcher", player) &&
+            		(player.getZ() >= -7250 && player.getZ() <= -6841) &&
+            		!player.isGM())
             	{
             		int driftX = Rnd.get(-80,80);
             		int driftY = Rnd.get(-80,80);
             		player.teleToLocation(169589 + driftX,-90493 + driftY,-2914);
             	}
             }
-            
+
+            // —ì•_“à‚Ì??ƒXƒ^[—Ş‚ğÁ‚·
             DeleteAllMobs();
 
+            // ŠJ‚¢‚Ä‚¢‚é‰Â”\«‚Ì?‚é‰ï“°‚Ì”à‚ğ‚·‚×‚Ä•Â‚¶‚é
             CloseAllDoors();
-            
-            _HallInUse.clear();
-            _HallInUse.put(31921,false);
-            _HallInUse.put(31922,false);
-            _HallInUse.put(31923,false);
-            _HallInUse.put(31924,false);
 
+            // —ì•_‚Ì?—pó‘Ô‚ğƒN?ƒA
+            _HallInUse.clear();
+            _HallInUse.put(31921,false);    // ª?Ò‚Ì—ì•_
+            _HallInUse.put(31922,false);    // x”zÒ‚Ì—ì•_
+            _HallInUse.put(31923,false);    // ‘åŒ«Ò‚Ì—ì•_
+            _HallInUse.put(31924,false);    // R”»Ò‚Ì—ì•_
+
+            // Œöİ‚Ì‰ï“°‚Ìƒn?ƒV?ƒAƒhƒ~ƒjƒXƒg?[ƒ^[‚ÌoŒ»ó‘Ô‚ğƒN?ƒA
             if(_ArchonSpawned.size() != 0)
             {
                 Set<Integer> npcIdSet = _ArchonSpawned.keySet();
@@ -1442,10 +1514,12 @@ public class FourSepulchersManager
                 	_ArchonSpawned.put(npcId, false);
                 }
             }
-            
-            _ChangeEntryTimeTask = 
+
+            // Q‰Áó•t?ŠÔ‚ÉˆÚs‚·‚éƒ^ƒXƒN‚ğd?‚ñ‚Å‚¨‚­
+            _ChangeEntryTimeTask =
                 ThreadPoolManager.getInstance().scheduleGeneral(new ChaneEntryTime(),Config.FS_TIME_COOLDOWN * 60000);
 
+            // Às‚³‚ê‚½ƒ^ƒXƒN‚ÌƒN?[?ƒAƒbƒv
             if(_ChangeCoolDownTimeTask != null)
             {
             	_ChangeCoolDownTimeTask.cancel(true);
@@ -1454,119 +1528,26 @@ public class FourSepulchersManager
         }
     }
 
+    // 4‘å—ì•_‚Å?‚ñ‚¾ê?Aƒp[ƒeƒB‚ª‘S–Å‚µ‚Ä‚¢‚ê‚Î?—çÒ‚Ì?‰@‚Ö”ò‚Î‚·
 	private class OnPartyAnnihilatedTask implements Runnable
 	{
 		L2PcInstance _player;
-		
+
 		public OnPartyAnnihilatedTask(L2PcInstance player)
 		{
 			_player = player;
 		}
-		
+
 		public void run()
 		{
 			OnPartyAnnihilated(_player);
-
+            // Às‚³‚ê‚½ƒ^ƒXƒN‚ÌƒN?[?ƒAƒbƒv
             if(_OnPartyAnnihilatedTask != null)
             {
             	_OnPartyAnnihilatedTask.cancel(true);
             	_OnPartyAnnihilatedTask = null;
             }
-			
+
 		}
 	}
-/* ================================================================================================
-            //¤J³õ®É¬q³Æ¥Î°T®§ In Entry Time (55¤ÀÄÁªº®É­Ô) 
-            //sendMessageToAll("©ºªAªÌ³®¹ÓºŞ²z­û", "±q²{¦b°_¥i¥H¶i¤J³®¹Ó¤º¡C");
-            //sendMessageToAll("©ºªAªÌ³®¹ÓºŞ²z­û", "­Y±N¤â©ñ¦b¥|¤j³®¹Óªº¥Û¹³¤W¡A´N¥i¥H¶i¤J³®¹Ó¤º¡C");
-            //sendMessageToAll("²ÎªvªÌ³®¹ÓºŞ²z­û", "±q²{¦b°_¥i¥H¶i¤J³®¹Ó¤º¡C");
-            //sendMessageToAll("²ÎªvªÌ³®¹ÓºŞ²z­û", "­Y±N¤â©ñ¦b¥|¤j³®¹Óªº¥Û¹³¤W¡A´N¥i¥H¶i¤J³®¹Ó¤º¡C");
-            //sendMessageToAll("¤j½åªÌ³®¹ÓºŞ²z­û", "±q²{¦b°_¥i¥H¶i¤J³®¹Ó¤º¡C");
-            //sendMessageToAll("¤j½åªÌ³®¹ÓºŞ²z­û", "­Y±N¤â©ñ¦b¥|¤j³®¹Óªº¥Û¹³¤W¡A´N¥i¥H¶i¤J³®¹Ó¤º¡C");
-            //sendMessageToAll("¼f§PªÌ³®¹ÓºŞ²z­û", "±q²{¦b°_¥i¥H¶i¤J³®¹Ó¤º¡C");
-            //sendMessageToAll("¼f§PªÌ³®¹ÓºŞ²z­û", "­Y±N¤â©ñ¦b¥|¤j³®¹Óªº¥Û¹³¤W¡A´N¥i¥H¶i¤J³®¹Ó¤º¡C");
-
-            //§ğÀ»®É¬q³Æ¥Î°T®§ In Attack Time
-            //sendMessageToAll("©ºªAªÌ³®¹ÓºŞ²z­û", "²{¦b¤w¸g¹L¤F5¤ÀÄÁ¡C");
-            //sendMessageToAll("©ºªAªÌ³®¹ÓºŞ²z­û", "²{¦b¤w¸g¹L¤F10¤ÀÄÁ¡C");
-            //sendMessageToAll("©ºªAªÌ³®¹ÓºŞ²z­û", "²{¦b¤w¸g¹L¤F15¤ÀÄÁ¡C");
-            //sendMessageToAll("©ºªAªÌ³®¹ÓºŞ²z­û", "²{¦b¤w¸g¹L¤F20¤ÀÄÁ¡C");
-            //sendMessageToAll("©ºªAªÌ³®¹ÓºŞ²z­û", "²{¦b¤w¸g¹L¤F25¤ÀÄÁ¡C");
-            //sendMessageToAll("©ºªAªÌ³®¹ÓºŞ²z­û", "²{¦b¤w¸g¹L¤F30¤ÀÄÁ¡C");
-            //sendMessageToAll("©ºªAªÌ³®¹ÓºŞ²z­û", "²{¦b¤w¸g¹L¤F35¤ÀÄÁ¡C");
-            //sendMessageToAll("©ºªAªÌ³®¹ÓºŞ²z­û", "²{¦b¤w¸g¹L¤F40¤ÀÄÁ¡C");
-            //sendMessageToAll("©ºªAªÌ³®¹ÓºŞ²z­û", "²{¦b¤w¸g¹L¤F45¤ÀÄÁ¡C");
-
-            //²M³õ®É¬q³Æ¥Î°T®§ Cool-Down Time (50¤ÀÄÁªº®É­Ô) 
-            //sendMessageToAll("©ºªAªÌ³®¹ÓºŞ²z­û", "¬D¾Ô¤wµ²§ô¡Aµy«á±N¦Û°Ê¶i¦æ¶Ç°e");
-
-/* ================================================================================================
-	
-/*
-// addon ==========================================================================================
-	public void sendMessageToAll(String senderName, String message)
-    {
-        if (
-        		_ConquerorsSepulcherManager == null //|| 
-        		//_EmperorsSepulcherManager == null || 
-        		//_GreatSagesSepulcherManager == null || 
-        		//_JudgesSepulcherManager == null 
-           )
-            return;
-
-        CreatureSay cs = new CreatureSay(_ConquerorsSepulcherManager.getObjectId(), 1, senderName, message);
-        _ConquerorsSepulcherManager.broadcastPacket(cs);
-
-        //cs = new CreatureSay(_EmperorsSepulcherManager.getObjectId(), 1, senderName, message);
-        //_EmperorsSepulcherManager.broadcastPacket(cs);
-
-        //cs = new CreatureSay(_GreatSagesSepulcherManager.getObjectId(), 1, senderName, message);
-        //_GreatSagesSepulcherManager.broadcastPacket(cs);
-
-        //cs = new CreatureSay(_JudgesSepulcherManager.getObjectId(), 1, senderName, message);
-        //_JudgesSepulcherManager.broadcastPacket(cs);
-
-    }
-    public void npcSpawned(L2NpcInstance npc)
-    {
-        if (npc == null)
-            return;
-
-        int npcId = npc.getNpcId();
-
-        // If the spawned NPC ID matches the ones we need, assign their instances.
-        if (npcId == 31921)
-        {
-            if (Config.DEBUG)
-                _log.config("ConquerorsSepulcherManager: Instance found for NPC ID 31921 (" + npc.getObjectId() + ").");
-
-            _ConquerorsSepulcherManager = npc;
-        }
-        if (npcId == 31922)
-        {
-            if (Config.DEBUG)
-                _log.config("EmperorsSepulcherManager: Instance found for NPC ID 31922 (" + npc.getObjectId() + ").");
-
-            _EmperorsSepulcherManager = npc;
-        }
-
-        if (npcId == 31923)
-        {
-            if (Config.DEBUG)
-                _log.config("GreatSagesSepulcherManager: Instance found for NPC ID 31923 (" + npc.getObjectId() + ").");
-
-            _GreatSagesSepulcherManager = npc;
-        }
-
-        if (npcId == 31924)
-        {
-            if (Config.DEBUG)
-                _log.config("JudgesSepulcherManager: Instance found for NPC ID 31924 (" + npc.getObjectId() + ").");
-
-            _JudgesSepulcherManager = npc;
-        }
-    }
-	// addon end=======================================================================================
-*/
-
 }

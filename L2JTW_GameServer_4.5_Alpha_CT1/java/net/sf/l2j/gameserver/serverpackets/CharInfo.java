@@ -345,7 +345,7 @@ public class CharInfo extends L2GameServerPacket
 				writeC(_activeChar.getAppearance().getInvisible() ? 1 : 0);	// invisible = 1  visible =0
 			}
 
-			writeC(_activeChar.getMountType());	// 1 on strider   2 on wyvern   0 no mount
+			writeC(_activeChar.getMountType());	// 1-on Strider, 2-on Wyvern, 3-on Great Wolf, 0-no mount
 			writeC(_activeChar.getPrivateStoreType());   //  1 - sellshop
 
 			writeH(_activeChar.getCubics().size());
@@ -383,9 +383,9 @@ public class CharInfo extends L2GameServerPacket
 			writeC((_activeChar.isHero() || (_activeChar.isGM() && Config.GM_HERO_AURA)) ? 1 : 0); // Hero Aura
 
 			writeC(_activeChar.isFishing() ? 1 : 0); //0x01: Fishing Mode (Cant be undone by setting back to 0)
-			writeD(_activeChar.GetFishx());
-			writeD(_activeChar.GetFishy());
-			writeD(_activeChar.GetFishz());
+			writeD(_activeChar.getFishx());
+			writeD(_activeChar.getFishy());
+			writeD(_activeChar.getFishz());
 
 	        writeD(_activeChar.getAppearance().getNameColor());
 

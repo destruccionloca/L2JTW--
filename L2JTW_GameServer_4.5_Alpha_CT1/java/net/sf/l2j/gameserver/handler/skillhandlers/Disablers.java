@@ -149,6 +149,11 @@ public class Disablers implements ISkillHandler
             	}
             }
         }
+        else if (activeChar instanceof L2NpcInstance)
+        {
+        	bss = ((L2NpcInstance)activeChar).isUsingShot(false);
+        	ss = ((L2NpcInstance)activeChar).isUsingShot(true);
+        }
 
         for (int index = 0; index < targets.length; index++)
         {

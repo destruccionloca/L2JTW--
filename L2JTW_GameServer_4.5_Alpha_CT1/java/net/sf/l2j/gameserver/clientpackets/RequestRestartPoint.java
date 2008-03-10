@@ -26,7 +26,6 @@ import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.entity.Castle;
 import net.sf.l2j.gameserver.model.entity.ClanHall;
 import net.sf.l2j.gameserver.network.SystemMessageId;
-import net.sf.l2j.gameserver.serverpackets.Revive;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.util.IllegalPlayerAction;
 import net.sf.l2j.gameserver.util.Util;
@@ -174,10 +173,9 @@ public final class RequestRestartPoint extends L2GameClientPacket
 		if (activeChar.isFakeDeath())
 		{
 			activeChar.stopFakeDeath(null);
-			activeChar.broadcastPacket(new Revive(activeChar));
 			return;
 		}
-		else if(!activeChar.isAlikeDead())
+		else if(!activeChar.isDead())
 		{
 			_log.warning("Living player ["+activeChar.getName()+"] called RestartPointPacket! Ban this player!");
 			return;

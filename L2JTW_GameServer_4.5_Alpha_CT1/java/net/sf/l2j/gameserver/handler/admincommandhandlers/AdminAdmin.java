@@ -59,6 +59,7 @@ public class AdminAdmin implements IAdminCommandHandler {
 		 "admin_admin3",
 		 "admin_admin4",
 		 "admin_admin5",
+		 "admin_cache",
 		 "admin_play_sounds",
 		 "admin_play_sound",
 		 "admin_gmliston",
@@ -100,6 +101,10 @@ public class AdminAdmin implements IAdminCommandHandler {
 		if (command.startsWith("admin_admin"))
 		{
 			showMainPage(activeChar,command);
+		}
+		else if (command.startsWith("admin_cache"))
+		{
+			showMainPageCache(activeChar);
 		}
 		else if (command.startsWith("admin_tw_menu"))
 		{
@@ -270,7 +275,7 @@ public class AdminAdmin implements IAdminCommandHandler {
 				else if(type.startsWith("npcwalkers"))
 				{
 					NpcWalkerRoutesTable.getInstance().load();
-					activeChar.sendMessage("All NPC walker routes have been reloaded");
+					activeChar.sendMessage("所有 npcwalers 重新讀取。");
 					
 				}
 				
@@ -412,29 +417,32 @@ public class AdminAdmin implements IAdminCommandHandler {
 	        replyMSG.append("<button value=\"傳送選單\" action=\"bypass -h admin_show_moves\" width=90 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"");
 	        replyMSG.append("<br>");
 	        replyMSG.append("<button value=\"物品強化管理\" action=\"bypass -h admin_enchant\" width=90 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"");
-	        replyMSG.append("<button value=\"多功能介面\" action=\"bypass -h admin_ctf\" width=90 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"");    
+	        replyMSG.append("<button value=\"Cache 管理\" action=\"bypass -h admin_cache\" width=90 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"");    
 	        replyMSG.append("<button value=\"訴求管理介面\" action=\"bypass -h admin_view_petitions\" width=90 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"");
 	        replyMSG.append("<button value=\"NPC管理介面\" action=\"bypass -h admin_show_spawns\" width=90 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"");
 	        replyMSG.append("<br>");
 	        replyMSG.append("</td></tr></table></center>");
-	        replyMSG.append("<center><table><tr><td>");
+	        //replyMSG.append("<center><table><tr><td>");
 	        //replyMSG.append("<button value=\"伺服器狀態\" action=\"bypass -h admin_server_login\" width=90 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"");
 	        //replyMSG.append("<button value=\"多功能控制\" action=\"bypass -h admin_eventmenu\" width=90 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"");
 	        //replyMSG.append("<button value=\"Cache控制\" action=\"bypass -h admin_cache\" width=90 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"");
 	        //replyMSG.append("<button value=\"檢視訴求\" action=\"bypass -h admin_view_petitions\" width=90 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"");
 	        //replyMSG.append("<button value=\"第二頁\" action=\"bypass -h admin_admin2\" width=90 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"");
-	        replyMSG.append("</td></tr></table></center>");
-	        replyMSG.append("<center>玩家:</center>");
+	        //replyMSG.append("</td></tr></table></center>");
+	        replyMSG.append("<center>數值:</center>");
 	        replyMSG.append("<center><edit var=\"menu_command\" width=100 height=15></center><br>");
 	        replyMSG.append("<center><table><tr><td>");
 	        replyMSG.append("<button value=\"滅亡\" action=\"bypass -h admin_kill $menu_command\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td><td>");
-	        replyMSG.append("<button value=\"踢除\" action=\"bypass -h admin_kick $menu_command\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td><td>");
-	        replyMSG.append("<button value=\"封鎖\" action=\"bypass -h admin_ban $menu_command\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td></tr>");
-	        replyMSG.append("</table><br><table width=200><tr><td>");
-	        replyMSG.append("<button value=\"聊天封鎖\" action=\"bypass -h admin_banchat $menu_command\" width=90 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td><td>");
-	        replyMSG.append("<button value=\"解除聊天封鎖\" action=\"bypass -h admin_unbanchat $menu_command\" width=90 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"");
-	        replyMSG.append("</td></tr></table></center><br>");
-	        replyMSG.append("<font color=\"LEVEL\"><tr><td>伺服器版本: L2JTW Server 4.5 Kamael</td></tr></font>");
+	        replyMSG.append("<button value=\"復活\" action=\"bypass -h admin_res $menu_command\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td><td>");
+	        replyMSG.append("<button value=\"回復\" action=\"bypass -h admin_heal $menu_command\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td><td>");
+	        replyMSG.append("<button value=\"性向\" action=\"bypass -h admin_setkarma $menu_command\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td><td>");
+	        replyMSG.append("</td></tr></table><br><table><tr><td>");
+	        replyMSG.append("<button value=\"離線\" action=\"bypass -h admin_kick $menu_command\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td><td>");
+	        replyMSG.append("<button value=\"封鎖\" action=\"bypass -h admin_ban $menu_command\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td><td>");
+	        replyMSG.append("<button value=\"禁言\" action=\"bypass -h admin_banchant $menu_command\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td><td>");
+	        replyMSG.append("<button value=\"解除\" action=\"bypass -h admin_unbanchat $menu_command\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"");
+	        replyMSG.append("</td></tr></table></center>");
+	        replyMSG.append("<br><font color=\"LEVEL\">伺服器版本: L2JTW Server 4.5 Kamael</font>");
 	        replyMSG.append("</body></html>");
 
 
@@ -512,6 +520,7 @@ public class AdminAdmin implements IAdminCommandHandler {
 	        adminReply.setHtml(replyMSG.toString());
 	        activeChar.sendPacket(adminReply); 
 	    }
+	    */
 	    public void showMainPageCache(L2PcInstance activeChar)
 	    {
 	        NpcHtmlMessage adminReply = new NpcHtmlMessage(5);
@@ -520,7 +529,7 @@ public class AdminAdmin implements IAdminCommandHandler {
 	        replyMSG.append("<center><table width=260><tr><td width=40>");
 	        replyMSG.append("<button value=\"首頁\" action=\"bypass -h admin_admin\" width=45 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"");
 	        replyMSG.append("</td><td width=180>");
-	        replyMSG.append("<center>Cache控制</center>");
+	        replyMSG.append("<center>Cache 控制</center>");
 	        replyMSG.append("</td><td width=40><button value=\"返回\" action=\"bypass -h admin_admin\" width=45 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"");
 	        replyMSG.append("</td></tr></table></center>");
 	        replyMSG.append("<center><table width=200><tr><td>");
@@ -541,13 +550,13 @@ public class AdminAdmin implements IAdminCommandHandler {
 	        replyMSG.append("<br>");
 	        replyMSG.append("<br>");
 	        replyMSG.append("<br>");
-	        replyMSG.append("<tr><td>伺服器版本: L2JTW Server 4.5 CT1</td></tr>");
+	        replyMSG.append("<tr><td>伺服器版本: L2JTW Server 4.5 Kamael</td></tr>");
 	        replyMSG.append("</body></html>");
 	        
 	        adminReply.setHtml(replyMSG.toString());
 	        activeChar.sendPacket(adminReply); 
 	    }
-*/
+
 	    public void showMainPageEventMenu(L2PcInstance activeChar, String command)
 	    {
 	        NpcHtmlMessage adminReply = new NpcHtmlMessage(5);
@@ -659,10 +668,10 @@ public class AdminAdmin implements IAdminCommandHandler {
             replyMSG.append("<tr><td><font color=\"LEVEL\">魔法傷害處理</font> = " + Config.ALT_GAME_MAGICFAILURES + "</td><td></td><td><button value=\"" + !Config.ALT_GAME_MAGICFAILURES + "\" action=\"bypass -h admin_set MagicFailures=" + !Config.ALT_GAME_MAGICFAILURES + "\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td></tr>");
             replyMSG.append("<tr><td><font color=\"LEVEL\">買書學習技能</font> = " + Config.SP_BOOK_NEEDED + "</td><td></td><td><button value=\"" + !Config.SP_BOOK_NEEDED + "\" action=\"bypass -h admin_set SpBookNeeded=" + !Config.SP_BOOK_NEEDED + "\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td></tr>");
             replyMSG.append("<tr><td><font color=\"LEVEL\">物品製作模式</font> = " + Config.IS_CRAFTING_ENABLED + "</td><td></td><td><button value=\"" + !Config.IS_CRAFTING_ENABLED + "\" action=\"bypass -h admin_set CraftingEnabled=" + !Config.IS_CRAFTING_ENABLED + "\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td></tr>");
-            //replyMSG.append((new StringBuilder()).append("<tr><td><font color=\"LEVEL\">可使用轉職員</font> = ").append(Config.ALLOW_CLASS_MASTERS).append("</td><td></td><td><button value=\"").append(!Config.ALLOW_CLASS_MASTERS).append("\" action=\"bypass -h admin_set AllowClassMasters ").append(!Config.ALLOW_CLASS_MASTERS).append("\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td></tr>").toString());
+            replyMSG.append("<tr><td><font color=\"LEVEL\">可使用轉職員</font> = ").append(Config.ALLOW_CLASS_MASTERS).append("</td><td></td><td><button value=\"").append(!Config.ALLOW_CLASS_MASTERS).append("\" action=\"bypass -h admin_set AllowClassMasters ").append(!Config.ALLOW_CLASS_MASTERS).append("\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td></tr>");
             replyMSG.append("<tr><td><font color=\"LEVEL\">盾牌格檔模式</font> = " + Config.ALT_GAME_SHIELD_BLOCKS + "</td><td></td><td><button value=\"" + !Config.ALT_GAME_SHIELD_BLOCKS + "\" action=\"bypass -h admin_set AltShieldBlocks=" + !Config.ALT_GAME_SHIELD_BLOCKS + "\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td></tr>");
             replyMSG.append("<tr><td><font color=\"LEVEL\">允許免費傳送</font> = " + Config.ALT_GAME_FREE_TELEPORT + "</td><td></td><td><button value=\"" + !Config.ALT_GAME_FREE_TELEPORT + "\" action=\"bypass -h admin_set AltFreeTeleporting=" + !Config.ALT_GAME_FREE_TELEPORT + "\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td></tr>");
-            //replyMSG.append("<tr><td><font color=\"LEVEL\">副職業免任務道具</font> = " + Config.ALT_GAME_SUBCLASS_WITHOUT_QUESTS + "</td><td></td><td><button value=\"" + !Config.ALT_GAME_SUBCLASS_WITHOUT_QUESTS + "\" action=\"bypass -h admin_set AltSubClassWithoutQuests " + !Config.ALT_GAME_SUBCLASS_WITHOUT_QUESTS + "\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td></tr>");
+            replyMSG.append("<tr><td><font color=\"LEVEL\">副職業免任務道具</font> = " + Config.ALT_GAME_SUBCLASS_WITHOUT_QUESTS + "</td><td></td><td><button value=\"" + !Config.ALT_GAME_SUBCLASS_WITHOUT_QUESTS + "\" action=\"bypass -h admin_set AltSubClassWithoutQuests " + !Config.ALT_GAME_SUBCLASS_WITHOUT_QUESTS + "\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td></tr>");
             replyMSG.append("</table></center></body></html>");
             adminReply.setHtml(replyMSG.toString());
             activeChar.sendPacket(adminReply);
@@ -701,8 +710,6 @@ public class AdminAdmin implements IAdminCommandHandler {
             replyMSG.append("<tr><td><font color=\"LEVEL\">創好新手獲得金額</font> = " + Config.STARTING_ADENA + "</td><td><edit var=\"menu_command1\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set StartingAdena=$menu_command1\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td></tr>");
             replyMSG.append("<tr><td><font color=\"LEVEL\">騎上飛龍增加速度</font> = " + Config.WYVERN_SPEED + "</td><td><edit var=\"menu_command2\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set WyvernSpeed=$menu_command2\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td></tr>");
             replyMSG.append("<tr><td><font color=\"LEVEL\">騎上座龍增加速度</font> = " + Config.STRIDER_SPEED + "</td><td><edit var=\"menu_command3\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set StriderSpeed=$menu_command3\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td></tr>");
-            //replyMSG.append("<tr><td><font color=\"LEVEL\">玩家攜帶物品限制</font> = " + Config.INVENTORY_MAXIMUM_NO_DWARF + "</td><td><edit var=\"menu_command4\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set=MaximumSlotsForNoDwarf $menu_command4\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td></tr>");
-            //replyMSG.append("<tr><td><font color=\"LEVEL\">矮人攜帶物品限制</font> = " + Config.INVENTORY_MAXIMUM_DWARF + "</td><td><edit var=\"menu_command5\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set=MaximumSlotsForDwarf $menu_command5\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td></tr>");
             replyMSG.append("<tr><td><font color=\"LEVEL\">防具強化成功機率</font> = " + Config.ENCHANT_CHANCE_ARMOR + "</td><td><edit var=\"menu_command6\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set=EnchantChanceArmor $menu_command6\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td></tr>");
             replyMSG.append("<tr><td><font color=\"LEVEL\">武器強化成功機率</font> = " + Config.ENCHANT_CHANCE_WEAPON + "</td><td><edit var=\"menu_command7\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set=EnchantChanceWeapon $menu_command6\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td></tr>");
             replyMSG.append("<tr><td><font color=\"LEVEL\">防具強化最高上限</font> = " + Config.ENCHANT_MAX_ARMOR + "</td><td><edit var=\"menu_command8\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set EnchantMaxArmor $menu_command7\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td></tr>");
@@ -712,23 +719,14 @@ public class AdminAdmin implements IAdminCommandHandler {
             replyMSG.append("<tr><td><font color=\"LEVEL\">體力回覆速度倍率</font> = " + Config.HP_REGEN_MULTIPLIER + "</td><td><edit var=\"menu_command10\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set HpRegenMultiplier=$menu_command8\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td></tr>");
             replyMSG.append("<tr><td><font color=\"LEVEL\">魔法回覆速度倍率</font> = " + Config.MP_REGEN_MULTIPLIER + "</td><td><edit var=\"menu_command11\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set MpRegenMultiplier=$menu_command9\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td></tr>");
             replyMSG.append("<tr><td><font color=\"LEVEL\">鬥志回覆速度倍率</font> = " + Config.CP_REGEN_MULTIPLIER + "</td><td><edit var=\"menu_command12\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set CpRegenMultiplier=$menu_command10\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td></tr>");
-            //replyMSG.append("<tr><td><font color=\"LEVEL\">首領體力回覆倍率</font> = " + Config.RAID_HP_REGEN_MULTIPLIER + "</td><td><edit var=\"menu_command13\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set RaidHpRegenMultiplier=$menu_command11\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td></tr>");
-            //replyMSG.append("<tr><td><font color=\"LEVEL\">首領魔法回覆倍率</font> = " + Config.RAID_MP_REGEN_MULTIPLIER + "</td><td><edit var=\"menu_command14\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set RaidMpRegenMultiplier=$menu_command12\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td></tr>");
-            //replyMSG.append("<tr><td><font color=\"LEVEL\">首領強化防禦倍率</font> = " + Config.RAID_DEFENCE_MULTIPLIER + "</td><td><edit var=\"menu_command15\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set RaidDefenceMultiplier=$menu_command13\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td></tr>");
             /*----處理機制----*/
             replyMSG.append("<tr><td><font color=\"LEVEL\">脫逃指令處理時間</font> = " + Config.UNSTUCK_INTERVAL + "</td><td><edit var=\"menu_command16\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set UnstuckInterval=$menu_command14\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td></tr>");
-            //replyMSG.append("<tr><td><font color=\"LEVEL\">登入傳送保護時間</font> = " + Config.PLAYER_SPAWN_PROTECTION + "</td><td><edit var=\"menu_command17\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set PlayerSpawnProtection $menu_command15\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td></tr>");
             replyMSG.append("<tr><td><font color=\"LEVEL\">重生後鬥志恢復值</font> = " + Config.RESPAWN_RESTORE_CP + "</td><td><edit var=\"menu_command18\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set RespawnRestoreCP=$menu_command16\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td></tr>");
             replyMSG.append("<tr><td><font color=\"LEVEL\">重生後體力恢復值</font> = " + Config.RESPAWN_RESTORE_HP + "</td><td><edit var=\"menu_command19\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set RespawnRestoreHP=$menu_command17\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td></tr>");
             replyMSG.append("<tr><td><font color=\"LEVEL\">重生後魔法恢復值</font> = " + Config.RESPAWN_RESTORE_MP + "</td><td><edit var=\"menu_command20\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set RespawnRestoreMP=$menu_command18\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td></tr>");
-            //replyMSG.append("<tr><td><font color=\"LEVEL\">一般商店最大數量</font> = " + Config.MAX_PVTSTORE_SLOTS_OTHER + "</td><td><edit var=\"menu_command21\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set MaxPvtStoreSlotsOther=$menu_command19\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td></tr>");
-            //replyMSG.append("<tr><td><font color=\"LEVEL\">矮人商店最大數量</font> = " + Config.MAX_PVTSTORE_SLOTS_DWARF + "</td><td><edit var=\"menu_command22\" width=40 height=15></td><td><button value=\"設定\" action=\"bypass -h admin_set MaxPvtStoreSlotsDwarf=$menu_command20\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td></tr>");
-            /*----啟用管理----*/
+             /*----啟用管理----*/
             replyMSG.append("<tr><td><font color=\"LEVEL\">允許寵物進化處理</font> = " + Config.ALLOW_WYVERN_UPGRADER + "</td><td></td><td><button value=\"" + !Config.ALLOW_WYVERN_UPGRADER + "\" action=\"bypass -h admin_set AllowWyvernUpgrader=" + !Config.ALLOW_WYVERN_UPGRADER + "\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td></tr>");
-            //replyMSG.append("<tr><td><font color=\"LEVEL\">覆蓋技能較低效果</font> = " + Config.EFFECT_CANCELING + "</td><td></td><td><button value=\"" + !Config.EFFECT_CANCELING + "\" action=\"bypass -h admin_set CancelLesserEffect " + !Config.EFFECT_CANCELING + "\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td></tr>");
-            replyMSG.append("<tr><td><font color=\"LEVEL\">允許警衛攻擊怪物</font> = " + Config.ALLOW_GUARDS + "</td><td></td><td><button value=\"" + !Config.ALLOW_GUARDS + "\" action=\"bypass -h admin_set AllowGuards=" + !Config.ALLOW_GUARDS + "\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td></tr>");
             replyMSG.append("<tr><td><font color=\"LEVEL\">允許藍怪掉落物品</font> = " + Config.DEEPBLUE_DROP_RULES + "</td><td></td><td><button value=\"" + !Config.DEEPBLUE_DROP_RULES + "\" action=\"bypass -h admin_set UseDeepBlueDropRules=" + !Config.DEEPBLUE_DROP_RULES + "\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td></tr>");
-            //replyMSG.append("<tr><td><font color=\"LEVEL\">保留技能效果機制</font> = " + Config.STORE_SKILL_COOLTIME + "</td><td></td><td><button value=\"" + !Config.STORE_SKILL_COOLTIME + "\" action=\"bypass -h admin_set StoreSkillCooltime=" + !Config.STORE_SKILL_COOLTIME + "\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td></tr>");
             replyMSG.append("<tr><td><font color=\"LEVEL\">財富商人公告處理</font> = " + Config.ANNOUNCE_MAMMON_SPAWN + "</td><td></td><td><button value=\"" + !Config.ANNOUNCE_MAMMON_SPAWN + "\" action=\"bypass -h admin_set AnnounceMammonSpawn=" + !Config.ANNOUNCE_MAMMON_SPAWN + "\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"</td></tr>");
             replyMSG.append("</table></center></body></html>");
             adminReply.setHtml(replyMSG.toString());

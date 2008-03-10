@@ -239,8 +239,8 @@ public final class L2PcInstance extends L2PlayableInstance
 	private static final String DELETE_CHAR_SKILLS = "DELETE FROM character_skills WHERE char_obj_id=? AND class_index=?";
 
 	// Character Skill Save SQL String Definitions:
-	private static final String ADD_SKILL_SAVE = "INSERT INTO character_skills_save (char_obj_id,skill_id,skill_level,effect_count,effect_cur_time,reuse_delay,restore_type,class_index,buff_index) VALUES (?,?,?,?,?,?,?,?,?)";
-	private static final String RESTORE_SKILL_SAVE = "SELECT skill_id,skill_level,effect_count,effect_cur_time, reuse_delay FROM character_skills_save WHERE char_obj_id=? AND class_index=? AND restore_type=? ORDER BY buff_index ASC";
+	private static final String ADD_SKILL_SAVE = "INSERT INTO character_skills_save (char_obj_id,skill_id,skill_level,effect_count,effect_cur_time,reuse_delay,systime,restore_type,class_index,buff_index) VALUES (?,?,?,?,?,?,?,?,?,?)";
+	private static final String RESTORE_SKILL_SAVE = "SELECT skill_id,skill_level,effect_count,effect_cur_time, reuse_delay, systime FROM character_skills_save WHERE char_obj_id=? AND class_index=? AND restore_type=? ORDER BY buff_index ASC";
 	private static final String DELETE_SKILL_SAVE = "DELETE FROM character_skills_save WHERE char_obj_id=? AND class_index=?";
 
 	// Character Character SQL String Definitions:
@@ -3359,6 +3359,10 @@ public final class L2PcInstance extends L2PlayableInstance
 			// cannot drop/trade wear-items
 			return null;
 		}
+		
+		// We cannot put a Weapon with Augmention in WH while casting (Possible Exploit)
+		if (item.isAugmented() && isCastingNow())
+			return null;
 
 		return item;
 	}
@@ -3667,7 +3671,7 @@ public final class L2PcInstance extends L2PlayableInstance
             {
                 L2Effect effect = effects[i];
 
-                if (effect == null)
+                if (effect == null	|| !effect.getShowIcon())
                 {
                     continue;
                 }
@@ -6202,7 +6206,11 @@ public final class L2PcInstance extends L2PlayableInstance
 				player.setCurrentCp(rset.getDouble("curCp"));
 				currentMp = rset.getDouble("curMp");
 				player.setCurrentMp(rset.getDouble("curMp"));
-
+				if (currentHp < 0.5) {
+					player.setIsDead(true);
+					player.stopHpMpRegeneration();
+				}
+				
 				//Check recs
 				player.checkRecom(rset.getInt("rec_have"),rset.getInt("rec_left"));
 
@@ -6678,15 +6686,17 @@ public final class L2PcInstance extends L2PlayableInstance
 					{
 						TimeStamp t = _reuseTimeStamps.remove(skillId);
 						statement.setLong(6, t.hasNotPassed() ? t.getReuse() : 0 );
+						statement.setLong(7, t.hasNotPassed() ? t.getStamp() : 0 );
 					}
                     else
 					{
 						statement.setLong(6, 0);
+						statement.setLong(7, 0);
 					}
-
-					statement.setInt(7, 0);
-					statement.setInt(8, getClassIndex());
-					statement.setInt(9, buff_index);
+					
+					statement.setInt(8, 0);
+					statement.setInt(9, getClassIndex());
+					statement.setInt(10, buff_index);
 					statement.execute();
 				}
 			}
@@ -6704,9 +6714,10 @@ public final class L2PcInstance extends L2PlayableInstance
 					statement.setInt (4, -1);
 					statement.setInt (5, -1);
 					statement.setLong(6, t.getReuse());
-					statement.setInt (7, 1);
-					statement.setInt (8, getClassIndex());
-					statement.setInt(9, buff_index);
+					statement.setLong(7, t.getStamp());
+					statement.setInt (8, 1);
+					statement.setInt (9, getClassIndex());
+					statement.setInt(10, buff_index);
 					statement.execute();
 					
 				}
@@ -6949,7 +6960,8 @@ public final class L2PcInstance extends L2PlayableInstance
 	{
 		L2Object[] targets = new L2Character[]{this};
 		java.sql.Connection con = null;
-
+		long delaytime = System.currentTimeMillis() - this.getLastAccess();
+		
 		try
 		{
 			con = L2DatabaseFactory.getInstance().getConnection();
@@ -6976,6 +6988,7 @@ public final class L2PcInstance extends L2PlayableInstance
 				int effectCount = rset.getInt("effect_count");
 				int effectCurTime = rset.getInt("effect_cur_time");
 				long reuseDelay = rset.getLong("reuse_delay");
+				long systime = rset.getLong("systime");
 
 				// Just incase the admin minipulated this table incorrectly :x
 				if(skillId == -1 || effectCount == -1 || effectCurTime == -1 || reuseDelay < 0) continue;
@@ -6990,7 +7003,7 @@ public final class L2PcInstance extends L2PlayableInstance
 				if (reuseDelay > 10)
 				{
 					disableSkill(skillId, reuseDelay);
-					addTimeStamp(new TimeStamp(skillId, reuseDelay));
+					addTimeStamp(new TimeStamp(skillId, reuseDelay, systime));
 				}
 
 				for (L2Effect effect : getAllEffects())
@@ -7020,11 +7033,14 @@ public final class L2PcInstance extends L2PlayableInstance
 			{
 				int skillId = rset.getInt("skill_id");
 				long reuseDelay = rset.getLong("reuse_delay");
+				long systime = rset.getInt("systime");
 
+				reuseDelay = reuseDelay - delaytime;
+				
 				if (reuseDelay <= 0) continue;
 
 				disableSkill(skillId, reuseDelay);
-				addTimeStamp(new TimeStamp(skillId, reuseDelay));
+				addTimeStamp(new TimeStamp(skillId, reuseDelay, systime));
 			}
 			rset.close();
 			statement.close();
@@ -8056,10 +8072,11 @@ public final class L2PcInstance extends L2PlayableInstance
 		{
 			case 0:
                 setIsFlying(false);
-                setIsRiding(false);
+				setIsRidingGreatWolf(false);
+				setIsRidingStrider(false);
                 break; //Dismounted
 			case 1:
-                setIsRiding(true);
+                setIsRidingStrider(true);
                 if(isNoble())
                 {
                 	L2Skill striderAssaultSkill = SkillTable.getInstance().getInfo(325, 1);
@@ -8069,6 +8086,9 @@ public final class L2PcInstance extends L2PlayableInstance
 			case 2:
                 setIsFlying(true);
                 break; //Flying Wyvern
+			case 3:
+				setIsRidingGreatWolf(true);
+				break; // Riding a Great Wolf
 		}
 
 		_mountType = mountType;
@@ -8372,7 +8392,7 @@ public final class L2PcInstance extends L2PlayableInstance
         public void run()
         {
             if (System.currentTimeMillis() >= _endTaskTime) {
-            	EndFishing(false);
+            	endFishing(false);
             	return;
             }
         	if (_fishType == -1)
@@ -8381,7 +8401,7 @@ public final class L2PcInstance extends L2PlayableInstance
             if(_fishGutsCheck > check)
             {
                 stopLookingForFishTask();
-                StartFishCombat(_isNoob, _isUpperGrade);
+                startFishCombat(_isNoob, _isUpperGrade);
             }
         }
 
@@ -8675,12 +8695,12 @@ public final class L2PcInstance extends L2PlayableInstance
 	{
 		if (hero && _baseClass == _activeClass)
 		{
-			for (L2Skill s : HeroSkillTable.GetHeroSkills())
+			for (L2Skill s : HeroSkillTable.getHeroSkills())
 				addSkill(s, false); //Dont Save Hero skills to database
 		}
 		else
 		{
-			for (L2Skill s : HeroSkillTable.GetHeroSkills())
+			for (L2Skill s : HeroSkillTable.getHeroSkills())
 				super.removeSkill(s); //Just Remove skills from nonHero characters
 		}
 		_hero = hero;
@@ -8797,10 +8817,10 @@ public final class L2PcInstance extends L2PlayableInstance
     public void setNoble(boolean val)
     {
     	if (val)
-    		for (L2Skill s : NobleSkillTable.getInstance().GetNobleSkills())
+    		for (L2Skill s : NobleSkillTable.getInstance().getNobleSkills())
     			addSkill(s, false); //Dont Save Noble skills to Sql
     	else
-    		for (L2Skill s : NobleSkillTable.getInstance().GetNobleSkills())
+    		for (L2Skill s : NobleSkillTable.getInstance().getNobleSkills())
     			super.removeSkill(s); //Just Remove skills without deleting from Sql
     	_noble = val;
     	
@@ -9120,6 +9140,17 @@ public final class L2PcInstance extends L2PlayableInstance
         for (L2ItemInstance temp : getInventory().getAugmentedItems())
             if (temp != null && temp.isEquipped()) temp.getAugmentation().removeBonus(this);
         
+        // Delete a force buff upon class change.
+        if(_forceBuff != null)
+			_forceBuff.delete();
+
+        // Stop casting for any player that may be casting a force buff on this l2pcinstance.
+		for(L2Character character : getKnownList().getKnownCharacters())
+		{
+			if(character.getForceBuff() != null && character.getForceBuff().getTarget() == this)
+				character.abortCast();
+		}
+
         /*
          * 1. Call store() before modifying _classIndex to avoid skill effects rollover.
          * 2. Register the correct _classId against applied 'classIndex'.
@@ -9175,17 +9206,6 @@ public final class L2PcInstance extends L2PlayableInstance
             getCubics().clear();
         }
         
-        // Delete a force buff upon class change.
-        if(_forceBuff != null)
-			_forceBuff.delete();
-
-        // Stop casting for any player that may be casting a force buff on this l2pcinstance.
-		for(L2Character character : getKnownList().getKnownCharacters())
-		{
-			if(character.getForceBuff() != null && character.getForceBuff().getTarget() == this)
-				character.abortCast();
-		}
-
         for (L2Skill oldSkill : getAllSkills())
             super.removeSkill(oldSkill);
 
@@ -10116,7 +10136,7 @@ public final class L2PcInstance extends L2PlayableInstance
 		if (fishs == null || fishs.size() == 0)
 		{
 			sendMessage("Error - Fishes are not definied");
-			EndFishing(false);
+			endFishing(false);
 			return;
 		}
 		int check = Rnd.get(fishs.size());
@@ -10131,7 +10151,7 @@ public final class L2PcInstance extends L2PlayableInstance
 		//sendMessage("Hook x,y: " + _x + "," + _y + " - Water Z, Player Z:" + _z + ", " + getZ()); //debug line, uncoment to show coordinates used in fishing.
     	efs = new ExFishingStart(this,_fish.getType(),_x,_y,_z,_lure.isNightLure());
         broadcastPacket(efs);
-        StartLookingForFishTask();
+        startLookingForFishTask();
     }
     public void stopLookingForFishTask()
     {
@@ -10141,7 +10161,7 @@ public final class L2PcInstance extends L2PlayableInstance
             _taskforfish = null;
         }
     }
-    public void StartLookingForFishTask()
+    public void startLookingForFishTask()
     {
         if (!isDead() && _taskforfish == null)
         {
@@ -10353,11 +10373,12 @@ public final class L2PcInstance extends L2PlayableInstance
 
 		return randomlvl;
 	}
-	public void StartFishCombat(boolean isNoob, boolean isUpperGrade)
+	public void startFishCombat(boolean isNoob, boolean isUpperGrade)
     {
         _fishCombat = new L2Fishing (this, _fish, isNoob, isUpperGrade);
     }
-    public void EndFishing(boolean win)
+    
+	public void endFishing(boolean win)
     {
         ExFishingEnd efe = new ExFishingEnd(win, this);
         broadcastPacket(efe);
@@ -10375,101 +10396,104 @@ public final class L2PcInstance extends L2PlayableInstance
         setIsImmobilized(false);
         stopLookingForFishTask();
     }
-    public L2Fishing GetFishCombat()
+
+    public L2Fishing getFishCombat()
     {
         return _fishCombat;
     }
-    public int GetFishx()
+
+    public int getFishx()
     {
         return _fishx;
     }
-    public int GetFishy()
+
+    public int getFishy()
     {
         return _fishy;
     }
-    public int GetFishz()
+
+    public int getFishz()
     {
         return _fishz;
     }
-    public void SetLure (L2ItemInstance lure)
+
+    public void setLure (L2ItemInstance lure)
     {
         _lure = lure;
     }
-    public L2ItemInstance GetLure()
-    {
-    return _lure;
-    }
-    public int GetInventoryLimit()
-    {
-        int ivlim;
-        if (isGM()) {
-            ivlim = Config.INVENTORY_MAXIMUM_GM;
-        }
-        else if (getRace() == Race.Dwarf)
-        {
-                ivlim = Config.INVENTORY_MAXIMUM_DWARF;
-        }
-        else
-        {
-            ivlim = Config.INVENTORY_MAXIMUM_NO_DWARF;
-        }
-        ivlim += (int)getStat().calcStat(Stats.INV_LIM, 0, null, null);
 
-           return ivlim;
-       }
-       public int GetWareHouseLimit()
-       {
-           int whlim;
-           if (getRace() == Race.Dwarf){
+ 	public L2ItemInstance getLure()
+	{
+ 		return _lure;
+	}
+
+	public int getInventoryLimit()
+	{
+		int ivlim;
+		if (isGM())
+			ivlim = Config.INVENTORY_MAXIMUM_GM;
+		else if (getRace() == Race.Dwarf)
+			ivlim = Config.INVENTORY_MAXIMUM_DWARF;
+		else
+        	ivlim = Config.INVENTORY_MAXIMUM_NO_DWARF;
+		ivlim += (int)getStat().calcStat(Stats.INV_LIM, 0, null, null);
+
+		return ivlim;
+	}
+
+	public int getWareHouseLimit()
+	{
+		int whlim;
+		if (getRace() == Race.Dwarf)
                whlim = Config.WAREHOUSE_SLOTS_DWARF;
-           }
-           else{
-               whlim = Config.WAREHOUSE_SLOTS_NO_DWARF;
-           }
-           whlim += (int)getStat().calcStat(Stats.WH_LIM, 0, null, null);
+		else
+			whlim = Config.WAREHOUSE_SLOTS_NO_DWARF;
 
-           return whlim;
-       }
-       public int GetPrivateSellStoreLimit()
-       {
-           int pslim;
-           if (getRace() == Race.Dwarf){
-               pslim = Config.MAX_PVTSTORE_SLOTS_DWARF;
-           }
-           else{
-               pslim = Config.MAX_PVTSTORE_SLOTS_OTHER;
-           }
-           pslim += (int)getStat().calcStat(Stats.P_SELL_LIM, 0, null, null);
+		whlim += (int)getStat().calcStat(Stats.WH_LIM, 0, null, null);
 
-           return pslim;
-       }
-       public int GetPrivateBuyStoreLimit()
-       {
-           int pblim;
-           if (getRace() == Race.Dwarf){
-               pblim = Config.MAX_PVTSTORE_SLOTS_DWARF;
-           }
-           else
-           {
-               pblim = Config.MAX_PVTSTORE_SLOTS_OTHER;
-           }
-           pblim += (int)getStat().calcStat(Stats.P_BUY_LIM, 0, null, null);
+		return whlim;
+	}
+	
+	public int getPrivateSellStoreLimit()
+	{
+		int pslim;
+	
+		if (getRace() == Race.Dwarf)
+			pslim = Config.MAX_PVTSTORE_SLOTS_DWARF;
+        else
+        	pslim = Config.MAX_PVTSTORE_SLOTS_OTHER;
 
-           return pblim;
-       }
-       public int GetFreightLimit()
-       {
-        return Config.FREIGHT_SLOTS + (int)getStat().calcStat(Stats.FREIGHT_LIM, 0, null, null);
-    }
+		pslim += (int)getStat().calcStat(Stats.P_SELL_LIM, 0, null, null);
 
-    public int GetDwarfRecipeLimit()
+		return pslim;
+	}
+
+	public int getPrivateBuyStoreLimit()
+	{
+		int pblim;
+		
+		if (getRace() == Race.Dwarf)
+			pblim = Config.MAX_PVTSTORE_SLOTS_DWARF;
+		else
+			pblim = Config.MAX_PVTSTORE_SLOTS_OTHER;
+		pblim += (int)getStat().calcStat(Stats.P_BUY_LIM, 0, null, null);
+
+		return pblim;
+	}
+	
+	public int getFreightLimit()
+	{
+		return Config.FREIGHT_SLOTS + (int)getStat().calcStat(Stats.FREIGHT_LIM, 0, null, null);
+	}
+
+    public int getDwarfRecipeLimit()
     {
         int recdlim = Config.DWARF_RECIPE_LIMIT;
         recdlim += (int)getStat().calcStat(Stats.REC_D_LIM, 0, null, null);
         return recdlim;
     }
 
-    public int GetCommonRecipeLimit()
+    public int getCommonRecipeLimit()
     {
         int recclim = Config.COMMON_RECIPE_LIMIT;
         recclim += (int)getStat().calcStat(Stats.REC_C_LIM, 0, null, null);
@@ -10969,6 +10993,13 @@ public final class L2PcInstance extends L2PlayableInstance
 			reuse = _reuse;
 			stamp = System.currentTimeMillis()+ reuse;
 		}
+		
+		public TimeStamp(int _skill, long _reuse, long _systime)
+		{
+			skill = _skill;
+			reuse = _reuse;
+			stamp = _systime;
+		}
 
 		public int getSkill()
         {
@@ -10978,6 +11009,11 @@ public final class L2PcInstance extends L2PlayableInstance
         public long getReuse()
         {
             return reuse;
+        }
+        
+        public long getStamp()
+        {
+            return stamp;
         }
         
         public long getRemaining()

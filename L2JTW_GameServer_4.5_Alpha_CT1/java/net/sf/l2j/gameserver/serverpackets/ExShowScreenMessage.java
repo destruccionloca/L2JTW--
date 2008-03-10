@@ -12,31 +12,50 @@
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package net.sf.l2j.gameserver.skills.conditions;
-
-import java.util.ArrayList;
-
-import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
-import net.sf.l2j.gameserver.skills.Env;
+package net.sf.l2j.gameserver.serverpackets;
 
 /**
- * @author nBd
+ * @author Kerberos
+ *
  */
-
-public class ConditionTargetRaceId extends Condition
+public class ExShowScreenMessage extends L2GameServerPacket
 {
-	private final ArrayList<Integer> _raceIds;
-	
-	public ConditionTargetRaceId(ArrayList<Integer> raceId)
+	private String _text;
+	private int _time;
+
+	public ExShowScreenMessage (String text, int time)
 	{
-		_raceIds = raceId;
+		_text = text;
+		_time = time;
 	}
-	
+
 	@Override
-	public boolean testImpl(Env env)
+	public String getType()
 	{
-		if (env.target == null || !(env.target instanceof L2NpcInstance))
-			return false;
-		return (_raceIds.contains(((L2NpcInstance)env.target).getTemplate().race.ordinal()));
+		return "ExShowScreenMessage";
 	}
+
+	@Override
+	protected void writeImpl()
+	{
+		writeC(0xfe);
+		writeH(0x39);
+
+		writeD(0x01);
+		writeD(-1);
+		writeD(0x02);
+		writeD(0x00);
+		writeD(0x00);
+		writeD(0x00);
+
+		writeD(0);
+		writeD(0);
+
+		writeD(_time);
+
+		writeD(1);
+
+		writeS(_text);
+	}
+
 }

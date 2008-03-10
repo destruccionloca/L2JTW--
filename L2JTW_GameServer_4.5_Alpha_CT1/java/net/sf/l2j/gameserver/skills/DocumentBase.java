@@ -15,6 +15,7 @@
 package net.sf.l2j.gameserver.skills;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -26,6 +27,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javolution.text.TextBuilder;
 import javolution.util.FastList;
 import javolution.util.FastMap;
+import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.datatables.SkillTable;
 import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.L2Skill;
@@ -205,6 +207,21 @@ abstract class DocumentBase
         if (attrs.getNamedItem("time") != null)
         {
         	time = Integer.decode(getValue(attrs.getNamedItem("time").getNodeValue(),template));
+            if (Config.ENABLE_MODIFY_SKILL_DURATION)
+            {
+                if (Config.SKILL_DURATION_LIST.containsKey(((L2Skill) template).getId()))
+                {
+                    if (((L2Skill) template).getLevel() < 100)
+                        time = Config.SKILL_DURATION_LIST.get(((L2Skill) template).getId());
+                    else if ((((L2Skill) template).getLevel() >= 100) && (((L2Skill) template).getLevel() < 140))
+                        time += Config.SKILL_DURATION_LIST.get(((L2Skill) template).getId());
+                    else if (((L2Skill) template).getLevel() > 140)
+                        time = Config.SKILL_DURATION_LIST.get(((L2Skill) template).getId());
+                    if (Config.DEBUG)
+                        _log.info("*** Skill " + ((L2Skill) template).getName() + " (" + ((L2Skill) template).getLevel() + ") changed duration to " + time + " seconds.");
+                }
+            }
+            else time = Integer.decode(getValue(attrs.getNamedItem("time").getNodeValue(),template));
         }
         else time = ((L2Skill) template).getBuffDuration() / 1000 / count;
         boolean self = false;
@@ -212,6 +229,12 @@ abstract class DocumentBase
         {
             if (Integer.decode(getValue(attrs.getNamedItem("self").getNodeValue(),template)) == 1)
                 self = true;
+        }
+        boolean icon = true;
+        if (attrs.getNamedItem("noicon") !=null)
+        {
+        	if (Integer.decode(getValue(attrs.getNamedItem("noicon").getNodeValue(),template)) == 1)
+        		icon = false;        		
         }
         Lambda lambda = getLambda(n, template);
         Condition applayCond = parseCondition(n.getFirstChild(), template);
@@ -236,7 +259,7 @@ abstract class DocumentBase
             stackOrder = Float.parseFloat(getValue(attrs.getNamedItem("stackOrder").getNodeValue(), template));
         }
         EffectTemplate lt = new EffectTemplate(attachCond, applayCond, name, lambda, count, time,
-                                               abnormal, stackType, stackOrder);
+                                               abnormal, stackType, stackOrder, icon);
         parseTemplate(n, lt);
         if (template instanceof L2Item) ((L2Item) template).attach(lt);
         else if (template instanceof L2Skill && !self) ((L2Skill) template).attach(lt);
@@ -487,7 +510,7 @@ abstract class DocumentBase
             }
             else if ("race_id".equalsIgnoreCase(a.getNodeName()))
             {
-            	FastList<Integer> array = new FastList<Integer>();
+            	ArrayList<Integer> array = new ArrayList<Integer>();
             	StringTokenizer st = new StringTokenizer(a.getNodeValue(), ",");
             	while (st.hasMoreTokens())
             	{

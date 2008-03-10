@@ -45,7 +45,7 @@ import net.sf.l2j.gameserver.serverpackets.SocialAction;
 import net.sf.l2j.util.Rnd;
 
 /**
- * 
+ *
  * This class ...
  * control for sequence of fight against Baium.
  * @version $Revision: $ $Date: $
@@ -60,9 +60,9 @@ public class BaiumManager
     private final int _StatueofBaiumId = 29025;
     private final int _StatueofBaiumLocation[] = {116067,17484,10110,41740};
     protected L2Spawn _StatueofBaiumSpawn = null;
-    
+
     // location of arcangels.
-    private final int _Angellocation[][] = 
+    private final int _Angellocation[][] =
     	{
 			{ 113004, 16209, 10076, 60242 },
 			{ 114053, 16642, 10076, 4411 },
@@ -77,7 +77,7 @@ public class BaiumManager
 		};
     protected List<L2Spawn> _AngelSpawn1 = new FastList<L2Spawn>();
     protected List<L2Spawn> _AngelSpawn2 = new FastList<L2Spawn>();
-    protected Map<Integer,List> _AngelSpawn = new FastMap<Integer,List>();
+    protected Map<Integer,List<L2Spawn>> _AngelSpawn = new FastMap<Integer,List<L2Spawn>>();
     List<L2NpcInstance> _Angels = new FastList<L2NpcInstance>();
 
     // location of teleport cube.
@@ -88,7 +88,7 @@ public class BaiumManager
     	};
     protected List<L2Spawn> _TeleportCubeSpawn = new FastList<L2Spawn>();
     protected List<L2NpcInstance> _TeleportCube = new FastList<L2NpcInstance>();
-    
+
     // list of intruders.
     protected List<L2PcInstance> _PlayersInLair = new FastList<L2PcInstance>();
 
@@ -102,29 +102,29 @@ public class BaiumManager
     protected List<L2NpcInstance> _Monsters = new FastList<L2NpcInstance>();
 
     // tasks.
-    protected ScheduledFuture _CubeSpawnTask = null;
-    protected ScheduledFuture _MonsterSpawnTask = null;
-    protected ScheduledFuture _IntervalEndTask = null;
-    protected ScheduledFuture _ActivityTimeEndTask = null;
-    protected ScheduledFuture _OnPlayersAnnihilatedTask = null;
-    protected ScheduledFuture _SocialTask = null;
-    protected ScheduledFuture _MobiliseTask = null;
-    protected ScheduledFuture _MoveAtRandomTask = null;
-    protected ScheduledFuture _SocialTask2 = null;
-    protected ScheduledFuture _RecallPcTask = null;
-    protected ScheduledFuture _KillPcTask = null;
-    protected ScheduledFuture _CallAngelTask = null;
-    protected ScheduledFuture _SleepCheckTask = null;
-    protected ScheduledFuture _SpeakTask = null;
-    
+    protected ScheduledFuture<?> _CubeSpawnTask = null;
+    protected ScheduledFuture<?> _MonsterSpawnTask = null;
+    protected ScheduledFuture<?> _IntervalEndTask = null;
+    protected ScheduledFuture<?> _ActivityTimeEndTask = null;
+    protected ScheduledFuture<?> _OnPlayersAnnihilatedTask = null;
+    protected ScheduledFuture<?> _SocialTask = null;
+    protected ScheduledFuture<?> _MobiliseTask = null;
+    protected ScheduledFuture<?> _MoveAtRandomTask = null;
+    protected ScheduledFuture<?> _SocialTask2 = null;
+    protected ScheduledFuture<?> _RecallPcTask = null;
+    protected ScheduledFuture<?> _KillPcTask = null;
+    protected ScheduledFuture<?> _CallAngelTask = null;
+    protected ScheduledFuture<?> _SleepCheckTask = null;
+    protected ScheduledFuture<?> _SpeakTask = null;
+
     // status in lair.
     protected GrandBossState _State = new GrandBossState(29020);
     protected String _ZoneType;
     protected String _QuestName;
     protected long _LastAttackTime = 0;
-    protected String _Words = ",?ÇÃñ∞ÇËÇñWÇ∞ÇÈÇ∆ÇÕÅIÅA?Ç Ç™Ç¢Ç¢ÅI";
+    protected String _Words = "Don't obstruct my sleep! Die!";
     //protected String _Words = ",Don't obstruct my sleep! Die!";
-    
+
     // location of banishment
     private final int _BanishmentLocation[][] =
     	{
@@ -157,7 +157,7 @@ public class BaiumManager
         {
             L2NpcTemplate template1;
             L2Spawn tempSpawn;
-            
+
             // Statue of Baium
             template1 = NpcTable.getInstance().getTemplate(_StatueofBaiumId);
             _StatueofBaiumSpawn = new L2Spawn(template1);
@@ -169,7 +169,7 @@ public class BaiumManager
             _StatueofBaiumSpawn.setRespawnDelay(Config.FWB_ACTIVITYTIMEOFBAIUM * 2);
             _StatueofBaiumSpawn.stopRespawn();
             SpawnTable.getInstance().addNewSpawn(_StatueofBaiumSpawn, false);
-            
+
             // Baium.
             template1 = NpcTable.getInstance().getTemplate(29020);
             tempSpawn = new L2Spawn(template1);
@@ -251,7 +251,7 @@ public class BaiumManager
         {
             _log.warning(e.getMessage());
         }
-        
+
         _log.info("BaiumManager : State of Baium is " + _State.getState() + ".");
         if (_State.getState().equals(GrandBossState.StateEnum.NOTSPAWN))
         	_StatueofBaiumSpawn.doSpawn();
@@ -263,7 +263,7 @@ public class BaiumManager
         }
         else if (_State.getState().equals(GrandBossState.StateEnum.INTERVAL) || _State.getState().equals(GrandBossState.StateEnum.DEAD))
         	setInetrvalEndTask();
-        
+
 		Date dt = new Date(_State.getRespawnDate());
         _log.info("BaiumManager : Next spawn date of Baium is " + dt + ".");
         _log.info("BaiumManager : Init BaiumManager.");
@@ -280,7 +280,7 @@ public class BaiumManager
 	{
 		return _PlayersInLair;
 	}
-    
+
     // Arcangel advent.
     protected synchronized void adventArcAngel()
     {
@@ -289,7 +289,7 @@ public class BaiumManager
     	{
     		_Angels.add(spawn.doSpawn());
     	}
-    	
+
         // set invulnerable.
         for (L2NpcInstance angel : _Angels)
         {
@@ -315,7 +315,7 @@ public class BaiumManager
 
         // get target from statue,to kill a player of make Baium awake.
         L2PcInstance target = (L2PcInstance)_npcbaium.getTarget();
-        
+
         // do spawn.
         L2Spawn baiumSpawn = _MonsterSpawn.get(29020);
         baiumSpawn.setLocx(_npcbaium.getX());
@@ -334,10 +334,10 @@ public class BaiumManager
         		+ Config.FWB_ACTIVITYTIMEOFBAIUM);
         _State.setState(GrandBossState.StateEnum.ALIVE);
 		_State.update();
-        
+
 		// set last attack time.
 		setLastAttackTime();
-		
+
     	// do social.
         updateKnownList(baium);
         baium.setIsImmobilized(true);
@@ -349,25 +349,25 @@ public class BaiumManager
         SocialAction sa = new SocialAction(baium.getObjectId(), 2);
         baium.broadcastPacket(sa);
 
-        _SocialTask = 
+        _SocialTask =
         	ThreadPoolManager.getInstance().scheduleGeneral(new Social(baium,3), 15000);
 
-        _RecallPcTask = 
+        _RecallPcTask =
         	ThreadPoolManager.getInstance().scheduleGeneral(new RecallPc(target), 20000);
-        
+
         _SpeakTask =
         	ThreadPoolManager.getInstance().scheduleGeneral(new Speak(target,baium), 24000);
 
-        _SocialTask2 = 
+        _SocialTask2 =
         	ThreadPoolManager.getInstance().scheduleGeneral(new Social(baium,1), 25000);
 
-        _KillPcTask = 
+        _KillPcTask =
         	ThreadPoolManager.getInstance().scheduleGeneral(new KillPc(target,baium), 26000);
 
-        _CallAngelTask = 
+        _CallAngelTask =
         	ThreadPoolManager.getInstance().scheduleGeneral(new CallArcAngel(),35000);
 
-        _MobiliseTask = 
+        _MobiliseTask =
         	ThreadPoolManager.getInstance().scheduleGeneral(new SetMobilised(baium),35500);
 
         // move at random.
@@ -377,9 +377,9 @@ public class BaiumManager
         	_MoveAtRandomTask = ThreadPoolManager.getInstance().scheduleGeneral(
             		new MoveAtRandom(baium,pos),36000);
         }
-        
+
         // set delete task.
-        _ActivityTimeEndTask = 
+        _ActivityTimeEndTask =
         	ThreadPoolManager.getInstance().scheduleGeneral(new ActivityTimeEnd(),Config.FWB_ACTIVITYTIMEOFBAIUM);
 
 		_SleepCheckTask = ThreadPoolManager.getInstance().scheduleGeneral(new CheckLastAttack(),60000);
@@ -387,7 +387,7 @@ public class BaiumManager
         baium = null;
     }
 
-    // Whether it lairs is confirmed. 
+    // Whether it lairs is confirmed.
     public boolean isEnableEnterToLair()
     {
     	if(_State.getState().equals(GrandBossState.StateEnum.NOTSPAWN))
@@ -401,8 +401,8 @@ public class BaiumManager
     {
         if (!_PlayersInLair.contains(pc)) _PlayersInLair.add(pc);
     }
-    
-    // Whether the players was annihilated is confirmed. 
+
+    // Whether the players was annihilated is confirmed.
     public synchronized boolean isPlayersAnnihilated()
     {
     	for (L2PcInstance pc : _PlayersInLair)
@@ -416,7 +416,7 @@ public class BaiumManager
 		}
 		return true;
     }
-    
+
     // banishes players from lair.
     public void banishesPlayers()
     {
@@ -440,7 +440,7 @@ public class BaiumManager
     	public ActivityTimeEnd()
     	{
     	}
-    	
+
     	public void run()
     	{
     		if(_State.getState().equals(GrandBossState.StateEnum.DEAD))
@@ -464,7 +464,7 @@ public class BaiumManager
     		mob.deleteMe();
     	}
     	_Monsters.clear();
-    	
+
     	// delete teleport cube.
 		for (L2NpcInstance cube : _TeleportCube)
 		{
@@ -472,7 +472,7 @@ public class BaiumManager
 			cube.deleteMe();
 		}
 		_TeleportCube.clear();
-		
+
 		// not executed tasks is canceled.
 		if(_CubeSpawnTask != null)
 		{
@@ -571,14 +571,14 @@ public class BaiumManager
 		public OnPlayersAnnihilatedTask()
 		{
 		}
-		
+
 		public void run()
 		{
 		    // banishes players from lair.
 			banishesPlayers();
 		}
 	}
-    
+
     // start interval.
     public void setInetrvalEndTask()
     {
@@ -591,7 +591,7 @@ public class BaiumManager
     		_State.setState(GrandBossState.StateEnum.INTERVAL);
     		_State.update();
     	}
-		
+
     	_IntervalEndTask = ThreadPoolManager.getInstance().scheduleGeneral(
             	new IntervalEnd(),_State.getInterval());
     }
@@ -602,18 +602,18 @@ public class BaiumManager
     	public IntervalEnd()
     	{
     	}
-    	
+
     	public void run()
     	{
     		_PlayersInLair.clear();
     		_State.setState(GrandBossState.StateEnum.NOTSPAWN);
     		_State.update();
-    		
+
     		// statue of Baium respawn.
     		_StatueofBaiumSpawn.doSpawn();
     	}
     }
-    
+
     // setting teleport cube spawn task.
     public void setCubeSpawn()
     {
@@ -624,7 +624,7 @@ public class BaiumManager
 
     	_CubeSpawnTask = ThreadPoolManager.getInstance().scheduleGeneral(new CubeSpawn(),10000);
     }
-    
+
     // update knownlist.
     protected void updateKnownList(L2NpcInstance boss)
     {
@@ -641,13 +641,13 @@ public class BaiumManager
     	public CubeSpawn()
     	{
     	}
-    	
+
         public void run()
         {
         	spawnCube();
         }
     }
-    
+
     // do social.
     private class Social implements Runnable
     {
@@ -662,9 +662,9 @@ public class BaiumManager
 
         public void run()
         {
-        	
+
         	updateKnownList(_npc);
-        	
+
     		SocialAction sa = new SocialAction(_npc.getObjectId(), _action);
             _npc.broadcastPacket(sa);
         }
@@ -683,7 +683,7 @@ public class BaiumManager
         {
         	_boss.setIsImmobilized(false);
         	_boss.setIsInSocialAction(false);
-            
+
             // When it is possible to act, a social action is canceled.
             if (_SocialTask != null)
             {
@@ -692,19 +692,19 @@ public class BaiumManager
             }
         }
     }
-    
+
     // Move at random on after Baium appears.
     private class MoveAtRandom implements Runnable
     {
     	private L2NpcInstance _npc;
     	L2CharPosition _pos;
-    	
+
     	public MoveAtRandom(L2NpcInstance npc,L2CharPosition pos)
     	{
     		_npc = npc;
     		_pos = pos;
     	}
-    	
+
     	public void run()
     	{
     		_npc.getAI().setIntention(CtrlIntention.AI_INTENTION_MOVE_TO,_pos);
@@ -737,7 +737,7 @@ public class BaiumManager
     		_target.teleToLocation(115831, 17248, 10078);
     	}
     }
-    
+
     // kill pc
     private class KillPc implements Runnable
     {
@@ -755,8 +755,8 @@ public class BaiumManager
     			_target.reduceCurrentHp(100000 + Rnd.get(_target.getMaxHp()/2,_target.getMaxHp()),_boss);
     	}
     }
-    
-    // Baium sleeps if never attacked for 30 minutes. 
+
+    // Baium sleeps if never attacked for 30 minutes.
     public void sleepBaium()
     {
     	setUnspawn();
@@ -764,16 +764,16 @@ public class BaiumManager
     	_PlayersInLair.clear();
 		_State.setState(GrandBossState.StateEnum.NOTSPAWN);
 		_State.update();
-		
+
 		// statue of Baium respawn.
 		_StatueofBaiumSpawn.doSpawn();
     }
-    
+
     public void setLastAttackTime()
     {
     	_LastAttackTime = System.currentTimeMillis();
     }
-    
+
     private class CheckLastAttack implements Runnable
     {
     	public CheckLastAttack()
@@ -798,7 +798,7 @@ public class BaiumManager
     		}
     	}
     }
-    
+
     private class Speak implements Runnable
     {
     	L2PcInstance _target;
