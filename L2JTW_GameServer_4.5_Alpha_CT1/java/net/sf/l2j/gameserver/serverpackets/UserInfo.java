@@ -349,11 +349,9 @@ public final class UserInfo extends L2GameServerPacket
        	writeC(_activeChar.isRunning() ? 0x01 : 0x00); //changes the Speed display on Status Window
 
         writeD(_activeChar.getPledgeClass()); //changes the text above CP on Status Window
-        writeD(0x00); // ??
+        writeD(_activeChar.getPledgeType());
 
         writeD(_activeChar.getAppearance().getTitleColor());
-
-        //writeD(0x00); // ??
 
         if (_activeChar.isCursedWeaponEquipped())
         	writeD(CursedWeaponsManager.getInstance().getLevel(_activeChar.getCursedWeaponEquippedId()));
@@ -363,7 +361,6 @@ public final class UserInfo extends L2GameServerPacket
         // T1 Starts
         writeD(_activeChar.getTranformationId());
         
-        //im not sure if position is in right place
         writeD(_activeChar.getAttackElement());
         writeD(_activeChar.getAttackElementValue());
         writeD(_activeChar.getDefAttrFire());
@@ -373,7 +370,7 @@ public final class UserInfo extends L2GameServerPacket
         writeD(_activeChar.getDefAttrHoly());
         writeD(_activeChar.getDefAttrUnholy());
         
-        writeD(0x00);
+        writeD(_activeChar.getAgathionId());
     }
 
     /* (non-Javadoc)

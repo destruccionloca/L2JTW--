@@ -120,7 +120,7 @@ public final class L2ItemInstance extends L2Object
 	public static final int CHARGED_NONE				=	0;
 	public static final int CHARGED_SOULSHOT				=	1;
 	public static final int CHARGED_SPIRITSHOT			=	1;
-	public static final int CHARGED_BLESSED_SOULSHOT		=	2; // It's a realy exists? ;-)
+	public static final int CHARGED_BLESSED_SOULSHOT		=	2; // It's a really exists? ;-)
 	public static final int CHARGED_BLESSED_SPIRITSHOT		=	2;
 
 	/** Item charged with SoulShot (type of SoulShot) */
@@ -568,7 +568,7 @@ public final class L2ItemInstance extends L2Object
     		&& (getItem().getType2() != 4 || getItem().getType1() != 1) // TODO: what does this mean?
     		&& (player.getPet() == null || getObjectId() != player.getPet().getControlItemId()) // Not Control item of currently summoned pet
     		&& (player.getActiveEnchantItem() != this) // Not momentarily used enchant scroll
-    		&& (allowAdena || getItemId() != 57)
+    		&& (allowAdena || getItemId() != 57) // Not adena
     		&& (player.getCurrentSkill() == null || player.getCurrentSkill().getSkill().getItemConsumeId() != getItemId())
 		&& (isTradeable())
     		);
@@ -596,7 +596,7 @@ public final class L2ItemInstance extends L2Object
             player.setTarget(this);
             player.getAI().setIntention(CtrlIntention.AI_INTENTION_IDLE);
             // Send a Server->Client ActionFailed to the L2PcInstance in order to avoid that the client wait another packet
-            player.sendPacket(new ActionFailed());
+            player.sendPacket(ActionFailed.STATIC_PACKET);
         }
 		else
 			player.getAI().setIntention(CtrlIntention.AI_INTENTION_PICK_UP, this);

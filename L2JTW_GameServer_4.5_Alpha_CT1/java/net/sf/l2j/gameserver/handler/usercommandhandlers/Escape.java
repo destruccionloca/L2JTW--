@@ -23,7 +23,6 @@ import net.sf.l2j.gameserver.handler.IUserCommandHandler;
 import net.sf.l2j.gameserver.instancemanager.GrandBossManager;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.entity.TvTEvent;
-import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.ActionFailed;
 import net.sf.l2j.gameserver.serverpackets.MagicSkillUse;
 import net.sf.l2j.gameserver.serverpackets.SetupGauge;
@@ -47,7 +46,7 @@ public class Escape implements IUserCommandHandler
     	// Thanks nbd
     	if (!TvTEvent.onEscapeUse(activeChar.getName()))
     	{
-    		activeChar.sendPacket(new ActionFailed());
+    		activeChar.sendPacket(ActionFailed.STATIC_PACKET);
     		return false;
     	}
 
@@ -55,13 +54,14 @@ public class Escape implements IUserCommandHandler
                 activeChar.isInOlympiadMode())
             return false;
 
-              int unstuckTimer = (activeChar.getAccessLevel() >=REQUIRED_LEVEL? 5000 : Config.UNSTUCK_INTERVAL*1000 );
+        int unstuckTimer = (activeChar.getAccessLevel() >= REQUIRED_LEVEL? 5000 : Config.UNSTUCK_INTERVAL*1000 );
+
 
         // 檢查玩家如果在黑暗祭典內
         if (activeChar.isFestivalParticipant())
         {
             //現在時刻無法嘗試「/逃脫」指令。請申請訴求。
-    		activeChar.sendPacket(new SystemMessage(SystemMessageId.UNSTUCK_COMMAND_CANNOT_BE_USED));
+    		activeChar.sendPacket(new SystemMessage(1043));
             return false;
         }
 
@@ -69,7 +69,7 @@ public class Escape implements IUserCommandHandler
         if (activeChar.isInJail())
         {
             //現在時刻無法嘗試「/逃脫」指令。請申請訴求。
-    		activeChar.sendPacket(new SystemMessage(SystemMessageId.UNSTUCK_COMMAND_CANNOT_BE_USED));
+    		activeChar.sendPacket(new SystemMessage(1043));
             return false;
         }
 
@@ -81,7 +81,17 @@ public class Escape implements IUserCommandHandler
         }
 **/
         //不能確認是否處於無法移動的地形。5分鐘之後將逃脫到村莊。
-		activeChar.sendPacket(new SystemMessage(SystemMessageId.YOU_ARE_STUCK));
+		//activeChar.sendPacket(new SystemMessage(SystemMessageId.YOU_ARE_STUCK));
+
+        if(activeChar.getAccessLevel() >= REQUIRED_LEVEL)
+        {
+        	activeChar.sendMessage("使用快速脫逃: 估計5秒.");
+        }
+        else if(Config.UNSTUCK_INTERVAL > 100)
+        {
+        	activeChar.sendMessage("使用脫逃: 估計 " + unstuckTimer/60000 + " 分鐘.");
+        }
+        else activeChar.sendMessage("使用脫逃: 估計 " + unstuckTimer/1000 + " 秒.");
 
         activeChar.getAI().setIntention(CtrlIntention.AI_INTENTION_IDLE);
         //SoE Animation section

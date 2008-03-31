@@ -32,10 +32,12 @@ import net.sf.l2j.gameserver.model.L2NpcCharData;
 import net.sf.l2j.gameserver.model.L2NpcAIData;
 import net.sf.l2j.gameserver.model.L2MinionData;
 import net.sf.l2j.gameserver.model.L2Skill;
+import net.sf.l2j.gameserver.model.L2Effect.EffectType;
 import net.sf.l2j.gameserver.model.base.ClassId;
 import net.sf.l2j.gameserver.skills.Stats;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
 import net.sf.l2j.gameserver.templates.StatsSet;
+import net.sf.l2j.gameserver.model.L2Effect;
 
 /**
  * This class ...
@@ -71,7 +73,7 @@ public class NpcTable
 	{
 		java.sql.Connection con = null;
 
-		try
+				try
 		{
 			try
 			{
@@ -95,7 +97,6 @@ public class NpcTable
 				ResultSet npcskills = statement.executeQuery();
 				L2NpcTemplate npcDat = null;
 				L2Skill npcSkill = null;
-				//L2NpcAIData SkillAI = null;
 
 				while (npcskills.next())
 				{
@@ -116,12 +117,8 @@ public class NpcTable
 					
 					npcSkill = SkillTable.getInstance().getInfo(skillId, level);
 
-
-					
-					
 					if (npcSkill == null)
 						continue;
-					
 
 					npcDat.addSkill(npcSkill);
 				}
@@ -275,7 +272,7 @@ public class NpcTable
 			try 
             {
 			    PreparedStatement statement10 = con.prepareStatement("SELECT " + L2DatabaseFactory.getInstance().safetyString(new String[] 
-			    {"npc_id", "primary_attack","skill_chance","canMove","soulshot","spiritshot","sschance","spschance","minrangeskill","minrangechance","maxrangeskill","maxrangechance","ischaos","clan","enemyClan","enemyRange","dodge"}) + " FROM npcAIData ORDER BY npc_id");
+			    {"npc_id", "primary_attack","skill_chance","canMove","soulshot","spiritshot","sschance","spschance","minrangeskill","minrangechance","maxrangeskill","maxrangechance","ischaos","clan","enemyClan","enemyRange","ai_type","dodge"}) + " FROM npcAIData ORDER BY npc_id");
 			    ResultSet NpcAIDataTable = statement10.executeQuery();
 			    L2NpcAIData npcAIDat = null;
 			    L2NpcTemplate npcDat = null;
@@ -303,6 +300,7 @@ public class NpcTable
                     npcAIDat.setShortRangeChance(NpcAIDataTable.getInt("minrangechance"));
                     npcAIDat.setLongRangeSkill(NpcAIDataTable.getInt("maxrangeskill"));
                     npcAIDat.setLongRangeChance(NpcAIDataTable.getInt("maxrangechance"));
+                    //npcAIDat.setSwitchRangeChance(NpcAIDataTable.getInt("rangeswitchchance"));
                     npcAIDat.setClan(NpcAIDataTable.getString("clan"));
                     npcAIDat.setEnemyClan(NpcAIDataTable.getString("enemyClan"));
                     npcAIDat.setEnemyRange(NpcAIDataTable.getInt("enemyRange"));

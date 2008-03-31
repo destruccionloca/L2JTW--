@@ -162,7 +162,7 @@ public class Disablers implements ISkillHandler
 
             L2Character target = (L2Character) targets[index];
 
-            if (target == null || target.isDead()) //bypass if target is null or dead
+            if (target == null || target.isDead() || target.isInvul()) //bypass if target is null, invul or dead
         		continue;
 
             switch (type)
@@ -629,19 +629,30 @@ public class Disablers implements ISkillHandler
                 case CANCEL:
                 case NEGATE:
                 {
+                	if (target instanceof L2Attackable)
+                        ((L2Attackable)target).addDamageHate(activeChar, 0, 700);
+                	
                     if(target.reflectSkill(skill))
                     	target = activeChar;
 
+                	if (skill.cancelEffect() > 0)
+                    {
+                    	L2Effect[] effects = target.getAllEffects();
+                    	for (L2Effect e : effects)
+                		{
+                    		if (e.getSkill().getId() == skill.cancelEffect())
+                    			e.exit();
+                		}
+                    }
                 	//TODO@   Rewrite it to properly use Formulas class.
                     // cancel
-                    if (target instanceof L2Attackable)
-                        ((L2Attackable)target).addDamageHate(activeChar, 0, 700);
-                    if (skill.getId() == 1056)
+                    else if (skill.getId() == 1056)
                     {
                     	int lvlmodifier= 52+skill.getLevel()*2;
                     	if(skill.getLevel()==12) lvlmodifier = (Experience.MAX_LEVEL - 1);
                     	int landrate = 90;
-                    	if((target.getLevel() - lvlmodifier)>0) landrate = 90-4*(target.getLevel()-lvlmodifier);
+                    	if((target.getLevel() - lvlmodifier)>0)
+                    		landrate = 90-4*(target.getLevel()-lvlmodifier);
 
                     	landrate = (int) activeChar.calcStat(Stats.CANCEL_VULN, landrate, target, null);
 
@@ -651,6 +662,14 @@ public class Disablers implements ISkillHandler
                     		int maxfive = 5;
                     		for (L2Effect e : effects)
                     		{
+                    			// do not delete signet effects!
+                    			switch (e.getEffectType())
+							    {
+							        case SIGNET_GROUND:
+							        case SIGNET_EFFECT:
+							            continue;
+							    }
+                    			
                     			if (e.getSkill().getId() != 4082 && e.getSkill().getId() != 4215 &&
                     					e.getSkill().getId() != 4515 && e.getSkill().getId() != 110 && e.getSkill().getId() != 111 &&
                     					e.getSkill().getId() != 1323 && e.getSkill().getId() != 1325) // Cannot cancel skills 4082, 4215, 4515, 110, 111, 1323, 1325
@@ -789,12 +808,15 @@ public class Disablers implements ISkillHandler
     	negateEffect(target, type, power, 0);
     }
 
-    private void negateEffect(L2Character target, SkillType type, double power, int skillId) {
+    private void negateEffect(L2Character target, SkillType type, double power, int skillId) 
+    {
         L2Effect[] effects = target.getAllEffects();
         for (L2Effect e : effects)
+        {
         	if (power == -1) // if power is -1 the effect is always removed without power/lvl check ^^
         	{
-        		if (e.getSkill().getSkillType() == type || (e.getSkill().getEffectType() != null && e.getSkill().getEffectType() == type)) {
+        		if (e.getSkill().getSkillType() == type || (e.getSkill().getEffectType() != null && e.getSkill().getEffectType() == type)) 
+        		{
         			if (skillId != 0)
         			{
         				if (skillId == e.getSkill().getId())
@@ -804,8 +826,8 @@ public class Disablers implements ISkillHandler
         				e.exit();
         		}
         	}
-        	else if ((e.getSkill().getSkillType() == type && e.getSkill().getPower() <= power)
-        			|| (e.getSkill().getEffectType() != null && e.getSkill().getEffectType() == type && e.getSkill().getEffectLvl() <= power)) {
+        	else if ((e.getSkill().getSkillType() == type && e.getSkill().getPower() <= power) || (e.getSkill().getEffectType() != null && e.getSkill().getEffectType() == type && e.getSkill().getEffectLvl() <= power)) 
+        	{
     			if (skillId != 0)
     			{
     				if (skillId == e.getSkill().getId())
@@ -814,6 +836,7 @@ public class Disablers implements ISkillHandler
     			else
     				e.exit();
         	}
+        }
     }
 
     public SkillType[] getSkillIds()

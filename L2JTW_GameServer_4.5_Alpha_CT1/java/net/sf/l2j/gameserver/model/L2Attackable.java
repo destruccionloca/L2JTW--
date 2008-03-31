@@ -282,6 +282,8 @@ public class L2Attackable extends L2NpcInstance
 
     /** Have this L2Attackable to reward Exp and SP on Die? **/
     private boolean _mustGiveExpSp;
+    
+    public FastList _hatelist;
     /**
      * Constructor of L2Attackable (use L2Character and L2NpcInstance constructor).<BR><BR>
      *
@@ -943,7 +945,7 @@ public class L2Attackable extends L2NpcInstance
             for (AggroInfo ai : getAggroListRP().values())
             {
             	if (ai == null) continue;
-            	if (ai._attacker.isAlikeDead() || !getKnownList().knowsObject(ai._attacker) ||!ai._attacker.isVisible())
+            	if (ai._attacker.isAlikeDead() || !getKnownList().knowsObject(ai._attacker) ||!ai._attacker.isVisible() || ai._attacker==this)
             		ai._hate = 0;
             	if (ai._hate > maxHate)
             	{
@@ -954,7 +956,7 @@ public class L2Attackable extends L2NpcInstance
         }
         return mostHated;
     }
-    
+
     /**
      * Return the 2 most hated L2Character of the L2Attackable _aggroList.<BR><BR>
      */
@@ -967,7 +969,7 @@ public class L2Attackable extends L2NpcInstance
         int maxHate = 0;
         List<L2Character> result = new FastList<L2Character>();
 
-        // While Interating over This Map Removing Object is Not Allowed
+        // While iterating over this map removing objects is not allowed
         synchronized (getAggroList())
         {
             // Go through the aggroList of the L2Attackable
@@ -990,7 +992,29 @@ public class L2Attackable extends L2NpcInstance
         else result.add(null);
         return result;
     }
+    
+    public List<L2Character> getHateList()
+    {
+    	if (getAggroListRP().isEmpty() || isAlikeDead()) return null;
 
+
+    	 synchronized (getAggroList())
+         {
+   			 _hatelist = new FastList<L2Character>();
+	    			 
+             for (AggroInfo ai : getAggroListRP().values())
+             {
+            	 if(ai._attacker instanceof L2Character)
+            	 _hatelist.add(ai._attacker);
+             }
+    		 
+    		 
+    		 
+         }
+    	 return _hatelist;
+    	
+    }
+    
     /**
      * Return the hate level of the L2Attackable against this L2Character contained in _aggroList.<BR><BR>
      *

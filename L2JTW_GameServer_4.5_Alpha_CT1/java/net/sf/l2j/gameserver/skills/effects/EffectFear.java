@@ -66,8 +66,8 @@ final class EffectFear extends L2Effect
 	@Override
 	public boolean onActionTime()
 	{
-		// Fear skills cannot be used l2pcinstance to l2pcinstance. Heroic Dread, Curse: Fear, Fear and Horror are the exceptions.
-		if(getEffected() instanceof L2PcInstance && getEffector() instanceof L2PcInstance && getSkill().getId() != 1376 && getSkill().getId() != 1169 && getSkill().getId() != 65 && getSkill().getId() != 1092) return false;
+		// Fear skills cannot be used l2pcinstance to l2pcinstance. Heroic Dread, Curse: Fear, Fear, Horror, Sword Symphony, Word of Fear and Mass Curse Fear are the exceptions.
+		if(getEffected() instanceof L2PcInstance && getEffector() instanceof L2PcInstance && getSkill().getId() != 1376 && getSkill().getId() != 1169 && getSkill().getId() != 65 && getSkill().getId() != 1092 && getSkill().getId() != 98 && getSkill().getId() != 1272 && getSkill().getId() != 1381) return false;
 		if(getEffected() instanceof L2FolkInstance) return false;
 		if(getEffected() instanceof L2SiegeGuardInstance) return false;
 		// Fear skills cannot be used on Headquarters Flag.
@@ -82,9 +82,9 @@ final class EffectFear extends L2Effect
 		
 		int signx=-1;
 		int signy=-1;
-		if (getEffected().getX()>getEffector().getX())
+		if (getEffected().getX() > getEffector().getX())
 			signx=1;
-		if (getEffected().getY()>getEffector().getY())
+		if (getEffected().getY() > getEffector().getY())
 			signy=1;
 		posX += signx*FEAR_RANGE;
 		posY += signy*FEAR_RANGE;

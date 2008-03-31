@@ -189,7 +189,7 @@ public class AdminEditChar implements IAdminCommandHandler
 					GMAudit.auditGMAction(activeChar.getName(), command, activeChar.getName(), "");
 				setTargetKarma(activeChar, karma);
 			}
-			catch (StringIndexOutOfBoundsException e)
+			catch (Exception e)
 			{
 
 				if (Config.DEVELOPER )

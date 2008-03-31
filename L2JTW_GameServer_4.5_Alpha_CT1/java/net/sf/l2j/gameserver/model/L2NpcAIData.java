@@ -19,8 +19,14 @@
 package net.sf.l2j.gameserver.model;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
+import net.sf.l2j.gameserver.templates.L2NpcTemplate;
 
 import javolution.util.FastList;
+import javolution.util.FastMap;
 
 /**
  *
@@ -58,19 +64,26 @@ public class L2NpcAIData
     private int _shortrangeskill;
     private int _longrangechance;
     private int _shortrangechance;
+    private int _switchrangechance;
     
     //Skill AI
-    private int _buffskill;
-    private int _debuffskill;
-    private int _atkskill;
-    private int _rootskill;
-    private int _sleepskill;
-    private int _silentskill;
-    private int _effectskill;
-    private int _specialskill; // It will be use later on..
-    
-    private int _castchance;
-    private int _skillcondition; // use later on
+	public FastList<L2Skill> _buffskills;
+	public FastList<L2Skill> _negativeskills;
+	public FastList<L2Skill> _debuffskills;
+	public FastList<L2Skill> _atkskills;
+	public FastList<L2Skill> _rootskills;
+	public FastList<L2Skill> _stunskills;
+	public FastList<L2Skill> _sleepskills;
+	public FastList<L2Skill> _paralyzeskills;
+	public FastList<L2Skill> _fossilskills;
+	public FastList<L2Skill> _floatskills;
+	public FastList<L2Skill> _immobiliseskills;
+	public FastList<L2Skill> _healskills;
+	public FastList<L2Skill> _resskills;
+	public FastList<L2Skill> _dotskills;
+	public FastList<L2Skill> _cotskills;
+	public FastList<L2Skill> _universalskills;
+	public FastList<L2Skill> _manaskills;
     
 
 	private FastList<L2NpcAIData> npcAIdata;
@@ -179,6 +192,13 @@ public class L2NpcAIData
         
     }
     
+    public void setSwitchRangeChance (int switchrangechance)
+    {
+        
+        _switchrangechance = switchrangechance;
+        
+    }
+    
     public void setIsChaos (int ischaos)
     {
     	_ischaos = ischaos;
@@ -204,6 +224,7 @@ public class L2NpcAIData
     	_enemyRange = enemyRange;
     	
     }
+    
     public void setDodge (int dodge)
     {
     	_dodge = dodge;
@@ -226,43 +247,7 @@ public class L2NpcAIData
     }
     */
     
-    public void setBuffSkill (int buff)
-    {
-    	_buffskill = buff;
-    }
-    public void setDebuffSkill (int debuff)
-    {
-    	_debuffskill = debuff;
-    }
-    public void setEffectSkill (int effect)
-    {
-    	_effectskill = effect;
-    }
-    public void setRootSkill (int root)
-    {
-    	_rootskill = root;
-    }
-    public void setSleepSkill (int sleep)
-    {
-    	_sleepskill = sleep;
-    }
-    public void setAtkSkill (int atk)
-    {
-    	_atkskill = atk;
-    }
-    public void setSpecialSkill(int special)
-    {
-    	_specialskill = special;
-    }
-    public void setCastChance(int chance)
-    {
-    	_castchance = chance;
-    }
     
-    public void setSkillCount(int count)
-    {
-        
-    }
     
     //--------------------------------------------------------------------------------------------------------------
     //Data Recall....
@@ -339,6 +324,12 @@ public class L2NpcAIData
         return _longrangechance;
         
     }
+    public int getSwitchRangeChance()
+    {
+        
+        return _switchrangechance;
+        
+    }
     public int getIsChaos ()
     {
         
@@ -389,39 +380,247 @@ public class L2NpcAIData
     }
     */
     
-    
-    public int getBuffSkill ()
-    {
-    	return _buffskill;
-    }
-    public int getDebuffSkill ()
-    {
-    	return _debuffskill;
-    }
-    public int getEffectSkill ()
-    {
-    	return _effectskill;
-    }
-    public int getRootSkill ()
-    {
-    	return _rootskill;
-    }
-    public int getSleepSkill ()
-    {
-    	return _sleepskill;
-    }
-    public int getAtkSkill ()
-    {
-    	return _atkskill;
-    }
-    public int getSpecialSkill()
-    {
-    	return _specialskill;
-    }
-    public int getCastChance()
-    {
-    	return _castchance;
-    }
-	
 
+    
+    
+    public void addBuffSkill(L2Skill skill)
+	{
+		if (_buffskills == null)
+			_buffskills = new FastList<L2Skill>();
+			_buffskills.add(skill);
+	}
+    
+    public void addHealSkill(L2Skill skill)
+	{
+		if (_healskills == null)
+			_healskills = new FastList<L2Skill>();
+			_healskills.add(skill);
+	}
+    
+    public void addResSkill(L2Skill skill)
+	{
+		if (_resskills == null)
+			_resskills = new FastList<L2Skill>();
+			_resskills.add(skill);
+	}
+	
+    public void addAtkSkill(L2Skill skill)
+	{
+		if (_atkskills == null)
+			_atkskills = new FastList<L2Skill>();
+			_atkskills.add(skill);
+	}
+
+    public void addDebuffSkill(L2Skill skill)
+	{
+		if (_debuffskills == null)
+			_debuffskills = new FastList<L2Skill>();
+			_debuffskills.add(skill);
+	}
+    
+    public void addRootSkill(L2Skill skill)
+	{
+		if (_rootskills == null)
+			_rootskills = new FastList<L2Skill>();
+			_rootskills.add(skill);
+	}
+    
+    public void addSleepSkill(L2Skill skill)
+	{
+		if (_sleepskills == null)
+			_sleepskills = new FastList<L2Skill>();
+			_sleepskills.add(skill);
+	}
+    
+    public void addStunSkill(L2Skill skill)
+	{
+		if (_stunskills == null)
+			_stunskills = new FastList<L2Skill>();
+			_stunskills.add(skill);
+	}
+    
+    public void addParalyzeSkill(L2Skill skill)
+	{
+		if (_paralyzeskills == null)
+			_paralyzeskills = new FastList<L2Skill>();
+			_paralyzeskills.add(skill);
+	}
+    
+    public void addFloatSkill(L2Skill skill)
+	{
+		if (_floatskills == null)
+			_floatskills = new FastList<L2Skill>();
+			_floatskills.add(skill);
+	}
+    
+    public void addFossilSkill(L2Skill skill)
+	{
+		if (_fossilskills == null)
+			_fossilskills = new FastList<L2Skill>();
+			_fossilskills.add(skill);
+	}
+    
+    public void addNegativeSkill(L2Skill skill)
+	{
+		if (_negativeskills == null)
+			_negativeskills = new FastList<L2Skill>();
+			_negativeskills.add(skill);
+	}
+    
+    public void addImmobiliseSkill(L2Skill skill)
+	{
+		if (_immobiliseskills == null)
+			_immobiliseskills = new FastList<L2Skill>();
+			_immobiliseskills.add(skill);
+	}
+    
+    public void addDOTSkill(L2Skill skill)
+	{
+		if (_dotskills == null)
+			_dotskills = new FastList<L2Skill>();
+			_dotskills.add(skill);
+	}
+    
+    public void addUniversalSkill(L2Skill skill)
+	{
+		if (_universalskills == null)
+			_universalskills = new FastList<L2Skill>();
+			_universalskills.add(skill);
+	}
+    
+    public void addCOTSkill(L2Skill skill)
+	{
+		if (_cotskills == null)
+			_cotskills = new FastList<L2Skill>();
+			_cotskills.add(skill);
+	}
+    
+    public void addManaHealSkill(L2Skill skill)
+	{
+		if (_manaskills == null)
+			_manaskills = new FastList<L2Skill>();
+			_manaskills.add(skill);
+	}
+    
+    
+    //--------------------------------------------------------------------
+    public boolean hasBuffSkill()
+	{
+		if (_buffskills != null && _buffskills.size()>0)
+			return true;
+		else return false;
+	}
+    public boolean hasHealSkill()
+	{
+		if (_healskills != null && _healskills.size()>0)
+			return true;
+		else return false;
+	}
+    
+    public boolean hasResSkill()
+	{
+		if (_resskills != null && _resskills.size()>0)
+			return true;
+		else return false;
+	}
+	
+    public boolean hasAtkSkill()
+	{
+		if (_atkskills != null && _atkskills.size()>0)
+			return true;
+		else return false;
+	}
+
+    public boolean hasDebuffSkill()
+	{
+		if (_debuffskills != null && _debuffskills.size()>0)
+			return true;
+		else return false;
+	}
+    
+    public boolean hasRootSkill()
+	{
+		if (_rootskills != null && _rootskills.size()>0)
+			return true;
+		else return false;
+	}
+    
+    public boolean hasSleepSkill()
+	{
+		if (_sleepskills != null && _sleepskills.size()>0)
+			return true;
+		else return false;
+	}
+    
+    public boolean hasStunSkill()
+	{
+		if (_stunskills != null && _stunskills.size()>0)
+			return true;
+		else return false;
+	}
+    
+    public boolean hasParalyzeSkill()
+	{
+		if (_paralyzeskills != null && _paralyzeskills.size()>0)
+			return true;
+		else return false;
+	}
+    
+    public boolean hasFloatSkill()
+	{
+		if (_floatskills != null && _floatskills.size()>0)
+			return true;
+		else return false;
+	}
+    
+    public boolean hasFossilSkill()
+	{
+		if (_fossilskills != null && _fossilskills.size()>0)
+			return true;
+		else return false;
+	}
+    
+    public boolean hasNegativeSkill()
+	{
+		if (_negativeskills != null && _negativeskills.size()>0)
+			return true;
+		else return false;
+	}
+    
+    public boolean hasImmobiliseSkill()
+	{
+		if (_immobiliseskills != null && _immobiliseskills.size()>0)
+			return true;
+		else return false;
+	}
+    
+    public boolean hasDOTSkill()
+	{
+		if (_dotskills != null && _dotskills.size()>0)
+			return true;
+		else return false;
+	}
+    
+    public boolean hasUniversalSkill()
+	{
+		if (_universalskills != null && _universalskills.size()>0)
+			return true;
+		else return false;
+	}
+    
+    public boolean hasCOTSkill()
+	{
+		if (_cotskills != null && _cotskills.size()>0)
+			return true;
+		else return false;
+	}
+    
+    public boolean hasManaHealSkill()
+	{
+		if (_manaskills != null && _manaskills.size()>0)
+			return true;
+		else return false;
+	}
+    
+    
 }

@@ -189,6 +189,7 @@ import net.sf.l2j.gameserver.serverpackets.StatusUpdate;
 import net.sf.l2j.gameserver.serverpackets.StopMove;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.serverpackets.TargetSelected;
+import net.sf.l2j.gameserver.serverpackets.TargetUnselected;
 import net.sf.l2j.gameserver.serverpackets.TradeDone;
 import net.sf.l2j.gameserver.serverpackets.TradeStart;
 import net.sf.l2j.gameserver.serverpackets.UserInfo;
@@ -330,12 +331,21 @@ public final class L2PcInstance extends L2PlayableInstance
 			getPlayer().setRecentFakeDeath(false);
 			if(skill == null) return;
 			if(!skill.isOffensive()) return;
-			L2Object mainTarget = skill.getFirstOfTargetList(L2PcInstance.this);
-			// the code doesn't now support multiple targets
-			if(mainTarget == null || !(mainTarget instanceof L2Character)) return;
-			for (L2CubicInstance cubic : getCubics().values())
-				if (cubic.getId() != L2CubicInstance.LIFE_CUBIC)
-					cubic.doAction((L2Character)mainTarget);
+			switch (skill.getTargetType())
+			{
+				case TARGET_GROUND:
+					return;
+				default:
+				{
+					L2Object mainTarget = skill.getFirstOfTargetList(L2PcInstance.this);
+					if (mainTarget == null || !(mainTarget instanceof L2Character))
+						return;
+					for (L2CubicInstance cubic : getCubics().values())
+						if (cubic.getId() != L2CubicInstance.LIFE_CUBIC)
+							cubic.doAction((L2Character)mainTarget);
+				}
+				break;
+			}
 		}
 	}
 
@@ -530,9 +540,11 @@ public final class L2PcInstance extends L2PlayableInstance
 	/** The L2Summon of the L2PcInstance */
 	private L2Summon _summon = null;
 	/** The L2Decoy of the L2PcInstance */
-    private L2Decoy _decoy = null;
-    /** The L2Trap of the L2PcInstance */
-    private L2Trap _trap = null;
+	private L2Decoy _decoy = null;
+	/** The L2Trap of the L2PcInstance */
+	private L2Trap _trap = null;
+	/** The L2Agathion of the L2PcInstance */
+	private int _agathionId = 0;
 	// apparently, a L2PcInstance CAN have both a summon AND a tamed beast at the same time!!
 	private L2TamedBeastInstance _tamedBeast = null;
 
@@ -579,6 +591,9 @@ public final class L2PcInstance extends L2PlayableInstance
     private int _souls = 0;
     private ScheduledFuture<?> _soulTask = null;
 
+    // WorldPosition used by TARGET_SIGNET_GROUND
+    private Point3D _currentSkillWorldPosition;
+    
 	//GM related variables
 	private boolean _isGm;
 	private int _accessLevel;
@@ -1451,7 +1466,7 @@ public final class L2PcInstance extends L2PlayableInstance
 			sendPacket(npcReply);
 		}
 
-		sendPacket( new ActionFailed() );
+		sendPacket( ActionFailed.STATIC_PACKET );
 	}
 
 	/**
@@ -3415,6 +3430,16 @@ public final class L2PcInstance extends L2PlayableInstance
 			client.close(new LeaveWorld());
 		}
 	}
+	
+	public Point3D getCurrentSkillWorldPosition()
+	{
+		return _currentSkillWorldPosition;
+	}
+	 
+	public void setCurrentSkillWorldPosition(Point3D worldPosition)
+	{
+		_currentSkillWorldPosition = worldPosition;
+	}
 
 	/**
 	 * Manage actions when a player click on this L2PcInstance.<BR><BR>
@@ -3441,7 +3466,7 @@ public final class L2PcInstance extends L2PlayableInstance
 		// See description in TvTEvent.java
 		if (!TvTEvent.onAction(player.getName(), getName()))
 		{
-			player.sendPacket(new ActionFailed());
+			player.sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 
@@ -3449,7 +3474,7 @@ public final class L2PcInstance extends L2PlayableInstance
 		if (player.isOutOfControl())
 		{
 			// Send a Server->Client packet ActionFailed to the player
-			player.sendPacket(new ActionFailed());
+			player.sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 
@@ -3482,7 +3507,7 @@ public final class L2PcInstance extends L2PlayableInstance
 					if ((isCursedWeaponEquipped() && player.getLevel() < 21)
 							|| (player.isCursedWeaponEquipped() && getLevel() < 21))
 					{
-						player.sendPacket(new ActionFailed());
+						player.sendPacket(ActionFailed.STATIC_PACKET);
 					} else
 					{
 						if (Config.GEODATA > 0)
@@ -3676,10 +3701,11 @@ public final class L2PcInstance extends L2PlayableInstance
                     continue;
                 }
                 
-                if (effect.getEffectType() == L2Effect.EffectType.CHARGE)
+                switch (effect.getEffectType())
                 {
-                    // handled by EtcStatusUpdate
-                    continue;
+                	case CHARGE: // handled by EtcStatusUpdate
+                	case SIGNET_GROUND:
+                		continue;
                 }
                 
                 if (effect.getInUse())
@@ -3879,7 +3905,7 @@ public final class L2PcInstance extends L2PlayableInstance
 		if (target instanceof L2PcInstance)
 		{
 			L2PcInstance temp = (L2PcInstance) target;
-			sendPacket(new ActionFailed());
+			sendPacket(ActionFailed.STATIC_PACKET);
 
 			if (temp.getPrivateStoreType() == STORE_PRIVATE_SELL || temp.getPrivateStoreType() == STORE_PRIVATE_PACKAGE_SELL)
 				sendPacket(new PrivateStoreListSell(this, temp));
@@ -3953,7 +3979,7 @@ public final class L2PcInstance extends L2PlayableInstance
 		L2ItemInstance target = (L2ItemInstance) object;
 
 		// Send a Server->Client packet ActionFailed to this L2PcInstance
-		sendPacket(new ActionFailed());
+		sendPacket(ActionFailed.STATIC_PACKET);
 
 		// Send a Server->Client packet StopMove to this L2PcInstance
 		StopMove sm = new StopMove(getObjectId(), getX(), getY(), getZ(), getHeading());
@@ -3966,20 +3992,20 @@ public final class L2PcInstance extends L2PlayableInstance
 			if (!target.isVisible())
 			{
 				// Send a Server->Client packet ActionFailed to this L2PcInstance
-				sendPacket(new ActionFailed());
+				sendPacket(ActionFailed.STATIC_PACKET);
 				return;
 			}
 
 			if ( ((isInParty() && getParty().getLootDistribution() == L2Party.ITEM_LOOTER) || !isInParty()) && !_inventory.validateCapacity(target))
 			{
-				sendPacket(new ActionFailed());
+				sendPacket(ActionFailed.STATIC_PACKET);
 				sendPacket(new SystemMessage(SystemMessageId.SLOTS_FULL));
 				return;
 			}
 
             if (isInvul() && !isGM())
             {
-                sendPacket(new ActionFailed());
+                sendPacket(ActionFailed.STATIC_PACKET);
                 SystemMessage smsg = new SystemMessage(SystemMessageId.FAILED_TO_PICKUP_S1);
                 smsg.addItemName(target.getItemId());
                 sendPacket(smsg);
@@ -3988,7 +4014,7 @@ public final class L2PcInstance extends L2PlayableInstance
 
 	        if (target.getOwnerId() != 0 && target.getOwnerId() != getObjectId() && !isInLooterParty(target.getOwnerId()))
             {
-                sendPacket(new ActionFailed());
+                sendPacket(ActionFailed.STATIC_PACKET);
 
                 if (target.getItemId() == 57)
                 {
@@ -4099,7 +4125,7 @@ public final class L2PcInstance extends L2PlayableInstance
         }
         else
         {
-            this.sendPacket(new ActionFailed());
+            this.sendPacket(ActionFailed.STATIC_PACKET);
         }
     }
     
@@ -4128,7 +4154,7 @@ public final class L2PcInstance extends L2PlayableInstance
         }
         else
         {
-            this.sendPacket(new ActionFailed());
+            this.sendPacket(ActionFailed.STATIC_PACKET);
         }
     }
     
@@ -4219,7 +4245,6 @@ public final class L2PcInstance extends L2PlayableInstance
             rset.next();
             _transformationId = rset.getInt("transform_id");
             statement.close();
-            return _transformationId;
         }
         catch (Exception e)
         {
@@ -4229,7 +4254,7 @@ public final class L2PcInstance extends L2PlayableInstance
         {
             try { con.close(); } catch (Exception e) {}
         }
-        return _transformationId = 0;
+        return _transformationId;
     }
 
     public void transformUpdateInfo()
@@ -4315,7 +4340,11 @@ public final class L2PcInstance extends L2PlayableInstance
 			TargetSelected my = new TargetSelected(getObjectId(), newTarget.getObjectId(), getX(), getY(), getZ());
 			broadcastPacket(my);
 		}
-
+		if (newTarget == null && getTarget() != null)
+		{
+			broadcastPacket(new TargetUnselected(this));
+		}
+		
 		// Target the new L2Object (add the target to the L2PcInstance _target, _knownObject and L2PcInstance to _KnownObject of the L2Object)
 		super.setTarget(newTarget);
 	}
@@ -4692,11 +4721,11 @@ public final class L2PcInstance extends L2PlayableInstance
 			_cubics.clear();
 		}
 
-		if(_forceBuff != null)
+		if (_forceBuff != null)
 			_forceBuff.delete();
 
-		for(L2Character character : getKnownList().getKnownCharacters())
-			if(character.getForceBuff() != null && character.getForceBuff().getTarget() == this)
+		for (L2Character character : getKnownList().getKnownCharacters())
+			if (character.getForceBuff() != null && character.getForceBuff().getTarget() == this)
 				character.abortCast();
 
 		if (isInParty() && getParty().isInDimensionalRift())
@@ -4898,6 +4927,21 @@ public final class L2PcInstance extends L2PlayableInstance
 			else if (targetPlayer.getPvpFlag() == 0)                                                                    // Target player doesn't have karma
 			{
                 increasePkKillsAndKarma(targetPlayer.getLevel());
+				//Unequip adventurer items
+				if(getInventory().getPaperdollItemId(7) >= 7816 && getInventory().getPaperdollItemId(7) <= 7831) 
+				{
+					L2ItemInstance invItem = getInventory().getItemByItemId(getInventory().getPaperdollItemId(7));
+					if(invItem.isEquipped()) 
+					{
+						L2ItemInstance unequiped[] = getInventory().unEquipItemInSlotAndRecord(invItem.getLocationSlot());
+						InventoryUpdate iu = new InventoryUpdate();
+						for(int i = 0; i < unequiped.length; i++)
+							iu.addModifiedItem(unequiped[i]);
+						sendPacket(iu);
+					}
+					refreshExpertisePenalty();			
+					sendPacket(new SystemMessage(SystemMessageId.YOU_ARE_UNABLE_TO_EQUIP_THIS_ITEM_WHEN_YOUR_PK_COUNT_IS_GREATER_THAN_OR_EQUAL_TO_ONE));
+				}
 			}
 		}
 	}
@@ -4992,12 +5036,13 @@ public final class L2PcInstance extends L2PlayableInstance
 
 	public void updatePvPStatus()
 	{
+		if (_inEventCTF && CTF._started) return;
 		if (isInsideZone(ZONE_PVP)) return;
 		setPvpFlagLasts(System.currentTimeMillis() + Config.PVP_NORMAL_TIME);
 
 		if (getPvpFlag() == 0)
 			startPvPFlag();
-		if (_inEventCTF && CTF._started) return;
+
 	}
 
 	public void updatePvPStatus(L2Character target)
@@ -7488,10 +7533,10 @@ public final class L2PcInstance extends L2PlayableInstance
 	 */
 	public void useMagic(L2Skill skill, boolean forceUse, boolean dontMove)
 	{
-        if (isDead())
+		if (isDead())
         {
             abortCast();
-            sendPacket(new ActionFailed());
+            sendPacket(ActionFailed.STATIC_PACKET);
             return;
         }
 
@@ -7500,7 +7545,7 @@ public final class L2PcInstance extends L2PlayableInstance
         {
             sendPacket(new SystemMessage(SystemMessageId.CANNOT_USE_ITEMS_SKILLS_WITH_FORMALWEAR));
 
-            sendPacket(new ActionFailed());
+            sendPacket(ActionFailed.STATIC_PACKET);
             abortCast();
             return;
         }
@@ -7509,7 +7554,7 @@ public final class L2PcInstance extends L2PlayableInstance
         {
         	sendPacket(new SystemMessage(SystemMessageId.OBSERVERS_CANNOT_PARTICIPATE));
             abortCast();
-            sendPacket(new ActionFailed());
+            sendPacket(ActionFailed.STATIC_PACKET);
             return;
         }
 
@@ -7525,7 +7570,7 @@ public final class L2PcInstance extends L2PlayableInstance
 				effect.exit();
 
 				// Send a Server->Client packet ActionFailed to the L2PcInstance
-				sendPacket(new ActionFailed());
+				sendPacket(ActionFailed.STATIC_PACKET);
 				return;
 			}
 		}
@@ -7535,7 +7580,7 @@ public final class L2PcInstance extends L2PlayableInstance
         {
             // just ignore the passive skill request. why does the client send it anyway ??
             // Send a Server->Client packet ActionFailed to the L2PcInstance
-            sendPacket(new ActionFailed());
+            sendPacket(ActionFailed.STATIC_PACKET);
             return;
         }
 
@@ -7564,7 +7609,7 @@ public final class L2PcInstance extends L2PlayableInstance
             // Check if new skill different from current skill in progress
             if (skill.getId() == getCurrentSkill().getSkillId())
             {
-            	sendPacket(new ActionFailed());
+            	sendPacket(ActionFailed.STATIC_PACKET);
             	return;
             }
 
@@ -7573,44 +7618,53 @@ public final class L2PcInstance extends L2PlayableInstance
 
             // Create a new SkillDat object and queue it in the player _queuedSkill
             setQueuedSkill(skill, forceUse, dontMove);
-            sendPacket(new ActionFailed());
+            sendPacket(ActionFailed.STATIC_PACKET);
             return;
         }
         if (getQueuedSkill() != null) // wiping out previous values, after casting has been aborted
         	setQueuedSkill(null, false, false);
 
         //************************************* Check Target *******************************************
-
         // Create and set a L2Object containing the target of the skill
         L2Object target = null;
         SkillTargetType sklTargetType = skill.getTargetType();
         SkillType sklType = skill.getSkillType();
 
+        Point3D worldPosition = getCurrentSkillWorldPosition();
+        
+        if (sklTargetType == SkillTargetType.TARGET_GROUND && worldPosition == null)
+        {
+        	_log.info("WorldPosition is null for skill: "+skill.getName() + ", player: " + getName() + ".");
+        	sendPacket(ActionFailed.STATIC_PACKET);
+        	return;
+        }
+        
         switch (sklTargetType)
         {
-            // Target the player if skill type is AURA, PARTY, CLAN or SELF
-            case TARGET_AURA:
-	    case TARGET_FRONT_AURA:
-	    case TARGET_BEHIND_AURA:
-            case TARGET_PARTY:
-            case TARGET_ALLY:
-            case TARGET_CLAN:
-            case TARGET_SELF:
-                target = this;
-                break;
-            case TARGET_PET:
-                target = getPet();
-                break;
-            default:
-                target = getTarget();
-            break;
+        	// Target the player if skill type is AURA, PARTY, CLAN or SELF
+        	case TARGET_AURA:
+        	case TARGET_FRONT_AURA:
+        	case TARGET_BEHIND_AURA:
+        	case TARGET_PARTY:
+        	case TARGET_ALLY:
+        	case TARGET_CLAN:
+        	case TARGET_GROUND:
+        	case TARGET_SELF:
+        		target = this;
+        		break;
+        	case TARGET_PET:
+        		target = getPet();
+        		break;
+        	default:
+        		target = getTarget();
+        	break;
         }
 
         // Check the validity of the target
         if (target == null)
         {
             sendPacket(new SystemMessage(SystemMessageId.TARGET_CANT_FOUND));
-            sendPacket(new ActionFailed());
+            sendPacket(ActionFailed.STATIC_PACKET);
             return;
         }
         // Are the target and the player in the same duel?
@@ -7619,7 +7673,7 @@ public final class L2PcInstance extends L2PlayableInstance
         	if ( !(target instanceof L2PcInstance && ((L2PcInstance)target).getDuelId() == getDuelId()) )
         	{
         		sendMessage("無法在決鬥狀態下執行。");
-        		sendPacket(new ActionFailed());
+        		sendPacket(ActionFailed.STATIC_PACKET);
         		return;
         	}
         }
@@ -7634,7 +7688,7 @@ public final class L2PcInstance extends L2PlayableInstance
             sendPacket(sm);
 
             // Send a Server->Client packet ActionFailed to the L2PcInstance
-            sendPacket(new ActionFailed());
+            sendPacket(ActionFailed.STATIC_PACKET);
             return;
         }
 
@@ -7642,7 +7696,7 @@ public final class L2PcInstance extends L2PlayableInstance
         if (isAllSkillsDisabled() && (getAccessLevel() < Config.GM_PEACEATTACK))
         {
             // Send a Server->Client packet ActionFailed to the L2PcInstance
-            sendPacket(new ActionFailed());
+            sendPacket(ActionFailed.STATIC_PACKET);
             return;
         }
 
@@ -7657,7 +7711,7 @@ public final class L2PcInstance extends L2PlayableInstance
             sendPacket(new SystemMessage(SystemMessageId.NOT_ENOUGH_MP));
 
             // Send a Server->Client packet ActionFailed to the L2PcInstance
-            sendPacket(new ActionFailed());
+            sendPacket(ActionFailed.STATIC_PACKET);
             return;
         }
 
@@ -7668,7 +7722,7 @@ public final class L2PcInstance extends L2PlayableInstance
             sendPacket(new SystemMessage(SystemMessageId.NOT_ENOUGH_HP));
 
             // Send a Server->Client packet ActionFailed to the L2PcInstance
-            sendPacket(new ActionFailed());
+            sendPacket(ActionFailed.STATIC_PACKET);
             return;
         }
 
@@ -7714,7 +7768,7 @@ public final class L2PcInstance extends L2PlayableInstance
         if (!skill.getWeaponDependancy(this))
         {
             // Send a Server->Client packet ActionFailed to the L2PcInstance
-            sendPacket(new ActionFailed());
+            sendPacket(ActionFailed.STATIC_PACKET);
             return;
         }
 
@@ -7722,11 +7776,9 @@ public final class L2PcInstance extends L2PlayableInstance
         if (!skill.checkCondition(this, target, false))
         {
             // Send a Server->Client packet ActionFailed to the L2PcInstance
-            sendPacket(new ActionFailed());
+            sendPacket(ActionFailed.STATIC_PACKET);
             return;
         }
-
-
 
         //************************************* Check Player State *******************************************
 
@@ -7736,7 +7788,7 @@ public final class L2PcInstance extends L2PlayableInstance
         if (isAlikeDead())
         {
             // Send a Server->Client packet ActionFailed to the L2PcInstance
-            sendPacket(new ActionFailed());
+            sendPacket(ActionFailed.STATIC_PACKET);
             return;
         }
 
@@ -7747,7 +7799,7 @@ public final class L2PcInstance extends L2PlayableInstance
             sendPacket(new SystemMessage(SystemMessageId.CANT_MOVE_SITTING));
 
             // Send a Server->Client packet ActionFailed to the L2PcInstance
-            sendPacket(new ActionFailed());
+            sendPacket(ActionFailed.STATIC_PACKET);
             return;
         }
 
@@ -7770,13 +7822,13 @@ public final class L2PcInstance extends L2PlayableInstance
 			{
 				// If L2Character or target is in a peace zone, send a system message TARGET_IN_PEACEZONE a Server->Client packet ActionFailed
 				sendPacket(new SystemMessage(SystemMessageId.TARGET_IN_PEACEZONE));
-				sendPacket(new ActionFailed());
+				sendPacket(ActionFailed.STATIC_PACKET);
 				return;
 			}
 
 			if (isInOlympiadMode() && !isOlympiadStart()){
 				// if L2PcInstance is in Olympia and the match isn't already start, send a Server->Client packet ActionFailed
-				sendPacket(new ActionFailed());
+				sendPacket(ActionFailed.STATIC_PACKET);
 				return;
 			}
 
@@ -7784,63 +7836,90 @@ public final class L2PcInstance extends L2PlayableInstance
             if (!target.isAttackable() && (getAccessLevel() < Config.GM_PEACEATTACK))
 			{
 				// If target is not attackable, send a Server->Client packet ActionFailed
-				sendPacket(new ActionFailed());
+				sendPacket(ActionFailed.STATIC_PACKET);
 				return;
 			}
 
 			// Check if a Forced ATTACK is in progress on non-attackable target
-			if (!target.isAutoAttackable(this) && !forceUse &&  !(_inEventCTF && CTF._started) &&
-					sklTargetType != SkillTargetType.TARGET_AURA &&
-					sklTargetType != SkillTargetType.TARGET_FRONT_AURA &&
-					sklTargetType != SkillTargetType.TARGET_BEHIND_AURA &&
-					sklTargetType != SkillTargetType.TARGET_CLAN &&
-					sklTargetType != SkillTargetType.TARGET_ALLY &&
-					sklTargetType != SkillTargetType.TARGET_PARTY &&
-					sklTargetType != SkillTargetType.TARGET_SELF)
+			if ((!target.isAutoAttackable(this) && !forceUse))
 			{
-				// Send a Server->Client packet ActionFailed to the L2PcInstance
-				sendPacket(new ActionFailed());
-				return;
+				switch (sklTargetType)
+				{
+					case TARGET_AURA:
+					case TARGET_FRONT_AURA:
+					case TARGET_BEHIND_AURA:
+					case TARGET_CLAN:
+					case TARGET_ALLY:
+					case TARGET_PARTY:
+					case TARGET_SELF:
+					case TARGET_GROUND:
+						break;
+					default: // Send a Server->Client packet ActionFailed to the L2PcInstance
+						sendPacket(ActionFailed.STATIC_PACKET);
+						return;
+				}
 			}
 
 			// Check if the target is in the skill cast range
 			if (dontMove)
 			{
 				// Calculate the distance between the L2PcInstance and the target
-                if (skill.getCastRange() > 0 && !isInsideRadius(target, skill.getCastRange()+getTemplate().collisionRadius, false, false))
+				if (sklTargetType == SkillTargetType.TARGET_GROUND)
+				{
+					if (!isInsideRadius(worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), skill.getCastRange()+getTemplate().collisionRadius, false, false))
+					{
+						// Send a System Message to the caster
+						sendPacket(new SystemMessage(SystemMessageId.TARGET_TOO_FAR));
+
+						// Send a Server->Client packet ActionFailed to the L2PcInstance
+						sendPacket(ActionFailed.STATIC_PACKET);
+						return;
+					}
+				}
+				else if (skill.getCastRange() > 0 && !isInsideRadius(target, skill.getCastRange()+getTemplate().collisionRadius, false, false))
 				{
 					// Send a System Message to the caster
 					sendPacket(new SystemMessage(SystemMessageId.TARGET_TOO_FAR));
 
 					// Send a Server->Client packet ActionFailed to the L2PcInstance
-					sendPacket(new ActionFailed());
+					sendPacket(ActionFailed.STATIC_PACKET);
 					return;
 				}
 			}
 		}
 
 		// Check if the skill is defensive
-		if (!skill.isOffensive())
+        if (!skill.isOffensive() && target instanceof L2MonsterInstance && !forceUse)
 		{
 			// check if the target is a monster and if force attack is set.. if not then we don't want to cast.
-			if ((target instanceof L2MonsterInstance) && !forceUse
-                    && (sklTargetType != SkillTargetType.TARGET_PET)
-                    && (sklTargetType != SkillTargetType.TARGET_AURA)
-		    && (sklTargetType != SkillTargetType.TARGET_FRONT_AURA)
-		    && (sklTargetType != SkillTargetType.TARGET_BEHIND_AURA)
-                    && (sklTargetType != SkillTargetType.TARGET_CLAN)
-                    && (sklTargetType != SkillTargetType.TARGET_SELF)
-                    && (sklTargetType != SkillTargetType.TARGET_PARTY)
-                    && (sklTargetType != SkillTargetType.TARGET_ALLY)
-                    && (sklTargetType != SkillTargetType.TARGET_CORPSE_MOB)
-                    && (sklTargetType != SkillTargetType.TARGET_AREA_CORPSE_MOB)
-                    && (sklType != SkillType.BEAST_FEED)
-                    && (sklType != SkillType.DELUXE_KEY_UNLOCK)
-                    && (sklType != SkillType.UNLOCK))
+        	switch (sklTargetType)
 			{
-				// send the action failed so that the skill doens't go off.
-				sendPacket (new ActionFailed());
-				return;
+				case TARGET_PET:
+				case TARGET_AURA:
+				case TARGET_FRONT_AURA:
+				case TARGET_BEHIND_AURA:
+				case TARGET_CLAN:
+				case TARGET_SELF:
+				case TARGET_PARTY:
+				case TARGET_ALLY:
+				case TARGET_CORPSE_MOB:
+				case TARGET_AREA_CORPSE_MOB:
+				case TARGET_GROUND:
+					break;
+				default:
+				{
+					switch (sklType)
+					{
+						case BEAST_FEED:
+						case DELUXE_KEY_UNLOCK:
+						case UNLOCK:
+							break;
+						default:
+							sendPacket(ActionFailed.STATIC_PACKET);
+						return;
+					}
+					break;
+				}
 			}
 		}
 
@@ -7853,7 +7932,7 @@ public final class L2PcInstance extends L2PlayableInstance
 				sendPacket(new SystemMessage(SystemMessageId.TARGET_IS_INCORRECT));
 
 				// Send a Server->Client packet ActionFailed to the L2PcInstance
-				sendPacket(new ActionFailed());
+				sendPacket(ActionFailed.STATIC_PACKET);
 				return;
 			}
 		}
@@ -7869,7 +7948,7 @@ public final class L2PcInstance extends L2PlayableInstance
 	                sendPacket(new SystemMessage(SystemMessageId.SWEEPER_FAILED_TARGET_NOT_SPOILED));
 
 	                // Send a Server->Client packet ActionFailed to the L2PcInstance
-	                sendPacket(new ActionFailed());
+	                sendPacket(ActionFailed.STATIC_PACKET);
 	                return;
             	}
 
@@ -7878,7 +7957,7 @@ public final class L2PcInstance extends L2PlayableInstance
 	                sendPacket(new SystemMessage(SystemMessageId.SWEEP_NOT_ALLOWED));
 
 	                // Send a Server->Client packet ActionFailed to the L2PcInstance
-	                sendPacket(new ActionFailed());
+	                sendPacket(ActionFailed.STATIC_PACKET);
 	                return;
             	}
             }
@@ -7893,7 +7972,7 @@ public final class L2PcInstance extends L2PlayableInstance
 				sendPacket(new SystemMessage(SystemMessageId.TARGET_IS_INCORRECT));
 
 				// Send a Server->Client packet ActionFailed to the L2PcInstance
-				sendPacket(new ActionFailed());
+				sendPacket(ActionFailed.STATIC_PACKET);
 				return;
 			}
 		}
@@ -7907,6 +7986,7 @@ public final class L2PcInstance extends L2PlayableInstance
 			case TARGET_AURA:
 			case TARGET_FRONT_AURA:
 			case TARGET_BEHIND_AURA:
+			case TARGET_GROUND:
 			case TARGET_SELF:
 				break;
 			default:
@@ -7916,7 +7996,7 @@ public final class L2PcInstance extends L2PlayableInstance
 					sendPacket(new SystemMessage(SystemMessageId.TARGET_IS_INCORRECT));
 
 					// Send a Server->Client packet ActionFailed to the L2PcInstance
-					sendPacket(new ActionFailed());
+					sendPacket(ActionFailed.STATIC_PACKET);
 					return;
 				}
 		}
@@ -7924,7 +8004,7 @@ public final class L2PcInstance extends L2PlayableInstance
         if (sklTargetType == SkillTargetType.TARGET_HOLY &&
         		!TakeCastle.checkIfOkToCastSealOfRule(this, false))
         {
-            sendPacket(new ActionFailed());
+            sendPacket(ActionFailed.STATIC_PACKET);
             abortCast();
             return;
         }
@@ -7932,24 +8012,36 @@ public final class L2PcInstance extends L2PlayableInstance
         if (sklType == SkillType.SIEGEFLAG &&
         		!SiegeFlag.checkIfOkToPlaceFlag(this, false))
         {
-            sendPacket(new ActionFailed());
+            sendPacket(ActionFailed.STATIC_PACKET);
             abortCast();
             return;
         }
         else if (sklType == SkillType.STRSIEGEASSAULT &&
         		!StrSiegeAssault.checkIfOkToUseStriderSiegeAssault(this, false))
         {
-        	sendPacket(new ActionFailed());
+        	sendPacket(ActionFailed.STATIC_PACKET);
         	abortCast();
         	return;
         }
 
         // GeoData Los Check here
-        if (skill.getCastRange() > 0 && !GeoData.getInstance().canSeeTarget(this, target))
+        if (skill.getCastRange() > 0)
         {
-            sendPacket(new SystemMessage(SystemMessageId.CANT_SEE_TARGET));
-            sendPacket(new ActionFailed());
-            return;
+        	if (sklTargetType == SkillTargetType.TARGET_GROUND)
+        	{
+        		if (!GeoData.getInstance().canSeeTarget(this, worldPosition))
+        		{
+        			sendPacket(new SystemMessage(SystemMessageId.CANT_SEE_TARGET));
+        			sendPacket(ActionFailed.STATIC_PACKET);
+	        			return;
+        		}
+        	}
+        	else if (!GeoData.getInstance().canSeeTarget(this, target))
+        	{
+        		sendPacket(new SystemMessage(SystemMessageId.CANT_SEE_TARGET));
+        		sendPacket(ActionFailed.STATIC_PACKET);
+        		return;
+        	}
         }
 
         // If all conditions are checked, create a new SkillDat object and set the player _currentSkill
@@ -8926,7 +9018,7 @@ public final class L2PcInstance extends L2PlayableInstance
      */
     public boolean addSubClass(int classId, int classIndex)
     {
-    	if (getTotalSubClasses() == 3 || classIndex == 0)
+    	if (getTotalSubClasses() == Config.MAX_SUBCLASS || classIndex == 0)
     		return false;
 
     	if (getSubClasses().containsKey(classIndex))
@@ -10030,6 +10122,24 @@ public final class L2PcInstance extends L2PlayableInstance
 					character.abortCast();
 		}
 		catch(Throwable t) {_log.log(Level.SEVERE, "deleteMe()", t); }
+		
+		try
+		{
+			for (L2Effect effect : getAllEffects())
+			{
+				switch (effect.getEffectType())
+				{
+					case SIGNET_GROUND:
+					case SIGNET_EFFECT:
+						effect.exit();
+						break;
+				}
+			}
+		}
+		catch (Throwable t)
+		{
+			_log.log(Level.SEVERE, "deleteMe()", t);
+		}
 
 		// Remove from world regions zones
         L2WorldRegion oldRegion = getWorldRegion();
@@ -11105,7 +11215,6 @@ public final class L2PcInstance extends L2PlayableInstance
 		return _forceBuff;
 	}
 
-	@Override
 	public void setForceBuff(ForceBuff fb)
 	{
 		_forceBuff = fb;
@@ -11116,8 +11225,17 @@ public final class L2PcInstance extends L2PlayableInstance
     {
         return super.mustFallDownOnDeath() && !TvTEvent.isPlayerParticipant(getName());
     }
-  
-  //L2JTW addon start =======================================
+
+    public void setAgathionId(int npcId)
+    {
+    	_agathionId = npcId;
+    }
+    public int getAgathionId()
+    {
+	    return _agathionId;
+    }
+    
+    //L2JTW addon start =======================================
     public int getNameColor()
     {
         return _nameColor;

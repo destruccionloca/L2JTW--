@@ -873,6 +873,171 @@ public class L2NpcInstance extends L2Character
     	}
         return 0;
     }
+    public int getSSkillChance()
+    {
+    	
+    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+    	for (L2NpcAIData AI: npcData.getAIData())
+    	{
+    		if (AI == null)
+    			return 0;
+    		else
+    		return AI.getShortRangeChance();
+    	}
+        return 0;
+    }
+    public int getLSkillChance()
+    {
+    	
+    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+    	for (L2NpcAIData AI: npcData.getAIData())
+    	{
+    		if (AI == null)
+    			return 0;
+    		else
+    		return AI.getLongRangeChance();
+    	}
+        return 0;
+    }
+    public int getSwitchRangeChance()
+    {
+    	
+    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+    	for (L2NpcAIData AI: npcData.getAIData())
+    	{
+    		if (AI == null)
+    			return 0;
+    		else
+    		return AI.getSwitchRangeChance();
+    	}
+        return 0;
+    }
+    
+    public boolean hasLSkill()
+    {
+    	
+    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+    	for (L2NpcAIData AI: npcData.getAIData())
+    	{
+    		if (AI == null || AI.getLongRangeSkill() ==0)
+    			return false;
+    		else
+    		return true;
+    	}
+        return false;
+    }
+    
+    public boolean hasSSkill()
+    {
+    	
+    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
+    	for (L2NpcAIData AI: npcData.getAIData())
+    	{
+    		if (AI == null || AI.getShortRangeSkill() ==0)
+    			return false;
+    		else
+    		return true;
+    	}
+        return false;
+    }
+    
+    public FastList<L2Skill> getLrangeSkill()
+    {
+    	FastList<L2Skill> skilldata = new FastList <L2Skill>();
+    	boolean hasLrange = false;
+    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(getTemplate().npcId);
+    	for (L2NpcAIData AI: npcData.getAIData())
+    	{
+    		if(AI==null || AI.getLongRangeSkill()==0)
+    			continue;
+
+    		switch(AI.getLongRangeSkill())
+    		{
+    			case -1:
+    			{
+					L2Skill[] skills = null;
+    	    		skills = getAllSkills();
+    				for (L2Skill sk: skills)
+    				{
+    					if(sk==null || sk.getSkillType() == L2Skill.SkillType.PASSIVE
+    					|| sk.getTargetType() == L2Skill.SkillTargetType.TARGET_SELF)
+    					{
+    						continue;
+    					}
+    					if(sk.getCastRange()>=200)
+    					{
+    						skilldata.add(sk);	
+    						hasLrange = true;
+    					}
+    				}
+    			}
+    			case 1:
+    			{
+    				for (L2Skill sk: npcData._universalskills)
+    				{
+    					if(sk.getCastRange()>=200)
+    					{
+    						skilldata.add(sk);	
+    						hasLrange = true;
+    					}
+    				}
+    			}
+    		}
+    		
+    	}
+    	if(hasLrange)
+    	return skilldata;
+    	else return null;
+    }
+    
+    public FastList<L2Skill> getSrangeSkill()
+    {
+    	FastList<L2Skill> skilldata = new FastList <L2Skill>();
+    	boolean hasSrange = false;
+    	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(getTemplate().npcId);
+    	for (L2NpcAIData AI: npcData.getAIData())
+    	{
+    		if(AI==null || AI.getShortRangeSkill()==0)
+    			continue;
+
+    		switch(AI.getShortRangeSkill())
+    		{
+    			case -1:
+    			{
+					L2Skill[] skills = null;
+    	    		skills = getAllSkills();
+    				for (L2Skill sk: skills)
+    				{
+    					if(sk==null || sk.getSkillType() == L2Skill.SkillType.PASSIVE
+    					|| sk.getTargetType() == L2Skill.SkillTargetType.TARGET_SELF)
+    					{
+    						continue;
+    					}
+    					if(sk.getCastRange()<=200)
+    					{
+    						skilldata.add(sk);	
+    						hasSrange = true;
+    					}
+    				}
+    			}
+    			case 1:
+    			{
+    				for (L2Skill sk: npcData._universalskills)
+    				{
+    					if(sk.getCastRange()<=200)
+    					{
+    						skilldata.add(sk);	
+    						hasSrange = true;
+    					}
+    				}
+    			}
+    		}
+    		
+    	}
+    	if(hasSrange)
+    	return skilldata;
+    	else return null;
+    }
 //L2JTW addon end ==========================================
 
     /**
@@ -1039,7 +1204,7 @@ public class L2NpcInstance extends L2Character
     {
         if (player.isOutOfControl())
         {
-            player.sendPacket(new ActionFailed());
+            player.sendPacket(ActionFailed.STATIC_PACKET);
             return false;
         }
         // TODO: More checks...
@@ -1140,7 +1305,7 @@ public class L2NpcInstance extends L2Character
                 else
                 {
                     // Send a Server->Client ActionFailed to the L2PcInstance in order to avoid that the client wait another packet
-                    player.sendPacket(new ActionFailed());
+                    player.sendPacket(ActionFailed.STATIC_PACKET);
                 }
             }
             else if(!isAutoAttackable(player)) 
@@ -1175,7 +1340,7 @@ public class L2NpcInstance extends L2Character
                 }
             }
             else
-                player.sendPacket(new ActionFailed());
+                player.sendPacket(ActionFailed.STATIC_PACKET);
         }
     }
     
@@ -1329,7 +1494,7 @@ public class L2NpcInstance extends L2Character
         }
 
         // Send a Server->Client ActionFailed to the L2PcInstance in order to avoid that the client wait another packet
-        player.sendPacket(new ActionFailed());
+        player.sendPacket(ActionFailed.STATIC_PACKET);
     }
 
     /** Return the L2Castle this L2NpcInstance belongs to. */
@@ -1376,7 +1541,7 @@ public class L2NpcInstance extends L2Character
         {
             if (isBusy() && getBusyMessage().length()>0)
             {
-                player.sendPacket( new ActionFailed() );
+                player.sendPacket( ActionFailed.STATIC_PACKET );
 
                 NpcHtmlMessage html = new NpcHtmlMessage(getObjectId());
                 html.setFile("data/html/npcbusy.htm");
@@ -1759,60 +1924,51 @@ public class L2NpcInstance extends L2Character
      */
     public void showQuestWindow(L2PcInstance player, String questId) 
     {
-        String content;
+        String content = null;
         
         Quest q = QuestManager.getInstance().getQuest(questId);
-
-        if (player.getWeightPenalty()>=3 && q.getQuestIntId() >= 1 && q.getQuestIntId() < 1000 ){	
-            player.sendPacket(new SystemMessage(SystemMessageId.INVENTORY_LESS_THAN_80_PERCENT));
-            return;
-        }
-        
-        //FileInputStream fis = null;
         
         // Get the state of the selected quest
         QuestState qs = player.getQuestState(questId);
         
-        if (qs != null) 
+        if (q == null) 
+        {
+            // no quests found
+            content = "<html><body>You are either not on a quest that involves this NPC, or you don't meet this NPC's minimum quest requirements.</body></html>";
+        }
+        else
+        {
+            if ((q.getQuestIntId() >= 1 && q.getQuestIntId() < 1000) && (player.getWeightPenalty()>=3 || player.getInventoryLimit()*0.8 <= player.getInventory().getSize()))
+            {	
+                player.sendPacket(new SystemMessage(SystemMessageId.INVENTORY_LESS_THAN_80_PERCENT));
+                return;
+            }
+            
+        	if (qs == null)
+        	{
+	            // check for start point
+	            Quest[] qlst = getTemplate().getEventQuests(Quest.QuestEventType.QUEST_START);
+	            
+	            if (qlst != null && qlst.length > 0) 
+	            {
+	                for (int i=0; i < qlst.length; i++) 
+	                {
+	                    if (qlst[i] == q) 
+	                    {
+	                        qs = q.newQuestState(player);
+	                        break;
+	                    }
+	                }
+	            }
+        	}
+        }
+
+        if (qs != null)
         {
             // If the quest is alreday started, no need to show a window
             if (!qs.getQuest().notifyTalk(this, qs))
                 return;
-        }
-        else
-        {
-            if (q != null) 
-            {
-                // check for start point
-                Quest[] qlst = getTemplate().getEventQuests(Quest.QuestEventType.QUEST_START);
-                
-                if (qlst != null && qlst.length > 0) 
-                {
-                    for (int i=0; i < qlst.length; i++) 
-                    {
-                        if (qlst[i] == q) 
-                        {
-                            qs = q.newQuestState(player);
-                            //disabled by mr. becouse quest dialog only show on second click.
-                            //if(qs.getState().getName().equalsIgnoreCase("completed"))
-                            //{
-                            if (!qs.getQuest().notifyTalk(this, qs))
-                                return; // no need to show a window
-                            //}
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        
-        if (qs == null) 
-        {
-            // no quests found
-            content = "<html><body>目前沒有執行任務，或條件不符。</body></html>";
-        } 
-        else 
-        {
+
             questId = qs.getQuest().getName();
             String stateId = State.getStateName(qs.getState());
             String path = "data/scripts/quests/"+questId+"/"+stateId+".htm";
@@ -1836,7 +1992,7 @@ public class L2NpcInstance extends L2Character
             insertObjectIdAndShowChatWindow(player, content);
         
         // Send a Server->Client ActionFailed to the L2PcInstance in order to avoid that the client wait another packet
-        player.sendPacket( new ActionFailed() );
+        player.sendPacket( ActionFailed.STATIC_PACKET );
     }
     
     /**
@@ -2125,7 +2281,7 @@ public class L2NpcInstance extends L2Character
         player.sendPacket(html);
              
         // Send a Server->Client ActionFailed to the L2PcInstance in order to avoid that the client wait another packet
-        player.sendPacket(new ActionFailed());
+        player.sendPacket(ActionFailed.STATIC_PACKET);
     }
     
     public void makeCPRecovery(L2PcInstance player)
@@ -2172,30 +2328,30 @@ public class L2NpcInstance extends L2Character
     	
         int player_level = player.getLevel();        
         int lowestLevel = 0;
-        int higestLevel = 0;
+        int highestLevel = 0;
         
         
         // Select the player
         setTarget(player);
         
         
-        // Calculate the min and max level between wich the player must be to obtain buff
+        // Calculate the min and max level between which the player must be to obtain buff
         if(player.isMageClass())
         {
             lowestLevel = HelperBuffTable.getInstance().getMagicClassLowestLevel();
-            higestLevel = HelperBuffTable.getInstance().getMagicClassHighestLevel();
+            highestLevel = HelperBuffTable.getInstance().getMagicClassHighestLevel();
         }
         else
         {
             lowestLevel = HelperBuffTable.getInstance().getPhysicClassLowestLevel();
-            higestLevel = HelperBuffTable.getInstance().getPhysicClassHighestLevel();
+            highestLevel = HelperBuffTable.getInstance().getPhysicClassHighestLevel();
         }
         
       
         // If the player is too high level, display a message and return
-        if (player_level > higestLevel)
+        if (player_level > highestLevel)
         {
-            String content = "<html><body>初學者嚮導：<br>輔助魔法只限於<font color=\"LEVEL\">等級"+ higestLevel +"以下的角色</font>。</body></html>";
+            String content = "<html><body>初學者嚮導：<br>輔助魔法只限於<font color=\"LEVEL\">等級"+ highestLevel +"以下的角色</font>。</body></html>";
             insertObjectIdAndShowChatWindow(player, content);
             return;
         }
@@ -2248,7 +2404,7 @@ public class L2NpcInstance extends L2Character
     		NpcHtmlMessage pkDenyMsg = new NpcHtmlMessage(getObjectId());
     		pkDenyMsg.setHtml(html);
     		player.sendPacket(pkDenyMsg);
-    		player.sendPacket(new ActionFailed());
+    		player.sendPacket(ActionFailed.STATIC_PACKET);
     		return true;
     	}
 
@@ -2519,6 +2675,7 @@ public class L2NpcInstance extends L2Character
                         if (playerCabal != compWinner || playerCabal != sealAvariceOwner)
                         {
                             player.sendPacket(new SystemMessage(SystemMessageId.CAN_BE_USED_BY_DAWN));
+                            player.sendPacket( ActionFailed.STATIC_PACKET );
                             return;
                         }
                         break;
@@ -2526,6 +2683,7 @@ public class L2NpcInstance extends L2Character
                         if (playerCabal != compWinner || playerCabal != sealAvariceOwner)
                         {
                             player.sendPacket(new SystemMessage(SystemMessageId.CAN_BE_USED_BY_DUSK));
+                            player.sendPacket( ActionFailed.STATIC_PACKET );
                             return;
                         }
                         break;
@@ -2539,6 +2697,7 @@ public class L2NpcInstance extends L2Character
                         if (playerCabal != compWinner || playerCabal != sealGnosisOwner)
                         {
                             player.sendPacket(new SystemMessage(SystemMessageId.CAN_BE_USED_BY_DAWN));
+                            player.sendPacket( ActionFailed.STATIC_PACKET );
                             return;
                         }
                         break;
@@ -2546,6 +2705,7 @@ public class L2NpcInstance extends L2Character
                         if (playerCabal != compWinner || playerCabal != sealGnosisOwner)
                         {
                             player.sendPacket(new SystemMessage(SystemMessageId.CAN_BE_USED_BY_DUSK));
+                            player.sendPacket( ActionFailed.STATIC_PACKET );
                             return;
                         }
                         break;
@@ -2618,7 +2778,7 @@ public class L2NpcInstance extends L2Character
         player.sendPacket(html);
         
         // Send a Server->Client ActionFailed to the L2PcInstance in order to avoid that the client wait another packet
-        player.sendPacket( new ActionFailed() );
+        player.sendPacket( ActionFailed.STATIC_PACKET );
     }
     
     /**
@@ -2639,7 +2799,7 @@ public class L2NpcInstance extends L2Character
         player.sendPacket(html);
         
         // Send a Server->Client ActionFailed to the L2PcInstance in order to avoid that the client wait another packet
-        player.sendPacket( new ActionFailed() );
+        player.sendPacket( ActionFailed.STATIC_PACKET );
     }
     
     /**

@@ -187,7 +187,7 @@ public class AdminEnchant implements IAdminCommandHandler
 
             activeChar.sendMessage("強化裝備"+itemInstance.getItem().getName()+"從 +"+curEnchant+"到 +"+ench+"。");
             // log
-            GMAudit.auditGMAction(activeChar.getName(), "enchant", player.getName(), itemInstance.getItem().getName() + " from " + curEnchant + " to " + ench);
+            GMAudit.auditGMAction(activeChar.getName(), "enchant", player.getName(), itemInstance.getItem().getName() + "(" + itemInstance.getObjectId() + ")" + " from " + curEnchant + " to " + ench);
         }
     }
 

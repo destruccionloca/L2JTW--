@@ -51,7 +51,7 @@ public class Blow implements ISkillHandler
 				continue;
 			if(activeChar.isBehindTarget())
 				_successChance = BEHIND;
-			else if(activeChar.isFrontTarget())
+			else if(activeChar.isInFrontOfTarget())
 				_successChance = FRONT;
 			else
 				_successChance = SIDE;
@@ -119,6 +119,8 @@ public class Blow implements ISkillHandler
 	        	    			   player.abortAttack();
 	        	    			   player.abortCast();
 	        	    			   player.getStatus().stopHpMpRegeneration();
+	        	    			   player.setIsDead(true);
+	        	    			   player.setIsPendingRevive(true);
 	        	    		   }
 	        	    		   else
 	        	    			   player.doDie(activeChar);

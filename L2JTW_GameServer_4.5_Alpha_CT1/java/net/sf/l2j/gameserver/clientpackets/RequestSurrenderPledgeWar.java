@@ -53,7 +53,7 @@ public final class RequestSurrenderPledgeWar extends L2GameClientPacket
         {
 
         	_activeChar.sendMessage("無此血盟");
-        	_activeChar.sendPacket(new ActionFailed());
+        	_activeChar.sendPacket(ActionFailed.STATIC_PACKET);
             return;
         }
 
@@ -63,7 +63,7 @@ public final class RequestSurrenderPledgeWar extends L2GameClientPacket
         {
 
         	_activeChar.sendMessage("並無與此血盟發生戰爭");
-        	_activeChar.sendPacket(new ActionFailed());
+        	_activeChar.sendPacket(ActionFailed.STATIC_PACKET);
             return;
         }
 
@@ -78,7 +78,7 @@ public final class RequestSurrenderPledgeWar extends L2GameClientPacket
         if(leader != null && leader.isOnline() == 0)
         {
             player.sendMessage("Clan leader isn't online.");
-            player.sendPacket(new ActionFailed());
+            player.sendPacket(ActionFailed.STATIC_PACKET);
             return;
         }
 

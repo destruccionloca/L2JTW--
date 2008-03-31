@@ -185,7 +185,7 @@ public class CharStatus
                     getActiveChar().disableAllSkills();
                     stopHpMpRegeneration();
                     attacker.getAI().setIntention(CtrlIntention.AI_INTENTION_ACTIVE);
-                    attacker.sendPacket(new ActionFailed());
+                    attacker.sendPacket(ActionFailed.STATIC_PACKET);
                     
                     // let the DuelManager know of his defeat
                     DuelManager.getInstance().onPlayerDefeat((L2PcInstance) getActiveChar());
@@ -215,6 +215,8 @@ public class CharStatus
                 if (((L2PcInstance) getActiveChar()).isInOlympiadMode())
                 {
                     stopHpMpRegeneration();
+                    getActiveChar().setIsDead(true);
+                    getActiveChar().setIsPendingRevive(true);
                     return;
                 }
             }

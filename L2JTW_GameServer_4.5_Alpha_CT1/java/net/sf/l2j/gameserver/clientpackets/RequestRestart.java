@@ -86,7 +86,7 @@ public final class RequestRestart extends L2GameClientPacket
                 _log.fine("Player " + player.getName() + " tried to logout while fighting.");
 
             player.sendPacket(new SystemMessage(SystemMessageId.CANT_RESTART_WHILE_FIGHTING));
-            player.sendPacket(new ActionFailed());
+            player.sendPacket(ActionFailed.STATIC_PACKET);
             return;
         }
 
@@ -98,7 +98,7 @@ public final class RequestRestart extends L2GameClientPacket
             if (SevenSignsFestival.getInstance().isFestivalInitialized())
             {
                 player.sendPacket(SystemMessage.sendString("無法在黑暗祭典進行時登出."));
-                player.sendPacket(new ActionFailed());
+                player.sendPacket(ActionFailed.STATIC_PACKET);
                 return;
             }
             L2Party playerParty = player.getParty();

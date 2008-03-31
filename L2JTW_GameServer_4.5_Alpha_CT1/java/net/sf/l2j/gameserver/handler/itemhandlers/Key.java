@@ -61,7 +61,7 @@ public class Key implements IItemHandler
 				if (!(target instanceof L2ChestInstance) || target == null)
 				{
 					activeChar.sendPacket(new SystemMessage(SystemMessageId.INCORRECT_TARGET));
-					activeChar.sendPacket(new ActionFailed());
+					activeChar.sendPacket(ActionFailed.STATIC_PACKET);
 				}
 				else
 				{
@@ -69,7 +69,7 @@ public class Key implements IItemHandler
 					if (chest.isDead() || chest.isInteracted())
 					{
 						activeChar.sendMessage("The chest Is empty.");
-						activeChar.sendPacket(new ActionFailed());
+						activeChar.sendPacket(ActionFailed.STATIC_PACKET);
 						return;
 					}
 					activeChar.useMagic(skill, false, false);
@@ -80,6 +80,7 @@ public class Key implements IItemHandler
 			{
 				L2Skill skill = SkillTable.getInstance().getInfo(2260,1);
 				activeChar.doCast(skill);
+				break;
 			}
 		}
 	}

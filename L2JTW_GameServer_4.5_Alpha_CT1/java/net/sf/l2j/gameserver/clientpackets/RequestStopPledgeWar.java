@@ -51,14 +51,14 @@ public final class RequestStopPledgeWar extends L2GameClientPacket
 		if (clan == null)
 		{
 			player.sendMessage("無此血盟");
-			player.sendPacket(new ActionFailed());
+			player.sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 
 		if (!playerClan.isAtWarWith(clan.getClanId()))
 		{
 			player.sendMessage("並無與此血盟發生戰爭");
-			player.sendPacket(new ActionFailed());
+			player.sendPacket(ActionFailed.STATIC_PACKET);
 			return;
 		}
 
@@ -76,7 +76,7 @@ public final class RequestStopPledgeWar extends L2GameClientPacket
 		//        if(leader != null && leader.isOnline() == 0)
 		//        {
 		//            player.sendMessage("Clan leader isn't online.");
-		//            player.sendPacket(new ActionFailed());
+		//            player.sendPacket(ActionFailed.STATIC_PACKET);
 		//            return;
 		//        }
 

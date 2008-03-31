@@ -90,6 +90,12 @@ public final class L2SiegeGuardInstance extends L2Attackable
          && !getCastle().getSiege().checkIsDefender(((L2PcInstance)attacker).getClan()));
     }
 
+    @Override
+	public boolean hasRandomAnimation()
+	{
+		return false;
+	}
+    
     /**
      * Sets home location of guard. Guard will always try to return to this location after
      * it has killed all PK's in range.
@@ -175,7 +181,7 @@ public final class L2SiegeGuardInstance extends L2Attackable
 				else
 				{
 					// Send a Server->Client ActionFailed to the L2PcInstance in order to avoid that the client wait another packet
-					player.sendPacket(new ActionFailed());
+					player.sendPacket(ActionFailed.STATIC_PACKET);
 				}
 			}
 			if(!isAutoAttackable(player))

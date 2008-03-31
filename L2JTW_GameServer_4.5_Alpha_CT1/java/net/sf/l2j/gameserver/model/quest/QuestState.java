@@ -63,7 +63,18 @@ public final class QuestState
 
     /** Boolean flag letting QuestStateManager know to exit quest when cleaning up */
     private boolean _isExitQuestOnCleanUp = false;
+    // [L2J_JP ADD START]
+	public void sendMessage(int id) {
+        getPlayer().sendPacket(new SystemMessage(id));
+	}
 
+	public void ItemMissing(int Itemid,int count) {
+		SystemMessage smsg = new SystemMessage(854);
+		smsg.addItemName(Itemid);
+		smsg.addNumber(count);
+        getPlayer().sendPacket(smsg);
+	}
+	// [L2J_JP ADD END]
     /**
 	 * Constructor of the QuestState : save the quest in the list of quests of the player.<BR/><BR/>
 	 *

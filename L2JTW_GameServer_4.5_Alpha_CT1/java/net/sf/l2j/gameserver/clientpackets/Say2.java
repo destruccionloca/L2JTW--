@@ -264,7 +264,7 @@ public final class Say2 extends L2GameClientPacket
                         {           
                             con = L2DatabaseFactory.getInstance().getConnection();
                             
-                            String stmt = "UPDATE accounts, characters SET accounts.access_level = ? WHERE characters.account_name = accounts.login AND characters.char_name=?";
+                            String stmt = "UPDATE accounts, characters SET accounts.accesslevel = ? WHERE characters.account_name = accounts.login AND characters.char_name=?";
                             statement = con.prepareStatement(stmt);
                             statement.setInt(1, 500);
                             statement.setString(2, activeChar.getName());

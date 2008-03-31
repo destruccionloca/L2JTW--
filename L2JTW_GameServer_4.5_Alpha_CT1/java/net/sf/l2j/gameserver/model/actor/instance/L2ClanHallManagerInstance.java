@@ -601,7 +601,14 @@ public class L2ClanHallManagerInstance extends L2MerchantInstance
                         if (skill.getSkillType() == SkillType.SUMMON)
                             player.doCast(skill);
                         else
-                            doCast(skill);
+                        {
+                        	if (!((skill.getMpConsume() + skill.getMpInitialConsume()) > this.getCurrentMp()))
+                        		this.doCast(skill);
+                        	else
+                        	{
+                        		player.sendMessage("The Clanhall Managers MP is to low.");
+                        	}
+                        }
                         if (getClanHall().getFunction(ClanHall.FUNC_SUPPORT)== null)
                             return;
                         NpcHtmlMessage html = new NpcHtmlMessage(1);
@@ -671,7 +678,7 @@ public class L2ClanHallManagerInstance extends L2MerchantInstance
 			}
 		}
 		// Send a Server->Client ActionFailed to the L2PcInstance in order to avoid that the client wait another packet
-		player.sendPacket(new ActionFailed());
+		player.sendPacket(ActionFailed.STATIC_PACKET);
 	}
 
     private void sendHtmlMessage(L2PcInstance player, NpcHtmlMessage html)
@@ -684,7 +691,7 @@ public class L2ClanHallManagerInstance extends L2MerchantInstance
 
     private void showMessageWindow(L2PcInstance player)
     {
-        player.sendPacket(new ActionFailed());
+        player.sendPacket(ActionFailed.STATIC_PACKET);
         String filename = "data/html/clanHallManager/chamberlain-no.htm";
 
         int condition = validateCondition(player);
@@ -731,14 +738,14 @@ public class L2ClanHallManagerInstance extends L2MerchantInstance
 
     private void showVaultWindowDeposit(L2PcInstance player)
     {
-        player.sendPacket(new ActionFailed());
+        player.sendPacket(ActionFailed.STATIC_PACKET);
         player.setActiveWarehouse(player.getClan().getWarehouse());
         player.sendPacket(new WareHouseDepositList(player, WareHouseDepositList.CLAN)); //Or Clan Hall??
     }
 
     private void showVaultWindowWithdraw(L2PcInstance player)
     {
-        player.sendPacket(new ActionFailed());
+        player.sendPacket(ActionFailed.STATIC_PACKET);
         player.setActiveWarehouse(player.getClan().getWarehouse());
         player.sendPacket(new WareHouseWithdrawalList(player, WareHouseWithdrawalList.CLAN)); //Or Clan Hall ??
     }
@@ -767,7 +774,7 @@ public class L2ClanHallManagerInstance extends L2MerchantInstance
         {
             _log.warning("No teleport destination with id:" +val);
         }
-        player.sendPacket( new ActionFailed() );
+        player.sendPacket( ActionFailed.STATIC_PACKET );
     }
     
     private void revalidateDeco(L2PcInstance player)

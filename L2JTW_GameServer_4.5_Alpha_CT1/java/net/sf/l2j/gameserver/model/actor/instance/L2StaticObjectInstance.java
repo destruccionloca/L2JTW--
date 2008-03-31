@@ -134,7 +134,7 @@ public class L2StaticObjectInstance extends L2Object
                 player.getAI().setIntention(CtrlIntention.AI_INTENTION_INTERACT, this);
 
                 // Send a Server->Client packet ActionFailed (target is out of interaction range) to the L2PcInstance player
-                player.sendPacket(new ActionFailed());
+                player.sendPacket(ActionFailed.STATIC_PACKET);
             } else {
 			if(_type == 2) {
 				String filename = "data/html/signboard.htm";
@@ -145,10 +145,10 @@ public class L2StaticObjectInstance extends L2Object
 				else html.setHtml(content);
 
 				player.sendPacket(html);
-				player.sendPacket(new ActionFailed());
+				player.sendPacket(ActionFailed.STATIC_PACKET);
 			} else if(_type == 0) player.sendPacket(new ShowTownMap(_texture, getMapX(), getMapY()));
                     // Send a Server->Client ActionFailed to the L2PcInstance in order to avoid that the client wait another packet
-                    player.sendPacket(new ActionFailed());
+                    player.sendPacket(ActionFailed.STATIC_PACKET);
             }
         }
 
@@ -173,14 +173,14 @@ public class L2StaticObjectInstance extends L2Object
 	                NpcHtmlMessage html = new NpcHtmlMessage(1);
 	                html.setHtml((new StringBuilder()).append("<html><head><body>決鬥場看板遺失<br>").append(filename).append("</body></html>").toString());
 	                player.sendPacket(html);
-	                player.sendPacket(new ActionFailed());
+	                player.sendPacket(ActionFailed.STATIC_PACKET);
 	            } else
 	            {
 	                NpcHtmlMessage itemReply = new NpcHtmlMessage(5);
 	                itemReply.setHtml(content);
 	                player.sendPacket(itemReply);
 	            }
-	            player.sendPacket(new ActionFailed());
+	            player.sendPacket(ActionFailed.STATIC_PACKET);
 	        }
     	}
     }

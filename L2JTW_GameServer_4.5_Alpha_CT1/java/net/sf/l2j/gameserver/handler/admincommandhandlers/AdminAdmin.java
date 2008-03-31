@@ -59,6 +59,7 @@ public class AdminAdmin implements IAdminCommandHandler {
 		 "admin_admin3",
 		 "admin_admin4",
 		 "admin_admin5",
+		 "admin_tw_menu",
 		 "admin_cache",
 		 "admin_play_sounds",
 		 "admin_play_sound",
@@ -153,7 +154,6 @@ public class AdminAdmin implements IAdminCommandHandler {
 				activeChar.sendPacket(new SystemMessage(SystemMessageId.MESSAGE_REFUSAL_MODE));
 			}
 		}
-
         
         else if(command.startsWith("admin_saveolymp"))
         {
@@ -228,8 +228,104 @@ public class AdminAdmin implements IAdminCommandHandler {
                     activeChar.sendMessage("禁止交易目前為取消。");
             }            
         }
-
-
+		else if(command.startsWith("admin_saveolymp"))
+		{
+			try
+			{
+				Olympiad.getInstance().save();
+			}
+			catch(Exception e){e.printStackTrace();}
+			activeChar.sendMessage("奧林匹亞資料存取!");
+		}
+		else if(command.startsWith("admin_endolympiad"))
+		{
+			try
+			{
+				Olympiad.getInstance().manualSelectHeroes();
+			}
+			catch(Exception e){e.printStackTrace();}
+			activeChar.sendMessage("設置英雄");
+		}
+		else if (command.startsWith("admin_manualhero") || command.startsWith("admin_sethero"))
+		{
+			L2PcInstance target = null;
+            
+			if (activeChar.getTarget() != null && activeChar.getTarget() instanceof L2PcInstance)
+			{
+				target = (L2PcInstance)activeChar.getTarget();
+				target.setHero(target.isHero()? false : true);
+			}
+			else
+			{
+				target = activeChar;
+				target.setHero(target.isHero()? false : true);
+			}
+		}
+		else if(command.startsWith("admin_diet"))
+		{
+			try
+			{
+				StringTokenizer st = new StringTokenizer(command);
+				st.nextToken();
+				if(st.nextToken().equalsIgnoreCase("on"))
+				{
+					activeChar.setDietMode(true);
+					activeChar.sendMessage("無重量模式啟用");
+				}
+				else if(st.nextToken().equalsIgnoreCase("off"))
+				{
+					activeChar.setDietMode(false);
+					activeChar.sendMessage("無重量模式關閉");
+				}
+			}
+			catch(Exception ex)
+			{
+				if(activeChar.getDietMode())
+				{
+					activeChar.setDietMode(false);
+					activeChar.sendMessage("無重量模式關閉");
+				}
+				else
+				{
+					activeChar.setDietMode(true);
+					activeChar.sendMessage("無重量模式啟用");
+				}
+			}
+			finally
+			{
+				activeChar.refreshOverloaded();
+			}
+		}
+		else if(command.startsWith("admin_tradeoff"))
+		{
+			try
+			{
+				String mode = command.substring(15);
+				if (mode.equalsIgnoreCase("on"))
+				{
+					activeChar.setTradeRefusal(true);
+					activeChar.sendMessage("交易關閉");
+				}
+				else if (mode.equalsIgnoreCase("off"))
+				{
+					activeChar.setTradeRefusal(false);
+					activeChar.sendMessage("交易開啟");
+				}
+			}
+			catch(Exception ex)
+			{
+				if(activeChar.getTradeRefusal())
+				{
+					activeChar.setTradeRefusal(false);
+					activeChar.sendMessage("交易關閉");
+				}
+				else
+				{
+					activeChar.setTradeRefusal(true);
+					activeChar.sendMessage("交易開啟");
+				}
+			}
+		}
 		else if(command.startsWith("admin_reload"))
 		{
 			StringTokenizer st = new StringTokenizer(command);

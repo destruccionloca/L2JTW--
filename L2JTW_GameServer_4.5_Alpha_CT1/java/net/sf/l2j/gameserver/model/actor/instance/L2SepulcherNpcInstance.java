@@ -180,7 +180,7 @@ public class L2SepulcherNpcInstance extends L2NpcInstance
                 else
                 {
                     // Send a Server->Client packet ActionFailed (target is out of attack range) to the L2PcInstance player
-                    player.sendPacket(new ActionFailed());
+                    player.sendPacket(ActionFailed.STATIC_PACKET);
                 }
             }
             
@@ -197,7 +197,7 @@ public class L2SepulcherNpcInstance extends L2NpcInstance
                     player.getAI().setIntention(CtrlIntention.AI_INTENTION_INTERACT, this);
                     
                     // Send a Server->Client packet ActionFailed (target is out of interaction range) to the L2PcInstance player
-                    player.sendPacket(new ActionFailed());
+                    player.sendPacket(ActionFailed.STATIC_PACKET);
                 } 
                 else 
                 {
@@ -209,7 +209,7 @@ public class L2SepulcherNpcInstance extends L2NpcInstance
                     doAction(player);
 
                     // Send a Server->Client ActionFailed to the L2PcInstance in order to avoid that the client wait another packet
-                    player.sendPacket(new ActionFailed());                  
+                    player.sendPacket(ActionFailed.STATIC_PACKET);                  
                 }
             }
         }
@@ -221,7 +221,7 @@ public class L2SepulcherNpcInstance extends L2NpcInstance
 
         if(isDead())
         {
-            player.sendPacket(new ActionFailed());
+            player.sendPacket(ActionFailed.STATIC_PACKET);
             return;
         }
         
@@ -275,7 +275,7 @@ public class L2SepulcherNpcInstance extends L2NpcInstance
             default:
                 showChatWindow(player,0);
         }
-        player.sendPacket(new ActionFailed());
+        player.sendPacket(ActionFailed.STATIC_PACKET);
     }
     
     public String getHtmlPath(int npcId, int val)
@@ -301,7 +301,7 @@ public class L2SepulcherNpcInstance extends L2NpcInstance
         html.setFile(filename);
         html.replace("%objectId%", String.valueOf(getObjectId()));
         player.sendPacket(html);
-        player.sendPacket( new ActionFailed() );
+        player.sendPacket(ActionFailed.STATIC_PACKET);
     }
     
 
@@ -317,7 +317,7 @@ public class L2SepulcherNpcInstance extends L2NpcInstance
         {
             if (isBusy())
             {
-                player.sendPacket( new ActionFailed() );
+                player.sendPacket(ActionFailed.STATIC_PACKET);
                 
                 NpcHtmlMessage html = new NpcHtmlMessage(getObjectId());
                 html.setFile("data/html/npcbusy.htm");

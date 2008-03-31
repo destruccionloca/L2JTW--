@@ -14,8 +14,6 @@
  */
 package net.sf.l2j.gameserver.ai;
 
-import java.util.List;
-import javolution.util.FastList;
 import static net.sf.l2j.gameserver.ai.CtrlIntention.AI_INTENTION_ACTIVE;
 import static net.sf.l2j.gameserver.ai.CtrlIntention.AI_INTENTION_ATTACK;
 import static net.sf.l2j.gameserver.ai.CtrlIntention.AI_INTENTION_CAST;
@@ -25,13 +23,20 @@ import static net.sf.l2j.gameserver.ai.CtrlIntention.AI_INTENTION_INTERACT;
 import static net.sf.l2j.gameserver.ai.CtrlIntention.AI_INTENTION_MOVE_TO;
 import static net.sf.l2j.gameserver.ai.CtrlIntention.AI_INTENTION_PICK_UP;
 import static net.sf.l2j.gameserver.ai.CtrlIntention.AI_INTENTION_REST;
+
+import java.util.List;
+
+import javolution.util.FastList;
 import net.sf.l2j.Config;
+import net.sf.l2j.gameserver.GeoData;
 import net.sf.l2j.gameserver.Universe;
 import net.sf.l2j.gameserver.model.L2Attackable;
 import net.sf.l2j.gameserver.model.L2CharPosition;
 import net.sf.l2j.gameserver.model.L2Character;
+import net.sf.l2j.gameserver.model.L2Effect;
 import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2Skill;
+import net.sf.l2j.gameserver.model.L2Skill.SkillTargetType;
 import net.sf.l2j.gameserver.model.actor.instance.L2BoatInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2DoorInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
@@ -41,6 +46,7 @@ import net.sf.l2j.gameserver.taskmanager.AttackStanceTaskManager;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
 import net.sf.l2j.gameserver.templates.L2Weapon;
 import net.sf.l2j.gameserver.templates.L2WeaponType;
+import net.sf.l2j.util.Point3D;
 import net.sf.l2j.util.Rnd;
 
 /**
@@ -55,12 +61,19 @@ import net.sf.l2j.util.Rnd;
  */
 public class L2CharacterAI extends AbstractAI
 {
-    @Override
-	protected void onEvtAttacked(L2Character attacker)
+    class IntentionCommand
     {
-        clientStartAutoAttack();
-    }
+    	protected CtrlIntention _crtlIntention;
+    	protected Object _arg0, _arg1;
 
+    	protected IntentionCommand(CtrlIntention pIntention, Object pArg0, Object pArg1)
+    	{
+    		_crtlIntention = pIntention;
+    		_arg0 = pArg0;
+    		_arg1 = pArg1;
+    	}
+    }
+    
     /**
      * Constructor of L2CharacterAI.<BR><BR>
      *
@@ -70,6 +83,17 @@ public class L2CharacterAI extends AbstractAI
     public L2CharacterAI(L2Character.AIAccessor accessor)
     {
         super(accessor);
+    }
+
+    public IntentionCommand getNextIntention()
+    {
+    	return null;
+    } 
+	
+    @Override
+	protected void onEvtAttacked(L2Character attacker)
+    {
+        clientStartAutoAttack();
     }
 
     /**
@@ -894,6 +918,53 @@ public class L2CharacterAI extends AbstractAI
     {
         // do nothing
     }
+    
+    protected boolean maybeMoveToPosition(Point3D worldPosition, int offset)
+	{
+    	if (worldPosition == null)
+    	{
+    		_log.warning("maybeMoveToPosition: worldPosition == NULL!");
+    		return false;
+    	}
+
+    	if (offset < 0)
+    		return false; // skill radius -1
+
+    	if (!_actor.isInsideRadius(worldPosition.getX(), worldPosition.getY(), offset + _actor.getTemplate().collisionRadius, false))
+    	{
+    		if (_actor.isMovementDisabled())
+    			return true;
+
+    		if (!_actor.isRunning() && !(this instanceof L2PlayerAI))
+    			_actor.setRunning();
+
+    		stopFollow();
+
+    		int x = _actor.getX();
+    		int y = _actor.getY();
+
+    		double dx = worldPosition.getX() - x;
+    		double dy = worldPosition.getY() - y;
+
+    		double dist = Math.sqrt(dx * dx + dy * dy);
+
+    		double sin = dy / dist;
+    		double cos = dx / dist;
+
+    		dist -= offset - 5;
+
+    		x += (int) (dist * cos);
+    		y += (int) (dist * sin);
+
+    		moveTo(x, y, worldPosition.getZ());
+    		return true;
+    	}
+
+    	if (getFollowTarget() != null)
+    		stopFollow();
+
+    	return false;
+	}
 
     /**
      * Manage the Move to Pawn action in function of the distance and of the Interact area.<BR><BR>
@@ -1141,6 +1212,7 @@ public class L2CharacterAI extends AbstractAI
                         hasHealOrResurrect = true;
                         break;
                     case NOTDONE:
+					case COREDONE:
                         continue; // won't be considered something for fighting
                     default:
                         if (!sk.isPassive()) {
@@ -1234,4 +1306,182 @@ public class L2CharacterAI extends AbstractAI
                 isCanceled = true;
         }
     }
+    
+    public boolean canAura(L2Skill sk)
+    {
+    	if(sk.getTargetType() == SkillTargetType.TARGET_AURA 
+    			|| sk.getTargetType() == SkillTargetType.TARGET_BEHIND_AURA
+    			|| sk.getTargetType() == SkillTargetType.TARGET_FRONT_AURA)
+    	{
+    		for(L2Object target:_actor.getKnownList().getKnownCharactersInRadius(sk.getSkillRadius()))
+    		{
+    			if (target==getAttackTarget())
+    				return true;
+    		}
+    	}
+    	return false;
+    }
+    public boolean canAOE(L2Skill sk)
+    {
+    	if(sk.getSkillType() != L2Skill.SkillType.NEGATE || sk.getSkillType() != L2Skill.SkillType.CANCEL)
+    	{
+	    	if(sk.getTargetType() == SkillTargetType.TARGET_AURA 
+	    			|| sk.getTargetType() == SkillTargetType.TARGET_BEHIND_AURA
+	    			|| sk.getTargetType() == SkillTargetType.TARGET_FRONT_AURA
+	    			|| sk.getTargetType() == SkillTargetType.TARGET_MULTIFACE)
+	    	{
+	    		boolean cancast = true;
+	    		for(L2Character target:_actor.getKnownList().getKnownCharactersInRadius(sk.getSkillRadius()))
+	    		{
+	    			if(!GeoData.getInstance().canSeeTarget(_actor,target))
+	    				continue;
+	    			if(target instanceof L2Attackable)
+	    			{
+	    				L2NpcInstance targets = ((L2NpcInstance)target);
+	    				L2NpcInstance actors = ((L2NpcInstance)_actor);
+	    				if(!targets.getEnemyClan().equals(actors.getClan()) || (actors.getClan()==null && actors.getIsChaos()== 0))
+	    					continue;
+	    			}
+	    			L2Effect[] effects = target.getAllEffects();
+					for (int i = 0; effects != null && i < effects.length; i++)
+					{
+						L2Effect effect = effects[i];
+						if (effect.getSkill() == sk)
+						{
+							cancast=false;
+							break;
+						}
+					}
+	    		}
+	    		if(cancast)
+	    			return true;
+	    	}
+	    	else if(sk.getTargetType() == SkillTargetType.TARGET_AREA 
+	    			|| sk.getTargetType() == SkillTargetType.TARGET_BEHIND_AREA
+	    			|| sk.getTargetType() == SkillTargetType.TARGET_FRONT_AREA)
+	    	{
+	    		boolean cancast = true;
+	    		for(L2Character target: getAttackTarget().getKnownList().getKnownCharactersInRadius(sk.getSkillRadius()))
+	    		{
+	    			if(!GeoData.getInstance().canSeeTarget(_actor,target) || target==null)
+	    				continue;
+	    			if(target instanceof L2Attackable)
+	    			{
+	    				L2NpcInstance targets = ((L2NpcInstance)target);
+	    				L2NpcInstance actors = ((L2NpcInstance)_actor);
+	    				if(!targets.getEnemyClan().equals(actors.getClan()) || (actors.getClan()==null && actors.getIsChaos()== 0))
+	    					continue;
+	    			}
+	    			L2Effect[] effects = target.getAllEffects();
+ 					if (effects.length >0)
+ 						cancast = true;
+	    		}
+	    		if(cancast)
+	    			return true;
+	    	}
+    	}
+    	else
+    	{
+    		if(sk.getTargetType() == SkillTargetType.TARGET_AURA 
+	    			|| sk.getTargetType() == SkillTargetType.TARGET_BEHIND_AURA
+	    			|| sk.getTargetType() == SkillTargetType.TARGET_FRONT_AURA
+	    			|| sk.getTargetType() == SkillTargetType.TARGET_MULTIFACE)
+	    	{
+	    		boolean cancast = false;
+	    		for(L2Character target:_actor.getKnownList().getKnownCharactersInRadius(sk.getSkillRadius()))
+	    		{
+	    			if(!GeoData.getInstance().canSeeTarget(_actor,target))
+	    				continue;
+	    			if(target instanceof L2Attackable)
+	    			{
+	    				L2NpcInstance targets = ((L2NpcInstance)target);
+	    				L2NpcInstance actors = ((L2NpcInstance)_actor);
+	    				if(!targets.getEnemyClan().equals(actors.getClan()) || (actors.getClan()==null && actors.getIsChaos()== 0))
+	    					continue;
+	    			}
+	    			L2Effect[] effects = target.getAllEffects();
+ 					if (effects.length >0)
+ 						cancast = true;
+	    		}
+	    		if(cancast)
+	    			return true;
+	    	}
+	    	else if(sk.getTargetType() == SkillTargetType.TARGET_AREA 
+	    			|| sk.getTargetType() == SkillTargetType.TARGET_BEHIND_AREA
+	    			|| sk.getTargetType() == SkillTargetType.TARGET_FRONT_AREA)
+	    	{
+	    		boolean cancast = true;
+	    		for(L2Character target: getAttackTarget().getKnownList().getKnownCharactersInRadius(sk.getSkillRadius()))
+	    		{
+	    			if(!GeoData.getInstance().canSeeTarget(_actor,target))
+	    				continue;
+	    			if(target instanceof L2Attackable)
+	    			{
+	    				L2NpcInstance targets = ((L2NpcInstance)target);
+	    				L2NpcInstance actors = ((L2NpcInstance)_actor);
+	    				if(!targets.getEnemyClan().equals(actors.getClan()) || (actors.getClan()==null && actors.getIsChaos()== 0))
+	    					continue;
+	    			}
+	    			L2Effect[] effects = target.getAllEffects();
+					for (int i = 0; effects != null && i < effects.length; i++)
+					{
+						L2Effect effect = effects[i];
+						if (effect.getSkill() == sk)
+						{
+							cancast=false;
+							break;
+						}
+					}
+	    		}
+	    		if(cancast)
+	    			return true;
+	    	}
+    	}
+    	return false;
+    }
+    public boolean canParty(L2Skill sk)
+    {
+    	if(sk.getTargetType() == SkillTargetType.TARGET_PARTY)
+    	{
+    			int count = 0;
+    			int ccount = 0;
+        		for(L2Character target:_actor.getKnownList().getKnownCharactersInRadius(sk.getSkillRadius()))
+        		{
+        			if(!(target instanceof L2Attackable) || !GeoData.getInstance().canSeeTarget(_actor,target))
+        			{
+        					continue;
+        			}
+    				L2NpcInstance targets = ((L2NpcInstance)target);
+    				L2NpcInstance actors = ((L2NpcInstance)_actor);
+    				if(targets.getFactionId() == actors.getFactionId() && actors.getFactionId() !=null)
+    				{
+    					count++;
+	        			L2Effect[] effects = target.getAllEffects();
+	    				for (int i = 0; effects != null && i < effects.length; i++)
+	    				{
+	    					
+	    					L2Effect effect = effects[i];
+	    					if (effect.getSkill() == sk)
+	    					{
+	    						ccount++;
+	    						break;
+	    					}
+	    				}
+    				}
+        		}
+        		if(ccount < count)
+        			return true;
+        	
+    	}
+    	return false;
+    }
+    public boolean isParty(L2Skill sk)
+    {
+    	if(sk.getTargetType() == SkillTargetType.TARGET_PARTY)
+    	{
+    				return true;
+    	}
+    	return false;
+    }
+
 }

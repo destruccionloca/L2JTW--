@@ -26,6 +26,8 @@ import net.sf.l2j.gameserver.datatables.ItemTable;
 import net.sf.l2j.gameserver.datatables.SkillTable;
 import net.sf.l2j.gameserver.model.L2ItemInstance.ItemLocation;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.network.SystemMessageId;
+import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.templates.L2Armor;
 import net.sf.l2j.gameserver.templates.L2EtcItem;
 import net.sf.l2j.gameserver.templates.L2EtcItemType;
@@ -863,6 +865,8 @@ public abstract class Inventory extends ItemContainer
 			case PAPERDOLL_BACK:		slot = L2Item.SLOT_BACK;		break;
 			case PAPERDOLL_FEET:		slot = L2Item.SLOT_FEET;		break;
 			case PAPERDOLL_LRHAND:		slot = L2Item.SLOT_LR_HAND;		break;
+			case PAPERDOLL_LBRACELET:   slot = L2Item.SLOT_L_BRACELET;  break;
+			case PAPERDOLL_RBRACELET:   slot = L2Item.SLOT_R_BRACELET;  break;
 		}
 		
 		return slot;
@@ -953,6 +957,8 @@ public abstract class Inventory extends ItemContainer
 			setPaperdollItem(PAPERDOLL_RHAND, null);// this should be the same as in LRHAND
 			pdollSlot = PAPERDOLL_LRHAND;
 			break;
+		case L2Item.SLOT_L_BRACELET:	pdollSlot = PAPERDOLL_LBRACELET;	break;
+		case L2Item.SLOT_R_BRACELET:	pdollSlot = PAPERDOLL_RBRACELET;	break;
 		}
 		if (pdollSlot >= 0)
 			setPaperdollItem(pdollSlot, null);
@@ -989,7 +995,14 @@ public abstract class Inventory extends ItemContainer
         if(getOwner() instanceof L2PcInstance)
         {
             L2PcInstance player = (L2PcInstance)getOwner();
-            
+
+
+            if(player.getPkKills() > 0 && item.getItemId() >= 7816 && item.getItemId() <= 7831)
+            {
+                player.sendPacket(new SystemMessage(SystemMessageId.YOU_ARE_UNABLE_TO_EQUIP_THIS_ITEM_WHEN_YOUR_PK_COUNT_IS_GREATER_THAN_OR_EQUAL_TO_ONE));
+                return;
+            }
+
             if(!player.isGM())
                 if (!player.isHero())
                 {
@@ -1164,6 +1177,12 @@ public abstract class Inventory extends ItemContainer
 			case L2Item.SLOT_BACK:
 				setPaperdollItem(PAPERDOLL_BACK, item);
 				break;
+			case L2Item.SLOT_L_BRACELET:
+				setPaperdollItem(PAPERDOLL_LBRACELET, item);
+				break;
+			case L2Item.SLOT_R_BRACELET:
+				setPaperdollItem(PAPERDOLL_RBRACELET, item);
+				break;
 			default:
 				_log.warning("unknown body slot:" + targetSlot);
 		}
@@ -1270,6 +1289,11 @@ public abstract class Inventory extends ItemContainer
 	            if(getOwner() instanceof L2PcInstance)
 	            {
 	                L2PcInstance player = (L2PcInstance)getOwner();
+
+		            if(player.getPkKills() > 0 && item.getItemId() >= 7816 && item.getItemId() <= 7831)
+		            {
+		                item.setLocation(ItemLocation.INVENTORY);
+		            }
 	                
 	                if(!player.isGM())
 	                    if (!player.isHero())

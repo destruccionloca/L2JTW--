@@ -42,10 +42,10 @@ public class Guide implements IItemHandler {
 		if (content == null)
 		{
 			NpcHtmlMessage html = new NpcHtmlMessage(1);
-			html.setHtml("<html><head><body>My Text is missing:<br>"+filename+"</body></html>");
+			html.setHtml("<html><head><body>¸ê®Æ¿ò¥¢:<br>"+filename+"</body></html>");
 			activeChar.sendPacket(html);
 			
-			activeChar.sendPacket( new ActionFailed() );
+			activeChar.sendPacket(ActionFailed.STATIC_PACKET);
 		}
 		else
 		{
@@ -54,7 +54,7 @@ public class Guide implements IItemHandler {
 			activeChar.sendPacket(itemReply);
 		}
 		
-		activeChar.sendPacket( new ActionFailed() );
+		activeChar.sendPacket(ActionFailed.STATIC_PACKET);
 	}
 
 	public int[] getItemIds()

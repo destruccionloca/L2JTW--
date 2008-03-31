@@ -52,12 +52,14 @@ public abstract class L2Effect
     public static enum EffectType
     {
         BUFF,
+        DEBUFF,
         CHARGE,
         DMG_OVER_TIME,
         HEAL_OVER_TIME,
         COMBAT_POINT_HEAL_OVER_TIME,
         MANA_DMG_OVER_TIME,
         MANA_HEAL_OVER_TIME,
+        MP_CONSUME_PER_LEVEL,
         RELAXING, STUN, ROOT,
         SLEEP,
         HATE,
@@ -70,7 +72,8 @@ public abstract class L2Effect
         SEED,
         PARALYZE,
         STUN_SELF,
-        PSYCHICAL_MUTE,
+        PHYSICAL_MUTE,
+        PHYSICAL_ATTACK_MUTE,
         REMOVE_TARGET,
         TARGET_ME,
         SILENCE_MAGIC_PHYSICAL,
@@ -79,8 +82,6 @@ public abstract class L2Effect
         PHOENIX_BLESSING,
         PETRIFICATION,
         BLUFF,
-        BATTLE_FORCE,
-        SPELL_FORCE,
         CHARM_OF_LUCK,
         INVINCIBLE,
         
@@ -91,7 +92,9 @@ public abstract class L2Effect
         DISARM,
         TRANSFORMATION,
         IMMOBILEUNTILATTACKED,
-        CHARMOFCOURAGE
+        CHARMOFCOURAGE,
+        SIGNET_EFFECT,
+        SIGNET_GROUND
     }
 
 
@@ -135,7 +138,9 @@ public abstract class L2Effect
     // abnormal effect mask
     private int _abnormalEffect;
 
+    // show icon
     private boolean _icon;
+    
     public boolean preventExitUpdate;
 
     public final class EffectTask implements Runnable
@@ -250,7 +255,6 @@ public abstract class L2Effect
                                                                             duration * 1000);
         }
     }
-
     public int getPeriod()
     {
         return _period;
@@ -280,6 +284,8 @@ public abstract class L2Effect
     public void setInUse(boolean inUse)
     {
         _inUse = inUse;
+        if (_inUse) onStart();
+        else onExit();
     }
 
     public String getStackType()
@@ -449,7 +455,6 @@ public abstract class L2Effect
         if (_state == EffectState.CREATED)
         {
             _state = EffectState.ACTING;
-            onStart();
 
             if (_skill.isPvpSkill())
             {
@@ -487,7 +492,7 @@ public abstract class L2Effect
         if (_state == EffectState.FINISHING)
         {
             // Cancel the effect in the the abnormal effect map of the L2Character
-            onExit();
+        	if (getInUse()) onExit();
 
             //If the time left is equal to zero, send the message
             if (_count == 0)

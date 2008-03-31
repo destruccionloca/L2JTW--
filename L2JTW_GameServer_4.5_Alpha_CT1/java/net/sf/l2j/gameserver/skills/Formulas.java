@@ -1161,9 +1161,10 @@ public final class Formulas
 		{
 			if(((L2Attackable)attacker)._soulshotcharged)
 			{
-
 				ss = true;
 			}
+			else
+				ss = false;
 		}
 
 		double damage = attacker.getPAtk(target);
@@ -1360,6 +1361,8 @@ public final class Formulas
     			((L2Attackable)attacker)._spiritshotcharged = false;
 				bss = true;
 			}
+			else
+				bss = false;
 		}
 		double mAtk = attacker.getMAtk(target, skill);
 
@@ -1508,7 +1511,7 @@ public final class Formulas
 				return false;
 			if(activeChar.isBehindTarget())
 				_successChance = 70;
-			else if(activeChar.isFrontTarget())
+			else if(activeChar.isInFrontOfTarget())
 				_successChance = 30;
 			else
 				_successChance = 50;
@@ -1591,6 +1594,12 @@ public final class Formulas
 	public final boolean calcAtkBreak(L2Character target, double dmg)
 	{
 
+	    if (target instanceof L2PcInstance)
+        {
+            if (((L2PcInstance)target).getForceBuff() != null)
+                return true;
+        }
+	    
         double init = 0;
 
 
@@ -1678,7 +1687,7 @@ public final class Formulas
 		return d < Rnd.get(100);
 	}
 
-	/** Returns true if shield defence successfull */
+	/** Returns true if shield defence successful */
 	public boolean calcShldUse(L2Character attacker, L2Character target)
 	{
 		L2Weapon at_weapon = attacker.getActiveWeaponItem();
@@ -1686,7 +1695,7 @@ public final class Formulas
 			* DEXbonus[target.getDEX()];
 		if (shldRate == 0.0) return false;
         int degreeside = (int)target.calcStat(Stats.SHIELD_DEFENCE_ANGLE, 0, null, null) + 120;
-        if (degreeside < 360 && (!target.isInFront(attacker, degreeside)))
+        if (degreeside < 360 && (!target.isFacing(attacker, degreeside)))
         {
             return false;
         }

@@ -55,7 +55,7 @@ public final class RequestSurrenderPersonally extends L2GameClientPacket
         {
 
         	_activeChar.sendMessage("無此血盟");
-        	_activeChar.sendPacket(new ActionFailed());
+        	_activeChar.sendPacket(ActionFailed.STATIC_PACKET);
 
             return;
 
@@ -65,7 +65,7 @@ public final class RequestSurrenderPersonally extends L2GameClientPacket
         {
 
         	_activeChar.sendMessage("並無與此血盟發生戰爭");
-        	_activeChar.sendPacket(new ActionFailed());
+        	_activeChar.sendPacket(ActionFailed.STATIC_PACKET);
 
             return;
 

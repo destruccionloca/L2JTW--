@@ -188,7 +188,7 @@ public final class L2VillageMasterInstance extends L2FolkInstance
             {
                 case 1: // Add Subclass - Initial
                     // Avoid giving player an option to add a new sub class, if they have three already.
-                    if (player.getTotalSubClasses() == 3)
+                    if (player.getTotalSubClasses() == Config.MAX_SUBCLASS)
                     {
                         player.sendMessage("現在只能變更一個副職業。");
                         return;
@@ -416,7 +416,8 @@ public final class L2VillageMasterInstance extends L2FolkInstance
                      */
                     if (player.modifySubClass(paramOne, paramTwo))
                     {
-                        player.setActiveClass(paramOne);
+                    	player.stopAllEffects(); // all effects from old subclass stopped!
+                    	player.setActiveClass(paramOne);
 
                         content.append("副職業間進行變更：<br>副職業變更為 <font color=\"LEVEL\">"
                             + CharTemplateTable.getClassNameById(paramTwo) + "</font>。");
@@ -859,7 +860,7 @@ public final class L2VillageMasterInstance extends L2FolkInstance
             player.sendPacket(asl);
         }
 
-        player.sendPacket(new ActionFailed());
+        player.sendPacket(ActionFailed.STATIC_PACKET);
     }
 
     private final String formatClassForDisplay(PlayerClass className)
