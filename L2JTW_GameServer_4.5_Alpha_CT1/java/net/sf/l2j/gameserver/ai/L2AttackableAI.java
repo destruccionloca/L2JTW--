@@ -2014,7 +2014,8 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 	            int range = 0;
 	        	L2Attackable actor = (L2Attackable)_actor;
 	        	range = sk.getCastRange() + _actor.getTemplate().collisionRadius + getAttackTarget().getTemplate().collisionRadius;
-	        	for(L2Character obj: actor.getHateList())
+	        	if(actor.getAttackByList()!=null)
+	        	for(L2Character obj: actor.getAttackByList())
 	        	{
 	        		if(obj.isDead() || obj == null || !GeoData.getInstance().canSeeTarget(_actor,obj) || obj == getAttackTarget())
 	        			continue;
@@ -2216,7 +2217,9 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         double dist2 = 0;
         int range = 0;
     	L2Attackable actor = (L2Attackable)_actor;
-    	for(L2Character obj: actor.getHateList())
+    	
+    	if(actor.getAttackByList()!=null)
+    	for(L2Character obj: actor.getAttackByList())
     	{
     		if(!GeoData.getInstance().canSeeTarget(_actor,obj) || obj.isDead())
 				continue;
@@ -2279,7 +2282,8 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         int range = 0;
     	L2Attackable actor = (L2Attackable)_actor;
     	L2Character MostHate = ((L2Attackable) _actor).getMostHated();
-    	for(L2Character obj: actor.getHateList())
+    	if(actor.getAttackByList()!=null)
+    	for(L2Character obj: actor.getAttackByList())
     	{
     		if(!GeoData.getInstance().canSeeTarget(_actor,obj) || obj.isDead())
 				continue;
@@ -2348,7 +2352,8 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         int range = 0;
     	L2Attackable actor = (L2Attackable)_actor;
     	L2Character MostHate = ((L2Attackable) _actor).getMostHated();
-    	for(L2Character obj: actor.getHateList())
+    	if(actor.getAttackByList()!=null)
+    	for(L2Character obj: actor.getAttackByList())
     	{
     		if(!GeoData.getInstance().canSeeTarget(_actor,obj) || obj.isDead())
 				continue;

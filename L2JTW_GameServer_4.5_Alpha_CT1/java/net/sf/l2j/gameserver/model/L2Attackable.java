@@ -997,14 +997,16 @@ public class L2Attackable extends L2NpcInstance
     {
     	if (getAggroListRP().isEmpty() || isAlikeDead()) return null;
 
-
+    	_hatelist = new FastList<L2Character>();
+    	
     	 synchronized (getAggroList())
          {
-   			 _hatelist = new FastList<L2Character>();
+   			 
 	    			 
              for (AggroInfo ai : getAggroListRP().values())
              {
-            	 if(ai._attacker instanceof L2Character)
+            	 if (ai == null)
+            		 continue;
             	 _hatelist.add(ai._attacker);
              }
     		 
