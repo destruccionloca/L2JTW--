@@ -526,22 +526,20 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
             }
             else if (Rnd.nextInt(RANDOM_WALK_RATE) == 0)
             {
-            	// self and clan buffs
+            	iscasting = false;
+            	if(_skillrender.hasBuffSkill())
                 for (L2Skill sk : _skillrender._buffskills)
                 {
-                	if (_actor.getFirstEffect(sk.getId()) == null)
-                	{
-                		if (_actor.getCurrentMp() < sk.getMpConsume())
-							continue;
-                		if (_actor.isSkillDisabled(sk.getId()))
-							continue;
-                		L2Object OldTarget = _actor.getTarget();
-                		 _actor.setTarget(_actor);
-                		clientStopMoving(null);
-                		_accessor.doCast(sk);
-                		_actor.setTarget(OldTarget);
-                		return;
-                    }
+					if(sk.getMpConsume()>=_actor.getCurrentMp()
+							||_actor.isSkillDisabled(sk.getId())
+							||(sk.isMagic()&&_actor.isMuted())
+							||(!sk.isMagic()&&_actor.isPhysicalMuted()))
+    				{
+    					continue;
+    				}
+					Cast(sk);
+    				if(iscasting)
+    					return;
                 }
             }
         }
@@ -551,22 +549,20 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
             int x1, y1, z1;
             int range = Config.MAX_DRIFT_RANGE;
             
-            // self and clan buffs
-            for (L2Skill sk : _selfAnalysis.buffSkills)
+        	iscasting = false;
+        	if(_skillrender.hasBuffSkill())
+            for (L2Skill sk : _skillrender._buffskills)
             {
-            	if (_actor.getFirstEffect(sk.getId()) == null)
-            	{
-            		if (_actor.getCurrentMp() < sk.getMpConsume())
-						continue;
-            		if (_actor.isSkillDisabled(sk.getId()))
-						continue;
-            		L2Object OldTarget = _actor.getTarget();
-            		 _actor.setTarget(_actor);
-            		clientStopMoving(null);
-            		_accessor.doCast(sk);
-            		_actor.setTarget(OldTarget);
-            		return;
-                }
+				if(sk.getMpConsume()>=_actor.getCurrentMp()
+						||_actor.isSkillDisabled(sk.getId())
+						||(sk.isMagic()&&_actor.isMuted())
+						||(!sk.isMagic()&&_actor.isPhysicalMuted()))
+				{
+					continue;
+				}
+				Cast(sk);
+				if(iscasting)
+					return;
             }
             
             // If NPC with random coord in territory
