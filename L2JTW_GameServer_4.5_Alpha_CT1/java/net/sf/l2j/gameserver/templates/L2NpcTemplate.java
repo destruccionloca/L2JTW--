@@ -166,6 +166,27 @@ public final class L2NpcTemplate extends L2CharTemplate
 	public FastList<L2Skill> _Srangeskills;
 	public FastList<L2Skill> _generalskills;
 	
+	private boolean _hasbuffskills;
+	private boolean _hasnegativeskills;
+	private boolean _hasdebuffskills;
+	private boolean _hasatkskills;
+	private boolean _hasrootskills;
+	private boolean _hasstunskills;
+	private boolean _hassleepskills;
+	private boolean _hasparalyzeskills;
+	private boolean _hasfossilskills;
+	private boolean _hasfloatskills;
+	private boolean _hasimmobiliseskills;
+	private boolean _hashealskills;
+	private boolean _hasresskills;
+	private boolean _hasdotskills;
+	private boolean _hascotskills;
+	private boolean _hasuniversalskills;
+	private boolean _hasmanaskills;
+	private boolean _hasLrangeskills;
+	private boolean _hasSrangeskills;
+	private boolean _hasgeneralskills;
+	
 	/**
 	 * Constructor of L2Character.<BR><BR>
 	 * 
@@ -634,6 +655,7 @@ public final class L2NpcTemplate extends L2CharTemplate
 		if (_buffskills == null)
 			_buffskills = new FastList<L2Skill>();
 			_buffskills.add(skill);
+			_hasbuffskills=true;
 	}
     
     public void addHealSkill(L2Skill skill)
@@ -641,6 +663,7 @@ public final class L2NpcTemplate extends L2CharTemplate
 		if (_healskills == null)
 			_healskills = new FastList<L2Skill>();
 			_healskills.add(skill);
+			_hashealskills=true;
 	}
     
     public void addResSkill(L2Skill skill)
@@ -648,6 +671,7 @@ public final class L2NpcTemplate extends L2CharTemplate
 		if (_resskills == null)
 			_resskills = new FastList<L2Skill>();
 			_resskills.add(skill);
+			_hasresskills=true;
 	}
 	
     public void addAtkSkill(L2Skill skill)
@@ -655,6 +679,7 @@ public final class L2NpcTemplate extends L2CharTemplate
 		if (_atkskills == null)
 			_atkskills = new FastList<L2Skill>();
 			_atkskills.add(skill);
+			_hasatkskills=true;
 	}
 
     public void addDebuffSkill(L2Skill skill)
@@ -662,6 +687,7 @@ public final class L2NpcTemplate extends L2CharTemplate
 		if (_debuffskills == null)
 			_debuffskills = new FastList<L2Skill>();
 			_debuffskills.add(skill);
+			_hasdebuffskills=true;
 	}
     
     public void addRootSkill(L2Skill skill)
@@ -669,6 +695,7 @@ public final class L2NpcTemplate extends L2CharTemplate
 		if (_rootskills == null)
 			_rootskills = new FastList<L2Skill>();
 			_rootskills.add(skill);
+			_hasrootskills=true;
 	}
     
     public void addSleepSkill(L2Skill skill)
@@ -676,6 +703,7 @@ public final class L2NpcTemplate extends L2CharTemplate
 		if (_sleepskills == null)
 			_sleepskills = new FastList<L2Skill>();
 			_sleepskills.add(skill);
+			_hassleepskills=true;
 	}
     
     public void addStunSkill(L2Skill skill)
@@ -683,6 +711,7 @@ public final class L2NpcTemplate extends L2CharTemplate
 		if (_stunskills == null)
 			_stunskills = new FastList<L2Skill>();
 			_stunskills.add(skill);
+			_hasstunskills=true;
 	}
     
     public void addParalyzeSkill(L2Skill skill)
@@ -690,6 +719,7 @@ public final class L2NpcTemplate extends L2CharTemplate
 		if (_paralyzeskills == null)
 			_paralyzeskills = new FastList<L2Skill>();
 			_paralyzeskills.add(skill);
+			_hasparalyzeskills=true;
 	}
     
     public void addFloatSkill(L2Skill skill)
@@ -697,6 +727,7 @@ public final class L2NpcTemplate extends L2CharTemplate
 		if (_floatskills == null)
 			_floatskills = new FastList<L2Skill>();
 			_floatskills.add(skill);
+			_hasfloatskills=true;
 	}
     
     public void addFossilSkill(L2Skill skill)
@@ -704,6 +735,7 @@ public final class L2NpcTemplate extends L2CharTemplate
 		if (_fossilskills == null)
 			_fossilskills = new FastList<L2Skill>();
 			_fossilskills.add(skill);
+			_hasfossilskills=true;
 	}
     
     public void addNegativeSkill(L2Skill skill)
@@ -711,6 +743,7 @@ public final class L2NpcTemplate extends L2CharTemplate
 		if (_negativeskills == null)
 			_negativeskills = new FastList<L2Skill>();
 			_negativeskills.add(skill);
+			_hasnegativeskills=true;
 	}
     
     public void addImmobiliseSkill(L2Skill skill)
@@ -718,6 +751,7 @@ public final class L2NpcTemplate extends L2CharTemplate
 		if (_immobiliseskills == null)
 			_immobiliseskills = new FastList<L2Skill>();
 			_immobiliseskills.add(skill);
+			_hasimmobiliseskills=true;
 	}
     
     public void addDOTSkill(L2Skill skill)
@@ -725,6 +759,7 @@ public final class L2NpcTemplate extends L2CharTemplate
 		if (_dotskills == null)
 			_dotskills = new FastList<L2Skill>();
 			_dotskills.add(skill);
+			_hasdotskills=true;
 	}
     
     public void addUniversalSkill(L2Skill skill)
@@ -732,6 +767,7 @@ public final class L2NpcTemplate extends L2CharTemplate
 		if (_universalskills == null)
 			_universalskills = new FastList<L2Skill>();
 			_universalskills.add(skill);
+			_hasuniversalskills=true;
 	}
     
     public void addCOTSkill(L2Skill skill)
@@ -739,6 +775,7 @@ public final class L2NpcTemplate extends L2CharTemplate
 		if (_cotskills == null)
 			_cotskills = new FastList<L2Skill>();
 			_cotskills.add(skill);
+			_hascotskills=true;
 	}
     
     public void addManaHealSkill(L2Skill skill)
@@ -746,148 +783,110 @@ public final class L2NpcTemplate extends L2CharTemplate
 		if (_manaskills == null)
 			_manaskills = new FastList<L2Skill>();
 			_manaskills.add(skill);
+			_hasmanaskills=true;
 	}
     public void addGeneralSkill(L2Skill skill)
 	{
 		if (_generalskills == null)
 			_generalskills = new FastList<L2Skill>();
 			_generalskills.add(skill);
+			_hasgeneralskills=true;
 	}
     
     //--------------------------------------------------------------------
     public boolean hasBuffSkill()
 	{
-		if (_buffskills != null && _buffskills.size()>0)
-			return true;
-		else return false;
+    	return _hasbuffskills;
 	}
     public boolean hasHealSkill()
 	{
-		if (_healskills != null && _healskills.size()>0)
-			return true;
-		else return false;
+    	return _hashealskills;
 	}
     
     public boolean hasResSkill()
 	{
-		if (_resskills != null && _resskills.size()>0)
-			return true;
-		else return false;
+    	return _hasresskills;
 	}
 	
     public boolean hasAtkSkill()
 	{
-		if (_atkskills != null && _atkskills.size()>0)
-			return true;
-		else return false;
+    	return _hasatkskills;
 	}
 
     public boolean hasDebuffSkill()
 	{
-		if (_debuffskills != null && _debuffskills.size()>0)
-			return true;
-		else return false;
+    	return _hasdebuffskills;
 	}
     
     public boolean hasRootSkill()
 	{
-		if (_rootskills != null && _rootskills.size()>0)
-			return true;
-		else return false;
+    	return _hasrootskills;
 	}
     
     public boolean hasSleepSkill()
 	{
-		if (_sleepskills != null && _sleepskills.size()>0)
-			return true;
-		else return false;
+    	return _hassleepskills;
 	}
     
     public boolean hasStunSkill()
 	{
-		if (_stunskills != null && _stunskills.size()>0)
-			return true;
-		else return false;
+    	return _hasstunskills;
 	}
     
     public boolean hasParalyzeSkill()
 	{
-		if (_paralyzeskills != null && _paralyzeskills.size()>0)
-			return true;
-		else return false;
+    	return _hasparalyzeskills;
 	}
     
     public boolean hasFloatSkill()
 	{
-		if (_floatskills != null && _floatskills.size()>0)
-			return true;
-		else return false;
+    	return _hasfloatskills;
 	}
     
     public boolean hasFossilSkill()
 	{
-		if (_fossilskills != null && _fossilskills.size()>0)
-			return true;
-		else return false;
+    	return _hasfossilskills;
 	}
     
     public boolean hasNegativeSkill()
 	{
-		if (_negativeskills != null && _negativeskills.size()>0)
-			return true;
-		else return false;
+    	return _hasnegativeskills;
 	}
     
     public boolean hasImmobiliseSkill()
 	{
-		if (_immobiliseskills != null && _immobiliseskills.size()>0)
-			return true;
-		else return false;
+    	return _hasimmobiliseskills;
 	}
     
     public boolean hasDOTSkill()
 	{
-		if (_dotskills != null && _dotskills.size()>0)
-			return true;
-		else return false;
+    	return _hasdotskills;
 	}
     
     public boolean hasUniversalSkill()
 	{
-		if (_universalskills != null && _universalskills.size()>0)
-			return true;
-		else return false;
+    	return _hasuniversalskills;
 	}
     
     public boolean hasCOTSkill()
 	{
-		if (_cotskills != null && _cotskills.size()>0)
-			return true;
-		else return false;
+    	return _hascotskills;
 	}
     
     public boolean hasManaHealSkill()
 	{
-		if (_manaskills != null && _manaskills.size()>0)
-			return true;
-		else return false;
+    	return _hasmanaskills;
 	}
     public boolean hasAutoLrangeSkill()
 	{
-		if (_Lrangeskills != null && _Lrangeskills.size()>0)
-			return true;
-		else return false;
+    	return _hasLrangeskills;
 	}
     public boolean hasAutoSrangeSkill()
 	{
-		if (_Srangeskills != null && _Srangeskills.size()>0)
-			return true;
-		else return false;
+    	return _hasSrangeskills;
 	}
     public boolean hasSkill()
 	{
-		if (_generalskills != null && _generalskills.size()>0)
-			return true;
-		else return false;
+    	return _hasgeneralskills;
 	}
 }

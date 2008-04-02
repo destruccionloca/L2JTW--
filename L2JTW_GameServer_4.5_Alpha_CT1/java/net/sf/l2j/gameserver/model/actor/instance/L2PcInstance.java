@@ -2987,7 +2987,9 @@ public final class L2PcInstance extends L2PlayableInstance
 		{
 			if (sendMessage)
             {
-                sendPacket(new SystemMessage(SystemMessageId.NOT_ENOUGH_ITEMS));
+				SystemMessage sm = new SystemMessage(SystemMessageId.ITEM_NOT_ENOUGH);
+	            sm.addItemName(objectId);
+				sendPacket(sm);
             }
             
 			return false;
@@ -3013,7 +3015,9 @@ public final class L2PcInstance extends L2PlayableInstance
 		{
 			if (sendMessage)
             {
-                sendPacket(new SystemMessage(SystemMessageId.NOT_ENOUGH_ITEMS));
+				SystemMessage sm = new SystemMessage(SystemMessageId.ITEM_NOT_ENOUGH);
+	            sm.addItemName(objectId);
+				sendPacket(sm);
             }
             
 			return false;
@@ -3039,7 +3043,11 @@ public final class L2PcInstance extends L2PlayableInstance
         if (item == null || item.getCount() < count || _inventory.destroyItemByItemId(process, itemId, count, this, reference) == null)
 		{
 			if (sendMessage)
-                sendPacket(new SystemMessage(SystemMessageId.NOT_ENOUGH_ITEMS));
+                {
+					SystemMessage sm = new SystemMessage(SystemMessageId.ITEM_NOT_ENOUGH);
+		            sm.addItemName(itemId);
+					sendPacket(sm);
+                }
 
 			return false;
 		}
@@ -3208,7 +3216,11 @@ public final class L2PcInstance extends L2PlayableInstance
 		if (item == null)
 		{
 			if (sendMessage)
-                sendPacket(new SystemMessage(SystemMessageId.NOT_ENOUGH_ITEMS));
+            {
+				SystemMessage sm = new SystemMessage(SystemMessageId.ITEM_NOT_ENOUGH);
+	            sm.addString("所需物品");
+				sendPacket(sm);
+            }
 
 			return false;
 		}
@@ -3274,7 +3286,7 @@ public final class L2PcInstance extends L2PlayableInstance
 		if (item == null)
 		{
 			if (sendMessage)
-                sendPacket(new SystemMessage(SystemMessageId.NOT_ENOUGH_ITEMS));
+                sendPacket(new SystemMessage(SystemMessageId.ITEM_NOT_ENOUGH));
 
 			return null;
 		}
@@ -4218,7 +4230,7 @@ public final class L2PcInstance extends L2PlayableInstance
         }
         catch (Exception e)
         {
-            _log.severe(e.toString());
+        	_log.log(Level.SEVERE, "Transformation insert info: ",e);
         }
         finally
         {
@@ -4248,7 +4260,7 @@ public final class L2PcInstance extends L2PlayableInstance
         }
         catch (Exception e)
         {
-            _log.severe(e.toString());
+        	_log.log(Level.SEVERE, "Transformation select info: ",e);
         }
         finally
         {
@@ -4273,7 +4285,7 @@ public final class L2PcInstance extends L2PlayableInstance
         }
         catch (Exception e)
         {
-            _log.severe(e.toString());
+        	_log.log(Level.SEVERE, "Transformation update info: ",e);
         }
         finally
         {
@@ -7739,15 +7751,15 @@ public final class L2PcInstance extends L2PlayableInstance
             	if (sklType == L2Skill.SkillType.SUMMON)
                 {
             		SystemMessage sm = new SystemMessage(SystemMessageId.SUMMONING_SERVITOR_COSTS_S2_S1);
-            		sm.addItemName(skill.getItemConsumeId());
             		sm.addNumber(skill.getItemConsume());
+            		sm.addItemName(skill.getItemConsumeId());
             		sendPacket(sm);
             		return;
                 }
             	else
                 {
             		// Send a System Message to the caster
-            		sendPacket(new SystemMessage(SystemMessageId.NOT_ENOUGH_ITEMS));
+            		sendPacket(new SystemMessage(SystemMessageId.ITEM_NOT_ENOUGH));
             		return;
                 }
             }

@@ -149,30 +149,30 @@ public class Pdam implements ISkillHandler
                         {
                         	if (activeChar instanceof L2PcInstance)
                         	{
-                       	SystemMessage sm = new SystemMessage(SystemMessageId.S1_WAS_UNAFFECTED_BY_S2);
-      					if(target instanceof L2NpcInstance || target instanceof L2Summon)
-      					{
-      						if(target instanceof L2NpcInstance)
-      						{
-      						if (((L2NpcInstance)target).getTemplate().serverSideName)
-      						{
-      							sm.addString(target.getName());
-      						}
-      						else
-      							sm.addNpcName(((L2NpcInstance)target).getTemplate().idTemplate);
-      						}
-      						
-      						if(target instanceof L2Summon)
-      						{
-      						if (((L2Summon)target).getTemplate().serverSideName)
-      						{
-      							sm.addString(target.getName());
-      						}
-      						else
-      							sm.addNpcName(((L2Summon)target).getTemplate().idTemplate);
-      						}
-                            sm.addSkillName(skill.getId());
-      						activeChar.sendPacket(sm);
+	                       	SystemMessage sm = new SystemMessage(SystemMessageId.S1_WAS_UNAFFECTED_BY_S2);
+	      					if(target instanceof L2NpcInstance || target instanceof L2Summon)
+	      					{
+	      						if(target instanceof L2NpcInstance)
+	      						{
+	      						if (((L2NpcInstance)target).getTemplate().serverSideName)
+	      						{
+	      							sm.addString(target.getName());
+	      						}
+	      						else
+	      							sm.addNpcName(((L2NpcInstance)target).getTemplate().idTemplate);
+	      						}
+	      						
+	      						if(target instanceof L2Summon)
+	      						{
+	      						if (((L2Summon)target).getTemplate().serverSideName)
+	      						{
+	      							sm.addString(target.getName());
+	      						}
+	      						else
+	      							sm.addNpcName(((L2Summon)target).getTemplate().idTemplate);
+	      						}
+	                            sm.addSkillName(skill.getId());
+	      						activeChar.sendPacket(sm);
       					}
       					else
       					{

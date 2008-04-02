@@ -647,12 +647,32 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
             _actor.setWalking();
             return;
         }
-        if (Config.DEBUG)_log.warning("AI - Phase 1");
+        _log.warning("AI - Phase 1");
         //Return when Attack been disable
         if(_actor.isAttackingDisabled())
         	return;
+    	// In case many mobs are trying to hit from same place, move a bit,
+		// circling around the target
+		if (!_actor.isMovementDisabled() && Rnd.nextInt(100) <= 33) // check it once per 3 seconds
+		{
+			int combinedCollision = _actor.getTemplate().collisionRadius + getAttackTarget().getTemplate().collisionRadius;
+			for (L2Object nearby : _actor.getKnownList().getKnownCharactersInRadius(10))
+			{
+				if (nearby instanceof L2Attackable
+				        && nearby != getAttackTarget())
+				{
+					int diffx = Rnd.get(combinedCollision, combinedCollision+40);
+					if (Rnd.get(10)<5) diffx = -diffx;
+					int diffy = Rnd.get(combinedCollision, combinedCollision+40);
+					if (Rnd.get(10)<5) diffy = -diffy;
+					moveTo(getAttackTarget().getX() + diffx, getAttackTarget().getY()
+					        + diffy, getAttackTarget().getZ());
+					return;
+				}
+			}
+		}
         //Dodge if its needed
-        if(((L2Attackable)_actor).getCanDodge()>0)
+        if(!_actor.isMovementDisabled() && ((L2Attackable)_actor).getCanDodge()>0)
         if (Rnd.get(100) <= ((L2Attackable)_actor).getCanDodge())
         {
             // Micht: kepping this one otherwise we should do 2 sqrt
@@ -751,7 +771,9 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
             setIntention(AI_INTENTION_ACTIVE);
             return;
         }
-        if (Config.DEBUG)_log.warning("AI - Phase 2");
+        _log.warning("AI - Phase 2 - If mob skills = null then Phase 4 begin");
+        if(_skillrender.hasSkill())
+        {
         //-------------------------------------------------------------------------------
         //Heal Condition
         if(_skillrender.hasHealSkill())
@@ -847,7 +869,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 				}
     		}
         }
-        if (Config.DEBUG)_log.warning("AI - Phase 3");
+        _log.warning("AI - Phase 3");
         //-------------------------------------------------------------------------------
         //Res Skill Condition
         if(_skillrender.hasResSkill())
@@ -924,7 +946,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 				}
     		}
         }
-        if (Config.DEBUG)_log.warning("AI - Phase 4");
+        _log.warning("AI - Phase 4");
         //-------------------------------------------------------------------------------
         //Immobilize Condition
         if((_actor.isMovementDisabled() && (dist > range || getAttackTarget().isMoving()))
@@ -937,7 +959,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         iscasting = false;
         //--------------------------------------------------------------------------------
         //Skill Use 
-        if (Config.DEBUG)_log.warning("AI - Phase 5");
+        _log.warning("AI - Phase 5");
         if(_skillrender.hasSkill())
         if(Rnd.get(100)<=((L2NpcInstance)_actor).getSkillChance())
         {
@@ -955,7 +977,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
             	Cast(skills);
 			if(iscasting)
 			{
-				if (Config.DEBUG)_log.warning("AI - Phase 5 - Random Cast: True");
+				_log.warning("AI - Phase 5 - Random Cast: True");
 				return;
 			}
 			
@@ -971,18 +993,18 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 				Cast(sk);
 				if(iscasting)
 				{
-					if (Config.DEBUG)_log.warning("AI - Phase 5 - Loop Cast: True");
+					_log.warning("AI - Phase 5 - Loop Cast: True");
 					return;
 				}
 				else continue;
     		}
         }
-        if (Config.DEBUG)_log.warning("AI - Phase 6");
+        _log.warning("AI - Phase 6");
         //--------------------------------------------------------------------------------
         //Long/Short Range skill Usage
         if(((L2NpcInstance)_actor).hasLSkill()||((L2NpcInstance)_actor).hasSSkill())
         {
-        	if (Config.DEBUG)_log.warning("AI - L/S Range Skill Task");
+        	_log.warning("AI - L/S Range Skill Task");
         	if(((L2NpcInstance)_actor).hasSSkill()&& dist2 <= 150 && Rnd.get(100) <= ((L2NpcInstance)_actor).getSSkillChance())
         	{
         		
@@ -1023,7 +1045,8 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         	}
         	
         }
-        if (Config.DEBUG)_log.warning("AI - Phase 7");
+        }
+        _log.warning("AI - Phase 7");
       //--------------------------------------------------------------------------------
       // Starts Melee or Primary Skill
         if(dist2>range || !GeoData.getInstance().canSeeTarget(_actor, getAttackTarget()))
@@ -1050,10 +1073,10 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
     
     private void Melee(int type)
     {
-    	if (Config.DEBUG)_log.warning("AI - MELEE TASk START");
+    	_log.warning("AI - MELEE TASk START");
     	if(type!=0)
     	{
-    		if (Config.DEBUG)_log.warning("AI - MELEE TASk - Primary Attack:"+type);
+    		_log.warning("AI - MELEE TASk - Primary Attack:"+type);
     		boolean check = true;
 	    	switch(type)
 	    	{
@@ -1117,14 +1140,17 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
     	}
 
     	_accessor.doAttack(getAttackTarget());
-    	if (Config.DEBUG)_log.warning("AI - MELEE TASK END");
+    	_log.warning("AI - MELEE TASK END");
     }
     private void Cast(L2Skill sk)
     {
     	if(sk == null)
     		return;
     	if(getAttackTarget() == null)
-    		setTarget(((L2Attackable)_actor).getMostHated());
+    	if(((L2Attackable)_actor).getMostHated()!=null)
+    		setAttackTarget(((L2Attackable)_actor).getMostHated());
+    	if(getAttackTarget()==null)
+    		return;
     	double dist = Math.sqrt(_actor.getPlanDistanceSq(getAttackTarget().getX(), getAttackTarget().getY()));
 	    double dist2= dist + getAttackTarget().getTemplate().collisionRadius;
 	    double range = _actor.getPhysicalAttackRange() + _actor.getTemplate().collisionRadius + getAttackTarget().getTemplate().collisionRadius;
@@ -1788,192 +1814,195 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
             return;
         }
         
-        
-    	//-------------------------------------------------------------
-        //Try to stop the target or disable the target as priority
-		if(_skillrender.hasImmobiliseSkill())
-		{
-			for(L2Skill sk:_skillrender._immobiliseskills)
+        //Check if activeChar has any skill
+        if(_skillrender.hasSkill())
+        {
+	    	//-------------------------------------------------------------
+	        //Try to stop the target or disable the target as priority
+			if(_skillrender.hasImmobiliseSkill())
 			{
-				if(sk.getMpConsume()>=_actor.getCurrentMp()
-						|| _actor.isSkillDisabled(sk.getId())
-						||(sk.getCastRange()+ _actor.getTemplate().collisionRadius + getAttackTarget().getTemplate().collisionRadius <= dist2 && !canAura(sk))
-						||(sk.isMagic()&&_actor.isMuted())
-						||(!sk.isMagic()&&_actor.isPhysicalMuted()))
+				for(L2Skill sk:_skillrender._immobiliseskills)
 				{
-					continue;
-				}
-				if(!GeoData.getInstance().canSeeTarget(_actor,getAttackTarget()))
-					continue;
-				L2Effect[] effects = (getAttackTarget()).getAllEffects();
-				for (int i = 0; effects != null && i < effects.length; i++)
-				{
-					L2Effect effect = effects[i];
-					if (effect.getSkill() == sk)
+					if(sk.getMpConsume()>=_actor.getCurrentMp()
+							|| _actor.isSkillDisabled(sk.getId())
+							||(sk.getCastRange()+ _actor.getTemplate().collisionRadius + getAttackTarget().getTemplate().collisionRadius <= dist2 && !canAura(sk))
+							||(sk.isMagic()&&_actor.isMuted())
+							||(!sk.isMagic()&&_actor.isPhysicalMuted()))
 					{
-						cancast = false;
-						break;
+						continue;
+					}
+					if(!GeoData.getInstance().canSeeTarget(_actor,getAttackTarget()))
+						continue;
+					L2Effect[] effects = (getAttackTarget()).getAllEffects();
+					for (int i = 0; effects != null && i < effects.length; i++)
+					{
+						L2Effect effect = effects[i];
+						if (effect.getSkill() == sk)
+						{
+							cancast = false;
+							break;
+						}
+					}
+					if(cancast)
+					{
+						clientStopMoving(null);
+						L2Object target = getAttackTarget();
+						setTarget(_actor);
+						_actor.doCast(sk);
+	    				setTarget(target);
+						return;
 					}
 				}
-				if(cancast)
+			}
+			//-------------------------------------------------------------
+			//Same as Above, but with Mute/FEAR etc....
+			if(_skillrender.hasCOTSkill())
+			{
+				for(L2Skill sk:_skillrender._cotskills)
 				{
+					if(sk.getMpConsume()>=_actor.getCurrentMp()
+							|| _actor.isSkillDisabled(sk.getId())
+							||(sk.getCastRange()+ _actor.getTemplate().collisionRadius + getAttackTarget().getTemplate().collisionRadius <= dist2 && !canAura(sk))
+							||(sk.isMagic()&&_actor.isMuted())
+							||(!sk.isMagic()&&_actor.isPhysicalMuted()))
+					{
+						continue;
+					}
+					if(!GeoData.getInstance().canSeeTarget(_actor,getAttackTarget()))
+						continue;
+					L2Effect[] effects = (getAttackTarget()).getAllEffects();
+					for (int i = 0; effects != null && i < effects.length; i++)
+					{
+						L2Effect effect = effects[i];
+						if (effect.getSkill() == sk)
+						{
+							cancast=false;
+							break;
+						}
+					}
+					if(cancast)
+					{
+						clientStopMoving(null);
+						L2Object target = getAttackTarget();
+						setTarget(_actor);
+						_actor.doCast(sk);
+	    				setTarget(target);
+						return;
+					}
+				}
+			}        		
+			//-------------------------------------------------------------
+			if(_skillrender.hasDebuffSkill()&&Rnd.get(10)<=2)
+			{
+				for(L2Skill sk:_skillrender._debuffskills)
+				{
+					if(sk.getMpConsume()>=_actor.getCurrentMp()
+							|| _actor.isSkillDisabled(sk.getId())
+							||(sk.getCastRange()+ _actor.getTemplate().collisionRadius + getAttackTarget().getTemplate().collisionRadius <= dist2 && !canAura(sk))
+							||(sk.isMagic()&&_actor.isMuted())
+							||(!sk.isMagic()&&_actor.isPhysicalMuted()))
+					{
+						continue;
+					}
+					if(!GeoData.getInstance().canSeeTarget(_actor,getAttackTarget()))
+						continue;
+					L2Effect[] effects = (getAttackTarget()).getAllEffects();
+					for (int i = 0; effects != null && i < effects.length; i++)
+					{
+						L2Effect effect = effects[i];
+						if (effect.getSkill() == sk)
+						{
+							cancast=false;
+							break;
+						}
+					}
+					if(cancast)
+					{
+						clientStopMoving(null);
+						L2Object target = getAttackTarget();
+						setTarget(_actor);
+						_actor.doCast(sk);
+	    				setTarget(target);
+						return;
+					}
+				}
+			}
+			//-------------------------------------------------------------
+			//Some side effect skill like CANCEL or NEGATE
+			if(_skillrender.hasNegativeSkill()&&Rnd.get(10)==1)
+			{
+				for(L2Skill sk:_skillrender._negativeskills)
+				{
+					if(sk.getMpConsume()>=_actor.getCurrentMp()
+							|| _actor.isSkillDisabled(sk.getId())
+							||(sk.getCastRange()+ _actor.getTemplate().collisionRadius + getAttackTarget().getTemplate().collisionRadius <= dist2 && !canAura(sk))
+							||(sk.isMagic()&&_actor.isMuted())
+							||(!sk.isMagic()&&_actor.isPhysicalMuted()))
+					{
+						continue;
+					}
+					if(!GeoData.getInstance().canSeeTarget(_actor,getAttackTarget()))
+						continue;
+					L2Effect[] effects = (getAttackTarget()).getAllEffects();
+					if(effects==null || effects.length == 0)
+						continue;
 					clientStopMoving(null);
 					L2Object target = getAttackTarget();
 					setTarget(_actor);
 					_actor.doCast(sk);
-    				setTarget(target);
+					setTarget(target);
 					return;
 				}
 			}
-		}
-		//-------------------------------------------------------------
-		//Same as Above, but with Mute/FEAR etc....
-		if(_skillrender.hasCOTSkill())
-		{
-			for(L2Skill sk:_skillrender._cotskills)
+			//-------------------------------------------------------------
+			//Start ATK SKILL when nothing can be done
+			if(_skillrender.hasAtkSkill())
 			{
-				if(sk.getMpConsume()>=_actor.getCurrentMp()
-						|| _actor.isSkillDisabled(sk.getId())
-						||(sk.getCastRange()+ _actor.getTemplate().collisionRadius + getAttackTarget().getTemplate().collisionRadius <= dist2 && !canAura(sk))
-						||(sk.isMagic()&&_actor.isMuted())
-						||(!sk.isMagic()&&_actor.isPhysicalMuted()))
+				for(L2Skill sk:_skillrender._atkskills)
 				{
-					continue;
-				}
-				if(!GeoData.getInstance().canSeeTarget(_actor,getAttackTarget()))
-					continue;
-				L2Effect[] effects = (getAttackTarget()).getAllEffects();
-				for (int i = 0; effects != null && i < effects.length; i++)
-				{
-					L2Effect effect = effects[i];
-					if (effect.getSkill() == sk)
+					if(sk.getMpConsume()>=_actor.getCurrentMp()
+							|| _actor.isSkillDisabled(sk.getId())
+							||(sk.getCastRange()+ _actor.getTemplate().collisionRadius + getAttackTarget().getTemplate().collisionRadius <= dist2 && !canAura(sk))
+							||(sk.isMagic()&&_actor.isMuted())
+							||(!sk.isMagic()&&_actor.isPhysicalMuted()))
 					{
-						cancast=false;
-						break;
+						continue;
 					}
-				}
-				if(cancast)
-				{
+					if(!GeoData.getInstance().canSeeTarget(_actor,getAttackTarget()))
+						continue;
 					clientStopMoving(null);
 					L2Object target = getAttackTarget();
 					setTarget(_actor);
 					_actor.doCast(sk);
-    				setTarget(target);
+					setTarget(target);
 					return;
 				}
 			}
-		}        		
-		//-------------------------------------------------------------
-		if(_skillrender.hasDebuffSkill()&&Rnd.get(10)<=2)
-		{
-			for(L2Skill sk:_skillrender._debuffskills)
+			//-------------------------------------------------------------
+			//if there is no ATK skill to use, then try Universal skill
+			if(_skillrender.hasUniversalSkill())
 			{
-				if(sk.getMpConsume()>=_actor.getCurrentMp()
-						|| _actor.isSkillDisabled(sk.getId())
-						||(sk.getCastRange()+ _actor.getTemplate().collisionRadius + getAttackTarget().getTemplate().collisionRadius <= dist2 && !canAura(sk))
-						||(sk.isMagic()&&_actor.isMuted())
-						||(!sk.isMagic()&&_actor.isPhysicalMuted()))
+				for(L2Skill sk:_skillrender._atkskills)
 				{
-					continue;
-				}
-				if(!GeoData.getInstance().canSeeTarget(_actor,getAttackTarget()))
-					continue;
-				L2Effect[] effects = (getAttackTarget()).getAllEffects();
-				for (int i = 0; effects != null && i < effects.length; i++)
-				{
-					L2Effect effect = effects[i];
-					if (effect.getSkill() == sk)
+					if(sk.getMpConsume()>=_actor.getCurrentMp()
+							|| _actor.isSkillDisabled(sk.getId())
+							||(sk.getCastRange()+ _actor.getTemplate().collisionRadius + getAttackTarget().getTemplate().collisionRadius <= dist2 && !canAura(sk))
+							||(sk.isMagic()&&_actor.isMuted())
+							||(!sk.isMagic()&&_actor.isPhysicalMuted()))
 					{
-						cancast=false;
-						break;
+						continue;
 					}
-				}
-				if(cancast)
-				{
+					if(!GeoData.getInstance().canSeeTarget(_actor,getAttackTarget()))
+						continue;
 					clientStopMoving(null);
 					L2Object target = getAttackTarget();
 					setTarget(_actor);
 					_actor.doCast(sk);
-    				setTarget(target);
+					setTarget(target);
 					return;
 				}
 			}
-		}
-		//-------------------------------------------------------------
-		//Some side effect skill like CANCEL or NEGATE
-		if(_skillrender.hasNegativeSkill()&&Rnd.get(10)==1)
-		{
-			for(L2Skill sk:_skillrender._negativeskills)
-			{
-				if(sk.getMpConsume()>=_actor.getCurrentMp()
-						|| _actor.isSkillDisabled(sk.getId())
-						||(sk.getCastRange()+ _actor.getTemplate().collisionRadius + getAttackTarget().getTemplate().collisionRadius <= dist2 && !canAura(sk))
-						||(sk.isMagic()&&_actor.isMuted())
-						||(!sk.isMagic()&&_actor.isPhysicalMuted()))
-				{
-					continue;
-				}
-				if(!GeoData.getInstance().canSeeTarget(_actor,getAttackTarget()))
-					continue;
-				L2Effect[] effects = (getAttackTarget()).getAllEffects();
-				if(effects==null || effects.length == 0)
-					continue;
-				clientStopMoving(null);
-				L2Object target = getAttackTarget();
-				setTarget(_actor);
-				_actor.doCast(sk);
-				setTarget(target);
-				return;
-			}
-		}
-		//-------------------------------------------------------------
-		//Start ATK SKILL when nothing can be done
-		if(_skillrender.hasAtkSkill())
-		{
-			for(L2Skill sk:_skillrender._atkskills)
-			{
-				if(sk.getMpConsume()>=_actor.getCurrentMp()
-						|| _actor.isSkillDisabled(sk.getId())
-						||(sk.getCastRange()+ _actor.getTemplate().collisionRadius + getAttackTarget().getTemplate().collisionRadius <= dist2 && !canAura(sk))
-						||(sk.isMagic()&&_actor.isMuted())
-						||(!sk.isMagic()&&_actor.isPhysicalMuted()))
-				{
-					continue;
-				}
-				if(!GeoData.getInstance().canSeeTarget(_actor,getAttackTarget()))
-					continue;
-				clientStopMoving(null);
-				L2Object target = getAttackTarget();
-				setTarget(_actor);
-				_actor.doCast(sk);
-				setTarget(target);
-				return;
-			}
-		}
-		//-------------------------------------------------------------
-		//if there is no ATK skill to use, then try Universal skill
-		if(_skillrender.hasUniversalSkill())
-		{
-			for(L2Skill sk:_skillrender._atkskills)
-			{
-				if(sk.getMpConsume()>=_actor.getCurrentMp()
-						|| _actor.isSkillDisabled(sk.getId())
-						||(sk.getCastRange()+ _actor.getTemplate().collisionRadius + getAttackTarget().getTemplate().collisionRadius <= dist2 && !canAura(sk))
-						||(sk.isMagic()&&_actor.isMuted())
-						||(!sk.isMagic()&&_actor.isPhysicalMuted()))
-				{
-					continue;
-				}
-				if(!GeoData.getInstance().canSeeTarget(_actor,getAttackTarget()))
-					continue;
-				clientStopMoving(null);
-				L2Object target = getAttackTarget();
-				setTarget(_actor);
-				_actor.doCast(sk);
-				setTarget(target);
-				return;
-			}
-		}
+        }
 		timepass = timepass + 1;
 		if (_actor.isMovementDisabled()|| timepass>=5)
 		{

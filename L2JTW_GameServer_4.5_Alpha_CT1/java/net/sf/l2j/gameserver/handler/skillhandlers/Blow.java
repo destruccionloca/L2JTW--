@@ -141,9 +141,11 @@ public class Blow implements ISkillHandler
 				SystemMessage sm = new SystemMessage(SystemMessageId.YOU_DID_S1_DMG);
 	            sm.addNumber((int)damage);
 	            activeChar.sendPacket(sm);
+	            
+				//Possibility of a lethal strike
+				Formulas.getInstance().calcLethalHit(activeChar, target, skill);
 			}
-			//Possibility of a lethal strike
-			Formulas.getInstance().calcLethalHit(activeChar, target, skill);
+
             
 
 			if(L2Character.CRIT_ATTACK==1)
