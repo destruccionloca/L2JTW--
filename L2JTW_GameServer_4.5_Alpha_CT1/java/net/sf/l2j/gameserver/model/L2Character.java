@@ -2882,12 +2882,10 @@ public abstract class L2Character extends L2Object
 			}
 
 
-			BroadcastFunction(effect.getStatFuncs());
 			// Remove the active skill L2effect from _effects of the L2Character
 			// The Integer key of _effects is the L2Skill Identifier that has created the effect
 			for (int i=0; i<_effects.size(); i++)
 			{
-				
 				if (_effects.get(i) == effect)
 				{
 					_effects.remove(i);
@@ -2900,126 +2898,6 @@ public abstract class L2Character extends L2Object
 		updateEffectIcons();
 	}
 
-	/*
-	public void updatetype(L2Effect effect)
-	{
-		for (int i=0; i<_effects.size(); i++)
-		{
-		BroadcastFunction(_effects.get(i).getStatFuncs());
-		}
-		
-	}
-	*/
-	
-	public void BroadcastFunction(Func[] funcs)
-	{
-		
-		_requireBroadcast = false;
-		_requirePacketSend = false;
-		for (Func f : funcs)
-		{
-			if ((	f.stat==Stats.POWER_DEFENCE||
-					f.stat==Stats.MAGIC_DEFENCE||
-					f.stat==Stats.POWER_ATTACK||
-					f.stat==Stats.MAGIC_ATTACK||
-					f.stat==Stats.POWER_ATTACK_SPEED||
-					f.stat==Stats.MAGIC_ATTACK_SPEED||
-					f.stat==Stats.RUN_SPEED||
-					f.stat==Stats.EVASION_RATE||
-					f.stat==Stats.CRITICAL_RATE||
-					f.stat==Stats.ACCURACY_COMBAT||
-					f.stat==Stats.MAX_HP||
-					f.stat==Stats.MAX_MP||
-					f.stat==Stats.MAX_CP)&& this instanceof L2PcInstance) 
-			{
-				
-				if(f.stat==Stats.POWER_ATTACK_SPEED||f.stat==Stats.RUN_SPEED)
-					_requireBroadcast = true;
-				else
-					_requirePacketSend = true;
-				
-				//_log.warning("PacketSend:"+_requirePacketSend+" Broadcast:"+_requireBroadcast);
-			}
-		}
-			
-			
-			
-			if(_requirePacketSend&&!_requireBroadcast)
-			{
-				StatusUpdate su = new StatusUpdate(getObjectId());
-				for (Func f : funcs)
-				{
-						if(f.stat==Stats.POWER_DEFENCE)
-						{
-							su.addAttribute(StatusUpdate.P_DEF, getPDef(null));
-						}
-						if(f.stat==Stats.MAGIC_DEFENCE)
-						{
-							su.addAttribute(StatusUpdate.M_DEF, getMDef(null,null));
-						}
-						if(f.stat==Stats.POWER_ATTACK)
-						{
-							su.addAttribute(StatusUpdate.P_ATK, getPAtk(null));
-						}
-						if(f.stat==Stats.MAGIC_ATTACK)
-						{
-							su.addAttribute(StatusUpdate.M_ATK, getMAtk(null,null));
-						}
-						if(f.stat==Stats.EVASION_RATE)
-						{
-							su.addAttribute(StatusUpdate.EVASION, getEvasionRate(null));
-						}
-						if(f.stat==Stats.CRITICAL_RATE)
-						{
-							su.addAttribute(StatusUpdate.CRITICAL, getCriticalHit(null, null));
-						}
-						if(f.stat==Stats.POWER_ATTACK_SPEED)
-						{
-							su.addAttribute(StatusUpdate.ATK_SPD, getPAtkSpd());
-							//su.addAttribute(StatusUpdate.ATK_SPD_MP, 2);
-						}
-						if(f.stat==Stats.MAGIC_ATTACK_SPEED)
-						{
-							su.addAttribute(StatusUpdate.CAST_SPD, getMAtkSpd());
-						}
-						if(f.stat==Stats.RUN_SPEED)
-						{
-							//su.addAttribute(StatusUpdate.RUN_SPD, getRunSpeed());
-							//su.addAttribute(StatusUpdate.RUN_SPD_MP, 5);
-							
-						}
-						if(f.stat==Stats.ACCURACY_COMBAT)
-						{
-							su.addAttribute(StatusUpdate.ACCURACY, getAccuracy());
-						}
-						if(f.stat==Stats.MAX_HP)
-						{
-							su.addAttribute(StatusUpdate.MAX_HP, getMaxHp());
-						}
-						if(f.stat==Stats.MAX_MP)
-						{
-							su.addAttribute(StatusUpdate.MAX_MP, getMaxMp());
-						}
-						if(f.stat==Stats.MAX_CP)
-						{
-							su.addAttribute(StatusUpdate.MAX_CP, getMaxCp());
-						}
-
-						
-							
-						
-				}
-		    	sendPacket(su);
-				
-
-			}
-			
-			if (_requireBroadcast && this instanceof L2PcInstance) 
-				((L2PcInstance)this).broadcastUserInfoMultiplier();
-			
-			_requireBroadcast  = false;
-			_requirePacketSend = false;
-	}
 	/**
 	 * Active abnormal effects flags in the binary mask and send Server->Client UserInfo/CharInfo packet.<BR><BR>
 	 */
@@ -3476,19 +3354,21 @@ public abstract class L2Character extends L2Object
     {
         updateEffectIcons(false);
     }
-    /** 
- 	* Updates Effect Icons for this character(palyer/summon) and his party if any<BR> 
- 	*  
- 	* Overriden in:<BR> 
- 	* L2PcInstance<BR> 
- 	*L2Summon<BR> 
- 	*  
- 	* @param partyOnly 
- 	*/ 
- 	public void updateEffectIcons(boolean partyOnly) 
- 	{ 
- 	// overriden 
- 	} 
+    
+    /**
+     * Updates Effect Icons for this character(palyer/summon) and his party if any<BR>
+     * 
+     * Overriden in:<BR>
+     * L2PcInstance<BR>
+     * L2Summon<BR>
+     * 
+     * @param partyOnly
+     */
+	public void updateEffectIcons(boolean partyOnly)
+	{
+        // overriden
+	}
+
 	// Property - Public
 	/**
 	 * Return a map of 16 bits (0x0000) containing all abnormal effect in progress for this L2Character.<BR><BR>
@@ -3803,7 +3683,7 @@ public abstract class L2Character extends L2Object
 	private int     _attackEndTime;
 	private int     _attacking;
 	private int     _disableBowAttackEndTime;
-	private int     _disableCrossBowAttackEndTime;
+    private int     _disableCrossBowAttackEndTime;
 
 
 	/** Table of calculators containing all standard NPC calculator (ex : ACCURACY_COMBAT, EVASION_RATE */
@@ -3921,120 +3801,15 @@ public abstract class L2Character extends L2Object
 	 */
 	public final synchronized void addStatFuncs(Func[] funcs)
 	{
-
-		//_log.warning("addStatFuncs");
-		_requireBroadcast = false;
-		_requirePacketSend = false;
-
+		
+		FastList<Stats> modifiedStats = new FastList<Stats>();
+		
 		for (Func f : funcs)
-
 		{
-			if ((	f.stat==Stats.POWER_DEFENCE||
-					f.stat==Stats.MAGIC_DEFENCE||
-					f.stat==Stats.POWER_ATTACK||
-					f.stat==Stats.MAGIC_ATTACK||
-					f.stat==Stats.POWER_ATTACK_SPEED||
-					f.stat==Stats.MAGIC_ATTACK_SPEED||
-					f.stat==Stats.RUN_SPEED||
-					f.stat==Stats.EVASION_RATE||
-					f.stat==Stats.CRITICAL_RATE||
-					f.stat==Stats.ACCURACY_COMBAT||
-					f.stat==Stats.MAX_HP||
-					f.stat==Stats.MAX_MP||
-					f.stat==Stats.MAX_CP)&& this instanceof L2PcInstance) 
-			{
-				
-				if(f.stat==Stats.POWER_ATTACK_SPEED||f.stat==Stats.RUN_SPEED)
-					_requireBroadcast = true;
-				else
-					_requirePacketSend = true;
-				
-				//_log.warning("PacketSend:"+_requirePacketSend+" Broadcast:"+_requireBroadcast);
-			}
-
+			modifiedStats.add(f.stat);
 			addStatFunc(f);
 		}
-
-		if(_requirePacketSend&&!_requireBroadcast)
-		{
-			StatusUpdate su = new StatusUpdate(getObjectId());
-			for (Func f : funcs)
-			{
-					if(f.stat==Stats.POWER_DEFENCE)
-					{
-						su.addAttribute(StatusUpdate.P_DEF, getPDef(null));
-					}
-					if(f.stat==Stats.MAGIC_DEFENCE)
-					{
-						su.addAttribute(StatusUpdate.M_DEF, getMDef(null,null));
-					}
-					if(f.stat==Stats.POWER_ATTACK)
-					{
-						su.addAttribute(StatusUpdate.P_ATK, getPAtk(null));
-					}
-					if(f.stat==Stats.MAGIC_ATTACK)
-					{
-						su.addAttribute(StatusUpdate.M_ATK, getMAtk(null,null));
-					}
-					if(f.stat==Stats.EVASION_RATE)
-					{
-						su.addAttribute(StatusUpdate.EVASION, getEvasionRate(null));
-					}
-					if(f.stat==Stats.CRITICAL_RATE)
-					{
-						su.addAttribute(StatusUpdate.CRITICAL, getCriticalHit(null, null));
-					}
-					if(f.stat==Stats.POWER_ATTACK_SPEED)
-					{
-						su.addAttribute(StatusUpdate.ATK_SPD, getPAtkSpd());
-						//su.addAttribute(StatusUpdate.ATK_SPD_MP, 2);
-					}
-					if(f.stat==Stats.MAGIC_ATTACK_SPEED)
-					{
-						su.addAttribute(StatusUpdate.CAST_SPD, getMAtkSpd());
-					}
-					if(f.stat==Stats.RUN_SPEED)
-					{
-						//su.addAttribute(StatusUpdate.RUN_SPD, getRunSpeed());
-						//su.addAttribute(StatusUpdate.RUN_SPD_MP, 5);
-						
-					}
-					if(f.stat==Stats.ACCURACY_COMBAT)
-					{
-						su.addAttribute(StatusUpdate.ACCURACY, getAccuracy());
-					}
-					if(f.stat==Stats.MAX_HP)
-					{
-						su.addAttribute(StatusUpdate.MAX_HP, getMaxHp());
-					}
-					if(f.stat==Stats.MAX_MP)
-					{
-						su.addAttribute(StatusUpdate.MAX_MP, getMaxMp());
-					}
-					if(f.stat==Stats.MAX_CP)
-					{
-						su.addAttribute(StatusUpdate.MAX_CP, getMaxCp());
-					}
-
-					
-						
-					
-			}
-	    	sendPacket(su);
-			
-				
-				
-			
-		}
-		if (_requireBroadcast && this instanceof L2PcInstance) 
-			((L2PcInstance)this).broadcastUserInfoMultiplier();
-		
-		_requireBroadcast  = false;
-		_requirePacketSend = false;
-		//---------------------------
-		
-		//if (funcs.length > 0) updateStats();
-
+		broadcastModifiedStats(modifiedStats);
 	}
 
 

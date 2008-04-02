@@ -440,7 +440,6 @@ public class L2Attackable extends L2NpcInstance
      * @param killer The L2Character that has killed the L2Attackable
      *
      */
-
     @Override
 	public boolean doDie(L2Character killer)
     {
