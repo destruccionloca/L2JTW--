@@ -21,6 +21,7 @@ package net.sf.l2j.gameserver.instancemanager;
 
 import java.util.logging.Logger;
 import java.util.concurrent.ScheduledFuture;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import javolution.util.FastList;
@@ -37,12 +38,14 @@ import net.sf.l2j.gameserver.model.L2Spawn;
 import net.sf.l2j.gameserver.model.actor.instance.L2GrandBossInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
-import net.sf.l2j.gameserver.model.entity.GrandBossState;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
+import net.sf.l2j.gameserver.templates.StatsSet;
 import net.sf.l2j.gameserver.serverpackets.CreatureSay;
 import net.sf.l2j.gameserver.serverpackets.Earthquake;
 import net.sf.l2j.gameserver.serverpackets.SocialAction;
 import net.sf.l2j.util.Rnd;
+import net.sf.l2j.gameserver.model.actor.status.GrandBossStatus;
+import net.sf.l2j.gameserver.instancemanager.GrandBossManager;
 
 /**
  *
@@ -118,12 +121,14 @@ public class BaiumManager
     protected ScheduledFuture<?> _SpeakTask = null;
 
     // status in lair.
-    protected GrandBossState _State = new GrandBossState(29020);
     protected String _ZoneType;
     protected String _QuestName;
     protected long _LastAttackTime = 0;
-    protected String _Words = "Don't obstruct my sleep! Die!";
+    protected String _Words = "竟敢妨礙我的睡眠! 去死吧!";
     //protected String _Words = ",Don't obstruct my sleep! Die!";
+    protected StatsSet _StateSet;
+    protected int _Alive;
+    protected int _BossId = 29020;
 
     // location of banishment
     private final int _BanishmentLocation[][] =
@@ -151,6 +156,8 @@ public class BaiumManager
     	_PlayersInLair.clear();
         _ZoneType = "LairofBaium";
         _QuestName = "baium";
+        _StateSet = GrandBossManager.getInstance().getStatsSet(_BossId);
+        _Alive = GrandBossManager.getInstance().getBossStatus(_BossId);
 
         // setting spawn data of monsters.
         try
@@ -252,27 +259,22 @@ public class BaiumManager
             _log.warning(e.getMessage());
         }
 
-        _log.info("BaiumManager : State of Baium is " + _State.getState() + ".");
-        if (_State.getState().equals(GrandBossState.StateEnum.NOTSPAWN))
+        _log.info("BaiumManager : State of Baium is " + _Alive + ".");
+        if (_Alive == GrandBossStatus.NOTSPAWN)
         	_StatueofBaiumSpawn.doSpawn();
-        else if (_State.getState().equals(GrandBossState.StateEnum.ALIVE))
+        else if (_Alive == GrandBossStatus.ALIVE)
         {
-        	_State.setState(GrandBossState.StateEnum.NOTSPAWN);
-        	_State.update();
+        	_Alive = GrandBossStatus.NOTSPAWN;
+        	GrandBossManager.getInstance().setBossStatus(_BossId, _Alive);
+        	GrandBossManager.getInstance().save();
         	_StatueofBaiumSpawn.doSpawn();
         }
-        else if (_State.getState().equals(GrandBossState.StateEnum.INTERVAL) || _State.getState().equals(GrandBossState.StateEnum.DEAD))
+        else if (_Alive == GrandBossStatus.INTERVAL || _Alive == GrandBossStatus.DEAD)
         	setInetrvalEndTask();
 
-		Date dt = new Date(_State.getRespawnDate());
+		Date dt = new Date(_StateSet.getLong("respawn_time"));
         _log.info("BaiumManager : Next spawn date of Baium is " + dt + ".");
         _log.info("BaiumManager : Init BaiumManager.");
-    }
-
-    // return Baium state.
-    public GrandBossState.StateEnum getState()
-    {
-    	return _State.getState();
     }
 
     // return list of intruders.
@@ -329,11 +331,12 @@ public class BaiumManager
         L2GrandBossInstance baium = (L2GrandBossInstance)baiumSpawn.doSpawn();
         _Monsters.add(baium);
 
-        _State.setRespawnDate(
-        		Rnd.get(Config.FWB_FIXINTERVALOFBAIUM,Config.FWB_FIXINTERVALOFBAIUM + Config.FWB_RANDOMINTERVALOFBAIUM)
-        		+ Config.FWB_ACTIVITYTIMEOFBAIUM);
-        _State.setState(GrandBossState.StateEnum.ALIVE);
-		_State.update();
+		_StateSet.set("respawn_time", Calendar.getInstance().getTimeInMillis() + Rnd.get(Config.FWB_FIXINTERVALOFBAIUM,Config.FWB_FIXINTERVALOFBAIUM + Config.FWB_RANDOMINTERVALOFBAIUM) + Config.FWB_ACTIVITYTIMEOFBAIUM);
+    	_Alive = GrandBossStatus.ALIVE;
+    	GrandBossManager.getInstance().setBossStatus(_BossId, _Alive);
+    	GrandBossManager.getInstance().setStatsSet(_BossId, _StateSet);
+    	GrandBossManager.getInstance().save();
+    	_log.info("BaiumManager : Spawn Baium.");
 
 		// set last attack time.
 		setLastAttackTime();
@@ -390,7 +393,7 @@ public class BaiumManager
     // Whether it lairs is confirmed.
     public boolean isEnableEnterToLair()
     {
-    	if(_State.getState().equals(GrandBossState.StateEnum.NOTSPAWN))
+       	if(_Alive == GrandBossStatus.NOTSPAWN)
     		return true;
     	else
     		return false;
@@ -409,7 +412,7 @@ public class BaiumManager
 		{
 			// player is must be alive and stay inside of lair.
 			if (!pc.isDead()
-					&& CustomZoneManager.getInstance().checkIfInZone(_ZoneType, pc))
+					&& GrandBossManager.getInstance().checkIfInZone(_ZoneType, pc))
 			{
 				return false;
 			}
@@ -423,7 +426,7 @@ public class BaiumManager
     	for(L2PcInstance pc : _PlayersInLair)
     	{
     		if(pc.getQuestState(_QuestName) != null) pc.getQuestState(_QuestName).exitQuest(true);
-    		if(CustomZoneManager.getInstance().checkIfInZone(_ZoneType, pc))
+    		if(GrandBossManager.getInstance().checkIfInZone(_ZoneType, pc))
     		{
         		int driftX = Rnd.get(-80,80);
         		int driftY = Rnd.get(-80,80);
@@ -443,7 +446,7 @@ public class BaiumManager
 
     	public void run()
     	{
-    		if(_State.getState().equals(GrandBossState.StateEnum.DEAD))
+    		if(_Alive == GrandBossStatus.DEAD)
     			setInetrvalEndTask();
     		else
     			sleepBaium();
@@ -584,16 +587,15 @@ public class BaiumManager
     {
 		setUnspawn();
 
-		// init state of Baium's lair.
-    	if (!_State.getState().equals(GrandBossState.StateEnum.INTERVAL))
+		if (_Alive != GrandBossStatus.INTERVAL)
     	{
-            _State.setRespawnDate(Rnd.get(Config.FWB_FIXINTERVALOFBAIUM,Config.FWB_FIXINTERVALOFBAIUM + Config.FWB_RANDOMINTERVALOFBAIUM));
-    		_State.setState(GrandBossState.StateEnum.INTERVAL);
-    		_State.update();
+        	_Alive = GrandBossStatus.INTERVAL;
+        	GrandBossManager.getInstance().setBossStatus(_BossId, _Alive);
+        	GrandBossManager.getInstance().save();
     	}
 
-    	_IntervalEndTask = ThreadPoolManager.getInstance().scheduleGeneral(
-            	new IntervalEnd(),_State.getInterval());
+    	_IntervalEndTask = ThreadPoolManager.getInstance().scheduleGeneral(new IntervalEnd(),GrandBossManager.getInstance().getInterval(_BossId));
+		_log.info("BaiumManager : Interval START.");
     }
 
     // at end of interval.
@@ -605,24 +607,39 @@ public class BaiumManager
 
     	public void run()
     	{
-    		_PlayersInLair.clear();
-    		_State.setState(GrandBossState.StateEnum.NOTSPAWN);
-    		_State.update();
-
-    		// statue of Baium respawn.
-    		_StatueofBaiumSpawn.doSpawn();
+    		doIntervalEnd();
     	}
+    }
+
+    protected void doIntervalEnd()
+    {
+		_PlayersInLair.clear();
+    	_Alive = GrandBossStatus.NOTSPAWN;
+    	GrandBossManager.getInstance().setBossStatus(_BossId, _Alive);
+    	GrandBossManager.getInstance().save();
+
+		// statue of Baium respawn.
+		_StatueofBaiumSpawn.doSpawn();
+
+		_log.info("BaiumManager : Interval END.");
     }
 
     // setting teleport cube spawn task.
     public void setCubeSpawn()
     {
-        _State.setState(GrandBossState.StateEnum.DEAD);
-		_State.update();
+    	_Alive = GrandBossStatus.DEAD;
+    	_StateSet.set("respawn_time", Calendar.getInstance().getTimeInMillis() + Rnd.get(Config.FWB_FIXINTERVALOFBAIUM,Config.FWB_FIXINTERVALOFBAIUM + Config.FWB_RANDOMINTERVALOFBAIUM));
+    	GrandBossManager.getInstance().setBossStatus(_BossId, _Alive);
+    	GrandBossManager.getInstance().setStatsSet(_BossId, _StateSet);
+    	GrandBossManager.getInstance().save();
 
 		ascensionArcAngel();
 
     	_CubeSpawnTask = ThreadPoolManager.getInstance().scheduleGeneral(new CubeSpawn(),10000);
+
+    	Date dt = new Date(_StateSet.getLong("respawn_time"));
+        _log.info("BaiumManager : Baium is dead.");
+        _log.info("BaiumManager : Next spawn date of Baium is " + dt + ".");
     }
 
     // update knownlist.
@@ -752,7 +769,7 @@ public class BaiumManager
     	public void run()
     	{
     		if (_target != null)
-    			_target.reduceCurrentHp(100000 + Rnd.get(_target.getMaxHp()/2,_target.getMaxHp()),_boss);
+    			_target.reduceCurrentHp(_target.getMaxHp() + Rnd.get(_target.getMaxHp()/2,_target.getMaxHp()),_boss);
     	}
     }
 
@@ -762,11 +779,14 @@ public class BaiumManager
     	setUnspawn();
 
     	_PlayersInLair.clear();
-		_State.setState(GrandBossState.StateEnum.NOTSPAWN);
-		_State.update();
+    	_Alive = GrandBossStatus.NOTSPAWN;
+    	GrandBossManager.getInstance().setBossStatus(_BossId, _Alive);
+    	GrandBossManager.getInstance().save();
 
 		// statue of Baium respawn.
 		_StatueofBaiumSpawn.doSpawn();
+
+		_log.info("BaiumManager : Sleep Baium.");
     }
 
     public void setLastAttackTime()
@@ -782,7 +802,7 @@ public class BaiumManager
 
     	public void run()
     	{
-    		if(_State.getState().equals(GrandBossState.StateEnum.ALIVE))
+    		if(_Alive == GrandBossStatus.ALIVE)
     		{
         		if(_LastAttackTime + Config.FWB_LIMITUNTILSLEEP < System.currentTimeMillis())
         			sleepBaium();

@@ -58,49 +58,49 @@ public class L2SepulcherNpcInstance extends L2NpcInstance
 {
     protected static Logger _log = Logger.getLogger(L2SepulcherNpcInstance.class.getName());
 
-
+    // ‰ï“°–å”Ô‚ÆƒhƒA‚Ì‘g‚İ?‚í‚¹(<–å”Ô‚ÌIDAƒhƒA‚ÌID>)
     protected static Map<Integer,Integer> _HallGateKeepers = new FastMap<Integer,Integer>();
 
-
+    // ‰ï“°‚Ì”à‚ğ•Â‚ß‚éƒ^ƒXƒN
     protected Future _CloseTask = null;
-
+    // “ä‚Ì?‚ğoŒ»‚³‚¹‚éƒ^ƒXƒN
     protected Future _SpawnNextMysteriousBoxTask = null;
-
+    // ??ƒXƒ^[‚ğoŒ»‚³‚¹‚éƒ^ƒXƒN
     protected Future _SpawnMonsterTask = null;
     
-
-    private final String _HTML_FILE_PATH = "data/html/four_sepulcher/";
+    // ‰ï˜b—pHTMLƒpƒX
+    private final String _HTML_FILE_PATH = "data/html/SepulcherNpc/";
     
-
+    // ‰ï“°‚ÌŒ®
     private final int _HallsKey = 7260;
 
-  
+    // ƒR?ƒXƒg?ƒNƒ^[
     public L2SepulcherNpcInstance(int objectID, L2NpcTemplate template)
     {
         super(objectID, template);
 
-        //
+        // ‰ï“°–å”Ô‚ÆƒhƒA‚Ì‘g‚İ?‚í‚¹‚ğì¬
         _HallGateKeepers.clear();
-        _HallGateKeepers.put(31925, 25150012);  
-        _HallGateKeepers.put(31926, 25150013); 
-        _HallGateKeepers.put(31927, 25150014); 
-        _HallGateKeepers.put(31928, 25150015);  
-        _HallGateKeepers.put(31929, 25150016);  
-        _HallGateKeepers.put(31930, 25150002);  
-        _HallGateKeepers.put(31931, 25150003);  
-        _HallGateKeepers.put(31932, 25150004);  
-        _HallGateKeepers.put(31933, 25150005);  
-        _HallGateKeepers.put(31934, 25150006); 
-        _HallGateKeepers.put(31935, 25150032);
-        _HallGateKeepers.put(31936, 25150033); 
-        _HallGateKeepers.put(31937, 25150034); 
-        _HallGateKeepers.put(31938, 25150035); 
-        _HallGateKeepers.put(31939, 25150036);  
-        _HallGateKeepers.put(31940, 25150022);  
-        _HallGateKeepers.put(31941, 25150023); 
-        _HallGateKeepers.put(31942, 25150024);  
-        _HallGateKeepers.put(31943, 25150025);  
-        _HallGateKeepers.put(31944, 25150026);  
+        _HallGateKeepers.put(31925, 25150012);  // ª?Ò‚Ì—ì•_F’jİ‚Ì‰ï“°–å”Ô
+        _HallGateKeepers.put(31926, 25150013);  // ª?Ò‚Ì—ì•_Fqİ‚Ì‰ï“°–å”Ô
+        _HallGateKeepers.put(31927, 25150014);  // ª?Ò‚Ì—ì•_F?İ‚Ì‰ï“°–å”Ô
+        _HallGateKeepers.put(31928, 25150015);  // ª?Ò‚Ì—ì•_FŒòİ‚Ì‰ï“°–å”Ô
+        _HallGateKeepers.put(31929, 25150016);  // ª?Ò‚Ì—ì•_FŒöİ‚Ì‰ï“°–å”Ô
+        _HallGateKeepers.put(31930, 25150002);  // x”zÒ‚Ì—ì•_F’jİ‚Ì‰ï“°–å”Ô
+        _HallGateKeepers.put(31931, 25150003);  // x”zÒ‚Ì—ì•_Fqİ‚Ì‰ï“°–å”Ô
+        _HallGateKeepers.put(31932, 25150004);  // x”zÒ‚Ì—ì•_F?İ‚Ì‰ï“°–å”Ô
+        _HallGateKeepers.put(31933, 25150005);  // x”zÒ‚Ì—ì•_FŒòİ‚Ì‰ï“°–å”Ô
+        _HallGateKeepers.put(31934, 25150006);  // x”zÒ‚Ì—ì•_FŒöİ‚Ì‰ï“°–å”Ô
+        _HallGateKeepers.put(31935, 25150032);  // ‘åŒ«Ò‚Ì—ì•_F’jİ‚Ì‰ï“°–å”Ô
+        _HallGateKeepers.put(31936, 25150033);  // ‘åŒ«Ò‚Ì—ì•_Fqİ‚Ì‰ï“°–å”Ô
+        _HallGateKeepers.put(31937, 25150034);  // ‘åŒ«Ò‚Ì—ì•_F?İ‚Ì‰ï“°–å”Ô
+        _HallGateKeepers.put(31938, 25150035);  // ‘åŒ«Ò‚Ì—ì•_FŒòİ‚Ì‰ï“°–å”Ô
+        _HallGateKeepers.put(31939, 25150036);  // ‘åŒ«Ò‚Ì—ì•_FŒöİ‚Ì‰ï“°–å”Ô
+        _HallGateKeepers.put(31940, 25150022);  // R”»Ò‚Ì—ì•_F’jİ‚Ì‰ï“°–å”Ô
+        _HallGateKeepers.put(31941, 25150023);  // R”»Ò‚Ì—ì•_Fqİ‚Ì‰ï“°–å”Ô
+        _HallGateKeepers.put(31942, 25150024);  // R”»Ò‚Ì—ì•_F?İ‚Ì‰ï“°–å”Ô
+        _HallGateKeepers.put(31943, 25150025);  // R”»Ò‚Ì—ì•_FŒòİ‚Ì‰ï“°–å”Ô
+        _HallGateKeepers.put(31944, 25150026);  // R”»Ò‚Ì—ì•_FŒöİ‚Ì‰ï“°–å”Ô
 
         if(_CloseTask != null) _CloseTask.cancel(true);
         if(_SpawnNextMysteriousBoxTask != null) _SpawnNextMysteriousBoxTask.cancel(true);
@@ -132,7 +132,7 @@ public class L2SepulcherNpcInstance extends L2NpcInstance
         super.deleteMe();
     }
 
-
+    // ƒAƒNƒV??
     public void onAction(L2PcInstance player)
     {
         // Check if the L2PcInstance already target the L2NpcInstance
@@ -215,10 +215,10 @@ public class L2SepulcherNpcInstance extends L2NpcInstance
         }
     }
 
-
+    // ƒAƒNƒV??Às
     private void doAction(L2PcInstance player)
     {
-
+    	// ?‚ñ‚Å‚¢‚éê?‚Í‰½‚à‚µ‚È‚¢
         if(isDead())
         {
             player.sendPacket(ActionFailed.STATIC_PACKET);
@@ -227,7 +227,7 @@ public class L2SepulcherNpcInstance extends L2NpcInstance
         
         switch(getNpcId())
         {
-
+            // “ä‚Ì?‚È‚ç‚ÎA?‚ñ‚ÅMob‚ğ—N‚©‚¹‚é
             case 31468:
             case 31469:
             case 31470:
@@ -253,7 +253,8 @@ public class L2SepulcherNpcInstance extends L2NpcInstance
                 _SpawnMonsterTask = 
                 	ThreadPoolManager.getInstance().scheduleEffect(new SpawnMonster(getNpcId()),3500); 
                 break;
-
+                
+            // Œ®‚Ì?‚È‚ç‚ÎA?‚ñ‚ÅŒ®‚ğPC‚É“n‚·
             case 31455:
             case 31456:
             case 31457:
@@ -271,13 +272,14 @@ public class L2SepulcherNpcInstance extends L2NpcInstance
 				player.addItem("Quest", _HallsKey, 1, player, true);
                 break;
 
-
+                // ‚»‚êˆÈŠO‚Í?’Ê‚É‰ï˜b‚·‚é
             default:
                 showChatWindow(player,0);
         }
         player.sendPacket(ActionFailed.STATIC_PACKET);
     }
     
+    // ƒ`?ƒbƒg—pHTMLƒtƒ@ƒC?ƒpƒX‚Ìæ“¾
     public String getHtmlPath(int npcId, int val)
     {
         String pom = "";
@@ -293,7 +295,7 @@ public class L2SepulcherNpcInstance extends L2NpcInstance
         return _HTML_FILE_PATH + pom + ".htm";
     }
 
-
+    // ƒ`?ƒbƒg?•\¦
     public void showChatWindow(L2PcInstance player, int val)
     {
         String filename = getHtmlPath(getNpcId(),val);
@@ -301,10 +303,10 @@ public class L2SepulcherNpcInstance extends L2NpcInstance
         html.setFile(filename);
         html.replace("%objectId%", String.valueOf(getObjectId()));
         player.sendPacket(html);
-        player.sendPacket(ActionFailed.STATIC_PACKET);
+        player.sendPacket( ActionFailed.STATIC_PACKET );
     }
     
-
+    // ƒoƒCƒpƒXƒRƒ}?ƒh??
     public void onBypassFeedback(L2PcInstance player, String command)
     {
         if (player == null) return;
@@ -317,7 +319,7 @@ public class L2SepulcherNpcInstance extends L2NpcInstance
         {
             if (isBusy())
             {
-                player.sendPacket(ActionFailed.STATIC_PACKET);
+                player.sendPacket( ActionFailed.STATIC_PACKET );
                 
                 NpcHtmlMessage html = new NpcHtmlMessage(getObjectId());
                 html.setFile("data/html/npcbusy.htm");
@@ -326,7 +328,7 @@ public class L2SepulcherNpcInstance extends L2NpcInstance
                 html.replace("%playername%", player.getName());
                 player.sendPacket(html);
             }
-
+            // ƒ`?ƒbƒg
             else if (command.startsWith("Chat"))
             {
                 int val = 0;
@@ -337,38 +339,38 @@ public class L2SepulcherNpcInstance extends L2NpcInstance
                 } catch (NumberFormatException nfe) {}
                 showChatWindow(player, val);
             }
-
+            // ‰ï“°‚Ì”à‚ğŠJ‚­
             else if (command.startsWith("open_gate"))
             {
                 L2ItemInstance HallsKey = player.getInventory().getItemByItemId(_HallsKey);
-
+                // ‰ï“°‚ÌŒ®‚ğ?‚Á‚Ä‚¢‚ÄA‚©‚ÂA—ì•_U—ª?ŠÔ‚Å?‚ê‚ÎA”à‚ÍŠJ‚­
                 if(HallsKey != null && FourSepulchersManager.getInstance().IsAttackTime())
                 {
                     switch(getNpcId())
                     {
-
+                    	// Œöİ‚ÌŠX“¹–å”Ô‚Ìê?‚Íƒn?ƒV?ƒV?ƒh[‚ğoŒ»‚³‚¹‚éB
                     	case 31929:
                     	case 31934:
                     	case 31939:
                     	case 31944:
                     		FourSepulchersManager.getInstance().SpawnShadow(getNpcId());
                     	default:
-
+                        	// ”à‚ğŠJ‚¯‚é
                             OpenNextDoor(getNpcId());
-
+                            // ‰ï“°‚ÌŒ®‚ğƒC?ƒx?ƒg?‚©‚çÁ‚·
                             player.destroyItemByItemId("Quest", _HallsKey, HallsKey.getCount(), player, true);
                     }                	
                 }
                 else
                 {
         			{
-        				//SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-        				//sm.addString("©|¥¼¹F¨ì©Ò»İ­nªº±ø¥ó");
-        				//player.sendPacket(sm);
+        				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
+        				sm.addString("ğ?‚ğ?‚½‚µ‚Ä‚¢‚È‚¢‚½‚ßA“üê‚ª?”Û‚³‚ê‚Ü‚µ‚½B");
+        				player.sendPacket(sm);
         			}
                 }
             }
-
+            // —ì•_“à‚É“ü‚é
             else if (command.startsWith("Entry"))
             {
             	FourSepulchersManager.getInstance().Entry(getNpcId(),player);
@@ -380,18 +382,19 @@ public class L2SepulcherNpcInstance extends L2NpcInstance
         }
     }
 
+    // ?‚Ì‰ï“°‚ÌƒhƒA‚ğŠJ‚¯‚é
     public void OpenNextDoor(int npcId)
     {
         int DoorId = _HallGateKeepers.get(npcId).intValue();
         DoorTable _doorTable = DoorTable.getInstance();
         _doorTable.getDoor(DoorId).openMe();
         
-
+        // 10•bŒã‚É•Â‚¶‚é
         if(_CloseTask != null) _CloseTask.cancel(true);
         _CloseTask = ThreadPoolManager.getInstance().scheduleEffect(new CloseNextDoor(npcId,DoorId),10000);
     }
 
-   
+    // ‰ï“°‚ÌƒhƒA‚ğ•Â‚¶‚é
     private class CloseNextDoor implements Runnable
     {
         final DoorTable _DoorTable = DoorTable.getInstance();
@@ -415,12 +418,13 @@ public class L2SepulcherNpcInstance extends L2NpcInstance
                 _log.warning(e.getMessage());
             }
             
-            
+            // “ä‚Ì?‚ğoŒ»‚³‚¹‚é(•s³‚Èi“üŒo˜H‚©‚ç‚ÌU—ª‚ğ–h‚®‚½‚ßAƒhƒA‚ª•Â‚Ü‚ç‚È‚¢‚ÆoŒ»‚µ‚È‚¢)
             if(_SpawnNextMysteriousBoxTask != null) _SpawnNextMysteriousBoxTask.cancel(true);
             _SpawnNextMysteriousBoxTask = ThreadPoolManager.getInstance().scheduleEffect(new SpawnNextMysteriousBox(_NpcId),10000);
         }
     }
 
+    // “ä‚Ì?‚ğoŒ»‚³‚¹‚éƒ^ƒXƒN
     private class SpawnNextMysteriousBox implements Runnable
     {
     	private int _NpcId;
@@ -434,6 +438,7 @@ public class L2SepulcherNpcInstance extends L2NpcInstance
         }
     }
 
+    // ??ƒXƒ^[‚ğoŒ»‚³‚¹‚éƒ^ƒXƒN
     private class SpawnMonster implements Runnable
     {
     	private int _NpcId;

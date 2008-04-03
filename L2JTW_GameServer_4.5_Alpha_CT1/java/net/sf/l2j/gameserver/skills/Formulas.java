@@ -43,7 +43,6 @@ import net.sf.l2j.gameserver.skills.conditions.ConditionUsingItemType;
 import net.sf.l2j.gameserver.skills.conditions.ConditionPlayerState.CheckPlayerState;
 import net.sf.l2j.gameserver.skills.funcs.Func;
 import net.sf.l2j.gameserver.templates.L2Armor;
-import net.sf.l2j.gameserver.templates.L2NpcTemplate;
 import net.sf.l2j.gameserver.templates.L2PcTemplate;
 import net.sf.l2j.gameserver.templates.L2Weapon;
 import net.sf.l2j.gameserver.templates.L2WeaponType;
@@ -409,8 +408,8 @@ public final class Formulas
 			{
 				env.value *= DEXbonus[p.getDEX()];
 				env.value *= 10;
-				if(env.value > 500)
-					env.value = 500;
+				if(env.value > Config.MAX_PCRIT_RATE)
+					env.value = Config.MAX_PCRIT_RATE;
 			}
 		}
 	}
@@ -440,6 +439,9 @@ public final class Formulas
 			else
 			{
 				env.value *= WITbonus[p.getWIT()];
+				
+				if(env.value > Config.MAX_MCRIT_RATE)
+					env.value = Config.MAX_MCRIT_RATE;
 			}
 		}
 	}
@@ -1286,9 +1288,32 @@ public final class Formulas
 
 		if (attacker instanceof L2NpcInstance)
 		{
-			//Skill Race : Undead
-			if (((L2NpcInstance) attacker).getTemplate().getRace() == L2NpcTemplate.Race.UNDEAD)
-				damage /= attacker.getPDefUndead(target);
+			switch (((L2NpcInstance) target).getTemplate().getRace())
+			{
+				case UNDEAD:
+					damage /= attacker.getPDefUndead(target);
+					break;
+				case BEAST:
+					damage /= attacker.getPDefMonsters(target);
+					break;
+				case ANIMAL:
+					damage /= attacker.getPDefAnimals(target);
+					break;
+				case PLANT:
+					damage /= attacker.getPDefPlants(target);
+					break;
+				case DRAGON:
+					damage /= attacker.getPDefDragons(target);
+					break;
+				case BUG:
+					damage /= attacker.getPDefInsects(target);
+					break;
+				case GIANT:
+					damage /= attacker.getPDefGiants(target);
+					break;					
+				default:
+					break;
+			}
 		}
 		if (target instanceof L2NpcInstance)
 		{
@@ -1312,9 +1337,9 @@ public final class Formulas
 				case BUG:
 					damage *= attacker.getPAtkInsects(target);
 					break;
-               case GIANT:
-                   damage *= attacker.getPAtkGiants(target);
-                   break;					
+				case GIANT:
+					damage *= attacker.getPAtkGiants(target);
+					break;					
 				default:
 					// nothing
 					break;

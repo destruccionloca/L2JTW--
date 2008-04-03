@@ -15,12 +15,13 @@
 package net.sf.l2j.gameserver.model.zone.type;
 
 import javolution.util.FastMap;
+import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.GameServer;
 import net.sf.l2j.gameserver.datatables.MapRegionTable;
+import net.sf.l2j.gameserver.instancemanager.VanHalterManager;
 import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.zone.L2ZoneType;
-import net.sf.l2j.gameserver.instancemanager.VanHalterManager;
 import net.sf.l2j.util.L2FastList;
 
 /**
@@ -32,6 +33,12 @@ public class L2BossZone extends L2ZoneType
     private int _timeInvade;
     private boolean _enabled = true;   // default value, unless overriden by xml...
     
+    // L2J_JP ADD SANDMAN START
+    private int _InvadeTimeAfterRestart = 0;
+    private boolean _IsFlyingEnable = false;
+    private String _QuestName = null;
+    // L2J_JP ADD SANDMAN END
+
     // track the times that players got disconnected. Players are allowed
     // to log back into the zone as long as their log-out was within _timeInvade
     // time...
@@ -50,6 +57,7 @@ public class L2BossZone extends L2ZoneType
         _playersAllowed = new L2FastList<Integer>();
     }
     
+	// L2J_JP EDIT SANDMAN
     @Override
     public void setParameter(String name, String value)
     {
@@ -57,12 +65,23 @@ public class L2BossZone extends L2ZoneType
         {
             _zoneName = value;
         }
-        
-        if (name.equals("InvadeTime"))
+        else if (name.equals("InvadeTime"))
         {
             _timeInvade = Integer.parseInt(value);
         }
-        if (name.equals("EnabledByDefault"))
+        else if (name.equals("InvadeTimeAfterRestart"))
+        {
+        	_InvadeTimeAfterRestart = Integer.parseInt(value);
+        }
+        else if (name.equals("Flying"))
+        {
+			_IsFlyingEnable = Boolean.parseBoolean(value);
+		}
+        else if (name.equals("QuestName"))
+        {
+        	_QuestName = value;
+		}
+        else if (name.equals("EnabledByDefault"))
         {
         	_enabled = Boolean.parseBoolean(value);
         }
@@ -88,6 +107,13 @@ public class L2BossZone extends L2ZoneType
      */
     protected void onEnter(L2Character character)
     {
+		// L2J_JP ADD SANDMAN
+		if(Config.USE_JP_RULE_OF_BOSSZONE)
+		{
+			this.jpOnEnter(character);
+			return;
+		}
+		
     	if (_enabled)
     	{
 	        if (character instanceof L2PcInstance)
@@ -127,8 +153,6 @@ public class L2BossZone extends L2ZoneType
 	                }
 	                _playersAllowed.remove(_playersAllowed.indexOf(character.getObjectId()));
 	            }
-	            if (_zoneName.equalsIgnoreCase("AltarofSacrifice"))
-	                VanHalterManager.getInstance().intruderDetection(player);
 	            // teleport out all players who attempt "illegal" (re-)entry
 	            player.teleToLocation(MapRegionTable.TeleportWhereType.Town);
 	        }
@@ -138,6 +162,13 @@ public class L2BossZone extends L2ZoneType
     @Override
     protected void onExit(L2Character character)
     {
+		// L2J_JP ADD SANDMAN
+		if(Config.USE_JP_RULE_OF_BOSSZONE)
+		{
+			this.jpOnExit(character);
+			return;
+		}
+		
     	if (_enabled)
     	{
 	        if (character instanceof L2PcInstance)
@@ -146,7 +177,7 @@ public class L2BossZone extends L2ZoneType
 	            L2PcInstance player = (L2PcInstance) character;
 	            if (player.isGM())
 	            {
-	            	player.sendMessage("Â÷¶}¤F" + _zoneName);
+	                player.sendMessage("You left " + _zoneName);
 	                return;
 	            }
 	            // if the player just got disconnected/logged out, store the dc
@@ -258,4 +289,87 @@ public class L2BossZone extends L2ZoneType
     protected void onReviveInside(L2Character character)
     {
     }
+
+    // L2J_JP ADD SANDMAN START
+    public int getInvadeTimeAfterRestart()
+    {
+    	return _InvadeTimeAfterRestart;
+    }
+
+	public boolean isFlyingEnable()
+	{
+		return _IsFlyingEnable;
+	}
+
+    public String getQuestName()
+    {
+    	return _QuestName;
+    }
+
+	protected void jpOnEnter(L2Character character)
+    {
+		if (character instanceof L2PcInstance)
+		{
+            L2PcInstance player = (L2PcInstance) character;
+
+            if (player.isGM())
+            {
+				player.sendMessage("[DEBUG] Into L2BossZone.jpOnEnter.");
+				player.sendMessage("[DEBUG] You entered " + _zoneName);
+
+				if(_QuestName != null)
+				{
+					if(player.getQuestState(_QuestName) == null)
+					{
+						player.sendMessage("[DEBUG] You dont have QuestState of  "+ _QuestName);
+					}
+					else
+					{
+						player.sendMessage("[DEBUG] You have QuestState of  "+ _QuestName);
+					}
+				}
+            }
+
+	        // When the player invades the flight prohibition zone.
+	        // player is banished.
+	        if (!player.isGM() && player.isFlying() && !player.isInJail() && !_IsFlyingEnable)
+		    {
+	        	player.teleToLocation(MapRegionTable.TeleportWhereType.Town);
+	        	return;
+	        }
+
+	        // Jail a player that tries an illegal entry.
+	        if(!player.isGM() && _QuestName != null && player.getQuestState(_QuestName) == null)
+	        {
+				player.sendMessage("You tried illegal entry!");
+				player.setInJail(true,1440);	// Jail 1Day.
+	        	return;
+	        }
+
+	        if (_zoneName.equalsIgnoreCase("AltarofSacrifice"))
+	        	VanHalterManager.getInstance().intruderDetection((L2PcInstance)character);
+		}
+    }
+
+    protected void jpOnExit(L2Character character)
+    {
+        if (character instanceof L2PcInstance)
+        {
+            //Thread.dumpStack();
+            L2PcInstance player = (L2PcInstance) character;
+            if (player.isGM())
+            {
+				player.sendMessage("[DEBUG] Into L2BossZone.jpOnExit.");
+                player.sendMessage("You left " + _zoneName);
+                return;
+            }
+
+            if(player.isOnline() == 1 && _QuestName != null && player.getQuestState(_QuestName) != null)
+			{
+				player.getQuestState(_QuestName).exitQuest(true);
+			}
+        }
+    }
+    // L2J_JP ADD SANDMAN END
+
 }

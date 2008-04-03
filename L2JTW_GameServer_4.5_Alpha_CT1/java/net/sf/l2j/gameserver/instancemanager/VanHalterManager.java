@@ -22,6 +22,7 @@ import java.sql.ResultSet;
 import java.util.Date;
 import java.util.logging.Logger;
 import java.util.concurrent.ScheduledFuture;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import javolution.util.FastList;
@@ -43,12 +44,13 @@ import net.sf.l2j.gameserver.model.L2Effect.EffectType;
 import net.sf.l2j.gameserver.model.actor.instance.L2DoorInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
-import net.sf.l2j.gameserver.model.actor.instance.L2RaidBossInstance;
-import net.sf.l2j.gameserver.model.entity.GrandBossState;
+import net.sf.l2j.gameserver.model.actor.instance.L2GrandBossInstance;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
+import net.sf.l2j.gameserver.templates.StatsSet;
 import net.sf.l2j.gameserver.serverpackets.CreatureSay;
 import net.sf.l2j.gameserver.serverpackets.MagicSkillUse;
-
+import net.sf.l2j.gameserver.model.actor.status.GrandBossStatus;
+import net.sf.l2j.gameserver.instancemanager.GrandBossManager;
 
 /**
  * This class ...
@@ -91,7 +93,7 @@ public class VanHalterManager
     protected List<L2DoorInstance> _DoorOfSacrifice = new FastList<L2DoorInstance>();
     protected L2NpcInstance _RitualOffering = null;
     protected L2NpcInstance _RitualSacrifice = null;
-    protected L2RaidBossInstance _vanHalter = null;
+    protected L2GrandBossInstance _vanHalter = null;
 
     // Task
     protected ScheduledFuture<?> _MovieTask = null;
@@ -110,7 +112,12 @@ public class VanHalterManager
     boolean _isSacrificeSpawned = false;
     boolean _isCaptainSpawned = false;
     boolean _isHelperCalled = false;
-    protected GrandBossState _State = new GrandBossState(29062);
+    protected String _ZoneType;
+    protected String _QuestName;
+    protected StatsSet _StateSet;
+    protected int _Alive;
+    protected int _BossId = 29062;
+    protected int _DummyId = 29059;
 
     public VanHalterManager()
     {
@@ -129,6 +136,10 @@ public class VanHalterManager
     {
     	// clear intruder.
     	_PlayersInLair.clear();
+        _ZoneType = "AltarofSacrifice";
+        _QuestName = "vanhalter";
+        _StateSet = GrandBossManager.getInstance().getStatsSet(_BossId);
+        _Alive = GrandBossManager.getInstance().getBossStatus(_BossId);
 
     	// clear flag.
         _isLocked = false;
@@ -154,12 +165,6 @@ public class VanHalterManager
     	loadRitualOffering();
     	loadRitualSacrifice();
 
-    	// spawn monsters.
-    	spawnRoyalGuard();
-    	spawnToriolRevelation();
-        spawnVanHalter();
-        spawnRitualOffering();
-
         // setting spawn data of Dummy camera marker.
     	_CameraMarkerSpawn.clear();
         try
@@ -168,7 +173,7 @@ public class VanHalterManager
             L2Spawn tempSpawn;
 
             // Dummy camera marker.
-            template1 = NpcTable.getInstance().getTemplate(13018);
+            template1 = NpcTable.getInstance().getTemplate(_DummyId);
             tempSpawn = new L2Spawn(template1);
             tempSpawn.setLocx(-16397);
             tempSpawn.setLocy(-55200);
@@ -179,7 +184,7 @@ public class VanHalterManager
             SpawnTable.getInstance().addNewSpawn(tempSpawn, false);
             _CameraMarkerSpawn.put(1, tempSpawn);
 
-            template1 = NpcTable.getInstance().getTemplate(13018);
+            template1 = NpcTable.getInstance().getTemplate(_DummyId);
             tempSpawn = new L2Spawn(template1);
             tempSpawn.setLocx(-16397);
             tempSpawn.setLocy(-55200);
@@ -190,7 +195,7 @@ public class VanHalterManager
             SpawnTable.getInstance().addNewSpawn(tempSpawn, false);
             _CameraMarkerSpawn.put(2, tempSpawn);
 
-            template1 = NpcTable.getInstance().getTemplate(13018);
+            template1 = NpcTable.getInstance().getTemplate(_DummyId);
             tempSpawn = new L2Spawn(template1);
             tempSpawn.setLocx(-16397);
             tempSpawn.setLocy(-55200);
@@ -201,7 +206,7 @@ public class VanHalterManager
             SpawnTable.getInstance().addNewSpawn(tempSpawn, false);
             _CameraMarkerSpawn.put(3, tempSpawn);
 
-            template1 = NpcTable.getInstance().getTemplate(13018);
+            template1 = NpcTable.getInstance().getTemplate(_DummyId);
             tempSpawn = new L2Spawn(template1);
             tempSpawn.setLocx(-16397);
             tempSpawn.setLocy(-55200);
@@ -212,7 +217,7 @@ public class VanHalterManager
             SpawnTable.getInstance().addNewSpawn(tempSpawn, false);
             _CameraMarkerSpawn.put(4, tempSpawn);
 
-            template1 = NpcTable.getInstance().getTemplate(13018);
+            template1 = NpcTable.getInstance().getTemplate(_DummyId);
             tempSpawn = new L2Spawn(template1);
             tempSpawn.setLocx(-16397);
             tempSpawn.setLocy(-55197);
@@ -226,33 +231,26 @@ public class VanHalterManager
         }
         catch (Exception e)
         {
-            _log.warning("VanHaletrManager : " + e.getMessage());
+            _log.warning("VanHalterManager : " + e.getMessage());
         }
-
-    	// set time up.
-    	if (_TimeUpTask != null) _TimeUpTask.cancel(true);
-    	_TimeUpTask = ThreadPoolManager.getInstance().scheduleGeneral(new TimeUp(),Config.HPH_ACTIVITYTIMEOFHALTER * 1000);
 
     	// set bleeding to palyers.
 		if (_SetBleedTask != null) _SetBleedTask.cancel(true);
 		_SetBleedTask = ThreadPoolManager.getInstance().scheduleGeneral(new Bleeding(),2000);
 
 		// check state of High Priestess van Halter.
-		_log.info("VanHaletrManager : State of High Priestess van Halter is " + _State.getState() + ".");
-		if (_State.getState().equals(GrandBossState.StateEnum.INTERVAL))
+        _log.info("VanHalterManager : State of High Priestess van Halter is " + _Alive + ".");
+        if (_Alive == GrandBossStatus.INTERVAL)
 			enterInterval();
-		else
-			_State.setState(GrandBossState.StateEnum.NOTSPAWN);
+        else
+        {
+        	// spawn monsters.
+            setupAlter();
+        }
 
-		Date dt = new Date(_State.getRespawnDate());
-		_log.info("VanHaletrManager : Next spawn date of High Priestess van Halter is " + dt + ".");
-        _log.info("VanHaletrManager : init VanHaletrManager.");
-    }
-
-    // return High Priestess van Halter state.
-    public GrandBossState.StateEnum getState()
-    {
-    	return _State.getState();
+		Date dt = new Date(_StateSet.getLong("respawn_time"));
+        _log.info("VanHalterManager : Next spawn date of High Priestess van Halter is " + dt + ".");
+        _log.info("VanHalterManager : Init VanHalterManager.");
     }
 
     // load Royal Guard.
@@ -289,24 +287,23 @@ public class VanHalterManager
                 	_RoyalGuardSpawn.add(spawnDat);
                 }
                 else {
-                    _log.warning("VanHaletrManager.loadRoyalGuard: Data missing in NPC table for ID: " + rset.getInt("npc_templateid") + ".");
+                    _log.warning("VanHalterManager.loadRoyalGuard: Data missing in NPC table for ID: " + rset.getInt("npc_templateid") + ".");
                 }
             }
 
             rset.close();
             statement.close();
-            _log.info("VanHaletrManager.loadRoyalGuard: Loaded " + _RoyalGuardSpawn.size() + " Royal Guard spawn locations.");
+            _log.info("VanHalterManager.loadRoyalGuard: Loaded " + _RoyalGuardSpawn.size() + " Royal Guard spawn locations.");
         }
         catch (Exception e)
         {
             // problem with initializing spawn, go to next one
-            _log.warning("VanHaletrManager.loadRoyalGuard: Spawn could not be initialized: " + e);
+            _log.warning("VanHalterManager.loadRoyalGuard: Spawn could not be initialized: " + e);
         }
         finally
         {
             try { con.close(); } catch (Exception e) {}
         }
-
     }
 
     protected void spawnRoyalGuard()
@@ -365,24 +362,23 @@ public class VanHalterManager
                 	_ToriolRevelationSpawn.add(spawnDat);
                 }
                 else {
-                    _log.warning("VanHaletrManager.loadToriolRevelation: Data missing in NPC table for ID: " + rset.getInt("npc_templateid") + ".");
+                    _log.warning("VanHalterManager.loadToriolRevelation: Data missing in NPC table for ID: " + rset.getInt("npc_templateid") + ".");
                 }
             }
 
             rset.close();
             statement.close();
-            _log.info("VanHaletrManager.loadToriolRevelation: Loaded " + _ToriolRevelationSpawn.size() + " Triol's Revelation spawn locations.");
+            _log.info("VanHalterManager.loadToriolRevelation: Loaded " + _ToriolRevelationSpawn.size() + " Triol's Revelation spawn locations.");
         }
         catch (Exception e)
         {
             // problem with initializing spawn, go to next one
-            _log.warning("VanHaletrManager.loadToriolRevelation: Spawn could not be initialized: " + e);
+            _log.warning("VanHalterManager.loadToriolRevelation: Spawn could not be initialized: " + e);
         }
         finally
         {
             try { con.close(); } catch (Exception e) {}
         }
-
     }
 
     protected void spawnToriolRevelation()
@@ -397,7 +393,6 @@ public class VanHalterManager
     		if (trs.getNpcid() != 32067 && trs.getNpcid() != 32068)
     			_ToriolRevelationAlive.add(trs);
     	}
-
     }
 
     protected void deleteToriolRevelation()
@@ -446,24 +441,23 @@ public class VanHalterManager
                 	_RoyalGuardCaptainSpawn.add(spawnDat);
                 }
                 else {
-                    _log.warning("VanHaletrManager.loadRoyalGuardCaptain: Data missing in NPC table for ID: " + rset.getInt("npc_templateid") + ".");
+                    _log.warning("VanHalterManager.loadRoyalGuardCaptain: Data missing in NPC table for ID: " + rset.getInt("npc_templateid") + ".");
                 }
             }
 
             rset.close();
             statement.close();
-            _log.info("VanHaletrManager.loadRoyalGuardCaptain: Loaded " + _RoyalGuardCaptainSpawn.size() + " Royal Guard Captain spawn locations.");
+            _log.info("VanHalterManager.loadRoyalGuardCaptain: Loaded " + _RoyalGuardCaptainSpawn.size() + " Royal Guard Captain spawn locations.");
         }
         catch (Exception e)
         {
             // problem with initializing spawn, go to next one
-            _log.warning("VanHaletrManager.loadRoyalGuardCaptain: Spawn could not be initialized: " + e);
+            _log.warning("VanHalterManager.loadRoyalGuardCaptain: Spawn could not be initialized: " + e);
         }
         finally
         {
             try { con.close(); } catch (Exception e) {}
         }
-
     }
 
     protected void spawnRoyalGuardCaptain()
@@ -523,24 +517,23 @@ public class VanHalterManager
                 	_RoyalGuardHelperSpawn.add(spawnDat);
                 }
                 else {
-                    _log.warning("VanHaletrManager.loadRoyalGuardHelper: Data missing in NPC table for ID: " + rset.getInt("npc_templateid") + ".");
+                    _log.warning("VanHalterManager.loadRoyalGuardHelper: Data missing in NPC table for ID: " + rset.getInt("npc_templateid") + ".");
                 }
             }
 
             rset.close();
             statement.close();
-            _log.info("VanHaletrManager.loadRoyalGuardHelper: Loaded " + _RoyalGuardHelperSpawn.size() + " Royal Guard Helper spawn locations.");
+            _log.info("VanHalterManager.loadRoyalGuardHelper: Loaded " + _RoyalGuardHelperSpawn.size() + " Royal Guard Helper spawn locations.");
         }
         catch (Exception e)
         {
             // problem with initializing spawn, go to next one
-            _log.warning("VanHaletrManager.loadRoyalGuardHelper: Spawn could not be initialized: " + e);
+            _log.warning("VanHalterManager.loadRoyalGuardHelper: Spawn could not be initialized: " + e);
         }
         finally
         {
             try { con.close(); } catch (Exception e) {}
         }
-
     }
 
     protected void spawnRoyalGuardHepler()
@@ -597,18 +590,18 @@ public class VanHalterManager
                 	_GuardOfAltarSpawn.add(spawnDat);
                 }
                 else {
-                    _log.warning("VanHaletrManager.loadGuardOfAltar: Data missing in NPC table for ID: " + rset.getInt("npc_templateid") + ".");
+                    _log.warning("VanHalterManager.loadGuardOfAltar: Data missing in NPC table for ID: " + rset.getInt("npc_templateid") + ".");
                 }
             }
 
             rset.close();
             statement.close();
-            _log.info("VanHaletrManager.loadGuardOfAltar: Loaded " + _GuardOfAltarSpawn.size() + " Guard Of Altar spawn locations.");
+            _log.info("VanHalterManager.loadGuardOfAltar: Loaded " + _GuardOfAltarSpawn.size() + " Guard Of Altar spawn locations.");
         }
         catch (Exception e)
         {
             // problem with initializing spawn, go to next one
-            _log.warning("VanHaletrManager.loadGuardOfAltar: Spawn could not be initialized: " + e);
+            _log.warning("VanHalterManager.loadGuardOfAltar: Spawn could not be initialized: " + e);
         }
         finally
         {
@@ -626,7 +619,6 @@ public class VanHalterManager
     		trs.startRespawn();
     		_GuardOfAltar.add(trs.doSpawn());
     	}
-
     }
 
     protected void deleteGuardOfAltar()
@@ -674,29 +666,28 @@ public class VanHalterManager
                 	_vanHalterSpawn = spawnDat;
                 }
                 else {
-                    _log.warning("VanHaletrManager.loadVanHalter: Data missing in NPC table for ID: " + rset.getInt("npc_templateid") + ".");
+                    _log.warning("VanHalterManager.loadVanHalter: Data missing in NPC table for ID: " + rset.getInt("npc_templateid") + ".");
                 }
             }
 
             rset.close();
             statement.close();
-            _log.info("VanHaletrManager.loadVanHalter: Loaded High Priestess van Halter spawn locations.");
+            _log.info("VanHalterManager.loadVanHalter: Loaded High Priestess van Halter spawn locations.");
         }
         catch (Exception e)
         {
             // problem with initializing spawn, go to next one
-            _log.warning("VanHaletrManager.loadVanHalter: Spawn could not be initialized: " + e);
+            _log.warning("VanHalterManager.loadVanHalter: Spawn could not be initialized: " + e);
         }
         finally
         {
             try { con.close(); } catch (Exception e) {}
         }
-
     }
 
     protected void spawnVanHalter()
     {
-    	_vanHalter = (L2RaidBossInstance)_vanHalterSpawn.doSpawn();
+    	_vanHalter = (L2GrandBossInstance)_vanHalterSpawn.doSpawn();
     	_vanHalter.setIsImmobilized(true);
     	_vanHalter.setIsInvul(true);
     	_isHalterSpawned = true;
@@ -704,10 +695,13 @@ public class VanHalterManager
 
     protected void deleteVanHalter()
     {
-    	_vanHalter.setIsImmobilized(false);
-    	_vanHalter.setIsInvul(false);
-    	_vanHalter.getSpawn().stopRespawn();
-    	_vanHalter.deleteMe();
+    	if(_vanHalter != null)
+    	{
+        	_vanHalter.setIsImmobilized(false);
+        	_vanHalter.setIsInvul(false);
+        	_vanHalter.getSpawn().stopRespawn();
+        	_vanHalter.deleteMe();
+    	}
     }
 
     // load Ritual Offering.
@@ -743,24 +737,23 @@ public class VanHalterManager
                 	_RitualOfferingSpawn = spawnDat;
                 }
                 else {
-                    _log.warning("VanHaletrManager.loadRitualOffering: Data missing in NPC table for ID: " + rset.getInt("npc_templateid") + ".");
+                    _log.warning("VanHalterManager.loadRitualOffering: Data missing in NPC table for ID: " + rset.getInt("npc_templateid") + ".");
                 }
             }
 
             rset.close();
             statement.close();
-            _log.info("VanHaletrManager.loadRitualOffering: Loaded Ritual Offering spawn locations.");
+            _log.info("VanHalterManager.loadRitualOffering: Loaded Ritual Offering spawn locations.");
         }
         catch (Exception e)
         {
             // problem with initializing spawn, go to next one
-            _log.warning("VanHaletrManager.loadRitualOffering: Spawn could not be initialized: " + e);
+            _log.warning("VanHalterManager.loadRitualOffering: Spawn could not be initialized: " + e);
         }
         finally
         {
             try { con.close(); } catch (Exception e) {}
         }
-
     }
 
     protected void spawnRitualOffering()
@@ -773,11 +766,14 @@ public class VanHalterManager
 
     protected void deleteRitualOffering()
     {
-    	_RitualOffering.setIsImmobilized(false);
-    	_RitualOffering.setIsInvul(false);
-    	_RitualOffering.setIsParalyzed(false);
-    	_RitualOffering.getSpawn().stopRespawn();
-    	_RitualOffering.deleteMe();
+    	if(_RitualOffering != null)
+    	{
+        	_RitualOffering.setIsImmobilized(false);
+        	_RitualOffering.setIsInvul(false);
+        	_RitualOffering.setIsParalyzed(false);
+        	_RitualOffering.getSpawn().stopRespawn();
+        	_RitualOffering.deleteMe();
+    	}
     }
 
     // Load Ritual Sacrifice.
@@ -813,24 +809,23 @@ public class VanHalterManager
                 	_RitualSacrificeSpawn = spawnDat;
                 }
                 else {
-                    _log.warning("VanHaletrManager.loadRitualSacrifice: Data missing in NPC table for ID: " + rset.getInt("npc_templateid") + ".");
+                    _log.warning("VanHalterManager.loadRitualSacrifice: Data missing in NPC table for ID: " + rset.getInt("npc_templateid") + ".");
                 }
             }
 
             rset.close();
             statement.close();
-            _log.info("VanHaletrManager.loadRitualSacrifice: Loaded Ritual Sacrifice spawn locations.");
+            _log.info("VanHalterManager.loadRitualSacrifice: Loaded Ritual Sacrifice spawn locations.");
         }
         catch (Exception e)
         {
             // problem with initializing spawn, go to next one
-            _log.warning("VanHaletrManager.loadRitualSacrifice: Spawn could not be initialized: " + e);
+            _log.warning("VanHalterManager.loadRitualSacrifice: Spawn could not be initialized: " + e);
         }
         finally
         {
             try { con.close(); } catch (Exception e) {}
         }
-
     }
 
     protected void spawnRitualSacrifice()
@@ -845,8 +840,11 @@ public class VanHalterManager
     {
     	if (!_isSacrificeSpawned) return;
 
-    	_RitualSacrifice.getSpawn().stopRespawn();
-    	_RitualSacrifice.deleteMe();
+    	if(_RitualSacrifice != null)
+    	{
+        	_RitualSacrifice.getSpawn().stopRespawn();
+        	_RitualSacrifice.deleteMe();
+    	}
     	_isSacrificeSpawned = false;
     }
 
@@ -856,8 +854,8 @@ public class VanHalterManager
     	for(int i = 1; i <= _CameraMarkerSpawn.size();i++)
     	{
     		_CameraMarker.put(i, _CameraMarkerSpawn.get(i).doSpawn());
-    		_CameraMarker.get(i).getSpawn().stopRespawn();
     		_CameraMarker.get(i).setIsImmobilized(true);
+    		_CameraMarker.get(i).getSpawn().stopRespawn();
     	}
     }
 
@@ -886,7 +884,6 @@ public class VanHalterManager
     {
     	public LockUpDoorOfAltar()
     	{
-
     	}
 
     	public void run()
@@ -923,7 +920,6 @@ public class VanHalterManager
     {
     	public OpenDoorOfAltar()
     	{
-
     	}
 
     	public void run()
@@ -956,7 +952,6 @@ public class VanHalterManager
     {
     	public CloseDoorOfAltar()
     	{
-
     	}
 
     	public void run()
@@ -1066,14 +1061,12 @@ public class VanHalterManager
         	_HalterEscapeTask = ThreadPoolManager.getInstance().scheduleGeneral(new HalterEscape(),500);
         	_CallRoyalGuardHelperTask = ThreadPoolManager.getInstance().scheduleGeneral(new CallRoyalGuardHelper(),1000);
     	}
-
     }
 
     private class CallRoyalGuardHelper implements Runnable
     {
     	public CallRoyalGuardHelper()
     	{
-
     	}
 
     	public void run()
@@ -1097,7 +1090,6 @@ public class VanHalterManager
     {
     	public HalterEscape()
     	{
-
     	}
 
     	public void run()
@@ -1186,7 +1178,6 @@ public class VanHalterManager
     {
     	public Bleeding()
     	{
-
     	}
 
     	public void run()
@@ -1195,37 +1186,14 @@ public class VanHalterManager
 
     		if (_SetBleedTask != null) _SetBleedTask.cancel(true);
     		_SetBleedTask = ThreadPoolManager.getInstance().scheduleGeneral(new Bleeding(),2000);
-
     	}
     }
 
     // High Priestess van Halter dead or time up.
     public void enterInterval()
     {
-    	// cancel all task
-    	if (_CallRoyalGuardHelperTask != null)	_CallRoyalGuardHelperTask.cancel(true);
-   		_CallRoyalGuardHelperTask = null;
-
-   		if (_CloseDoorOfAltarTask != null)	_CloseDoorOfAltarTask.cancel(true);
-   		_CloseDoorOfAltarTask = null;
-
-   		if (_HalterEscapeTask != null)	_HalterEscapeTask.cancel(true);
-   		_HalterEscapeTask = null;
-
-    	if (_LockUpDoorOfAltarTask != null) _LockUpDoorOfAltarTask.cancel(true);
-   		_LockUpDoorOfAltarTask = null;
-
-   		if (_MovieTask != null) _MovieTask.cancel(true);
-   		_MovieTask = null;
-
-   		if (_OpenDoorOfAltarTask != null) _OpenDoorOfAltarTask.cancel(true);
-   		_OpenDoorOfAltarTask = null;
-
-   		if (_TimeUpTask != null) _TimeUpTask.cancel(true);
-   		_TimeUpTask = null;
-
     	// delete monsters
-   		if (_vanHalter.isDead())
+   		if (_vanHalter != null && _vanHalter.isDead())
    		{
    	    	_vanHalter.getSpawn().stopRespawn();
    		}
@@ -1241,38 +1209,15 @@ public class VanHalterManager
     	deleteGuardOfAltar();
 
     	// set interval end.
-    	if (_IntervalTask != null) _IntervalTask.cancel(true);
-
-    	if (!_State.getState().equals(GrandBossState.StateEnum.INTERVAL))
+    	if (_Alive != GrandBossStatus.INTERVAL)
     	{
-        	int interval = Rnd.get(Config.HPH_FIXINTERVALOFHALTER,Config.HPH_FIXINTERVALOFHALTER + Config.HPH_RANDOMINTERVALOFHALTER) * 1000;
-        	_State.setRespawnDate(interval);
-        	_State.setState(GrandBossState.StateEnum.INTERVAL);
-        	_State.update();
-
+        	_StateSet.set("respawn_time", Calendar.getInstance().getTimeInMillis() + (Rnd.get(Config.HPH_FIXINTERVALOFHALTER,Config.HPH_FIXINTERVALOFHALTER + Config.HPH_RANDOMINTERVALOFHALTER) * 1000));
+        	_Alive = GrandBossStatus.INTERVAL;
+        	GrandBossManager.getInstance().setBossStatus(_BossId, _Alive);
+        	GrandBossManager.getInstance().setStatsSet(_BossId, _StateSet);
+        	GrandBossManager.getInstance().save();
     	}
 
-    	_IntervalTask = ThreadPoolManager.getInstance().scheduleGeneral(new Interval(),_State.getInterval());
-    }
-
-    // interval.
-    private class Interval implements Runnable
-    {
-    	public Interval()
-    	{
-
-    	}
-
-    	public void run()
-    	{
-    		_PlayersInLair.clear();
-    		setupAlter();
-    	}
-    }
-
-    // interval end.
-    public void setupAlter()
-    {
     	// cancel all task
     	if (_CallRoyalGuardHelperTask != null)	_CallRoyalGuardHelperTask.cancel(true);
    		_CallRoyalGuardHelperTask = null;
@@ -1282,9 +1227,6 @@ public class VanHalterManager
 
    		if (_HalterEscapeTask != null)	_HalterEscapeTask.cancel(true);
    		_HalterEscapeTask = null;
-
-   		if (_IntervalTask != null)	_IntervalTask.cancel(true);
-   		_IntervalTask = null;
 
     	if (_LockUpDoorOfAltarTask != null) _LockUpDoorOfAltarTask.cancel(true);
    		_LockUpDoorOfAltarTask = null;
@@ -1298,6 +1240,30 @@ public class VanHalterManager
    		if (_TimeUpTask != null) _TimeUpTask.cancel(true);
    		_TimeUpTask = null;
 
+   		if (_IntervalTask != null) _IntervalTask.cancel(true);
+   		_IntervalTask = null;
+
+    	_IntervalTask = ThreadPoolManager.getInstance().scheduleGeneral(new Interval(),GrandBossManager.getInstance().getInterval(_BossId));
+        _log.info("VanHalterManager : Interval START.");
+    }
+
+    // interval.
+    private class Interval implements Runnable
+    {
+    	public Interval()
+    	{
+    	}
+
+    	public void run()
+    	{
+    		_PlayersInLair.clear();
+    		setupAlter();
+    	}
+    }
+
+    // interval end.
+    public void setupAlter()
+    {
     	// delete all monsters
     	deleteVanHalter();
     	deleteToriolRevelation();
@@ -1325,12 +1291,40 @@ public class VanHalterManager
     	spawnRitualOffering();
     	spawnVanHalter();
 
-    	_State.setState(GrandBossState.StateEnum.NOTSPAWN);
-    	_State.update();
+    	// Update Status
+    	_Alive = GrandBossStatus.ALIVE;
+    	GrandBossManager.getInstance().setBossStatus(_BossId, _Alive);
+    	GrandBossManager.getInstance().save();
+
+    	// cancel all task
+    	if (_CallRoyalGuardHelperTask != null)	_CallRoyalGuardHelperTask.cancel(true);
+   		_CallRoyalGuardHelperTask = null;
+
+   		if (_CloseDoorOfAltarTask != null)	_CloseDoorOfAltarTask.cancel(true);
+   		_CloseDoorOfAltarTask = null;
+
+   		if (_HalterEscapeTask != null)	_HalterEscapeTask.cancel(true);
+   		_HalterEscapeTask = null;
+
+    	if (_LockUpDoorOfAltarTask != null) _LockUpDoorOfAltarTask.cancel(true);
+   		_LockUpDoorOfAltarTask = null;
+
+   		if (_MovieTask != null) _MovieTask.cancel(true);
+   		_MovieTask = null;
+
+   		if (_OpenDoorOfAltarTask != null) _OpenDoorOfAltarTask.cancel(true);
+   		_OpenDoorOfAltarTask = null;
+
+   		if (_TimeUpTask != null) _TimeUpTask.cancel(true);
+   		_TimeUpTask = null;
+
+   		if (_IntervalTask != null) _IntervalTask.cancel(true);
+   		_IntervalTask = null;
 
     	// set time up.
-    	if (_TimeUpTask != null) _TimeUpTask.cancel(true);
     	_TimeUpTask = ThreadPoolManager.getInstance().scheduleGeneral(new TimeUp(), Config.HPH_ACTIVITYTIMEOFHALTER * 1000);
+
+    	_log.info("VanHalterManager : Spawn Van Halter.");
     }
 
     // time up.
@@ -1338,7 +1332,6 @@ public class VanHalterManager
     {
     	public TimeUp()
     	{
-
     	}
 
     	public void run()
@@ -1367,8 +1360,9 @@ public class VanHalterManager
     		switch(_taskId)
     		{
 	    		case 1:
-	    	    	_State.setState(GrandBossState.StateEnum.ALIVE);
-	    	    	_State.update();
+	            	_Alive = GrandBossStatus.ALIVE;
+	            	GrandBossManager.getInstance().setBossStatus(_BossId, _Alive);
+	            	GrandBossManager.getInstance().save();
 
 	    	    	// set camera.
 					for (L2PcInstance pc : _PlayersInLair)
@@ -1718,5 +1712,4 @@ public class VanHalterManager
     		}
         }
     }
-
 }

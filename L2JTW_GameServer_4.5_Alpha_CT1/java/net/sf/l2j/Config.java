@@ -91,6 +91,8 @@ public final class Config
     public static boolean CUSTOM_COMMUNITY_BOARD;
     /** Time limit of invade to lair of bosses after server restarted **/
     public static int TIMELIMITOFINVADE;
+    /** Config for boss zone **/
+    public static boolean USE_JP_RULE_OF_BOSSZONE;
     /***************************************************************************
      * Four-Sepulchers Custom CONFIG                                           *
      **************************************************************************/
@@ -246,6 +248,7 @@ public final class Config
 	
 	public static boolean	ALT_GAME_DELEVEL;
     public static double	ALT_WEIGHT_LIMIT;
+    public static int		RUN_SPD_BOOST;
     public static int		DEATH_PENALTY_CHANCE;
     public static double	RESPAWN_RESTORE_CP;
     public static double	RESPAWN_RESTORE_HP;
@@ -271,6 +274,9 @@ public final class Config
     public static boolean	ES_SP_BOOK_NEEDED;
     public static boolean	ALT_GAME_SKILL_LEARN;
     public static boolean	ALT_GAME_SUBCLASS_WITHOUT_QUESTS;
+    public static int		MAX_RUN_SPEED;
+    public static int		MAX_PCRIT_RATE;
+    public static int		MAX_MCRIT_RATE;
     public static byte		MAX_SUBCLASS;
     public static int		MAX_PVTSTORE_SLOTS_DWARF;
     public static int		MAX_PVTSTORE_SLOTS_OTHER;
@@ -654,7 +660,8 @@ public final class Config
     public static float		L2JMOD_CHAMPION_HP_REGEN;
     public static float		L2JMOD_CHAMPION_ATK;
     public static float		L2JMOD_CHAMPION_SPD_ATK;
-    public static int		L2JMOD_CHAMPION_REWARD;
+    public static int		L2JMOD_CHAMPION_REWARD_LOWER_LVL_ITEM_CHANCE;
+    public static int		L2JMOD_CHAMPION_REWARD_HIGHER_LVL_ITEM_CHANCE;
     public static int		L2JMOD_CHAMPION_REWARD_ID;
     public static int		L2JMOD_CHAMPION_REWARD_QTY;
     public static boolean	TVT_EVENT_ENABLED;
@@ -1173,6 +1180,7 @@ public final class Config
 
                 ALT_GAME_DELEVEL					= Boolean.parseBoolean(Character.getProperty("Delevel", "true"));
                 ALT_WEIGHT_LIMIT					= Double.parseDouble(Character.getProperty("AltWeightLimit", "1"));
+                RUN_SPD_BOOST						= Integer.parseInt(Character.getProperty("RunSpeedBoost", "0"));
                 DEATH_PENALTY_CHANCE				= Integer.parseInt(Character.getProperty("DeathPenaltyChance", "20"));
                 RESPAWN_RESTORE_CP					= Double.parseDouble(Character.getProperty("RespawnRestoreCP", "0")) / 100;
                 RESPAWN_RESTORE_HP					= Double.parseDouble(Character.getProperty("RespawnRestoreHP", "70")) / 100;
@@ -1227,6 +1235,9 @@ public final class Config
                 ES_SP_BOOK_NEEDED					= Boolean.parseBoolean(Character.getProperty("EnchantSkillSpBookNeeded","true"));
                 ALT_GAME_SKILL_LEARN				= Boolean.parseBoolean(Character.getProperty("AltGameSkillLearn", "false"));
                 ALT_GAME_SUBCLASS_WITHOUT_QUESTS	= Boolean.parseBoolean(Character.getProperty("AltSubClassWithoutQuests", "False"));
+                MAX_RUN_SPEED						= Integer.parseInt(Character.getProperty("MaxRunSpeed", "250"));
+                MAX_PCRIT_RATE						= Integer.parseInt(Character.getProperty("MaxPCritRate", "500"));
+                MAX_MCRIT_RATE						= Integer.parseInt(Character.getProperty("MaxMCritRate", "300"));
                 MAX_SUBCLASS						= Byte.parseByte(Character.getProperty("MaxSubclass", "3"));
                 MAX_PVTSTORE_SLOTS_DWARF			= Integer.parseInt(Character.getProperty("MaxPvtStoreSlotsDwarf", "5"));
                 MAX_PVTSTORE_SLOTS_OTHER			= Integer.parseInt(Character.getProperty("MaxPvtStoreSlotsOther", "4"));
@@ -1546,6 +1557,7 @@ public final class Config
                 Preacher_Spawns                   						= Boolean.parseBoolean(General.getProperty("PreacherSpawns", "False"));
                 ALT_GAME_ATKSPD                  		     		= Integer.parseInt(General.getProperty("AltGameAtkSpd", "1200"));
                 ALLOW_3RD_CLASS                  		     		= Boolean.parseBoolean(General.getProperty("Allow3rdClass", "False"));
+                USE_JP_RULE_OF_BOSSZONE								= Boolean.parseBoolean(General.getProperty("UseJPBossZone", "true"));
             }
             catch (Exception e)
             {
@@ -1662,7 +1674,8 @@ public final class Config
                 L2JMOD_CHAMPION_ADENAS_REWARDS         	= Integer.parseInt(L2JModSettings.getProperty("ChampionAdenasRewards", "1"));
                 L2JMOD_CHAMPION_ATK                 	= Float.parseFloat(L2JModSettings.getProperty("ChampionAtk", "1."));
                 L2JMOD_CHAMPION_SPD_ATK             	= Float.parseFloat(L2JModSettings.getProperty("ChampionSpdAtk", "1."));
-                L2JMOD_CHAMPION_REWARD                 	= Integer.parseInt(L2JModSettings.getProperty("ChampionRewardItem", "0"));
+                L2JMOD_CHAMPION_REWARD_LOWER_LVL_ITEM_CHANCE = Integer.parseInt(L2JModSettings.getProperty("ChampionRewardLowerLvlItemChance", "0"));
+                L2JMOD_CHAMPION_REWARD_HIGHER_LVL_ITEM_CHANCE = Integer.parseInt(L2JModSettings.getProperty("ChampionRewardHigherLvlItemChance", "0"));
                 L2JMOD_CHAMPION_REWARD_ID             	= Integer.parseInt(L2JModSettings.getProperty("ChampionRewardItemID", "6393"));
                 L2JMOD_CHAMPION_REWARD_QTY            	= Integer.parseInt(L2JModSettings.getProperty("ChampionRewardItemQty", "1"));
 
@@ -2396,7 +2409,8 @@ public final class Config
         else if (pName.equalsIgnoreCase("ChampionAdenasRewards")) L2JMOD_CHAMPION_ADENAS_REWARDS = Integer.parseInt(pValue);
         else if (pName.equalsIgnoreCase("ChampionAtk")) L2JMOD_CHAMPION_ATK = Float.parseFloat(pValue);
         else if (pName.equalsIgnoreCase("ChampionSpdAtk")) L2JMOD_CHAMPION_SPD_ATK = Float.parseFloat(pValue);
-        else if (pName.equalsIgnoreCase("ChampionRewardItem")) L2JMOD_CHAMPION_REWARD = Integer.parseInt(pValue);
+        else if (pName.equalsIgnoreCase("ChampionRewardLowerLvlItemChance")) L2JMOD_CHAMPION_REWARD_LOWER_LVL_ITEM_CHANCE = Integer.parseInt(pValue);
+        else if (pName.equalsIgnoreCase("ChampionRewardHigherLvlItemChance")) L2JMOD_CHAMPION_REWARD_HIGHER_LVL_ITEM_CHANCE = Integer.parseInt(pValue);
         else if (pName.equalsIgnoreCase("ChampionRewardItemID")) L2JMOD_CHAMPION_REWARD_ID = Integer.parseInt(pValue);
         else if (pName.equalsIgnoreCase("ChampionRewardItemQty")) L2JMOD_CHAMPION_REWARD_QTY = Integer.parseInt(pValue);
 

@@ -18,6 +18,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Calendar;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -29,6 +30,7 @@ import net.sf.l2j.gameserver.model.actor.instance.L2GrandBossInstance;
 import net.sf.l2j.gameserver.model.zone.type.L2BossZone;
 import net.sf.l2j.gameserver.templates.StatsSet;
 import net.sf.l2j.util.L2FastList;
+import net.sf.l2j.Config;
 
 /**
  *
@@ -51,6 +53,8 @@ public class GrandBossManager
 	 * <li>29028        Valakas</li>
 	 * <li>29045        Frintezza</li>
 	 * <li>29046-29047  Scarlet van Halisha</li>
+	 * <li>29062        High Priestess van Halter</li>
+	 * <li>29065        Sailren</li>
 	 * </ul>
 	 *
 	 * It handles the saving of hp, mp, location, and status
@@ -365,31 +369,48 @@ public class GrandBossManager
 			{
 				L2GrandBossInstance boss = _bosses.get(bossId);
 				StatsSet info = _storedInfo.get(bossId);
-				if (boss == null || info == null)
+				// L2J_JP SANDMAN EDIT
+				if(Config.USE_JP_RULE_OF_BOSSZONE)
 				{
-					statement = con.prepareStatement(UPDATE_GRAND_BOSS_DATA2);
-					statement.setInt(1, _bossStatus.get(bossId));
-					statement.setInt(2, bossId);
+					statement = con.prepareStatement(UPDATE_GRAND_BOSS_DATA);
+					statement.setInt(1, 0);
+					statement.setInt(2, 0);
+					statement.setInt(3, 0);
+					statement.setInt(4, 0);
+					statement.setLong(5, info.getLong("respawn_time"));
+					statement.setDouble(6, 0);
+					statement.setDouble(7, 0);
+					statement.setInt(8, _bossStatus.get(bossId));
+					statement.setInt(9, bossId);
 				}
 				else
 				{
-					statement = con.prepareStatement(UPDATE_GRAND_BOSS_DATA);
-					statement.setInt(1, boss.getX());
-					statement.setInt(2, boss.getY());
-					statement.setInt(3, boss.getZ());
-					statement.setInt(4, boss.getHeading());
-					statement.setLong(5, info.getLong("respawn_time"));
-					double hp = boss.getCurrentHp();
-					double mp = boss.getCurrentMp();
-					if (boss.isDead())
+					if (boss == null || info == null)
 					{
-						hp = boss.getMaxHp();
-						mp = boss.getMaxMp();
+						statement = con.prepareStatement(UPDATE_GRAND_BOSS_DATA2);
+						statement.setInt(1, _bossStatus.get(bossId));
+						statement.setInt(2, bossId);
 					}
-					statement.setDouble(6, hp);
-					statement.setDouble(7, mp);
-					statement.setInt(8, _bossStatus.get(bossId));
-					statement.setInt(9, bossId);
+					else
+					{
+						statement = con.prepareStatement(UPDATE_GRAND_BOSS_DATA);
+						statement.setInt(1, boss.getX());
+						statement.setInt(2, boss.getY());
+						statement.setInt(3, boss.getZ());
+						statement.setInt(4, boss.getHeading());
+						statement.setLong(5, info.getLong("respawn_time"));
+						double hp = boss.getCurrentHp();
+						double mp = boss.getCurrentMp();
+						if (boss.isDead())
+						{
+							hp = boss.getMaxHp();
+							mp = boss.getMaxMp();
+						}
+						statement.setDouble(6, hp);
+						statement.setDouble(7, mp);
+						statement.setInt(8, _bossStatus.get(bossId));
+						statement.setInt(9, bossId);
+					}
 				}
 				statement.executeUpdate();
 				statement.close();
@@ -426,4 +447,20 @@ public class GrandBossManager
 		 _zones.clear();
 	}
 
+	// L2J_JP ADD SANDMAN START
+	synchronized public void save()
+	{
+		storeToDb();
+	}
+
+	public long getInterval(int bossId)
+	{
+		long interval = this.getStatsSet(bossId).getLong("respawn_time") - Calendar.getInstance().getTimeInMillis();
+
+		if(interval < 0)
+			return 0;
+		else
+			return interval;
+	}
+	// L2J_JP ADD SANDMAN END
 }

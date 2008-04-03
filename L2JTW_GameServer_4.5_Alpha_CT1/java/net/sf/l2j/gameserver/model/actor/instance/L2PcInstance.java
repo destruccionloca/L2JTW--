@@ -223,6 +223,9 @@ import net.sf.l2j.gameserver.serverpackets.CameraMode;
 import net.sf.l2j.gameserver.serverpackets.SpecialCamera;
 import net.sf.l2j.gameserver.model.entity.GrandBossState;
 import net.sf.l2j.gameserver.model.entity.CTF;
+import net.sf.l2j.gameserver.model.zone.type.L2BossZone;
+import net.sf.l2j.gameserver.model.actor.status.GrandBossStatus;
+import net.sf.l2j.gameserver.instancemanager.GrandBossManager;
 //-------------------------------------------------------------------
 /**
  * This class represents all player characters in the world.
@@ -6790,7 +6793,7 @@ public final class L2PcInstance extends L2PlayableInstance
 		}
 		catch (Exception e)
         {
-            _log.warning("Could not store char effect data: "+ e);
+			_log.log(Level.WARNING, "Could not store char effect data: ",e);
         }
 		finally
         {
@@ -9497,92 +9500,52 @@ public final class L2PcInstance extends L2PlayableInstance
 		revalidateZone(true);
 		
 		//L2J_JP Addon ===============================================
-		if(BossZoneManager.getInstance().getZone(this) != null)
+		if(Config.USE_JP_RULE_OF_BOSSZONE)
 		{
-	          String zn = BossZoneManager.getInstance().getZone(this).getZoneName();
-	            // Four-Sepulcher,It is less than 5 minutes
-	    if (zn.equalsIgnoreCase("FourSepulcher") && (System.currentTimeMillis() - getLastAccess() >= 300000))
-	    {
-	              int driftX = Rnd.get(-80,80);
-	              int driftY = Rnd.get(-80,80);
-	              teleToLocation(178293 + driftX,-84607 + driftY,-7216);
-	    }
-	    else if (zn.equalsIgnoreCase("LairofAntharas"))
-	    {
-	        if (getQuestState("antharas") != null) 
-	            getQuestState("antharas").exitQuest(true);
-	        else
-	            AntharasManager.getInstance().addPlayerToLair(this);
-	    }
-	    
-	    // Baium
-	    else if (zn.equalsIgnoreCase("LairofBaium"))
-	    {
-	        if (getQuestState("baium") != null)
-	            getQuestState("baium").exitQuest(true);
-	        else
-	            BaiumManager.getInstance().addPlayerToLair(this);
-	    }
+			if(!this.isGM() && GrandBossManager.getInstance().getZone(this) != null)
+			{
+				L2BossZone bz = GrandBossManager.getInstance().getZone(this);
 
-	    // Lilith
-	    else if (zn.equalsIgnoreCase("LairofLilith"))
-	    {
-	        //if (System.currentTimeMillis() - getLastAccess() >= 600000)
-	        //teleToLocation(MapRegionTable.TeleportWhereType.Town);
-	    }
-	    
-	    // Anakim
-	    else if (zn.equalsIgnoreCase("LairofAnakim"))
-	    {
-	        //if (System.currentTimeMillis() - getLastAccess() >= 600000)
-	        //teleToLocation(MapRegionTable.TeleportWhereType.Town);
-	    }
-	    
-	    // Zaken
-	    else if (zn.equalsIgnoreCase("LairofZaken"))
-	    {
-	        //if (System.currentTimeMillis() - getLastAccess() >= 600000)
-	            //teleToLocation(MapRegionTable.TeleportWhereType.Town);
-	    }
+				// check server restart
+				if(System.currentTimeMillis() - this.getLastAccess() <= bz.getInvadeTimeAfterRestart())
+				{
+	    	    	// Lair of bosses,It is less than 30 minutes from server starting.
+		    		// Player can restart inside lair, but Antharas do not respawn.
+					if(bz.getZoneName().equalsIgnoreCase("LairofAntharas"))
+						AntharasManager.getInstance().addPlayerToLair(this);
+	    	    	// Lair of bosses,It is less than 30 minutes from server starting.
+		    		// Player can restart inside lair, and begin fight against Valakas 30min later.
+					else if(bz.getZoneName().equalsIgnoreCase("LairofValakas"))
+    	    			if(GrandBossManager.getInstance().getBossStatus(29028) == GrandBossStatus.ALIVE)
+    		    			ValakasManager.getInstance().addPlayerToLair(this);
+				}
+				// check client restart.
+				else if(System.currentTimeMillis() - this.getLastAccess() >= bz.getTimeInvade())
+				{
+					if(bz.getQuestName() != null && this.getQuestState(bz.getQuestName()) != null)
+					{
+						this.getQuestState(bz.getQuestName()).exitQuest(true);
+					}
 
-	    // High Priestess van Halter
-	    else if (zn.equalsIgnoreCase("AltarofSacrifice"))
-	    {
-	        VanHalterManager.getInstance().intruderDetection(this);
-	    }
-
-	    // 0 minutes
-	    // Valakas
-	    else if (zn.equalsIgnoreCase("LairofValakas"))
-	    {
-	        // Lair of bosses,It is less than 30 minutes from server starting.
-	        // Player can restart inside lair, and begin fight against Valakas 30min later.
-	        if(System.currentTimeMillis() - GameServer.dateTimeServerStarted.getTimeInMillis() <= Config.TIMELIMITOFINVADE &&
-	            ValakasManager.getInstance().getState().equals(GrandBossState.StateEnum.ALIVE))
-	        {
-	            ValakasManager.getInstance().addPlayerToLair(this);
-	        }
-	        else
-	        {
-	            if (getQuestState("valakas") != null) 
-	                getQuestState("valakas").exitQuest(true);
-	        }
-	    }
-	    else if (zn.equalsIgnoreCase("PilgrimsTemple"))
-	    {
-	        if (getQuestState("frintezza") != null) 
-	            getQuestState("frintezza").exitQuest(true);
-	        else
-	            FrintezzaManager.getInstance().addPlayerToLair(this);
-	    }
-
-	    // Sailren
-	    else if (zn.equalsIgnoreCase("LairofSailren"))
-	    {
-	        if (getQuestState("sailren") != null) 
-	            getQuestState("sailren").exitQuest(true);
-	    }
-	 }
+					if(bz.getZoneName().equalsIgnoreCase("LairofBaium"))
+					{
+						// Player can restart inside lair, but can not awake Baium.
+		        		BaiumManager.getInstance().addPlayerToLair(this);
+					}
+					else if(bz.getZoneName().equalsIgnoreCase("FourSepulcher"))
+					{
+			    		int driftX = Rnd.get(-80,80);
+			    		int driftY = Rnd.get(-80,80);
+			    		this.teleToLocation(178293 + driftX,-84607 + driftY,-7216);
+					}
+					else
+					{
+						this.teleToLocation(MapRegionTable.TeleportWhereType.Town);
+					}
+				}
+			}
+		}
+	 
 	//addon end ===============================================
 	}
 

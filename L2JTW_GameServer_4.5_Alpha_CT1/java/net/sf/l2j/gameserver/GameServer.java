@@ -474,14 +474,13 @@ public class GameServer
         // Init of a cursed weapon manager
         CursedWeaponsManager.getInstance();
 
-        // [L2J_JP ADD - SANDMAN]
+		// [L2J_JP ADD - SANDMAN]
 		FourSepulchersManager.getInstance().init();
 		SailrenManager.getInstance().init();
 		AntharasManager.getInstance().init();
 		ValakasManager.getInstance().init();
 		BaiumManager.getInstance().init();
 		VanHalterManager.getInstance().init();
-		FrintezzaManager.getInstance().init();
 
 		_log.config("AutoChatHandler: Loaded " + _autoChatHandler.size() + " handlers in total.");
 		_log.config("AutoSpawnHandler: Loaded " + _autoSpawnHandler.size() + " handlers in total.");

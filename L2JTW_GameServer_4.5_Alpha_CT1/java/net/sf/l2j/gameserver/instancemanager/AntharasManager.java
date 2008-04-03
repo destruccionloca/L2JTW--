@@ -21,6 +21,7 @@ package net.sf.l2j.gameserver.instancemanager;
 
 import java.util.logging.Logger;
 import java.util.concurrent.ScheduledFuture;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -39,11 +40,13 @@ import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2GrandBossInstance;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
+import net.sf.l2j.gameserver.templates.StatsSet;
 import net.sf.l2j.gameserver.serverpackets.SocialAction;
 import net.sf.l2j.util.Rnd;
 import net.sf.l2j.gameserver.ai.CtrlIntention;
 import net.sf.l2j.gameserver.model.L2CharPosition;
-import net.sf.l2j.gameserver.model.entity.GrandBossState;
+import net.sf.l2j.gameserver.model.actor.status.GrandBossStatus;
+import net.sf.l2j.gameserver.instancemanager.GrandBossManager;
 
 /**
  *
@@ -90,9 +93,11 @@ public class AntharasManager
     protected ScheduledFuture<?> _MovieTsak = null;
 
     // status in lair.
-    protected GrandBossState _State = new GrandBossState(29019);
     protected String _ZoneType;
     protected String _QuestName;
+    protected StatsSet _StateSet;
+    protected int _Alive;
+    protected int _BossId = 29019;
 
     // location of banishment
     private final int _BanishmentLocation[][] =
@@ -121,6 +126,8 @@ public class AntharasManager
     	_PlayersInLair.clear();
         _ZoneType = "LairofAntharas";
         _QuestName = "antharas";
+        _StateSet = GrandBossManager.getInstance().getStatsSet(_BossId);
+        _Alive = GrandBossManager.getInstance().getBossStatus(_BossId);
 
         // setting spawn data of monsters.
         try
@@ -205,19 +212,14 @@ public class AntharasManager
             _log.warning(e.getMessage());
         }
 
-        _log.info("AntharasManager : State of Antharas is " + _State.getState() + ".");
-        if (!_State.getState().equals(GrandBossState.StateEnum.NOTSPAWN))
+        _log.info("AntharasManager : State of Antharas is " + _Alive + ".");
+        if (_Alive != GrandBossStatus.NOTSPAWN)
         	setInetrvalEndTask();
 
-		Date dt = new Date(_State.getRespawnDate());
+		Date dt = new Date(_StateSet.getLong("respawn_time"));
         _log.info("AntharasManager : Next spawn date of Antharas is " + dt + ".");
         _log.info("AntharasManager : Init AntharasManager.");
-    }
 
-    // return Antaras state.
-    public GrandBossState.StateEnum getState()
-    {
-    	return _State.getState();
     }
 
     // return list of intruders.
@@ -229,14 +231,10 @@ public class AntharasManager
     // Whether it lairs is confirmed.
     public boolean isEnableEnterToLair()
     {
-    	if(_State.getState().equals(GrandBossState.StateEnum.NOTSPAWN))
-    	{
+       	if(_Alive == GrandBossStatus.NOTSPAWN)
     		return true;
-    	}
     	else
-    	{
     		return false;
-    	}
     }
 
     // update list of intruders.
@@ -252,7 +250,7 @@ public class AntharasManager
 		{
 			// player is must be alive and stay inside of lair.
 			if (!pc.isDead()
-					&& CustomZoneManager.getInstance().checkIfInZone(_ZoneType, pc))
+					&& GrandBossManager.getInstance().checkIfInZone(_ZoneType, pc))
 			{
 				return false;
 			}
@@ -266,7 +264,7 @@ public class AntharasManager
     	for(L2PcInstance pc : _PlayersInLair)
     	{
     		if(pc.getQuestState(_QuestName) != null) pc.getQuestState(_QuestName).exitQuest(true);
-    		if(CustomZoneManager.getInstance().checkIfInZone(_ZoneType, pc))
+    		if(GrandBossManager.getInstance().checkIfInZone(_ZoneType, pc))
     		{
         		int driftX = Rnd.get(-80,80);
         		int driftY = Rnd.get(-80,80);
@@ -378,11 +376,12 @@ public class AntharasManager
 					_antharas.setIsImmobilized(true);
 					_antharas.setIsInSocialAction(true);
 
-					_State.setRespawnDate(
-			    			Rnd.get(Config.FWA_FIXINTERVALOFANTHARAS,Config.FWA_FIXINTERVALOFANTHARAS + Config.FWA_RANDOMINTERVALOFANTHARAS)
-			    			+ Config.FWA_ACTIVITYTIMEOFANTHARAS);
-			    	_State.setState(GrandBossState.StateEnum.ALIVE);
-					_State.update();
+	            	_StateSet.set("respawn_time", Calendar.getInstance().getTimeInMillis() + Rnd.get(Config.FWA_FIXINTERVALOFANTHARAS,Config.FWA_FIXINTERVALOFANTHARAS + Config.FWA_RANDOMINTERVALOFANTHARAS) + Config.FWA_ACTIVITYTIMEOFANTHARAS);
+	            	_Alive = GrandBossStatus.ALIVE;
+	            	GrandBossManager.getInstance().setBossStatus(_BossId, _Alive);
+	            	GrandBossManager.getInstance().setStatsSet(_BossId, _StateSet);
+	            	GrandBossManager.getInstance().save();
+	            	_log.info("AntharasManager : Spawn Antharas.");
 
 					// set KnownList
 					updateKnownList(_antharas);
@@ -831,15 +830,15 @@ public class AntharasManager
     public void setInetrvalEndTask()
     {
 		// init state of Antharas's lair.
-    	if (!_State.getState().equals(GrandBossState.StateEnum.INTERVAL))
+       	if (_Alive != GrandBossStatus.INTERVAL)
     	{
-    		_State.setRespawnDate(Rnd.get(Config.FWA_FIXINTERVALOFANTHARAS,Config.FWA_FIXINTERVALOFANTHARAS + Config.FWA_RANDOMINTERVALOFANTHARAS));
-    		_State.setState(GrandBossState.StateEnum.INTERVAL);
-    		_State.update();
+        	_Alive = GrandBossStatus.INTERVAL;
+        	GrandBossManager.getInstance().setBossStatus(_BossId, _Alive);
+        	GrandBossManager.getInstance().save();
     	}
 
-    	_IntervalEndTask = ThreadPoolManager.getInstance().scheduleGeneral(
-            	new IntervalEnd(),_State.getInterval());
+    	_IntervalEndTask = ThreadPoolManager.getInstance().scheduleGeneral(new IntervalEnd(),GrandBossManager.getInstance().getInterval(_BossId));
+        _log.info("AntharasManager : Interval START.");
     }
 
     // at end of interval.
@@ -851,19 +850,32 @@ public class AntharasManager
 
     	public void run()
     	{
-    		_PlayersInLair.clear();
-    		_State.setState(GrandBossState.StateEnum.NOTSPAWN);
-    		_State.update();
+    		doIntervalEnd();
     	}
+    }
+
+    protected void doIntervalEnd()
+    {
+		_PlayersInLair.clear();
+    	_Alive = GrandBossStatus.NOTSPAWN;
+    	GrandBossManager.getInstance().setBossStatus(_BossId, _Alive);
+    	GrandBossManager.getInstance().save();
+        _log.info("AntharasManager : Interval END.");
     }
 
     // setting teleport cube spawn task.
     public void setCubeSpawn()
     {
-    	_State.setState(GrandBossState.StateEnum.DEAD);
-    	_State.update();
+    	_Alive = GrandBossStatus.DEAD;
+    	_StateSet.set("respawn_time", Calendar.getInstance().getTimeInMillis() + Rnd.get(Config.FWA_FIXINTERVALOFANTHARAS,Config.FWA_FIXINTERVALOFANTHARAS + Config.FWA_RANDOMINTERVALOFANTHARAS));
+    	GrandBossManager.getInstance().setBossStatus(_BossId, _Alive);
+    	GrandBossManager.getInstance().setStatsSet(_BossId, _StateSet);
+    	GrandBossManager.getInstance().save();
 
     	_CubeSpawnTask = ThreadPoolManager.getInstance().scheduleGeneral(new CubeSpawn(),10000);
+		Date dt = new Date(_StateSet.getLong("respawn_time"));
+        _log.info("AntharasManager : Antharas is dead.");
+        _log.info("AntharasManager : Next spawn date of Antharas is " + dt + ".");
     }
 
     // update knownlist.
