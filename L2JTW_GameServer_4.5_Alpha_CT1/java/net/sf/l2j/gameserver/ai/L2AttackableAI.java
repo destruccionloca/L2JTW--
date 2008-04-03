@@ -961,6 +961,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         //Skill Use 
         _log.warning("AI - Phase 5");
         if(_skillrender.hasSkill())
+        	
         if(Rnd.get(100)<=((L2NpcInstance)_actor).getSkillChance())
         {
             L2Skill skills;
@@ -998,7 +999,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 				}
 				else continue;
     		}
-        }
+        
         _log.warning("AI - Phase 6");
         //--------------------------------------------------------------------------------
         //Long/Short Range skill Usage
@@ -1009,6 +1010,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         	{
         		
         		SSkillRender();
+        		if(_skillrender._Srangeskills!=null)
         		for(L2Skill sk:_skillrender._Srangeskills)
         		{
     				if(sk.getMpConsume()>=_actor.getCurrentMp()
@@ -1028,6 +1030,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         	{
         		
         		LSkillRender();
+        		if(_skillrender._Lrangeskills!=null)
         		for(L2Skill sk:_skillrender._Lrangeskills)
         		{
     				if(sk.getMpConsume()>=_actor.getCurrentMp()
@@ -1044,6 +1047,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         		}
         	}
         	
+        }
         }
         }
         _log.warning("AI - Phase 7");
