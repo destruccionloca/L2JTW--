@@ -1870,7 +1870,7 @@ public abstract class L2Character extends L2Object
 			if (effectWhileCasting)
 				_skillCast = ThreadPoolManager.getInstance().scheduleEffect(new MagicUseTask(targets, skill, coolTime, 2), hitTime);
 			else
-				_skillCast = ThreadPoolManager.getInstance().scheduleEffect(new MagicUseTask(targets, skill, coolTime, 1), hitTime-200);
+				_skillCast = ThreadPoolManager.getInstance().scheduleEffect(new MagicUseTask(targets, skill, coolTime, 1), hitTime-300);
 		}
 		else
 			onMagicLaunchedTimer(targets, skill, coolTime, true);

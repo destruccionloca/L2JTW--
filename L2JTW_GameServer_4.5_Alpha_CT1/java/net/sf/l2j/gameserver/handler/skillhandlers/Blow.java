@@ -57,8 +57,10 @@ public class Blow implements ISkillHandler
 				_successChance = SIDE;
 			//If skill requires Crit or skill requires behind,
 			//calculate chance based on DEX, Position and on self BUFF
-			if(((skill.getCondition() & L2Skill.COND_CRIT) != 0) && L2Character.CRIT_ATTACK==1)
+			if(L2Character.CRIT_ATTACK==1)
 			{
+				if(activeChar instanceof L2PcInstance)
+					activeChar.sendPacket(new SystemMessage(SystemMessageId.CRITICAL_HIT));
 				if (skill.hasEffects())
 				{
 					if (target.reflectSkill(skill))
@@ -106,6 +108,10 @@ public class Blow implements ISkillHandler
 				if(skill.getDmgDirectlyToHP() && target instanceof L2PcInstance)
 	        	{
 					L2PcInstance player = (L2PcInstance)target;
+	        		SystemMessage smsg = new SystemMessage(SystemMessageId.S1_GAVE_YOU_S2_DMG);
+	        		smsg.addString(activeChar.getName());
+	        		smsg.addNumber((int)damage);
+	        		player.sendPacket(smsg);
 	        		if (!player.isInvul())
 					{
 	        	       if (damage >= player.getCurrentHp())
@@ -129,19 +135,16 @@ public class Blow implements ISkillHandler
 	        	       else
 	        		      player.setCurrentHp(player.getCurrentHp() - damage);
 					}
-	        		SystemMessage smsg = new SystemMessage(SystemMessageId.S1_GAVE_YOU_S2_DMG);
-	        		smsg.addString(activeChar.getName());
-	        		smsg.addNumber((int)damage);
-	        		player.sendPacket(smsg);
+
 	        	}
 	        	else
+	        	{
+					SystemMessage sm = new SystemMessage(SystemMessageId.YOU_DID_S1_DMG);
+		            sm.addNumber((int)damage);
+		            activeChar.sendPacket(sm);
 	        		target.reduceCurrentHp(damage, activeChar);
-				if(activeChar instanceof L2PcInstance)
-					activeChar.sendPacket(new SystemMessage(SystemMessageId.CRITICAL_HIT));
-				SystemMessage sm = new SystemMessage(SystemMessageId.YOU_DID_S1_DMG);
-	            sm.addNumber((int)damage);
-	            activeChar.sendPacket(sm);
-	            
+
+	        	}
 				//Possibility of a lethal strike
 				Formulas.getInstance().calcLethalHit(activeChar, target, skill);
 			}

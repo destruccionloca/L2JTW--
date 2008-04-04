@@ -724,6 +724,11 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         {
         	if(getAttackTarget() == null || getAttackTarget()==_actor)
         	setAttackTarget(MostHate);
+        	if(getTarget()==null || _actor.getTarget() == null || getTarget()==_actor || _actor.getTarget()==_actor)
+        	{
+        		setTarget(MostHate);
+        		_actor.setTarget(MostHate);
+        	}
             dist = Math.sqrt(_actor.getPlanDistanceSq(getAttackTarget().getX(), getAttackTarget().getY()));
             dist2= (int)dist;
             range = _actor.getPhysicalAttackRange() + _actor.getTemplate().collisionRadius + getAttackTarget().getTemplate().collisionRadius;
@@ -1113,6 +1118,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 	        					return;
 	    				
 	    			}
+	    			break;
 	    		}
 	    		case 1:
 	    		{
@@ -1131,6 +1137,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 	        					return;
 	    				
 	    			}
+	    			break;
 	    		}
 	    		default:
 	    		{
@@ -1152,6 +1159,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 	    				}
 	    			}
 	    		}
+	    		break;
 	    	}
     	}
 
@@ -1230,6 +1238,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 	        				return;
 						
 					}
+					break;
 				}
 			case HEAL:
 			case HOT:
@@ -1326,6 +1335,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 			    				}
 			    			}
 						}
+						break;
 				}
 			case RESURRECT:
 				{
@@ -1401,6 +1411,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 			    				}
 			    			}
 						}
+						break;
 				}
 			case DEBUFF:
 			case WEAKNESS:
@@ -1467,7 +1478,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 							return;
 						}
 					}
-					else return;
+					break;
 				}
 			case SLEEP:
 				{
@@ -1538,7 +1549,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 							return;
 				    	}
 					}
-					else return;
+					break;
 				}
 			case ROOT:
 			case STUN:
@@ -1600,7 +1611,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 							return;
 						}
 					}
-					else return;
+					break;
 				}
 			case MUTE:
 			case FEAR:
@@ -1661,7 +1672,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 							return;
 						}
 					}
-					else return;
+					break;
 				}
 			case CANCEL:
 			case NEGATE:
@@ -1722,6 +1733,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 							return;
 				    	}
 					}
+					break;
 				}
 			case PDAM:
 			case MDAM:
@@ -1763,6 +1775,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 						_actor.doCast(sk);
 						return;
 					}
+					break;
 				}
 			default :
 				{
@@ -1803,7 +1816,10 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 						//_actor.setTarget(targets);
 						return;
 					}
-				};
+					
+				}
+				break;
+				
 
     				
     		
