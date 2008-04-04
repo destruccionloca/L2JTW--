@@ -722,7 +722,8 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         L2Character MostHate = ((L2Attackable) _actor).getMostHated();
         try
         {
-        	setTarget(MostHate);
+        	if(getAttackTarget() == null || getAttackTarget()==_actor)
+        	setAttackTarget(MostHate);
             dist = Math.sqrt(_actor.getPlanDistanceSq(getAttackTarget().getX(), getAttackTarget().getY()));
             dist2= (int)dist;
             range = _actor.getPhysicalAttackRange() + _actor.getTemplate().collisionRadius + getAttackTarget().getTemplate().collisionRadius;
