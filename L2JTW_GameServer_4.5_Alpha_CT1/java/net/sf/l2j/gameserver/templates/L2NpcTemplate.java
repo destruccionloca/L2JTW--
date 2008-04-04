@@ -377,6 +377,7 @@ public final class L2NpcTemplate extends L2CharTemplate
 				case BUFF:
 				case REFLECT:
 					addBuffSkill(skill);
+					break;
 				case HEAL:
 				case HOT:
 				case HEAL_PERCENT:
@@ -384,24 +385,31 @@ public final class L2NpcTemplate extends L2CharTemplate
 				case BALANCE_LIFE:
 				case BALANCE:
 					addHealSkill(skill);
+					break;
 				case RESURRECT:
 					addResSkill(skill);
+					break;
 				case DEBUFF:
 				case WEAKNESS:
 					addDebuffSkill(skill);
 					addCOTSkill(skill);
+					break;
 				case ROOT:
 					addRootSkill(skill);
 					addImmobiliseSkill(skill);
+					break;
 				case SLEEP:
 					addSleepSkill(skill);
 					addImmobiliseSkill(skill);
+					break;
 				case STUN:
 					addRootSkill(skill);
 					addImmobiliseSkill(skill);
+					break;
 				case PARALYZE:
 					addParalyzeSkill(skill);
 					addImmobiliseSkill(skill);
+					break;
 				case PDAM:
 				case MDAM:
 				case BLOW:
@@ -412,19 +420,24 @@ public final class L2NpcTemplate extends L2CharTemplate
 				case MANADAM:
 					addAtkSkill(skill);
 					addUniversalSkill(skill);
+					break;
 				case POISON:
 				case DOT:
 				case MDOT:
 				case BLEED:
 					addDOTSkill(skill);
+					break;
 				case MUTE:
 				case FEAR:
 					addCOTSkill(skill);
+					break;
 				case CANCEL:
 				case NEGATE:
 					addNegativeSkill(skill);
+					break;
 				default :
 					addUniversalSkill(skill);
+					break;
 		
 			}
 		}

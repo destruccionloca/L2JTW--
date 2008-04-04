@@ -1351,7 +1351,8 @@ public class L2CharacterAI extends AbstractAI
 	    			{
 	    				L2NpcInstance targets = ((L2NpcInstance)target);
 	    				L2NpcInstance actors = ((L2NpcInstance)_actor);
-	    				if(!targets.getEnemyClan().equals(actors.getClan()) || (actors.getClan()==null && actors.getIsChaos()== 0))
+	    				
+	    				if(targets.getEnemyClan()==null || actors.getClan() == null||!targets.getEnemyClan().equals(actors.getClan()) || (actors.getClan()=="none" && actors.getIsChaos()== 0))
 	    					continue;
 	    			}
 	    			L2Effect[] effects = target.getAllEffects();
@@ -1381,7 +1382,7 @@ public class L2CharacterAI extends AbstractAI
 	    			{
 	    				L2NpcInstance targets = ((L2NpcInstance)target);
 	    				L2NpcInstance actors = ((L2NpcInstance)_actor);
-	    				if(!targets.getEnemyClan().equals(actors.getClan()) || (actors.getClan()==null && actors.getIsChaos()== 0))
+	    				if(targets.getEnemyClan()==null || actors.getClan() == null||!targets.getEnemyClan().equals(actors.getClan()) || ((actors.getClan()=="none") && actors.getIsChaos()== 0))
 	    					continue;
 	    			}
 	    			L2Effect[] effects = target.getAllEffects();
@@ -1408,7 +1409,7 @@ public class L2CharacterAI extends AbstractAI
 	    			{
 	    				L2NpcInstance targets = ((L2NpcInstance)target);
 	    				L2NpcInstance actors = ((L2NpcInstance)_actor);
-	    				if(!targets.getEnemyClan().equals(actors.getClan()) || (actors.getClan()==null && actors.getIsChaos()== 0))
+	    				if(targets.getEnemyClan()==null || actors.getClan() == null||!targets.getEnemyClan().equals(actors.getClan()) || (actors.getClan()==null && actors.getIsChaos()== 0))
 	    					continue;
 	    			}
 	    			L2Effect[] effects = target.getAllEffects();
@@ -1431,7 +1432,7 @@ public class L2CharacterAI extends AbstractAI
 	    			{
 	    				L2NpcInstance targets = ((L2NpcInstance)target);
 	    				L2NpcInstance actors = ((L2NpcInstance)_actor);
-	    				if(!targets.getEnemyClan().equals(actors.getClan()) || (actors.getClan()==null && actors.getIsChaos()== 0))
+	    				if(targets.getEnemyClan()==null || actors.getClan() == null||!targets.getEnemyClan().equals(actors.getClan()) || (actors.getClan()==null && actors.getIsChaos()== 0))
 	    					continue;
 	    			}
 	    			L2Effect[] effects = target.getAllEffects();

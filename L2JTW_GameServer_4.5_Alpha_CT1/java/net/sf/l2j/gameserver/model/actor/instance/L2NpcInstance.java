@@ -786,12 +786,12 @@ public class L2NpcInstance extends L2Character
     	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
     	for (L2NpcAIData AI: npcData.getAIData())
     	{
-    		//if (AI == null)
-    		//	return null;
-    		//else
+    		if (AI == null || AI.getEnemyClan() == "")
+    			return "none";
+    		else
     		return AI.getEnemyClan();
     	}
-        return null;
+        return "none";
     }
     
     public String getClan()
@@ -799,12 +799,12 @@ public class L2NpcInstance extends L2Character
     	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
     	for (L2NpcAIData AI: npcData.getAIData())
     	{
-    		//if (AI == null)
-    		//	return null;
-    		//else
+    		if (AI == null || getClan() == "")
+    			return "none";
+    		else
     		return AI.getClan();
     	}
-        return null;
+        return "none";
     }
     
  // GET THE PRIMARY ATTACK

@@ -1167,6 +1167,7 @@ public final class Formulas
 			}
 			else
 				ss = false;
+			((L2Attackable)attacker)._soulshotcharged = false;
 		}
 
 		double damage = attacker.getPAtk(target);
