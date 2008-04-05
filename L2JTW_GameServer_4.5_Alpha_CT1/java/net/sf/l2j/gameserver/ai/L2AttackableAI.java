@@ -651,6 +651,32 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         //Return when Attack been disable
         if(_actor.isAttackingDisabled())
         	return;
+        //------------------------------------------------------------------------------
+        //Initialize data
+        double dist = 0;
+        int dist2 = 0;
+        int range = 0;
+        L2Character MostHate = ((L2Attackable) _actor).getMostHated();
+        try
+        {
+        	//if(getAttackTarget() == null || getAttackTarget()==_actor)
+        	//setAttackTarget(MostHate);
+        	//if(getTarget()==null || _actor.getTarget() == null || getTarget()==_actor || _actor.getTarget()==_actor)
+        	//{
+        		setTarget(MostHate);
+        		_actor.setTarget(MostHate);
+        	//}
+            dist = Math.sqrt(_actor.getPlanDistanceSq(getAttackTarget().getX(), getAttackTarget().getY()));
+            dist2= (int)dist;
+            range = _actor.getPhysicalAttackRange() + _actor.getTemplate().collisionRadius + getAttackTarget().getTemplate().collisionRadius;
+            if(getAttackTarget().isMoving())
+            	range = range + 50;
+        }
+        catch (NullPointerException e)
+        {
+            setIntention(AI_INTENTION_ACTIVE);
+            return;
+        }
     	// In case many mobs are trying to hit from same place, move a bit,
 		// circling around the target
 		if (!_actor.isRooted() && Rnd.nextInt(100) <= 33) // check it once per 3 seconds
@@ -714,32 +740,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
                 //}
             }
         }
-        //------------------------------------------------------------------------------
-        //Initialize data
-        double dist = 0;
-        int dist2 = 0;
-        int range = 0;
-        L2Character MostHate = ((L2Attackable) _actor).getMostHated();
-        try
-        {
-        	if(getAttackTarget() == null || getAttackTarget()==_actor)
-        	setAttackTarget(MostHate);
-        	if(getTarget()==null || _actor.getTarget() == null || getTarget()==_actor || _actor.getTarget()==_actor)
-        	{
-        		setTarget(MostHate);
-        		_actor.setTarget(MostHate);
-        	}
-            dist = Math.sqrt(_actor.getPlanDistanceSq(getAttackTarget().getX(), getAttackTarget().getY()));
-            dist2= (int)dist;
-            range = _actor.getPhysicalAttackRange() + _actor.getTemplate().collisionRadius + getAttackTarget().getTemplate().collisionRadius;
-            if(getAttackTarget().isMoving())
-            	range = range + 50;
-        }
-        catch (NullPointerException e)
-        {
-            setIntention(AI_INTENTION_ACTIVE);
-            return;
-        }
+
         //------------------------------------------------------------------------------
         // BOSS Target Reconsider
         if((_actor instanceof L2RaidBossInstance) || (_actor instanceof L2GrandBossInstance))
