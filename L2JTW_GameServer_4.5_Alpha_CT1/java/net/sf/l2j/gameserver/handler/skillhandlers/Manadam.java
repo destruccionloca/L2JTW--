@@ -118,7 +118,7 @@ L2Character activeChar, L2Skill skill, L2Object[] targets)
 			if(target instanceof L2PcInstance)
 			{
 				SystemMessage sm = new SystemMessage(SystemMessageId.S2_MP_HAS_BEEN_DRAINED_BY_S1);
-				sm.addNumber((int) mp);
+
 					if(activeChar instanceof L2NpcInstance || activeChar instanceof L2Summon)
 					{
 						if(activeChar instanceof L2NpcInstance)
@@ -146,11 +146,11 @@ L2Character activeChar, L2Skill skill, L2Object[] targets)
 					{
                
 		                 sm.addString(activeChar.getName());
-		                 sm.addSkillName(skill.getId());
-		                 activeChar.sendPacket(sm);
+		                 //sm.addSkillName(skill.getId());
+		                 //activeChar.sendPacket(sm);
 					}
-
-				target.sendPacket(sm);
+					sm.addNumber((int) mp);
+					target.sendPacket(sm);
 			}
 			if (activeChar instanceof L2PcInstance)
 			{

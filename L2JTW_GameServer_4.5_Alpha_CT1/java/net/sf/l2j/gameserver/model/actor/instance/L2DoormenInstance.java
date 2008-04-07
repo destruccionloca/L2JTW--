@@ -77,8 +77,9 @@ public class L2DoormenInstance extends L2FolkInstance
                 {
                     getClanHall().openCloseDoors(true);
                     player.sendPacket(new NpcHtmlMessage(getObjectId(),
+
                     		"<html><body><font color=\"LEVEL\">已經開啟</font>根據地的門。<br>若開著門，除了血盟成員以外的角色也可進出，辦完事請務必關門。<br><center><br>" +
-                    		"<button action=\"bypass -h npc_" + getObjectId()+ "_close_doors\" value=\"關閉\" width=74 height=21 back=\"L2UI_CH3.Btn1_normalOn\" fore=\"L2UI_CH3.Btn1_normal\"></center></body></html>"));
+                    		"<button action=\"bypass -h npc_" + getObjectId()+ "_close_doors\" value=\"關閉\" width=74 height=21 back=\"L2UI_CT1.Button_DF_Down\" fore=\"L2UI_CT1.Button_DF\"></center></body></html>"));
                 }
                 else
                 {
@@ -104,7 +105,8 @@ public class L2DoormenInstance extends L2FolkInstance
                     getClanHall().openCloseDoors(false);
                     player.sendPacket(new NpcHtmlMessage(getObjectId(),
                     		"<html><body><font color=\"LEVEL\">已經關閉</font>根據地的門。<br>祝您有個愉快的一天！<br><center><br>" +
-                    		"<button action=\"bypass -h npc_" + getObjectId()+ "_Chat\" value=\"首頁\" width=74 height=21 back=\"L2UI_CH3.Btn1_normalOn\" fore=\"L2UI_CH3.Btn1_normal\"></center></body></html>"));
+                    		"<button action=\"bypass -h npc_" + getObjectId()+ "_Chat\" value=\"首頁\" width=74 height=21 back=\"L2UI_CT1.Button_DF_Down\" fore=\"L2UI_CT1.Button_DF\"></center></body></html>"));
+
                 }
                 else
                 {
@@ -186,9 +188,11 @@ public class L2DoormenInstance extends L2FolkInstance
         {
             if (condition == COND_HALL_OWNER)
             {
+
                 str = "<html><body>啊，您來了？<br><font color=\"55FFFF\">" + getName()+ "</font>很榮幸迎接到血盟成員。<br>有什麼事情需要我幫忙？<br><center>";
-                str += "<br><button action=\"bypass -h npc_%objectId%_open_doors\" value=\"開門\" width=74 height=21 back=\"L2UI_CH3.Btn1_normalOn\" fore=\"L2UI_CH3.Btn1_normal\">";
-                str += "<br><button action=\"bypass -h npc_%objectId%_close_doors\" value=\"關門\" width=74 height=21 back=\"L2UI_CH3.Btn1_normalOn\" fore=\"L2UI_CH3.Btn1_normal\"></center></body></html>";
+                str += "<br><button action=\"bypass -h npc_%objectId%_open_doors\" value=\"開門\" width=74 height=21 back=\"L2UI_CT1.Button_DF_Down\" fore=\"L2UI_CT1.Button_DF\">";
+                str += "<br><button action=\"bypass -h npc_%objectId%_close_doors\" value=\"關門\" width=74 height=21 back=\"L2UI_CT1.Button_DF_Down\" fore=\"L2UI_CT1.Button_DF\"></center></body></html>";
+
             }
             else
             {
@@ -200,6 +204,7 @@ public class L2DoormenInstance extends L2FolkInstance
                     str += owner.getName() + "</font>陛下。<br>";
                     str += "很抱歉，非<font color=\"55FFFF\">"
                         + owner.getName() + "</font>血盟之血盟成員不得進入。</body></html>";
+
                 }
                 else str = "<html><body>" + getName() + "<br1>根據地<font color=\"LEVEL\">"
                     + getClanHall().getName()

@@ -147,7 +147,6 @@ public class L2NpcInstance extends L2Character
     private int _currentCollisionHeight; // used for npc grow effect skills
     private int _currentCollisionRadius; // used for npc grow effect skills
 //l2JTW addon start ========================================
-    protected RandomPathTask _rPathTask = null;
     
     public boolean _soulshotcharged = false;
     public boolean _spiritshotcharged = false;
@@ -156,33 +155,7 @@ public class L2NpcInstance extends L2Character
     public boolean _ssrecharged = true;
     public boolean _spsrecharged = true;
 
-    // L2NpcInstance act like L2Attackable
-    // This is part of L2JTW 5.0 Implement Function, will not complete in 4.5
-    protected class RandomPathTask implements Runnable 
-    {
-    	public void run()
-        {
-            try
-            {
-            	if(this != _rPathTask)
-                    return; 
-                if(isMob())
-                {
-                    	return; 
-                }
-                else
-                {
-                	if (!isInActiveRegion()) 
-                		return;
-                	
-                	getKnownList().updateKnownObjects(); 
-                }
 
-
-            }
-            catch (Throwable a) {}
-        }
-    }
 //l2JTW addon end ==========================================
 
     /** Task launching the function onRandomAnimation() */
@@ -204,8 +177,6 @@ public class L2NpcInstance extends L2Character
                 {
                 	if (!isInActiveRegion()) // NPCs in inactive region don't run this task
                 		return;
-                	// update knownlist to remove playable which aren't in range any more
-                	getKnownList().updateKnownObjects();
                 }
 
                 if(!(isDead() || isStunned() || isSleeping() || isParalyzed()))
@@ -957,6 +928,7 @@ public class L2NpcInstance extends L2Character
     			{
 					L2Skill[] skills = null;
     	    		skills = getAllSkills();
+    	    		if(skills != null)
     				for (L2Skill sk: skills)
     				{
     					if(sk==null || sk.getSkillType() == L2Skill.SkillType.PASSIVE
@@ -973,6 +945,7 @@ public class L2NpcInstance extends L2Character
     			}
     			case 1:
     			{
+    				if(npcData._universalskills!=null)
     				for (L2Skill sk: npcData._universalskills)
     				{
     					if(sk.getCastRange()>=200)
@@ -1006,6 +979,7 @@ public class L2NpcInstance extends L2Character
     			{
 					L2Skill[] skills = null;
     	    		skills = getAllSkills();
+    	    		if(skills!=null)
     				for (L2Skill sk: skills)
     				{
     					if(sk==null || sk.getSkillType() == L2Skill.SkillType.PASSIVE
@@ -1022,6 +996,7 @@ public class L2NpcInstance extends L2Character
     			}
     			case 1:
     			{
+    				if(npcData._universalskills!=null)
     				for (L2Skill sk: npcData._universalskills)
     				{
     					if(sk.getCastRange()<=200)
@@ -1946,6 +1921,15 @@ public class L2NpcInstance extends L2Character
             
         	if (qs == null)
         	{
+        		if (q.getQuestIntId() >= 1 && q.getQuestIntId() < 1000)
+        		{
+        			Quest[] questList = player.getAllActiveQuests();
+        			if (questList.length >= 25) // if too many ongoing quests, don't show window and send message
+	                {
+        				player.sendPacket(new SystemMessage(SystemMessageId.TOO_MANY_QUESTS));
+	                    return;
+	                 }
+        		}
 	            // check for start point
 	            Quest[] qlst = getTemplate().getEventQuests(Quest.QuestEventType.QUEST_START);
 	            

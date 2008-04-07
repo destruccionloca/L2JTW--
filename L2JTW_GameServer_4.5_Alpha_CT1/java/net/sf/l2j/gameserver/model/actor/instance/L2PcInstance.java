@@ -1810,7 +1810,7 @@ public final class L2PcInstance extends L2PlayableInstance
 		{
 			for (L2Object object : getKnownList().getKnownObjects().values())
 			{
-				if (object == null || !(object instanceof L2GuardInstance)) continue;
+				if (!(object instanceof L2GuardInstance)) continue;
 
 				if (((L2GuardInstance)object).getAI().getIntention() == CtrlIntention.AI_INTENTION_IDLE)
 					((L2GuardInstance)object).getAI().setIntention(CtrlIntention.AI_INTENTION_ACTIVE, null);
@@ -2990,8 +2990,8 @@ public final class L2PcInstance extends L2PlayableInstance
 		{
 			if (sendMessage)
             {
-				SystemMessage sm = new SystemMessage(SystemMessageId.ITEM_NOT_ENOUGH);
-	            sm.addItemName(objectId);
+				SystemMessage sm = new SystemMessage(1987);
+	            sm.addString("所需物品不足");
 				sendPacket(sm);
             }
             
@@ -3018,8 +3018,8 @@ public final class L2PcInstance extends L2PlayableInstance
 		{
 			if (sendMessage)
             {
-				SystemMessage sm = new SystemMessage(SystemMessageId.ITEM_NOT_ENOUGH);
-	            sm.addItemName(objectId);
+				SystemMessage sm = new SystemMessage(1987);
+	            sm.addString("所需物品不足");
 				sendPacket(sm);
             }
             
@@ -3047,9 +3047,9 @@ public final class L2PcInstance extends L2PlayableInstance
 		{
 			if (sendMessage)
                 {
-					SystemMessage sm = new SystemMessage(SystemMessageId.ITEM_NOT_ENOUGH);
-		            sm.addItemName(itemId);
-					sendPacket(sm);
+				SystemMessage sm = new SystemMessage(1987);
+	            sm.addString("所需物品不足");
+				sendPacket(sm);
                 }
 
 			return false;
@@ -3220,8 +3220,8 @@ public final class L2PcInstance extends L2PlayableInstance
 		{
 			if (sendMessage)
             {
-				SystemMessage sm = new SystemMessage(SystemMessageId.ITEM_NOT_ENOUGH);
-	            sm.addString("所需物品");
+				SystemMessage sm = new SystemMessage(1987);
+	            sm.addString("所需物品不足");
 				sendPacket(sm);
             }
 
@@ -5792,10 +5792,10 @@ public final class L2PcInstance extends L2PlayableInstance
     
     public boolean mount(L2Summon pet)
     {
-        if (!this.disarmWeapons())
-        {
+        if (!disarmWeapons())
             return false;
-        }
+        if (isTransformed())
+        	return false;
         
         Ride mount = new Ride(this, true, pet.getTemplate().npcId);
         this.setMount(pet.getTemplate().npcId, mount.getMountType());
@@ -5807,16 +5807,15 @@ public final class L2PcInstance extends L2PlayableInstance
         
         pet.unSummon(this);
         
-        
         return true;
     }
     
     public boolean mount(int npcId, int controlItemObjId)
     {
-        if (!this.disarmWeapons())
-        {
+        if (!disarmWeapons())
             return false;
-        }
+        if (isTransformed())
+        	return false;
         
         Ride mount = new Ride(this, true, npcId);
         this.setMount(npcId, mount.getMountType());
@@ -6750,13 +6749,13 @@ public final class L2PcInstance extends L2PlayableInstance
 					if (_reuseTimeStamps.containsKey(skillId))
 					{
 						TimeStamp t = _reuseTimeStamps.remove(skillId);
-						statement.setLong(6, t.hasNotPassed() ? t.getReuse() : 0 );
-						statement.setLong(7, t.hasNotPassed() ? t.getStamp() : 0 );
+						statement.setDouble(6, t.hasNotPassed() ? t.getReuse() : 0 );
+						statement.setDouble(7, t.hasNotPassed() ? t.getStamp() : 0 );
 					}
                     else
 					{
-						statement.setLong(6, 0);
-						statement.setLong(7, 0);
+						statement.setDouble(6, 0);
+						statement.setDouble(7, 0);
 					}
 					
 					statement.setInt(8, 0);
@@ -7052,8 +7051,8 @@ public final class L2PcInstance extends L2PlayableInstance
 				int skillLvl = rset.getInt("skill_level");
 				int effectCount = rset.getInt("effect_count");
 				int effectCurTime = rset.getInt("effect_cur_time");
-				long reuseDelay = rset.getLong("reuse_delay");
-				long systime = rset.getLong("systime");
+				double reuseDelay = rset.getDouble("reuse_delay");
+				double systime = rset.getDouble("systime");
 
 				// Just incase the admin minipulated this table incorrectly :x
 				if(skillId == -1 || effectCount == -1 || effectCurTime == -1 || reuseDelay < 0) continue;
@@ -7067,8 +7066,8 @@ public final class L2PcInstance extends L2PlayableInstance
 
 				if (reuseDelay > 10)
 				{
-					disableSkill(skillId, reuseDelay);
-					addTimeStamp(new TimeStamp(skillId, reuseDelay, systime));
+					disableSkill(skillId, (long)reuseDelay);
+					addTimeStamp(new TimeStamp(skillId, (long)reuseDelay, (long)systime));
 				}
 
 				for (L2Effect effect : getAllEffects())
@@ -7097,15 +7096,15 @@ public final class L2PcInstance extends L2PlayableInstance
 			while (rset.next())
 			{
 				int skillId = rset.getInt("skill_id");
-				long reuseDelay = rset.getLong("reuse_delay");
-				long systime = rset.getInt("systime");
+				double reuseDelay = rset.getDouble("reuse_delay");
+				double systime = rset.getDouble("systime");
 
 				reuseDelay = reuseDelay - delaytime;
 				
 				if (reuseDelay <= 0) continue;
 
-				disableSkill(skillId, reuseDelay);
-				addTimeStamp(new TimeStamp(skillId, reuseDelay, systime));
+				disableSkill(skillId, (long)reuseDelay);
+				addTimeStamp(new TimeStamp(skillId, (long)reuseDelay, (long)systime));
 			}
 			rset.close();
 			statement.close();

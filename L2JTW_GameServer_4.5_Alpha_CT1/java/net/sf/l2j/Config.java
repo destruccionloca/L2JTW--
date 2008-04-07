@@ -554,6 +554,17 @@ public final class Config
     public static boolean 	ONLY_GM_ITEMS_FREE;
     public static boolean 	JAIL_IS_PVP;
     public static boolean 	JAIL_DISABLE_CHAT;
+    public static boolean	CUSTOM_SPAWNLIST_TABLE;
+    public static boolean	SAVE_GMSPAWN_ON_CUSTOM;
+    public static boolean	DELETE_GMSPAWN_ON_CUSTOM;
+    public static boolean	CUSTOM_NPC_TABLE;
+    public static boolean	CUSTOM_ETCITEM_TABLE;
+    public static boolean	CUSTOM_ARMOR_TABLE;
+    public static boolean	CUSTOM_ARMORSETS_TABLE;
+    public static boolean	CUSTOM_WEAPON_TABLE;
+    public static boolean	CUSTOM_TELEPORT_TABLE;
+    public static boolean	CUSTOM_DROPLIST_TABLE;
+    public static boolean	CUSTOM_MERCHANT_TABLES;
 	
 	/** ************************************************** **/
 	/** General Settings -End                              **/
@@ -1101,56 +1112,56 @@ public final class Config
                 Feature.load(is);
                 is.close();
                 
-				CH_TELE_FEE_RATIO                                   = Long.parseLong(Feature.getProperty("ClanHallTeleportFunctionFeeRation", "86400000"));
-                CH_TELE1_FEE                                        = Integer.parseInt(Feature.getProperty("ClanHallTeleportFunctionFeeLvl1", "86400000"));
-                CH_TELE2_FEE                                        = Integer.parseInt(Feature.getProperty("ClanHallTeleportFunctionFeeLvl2", "86400000"));
-                CH_SUPPORT_FEE_RATIO                                = Long.parseLong(Feature.getProperty("ClanHallSupportFunctionFeeRation", "86400000"));
-                CH_SUPPORT1_FEE                                     = Integer.parseInt(Feature.getProperty("ClanHallSupportFeeLvl1", "86400000"));
-                CH_SUPPORT2_FEE                                     = Integer.parseInt(Feature.getProperty("ClanHallSupportFeeLvl2", "86400000"));
-                CH_SUPPORT3_FEE                                     = Integer.parseInt(Feature.getProperty("ClanHallSupportFeeLvl3", "86400000"));
-                CH_SUPPORT4_FEE                                     = Integer.parseInt(Feature.getProperty("ClanHallSupportFeeLvl4", "86400000"));
-                CH_SUPPORT5_FEE                                     = Integer.parseInt(Feature.getProperty("ClanHallSupportFeeLvl5", "86400000"));
-                CH_SUPPORT6_FEE                                     = Integer.parseInt(Feature.getProperty("ClanHallSupportFeeLvl6", "86400000"));
-                CH_SUPPORT7_FEE                                     = Integer.parseInt(Feature.getProperty("ClanHallSupportFeeLvl7", "86400000"));
-                CH_SUPPORT8_FEE                                     = Integer.parseInt(Feature.getProperty("ClanHallSupportFeeLvl8", "86400000"));
-                CH_MPREG_FEE_RATIO                                  = Long.parseLong(Feature.getProperty("ClanHallMpRegenerationFunctionFeeRation", "86400000"));
-                CH_MPREG1_FEE                                       = Integer.parseInt(Feature.getProperty("ClanHallMpRegenerationFeeLvl1", "86400000"));
-                CH_MPREG2_FEE                                       = Integer.parseInt(Feature.getProperty("ClanHallMpRegenerationFeeLvl2", "86400000"));
-                CH_MPREG3_FEE                                       = Integer.parseInt(Feature.getProperty("ClanHallMpRegenerationFeeLvl3", "86400000"));
-                CH_MPREG4_FEE                                       = Integer.parseInt(Feature.getProperty("ClanHallMpRegenerationFeeLvl4", "86400000"));
-                CH_MPREG5_FEE                                       = Integer.parseInt(Feature.getProperty("ClanHallMpRegenerationFeeLvl5", "86400000"));
-                CH_HPREG_FEE_RATIO                                  = Long.parseLong(Feature.getProperty("ClanHallHpRegenerationFunctionFeeRation", "86400000"));
-                CH_HPREG1_FEE                                       = Integer.parseInt(Feature.getProperty("ClanHallHpRegenerationFeeLvl1", "86400000"));
-                CH_HPREG2_FEE                                       = Integer.parseInt(Feature.getProperty("ClanHallHpRegenerationFeeLvl2", "86400000"));
-                CH_HPREG3_FEE                                       = Integer.parseInt(Feature.getProperty("ClanHallHpRegenerationFeeLvl3", "86400000"));
-                CH_HPREG4_FEE                                       = Integer.parseInt(Feature.getProperty("ClanHallHpRegenerationFeeLvl4", "86400000"));
-                CH_HPREG5_FEE                                       = Integer.parseInt(Feature.getProperty("ClanHallHpRegenerationFeeLvl5", "86400000"));
-                CH_HPREG6_FEE                                       = Integer.parseInt(Feature.getProperty("ClanHallHpRegenerationFeeLvl6", "86400000"));
-                CH_HPREG7_FEE                                       = Integer.parseInt(Feature.getProperty("ClanHallHpRegenerationFeeLvl7", "86400000"));
-                CH_HPREG8_FEE                                       = Integer.parseInt(Feature.getProperty("ClanHallHpRegenerationFeeLvl8", "86400000"));
-                CH_HPREG9_FEE                                       = Integer.parseInt(Feature.getProperty("ClanHallHpRegenerationFeeLvl9", "86400000"));
-                CH_HPREG10_FEE                                      = Integer.parseInt(Feature.getProperty("ClanHallHpRegenerationFeeLvl10", "86400000"));
-                CH_HPREG11_FEE                                      = Integer.parseInt(Feature.getProperty("ClanHallHpRegenerationFeeLvl11", "86400000"));
-                CH_HPREG12_FEE										= Integer.parseInt(Feature.getProperty("ClanHallHpRegenerationFeeLvl12", "86400000"));
-                CH_HPREG13_FEE                                      = Integer.parseInt(Feature.getProperty("ClanHallHpRegenerationFeeLvl13", "86400000"));
-                CH_EXPREG_FEE_RATIO                                 = Long.parseLong(Feature.getProperty("ClanHallExpRegenerationFunctionFeeRation", "86400000"));
-                CH_EXPREG1_FEE                                      = Integer.parseInt(Feature.getProperty("ClanHallExpRegenerationFeeLvl1", "86400000"));
-                CH_EXPREG2_FEE                                      = Integer.parseInt(Feature.getProperty("ClanHallExpRegenerationFeeLvl2", "86400000"));
-                CH_EXPREG3_FEE                                      = Integer.parseInt(Feature.getProperty("ClanHallExpRegenerationFeeLvl3", "86400000"));
-                CH_EXPREG4_FEE                                      = Integer.parseInt(Feature.getProperty("ClanHallExpRegenerationFeeLvl4", "86400000"));
-                CH_EXPREG5_FEE                                      = Integer.parseInt(Feature.getProperty("ClanHallExpRegenerationFeeLvl5", "86400000"));
-                CH_EXPREG6_FEE                                      = Integer.parseInt(Feature.getProperty("ClanHallExpRegenerationFeeLvl6", "86400000"));
-                CH_EXPREG7_FEE                                      = Integer.parseInt(Feature.getProperty("ClanHallExpRegenerationFeeLvl7", "86400000"));
-                CH_ITEM_FEE_RATIO                                   = Long.parseLong(Feature.getProperty("ClanHallItemCreationFunctionFeeRation", "86400000"));
-                CH_ITEM1_FEE                                        = Integer.parseInt(Feature.getProperty("ClanHallItemCreationFunctionFeeLvl1", "86400000"));
-                CH_ITEM2_FEE                                        = Integer.parseInt(Feature.getProperty("ClanHallItemCreationFunctionFeeLvl2", "86400000"));
-                CH_ITEM3_FEE                                        = Integer.parseInt(Feature.getProperty("ClanHallItemCreationFunctionFeeLvl3", "86400000"));
-                CH_CURTAIN_FEE_RATIO                                = Long.parseLong(Feature.getProperty("ClanHallCurtainFunctionFeeRation", "86400000"));
-                CH_CURTAIN1_FEE                                     = Integer.parseInt(Feature.getProperty("ClanHallCurtainFunctionFeeLvl1", "86400000"));
-                CH_CURTAIN2_FEE                                     = Integer.parseInt(Feature.getProperty("ClanHallCurtainFunctionFeeLvl2", "86400000"));
-                CH_FRONT_FEE_RATIO                                	= Long.parseLong(Feature.getProperty("ClanHallFrontPlatformFunctionFeeRation", "86400000"));
-                CH_FRONT1_FEE                                       = Integer.parseInt(Feature.getProperty("ClanHallFrontPlatformFunctionFeeLvl1", "86400000"));
-                CH_FRONT2_FEE                                       = Integer.parseInt(Feature.getProperty("ClanHallFrontPlatformFunctionFeeLvl2", "86400000"));
+				CH_TELE_FEE_RATIO                                   = Long.parseLong(Feature.getProperty("ClanHallTeleportFunctionFeeRatio", "604800000"));
+                CH_TELE1_FEE                                        = Integer.parseInt(Feature.getProperty("ClanHallTeleportFunctionFeeLvl1", "7000"));
+                CH_TELE2_FEE                                        = Integer.parseInt(Feature.getProperty("ClanHallTeleportFunctionFeeLvl2", "14000"));
+                CH_SUPPORT_FEE_RATIO                                = Long.parseLong(Feature.getProperty("ClanHallSupportFunctionFeeRatio", "86400000"));
+                CH_SUPPORT1_FEE                                     = Integer.parseInt(Feature.getProperty("ClanHallSupportFeeLvl1", "2500"));
+                CH_SUPPORT2_FEE                                     = Integer.parseInt(Feature.getProperty("ClanHallSupportFeeLvl2", "5000"));
+                CH_SUPPORT3_FEE                                     = Integer.parseInt(Feature.getProperty("ClanHallSupportFeeLvl3", "7000"));
+                CH_SUPPORT4_FEE                                     = Integer.parseInt(Feature.getProperty("ClanHallSupportFeeLvl4", "11000"));
+                CH_SUPPORT5_FEE                                     = Integer.parseInt(Feature.getProperty("ClanHallSupportFeeLvl5", "21000"));
+                CH_SUPPORT6_FEE                                     = Integer.parseInt(Feature.getProperty("ClanHallSupportFeeLvl6", "36000"));
+                CH_SUPPORT7_FEE                                     = Integer.parseInt(Feature.getProperty("ClanHallSupportFeeLvl7", "37000"));
+                CH_SUPPORT8_FEE                                     = Integer.parseInt(Feature.getProperty("ClanHallSupportFeeLvl8", "52000"));
+                CH_MPREG_FEE_RATIO                                  = Long.parseLong(Feature.getProperty("ClanHallMpRegenerationFunctionFeeRatio", "86400000"));
+                CH_MPREG1_FEE                                       = Integer.parseInt(Feature.getProperty("ClanHallMpRegenerationFeeLvl1", "2000"));
+                CH_MPREG2_FEE                                       = Integer.parseInt(Feature.getProperty("ClanHallMpRegenerationFeeLvl2", "3750"));
+                CH_MPREG3_FEE                                       = Integer.parseInt(Feature.getProperty("ClanHallMpRegenerationFeeLvl3", "6500"));
+                CH_MPREG4_FEE                                       = Integer.parseInt(Feature.getProperty("ClanHallMpRegenerationFeeLvl4", "13750"));
+                CH_MPREG5_FEE                                       = Integer.parseInt(Feature.getProperty("ClanHallMpRegenerationFeeLvl5", "20000"));
+                CH_HPREG_FEE_RATIO                                  = Long.parseLong(Feature.getProperty("ClanHallHpRegenerationFunctionFeeRatio", "86400000"));
+                CH_HPREG1_FEE                                       = Integer.parseInt(Feature.getProperty("ClanHallHpRegenerationFeeLvl1", "700"));
+                CH_HPREG2_FEE                                       = Integer.parseInt(Feature.getProperty("ClanHallHpRegenerationFeeLvl2", "800"));
+                CH_HPREG3_FEE                                       = Integer.parseInt(Feature.getProperty("ClanHallHpRegenerationFeeLvl3", "1000"));
+                CH_HPREG4_FEE                                       = Integer.parseInt(Feature.getProperty("ClanHallHpRegenerationFeeLvl4", "1166"));
+                CH_HPREG5_FEE                                       = Integer.parseInt(Feature.getProperty("ClanHallHpRegenerationFeeLvl5", "1500"));
+                CH_HPREG6_FEE                                       = Integer.parseInt(Feature.getProperty("ClanHallHpRegenerationFeeLvl6", "1750"));
+                CH_HPREG7_FEE                                       = Integer.parseInt(Feature.getProperty("ClanHallHpRegenerationFeeLvl7", "2000"));
+                CH_HPREG8_FEE                                       = Integer.parseInt(Feature.getProperty("ClanHallHpRegenerationFeeLvl8", "2250"));
+                CH_HPREG9_FEE                                       = Integer.parseInt(Feature.getProperty("ClanHallHpRegenerationFeeLvl9", "2500"));
+                CH_HPREG10_FEE                                      = Integer.parseInt(Feature.getProperty("ClanHallHpRegenerationFeeLvl10", "3250"));
+                CH_HPREG11_FEE                                      = Integer.parseInt(Feature.getProperty("ClanHallHpRegenerationFeeLvl11", "3270"));
+                CH_HPREG12_FEE										= Integer.parseInt(Feature.getProperty("ClanHallHpRegenerationFeeLvl12", "4250"));
+                CH_HPREG13_FEE                                      = Integer.parseInt(Feature.getProperty("ClanHallHpRegenerationFeeLvl13", "5166"));
+                CH_EXPREG_FEE_RATIO                                 = Long.parseLong(Feature.getProperty("ClanHallExpRegenerationFunctionFeeRatio", "86400000"));
+                CH_EXPREG1_FEE                                      = Integer.parseInt(Feature.getProperty("ClanHallExpRegenerationFeeLvl1", "3000"));
+                CH_EXPREG2_FEE                                      = Integer.parseInt(Feature.getProperty("ClanHallExpRegenerationFeeLvl2", "6000"));
+                CH_EXPREG3_FEE                                      = Integer.parseInt(Feature.getProperty("ClanHallExpRegenerationFeeLvl3", "9000"));
+                CH_EXPREG4_FEE                                      = Integer.parseInt(Feature.getProperty("ClanHallExpRegenerationFeeLvl4", "15000"));
+                CH_EXPREG5_FEE                                      = Integer.parseInt(Feature.getProperty("ClanHallExpRegenerationFeeLvl5", "21000"));
+                CH_EXPREG6_FEE                                      = Integer.parseInt(Feature.getProperty("ClanHallExpRegenerationFeeLvl6", "23330"));
+                CH_EXPREG7_FEE                                      = Integer.parseInt(Feature.getProperty("ClanHallExpRegenerationFeeLvl7", "30000"));
+                CH_ITEM_FEE_RATIO                                   = Long.parseLong(Feature.getProperty("ClanHallItemCreationFunctionFeeRatio", "86400000"));
+                CH_ITEM1_FEE                                        = Integer.parseInt(Feature.getProperty("ClanHallItemCreationFunctionFeeLvl1", "30000"));
+                CH_ITEM2_FEE                                        = Integer.parseInt(Feature.getProperty("ClanHallItemCreationFunctionFeeLvl2", "70000"));
+                CH_ITEM3_FEE                                        = Integer.parseInt(Feature.getProperty("ClanHallItemCreationFunctionFeeLvl3", "140000"));
+                CH_CURTAIN_FEE_RATIO                                = Long.parseLong(Feature.getProperty("ClanHallCurtainFunctionFeeRatio", "604800000"));
+                CH_CURTAIN1_FEE                                     = Integer.parseInt(Feature.getProperty("ClanHallCurtainFunctionFeeLvl1", "2000"));
+                CH_CURTAIN2_FEE                                     = Integer.parseInt(Feature.getProperty("ClanHallCurtainFunctionFeeLvl2", "2500"));
+                CH_FRONT_FEE_RATIO                                	= Long.parseLong(Feature.getProperty("ClanHallFrontPlatformFunctionFeeRatio", "259200000"));
+                CH_FRONT1_FEE                                       = Integer.parseInt(Feature.getProperty("ClanHallFrontPlatformFunctionFeeLvl1", "1300"));
+                CH_FRONT2_FEE                                       = Integer.parseInt(Feature.getProperty("ClanHallFrontPlatformFunctionFeeLvl2", "4000"));
 				ALT_GAME_REQUIRE_CASTLE_DAWN    					= Boolean.parseBoolean(Feature.getProperty("AltRequireCastleForDawn", "False"));
                 ALT_GAME_REQUIRE_CLAN_CASTLE    					= Boolean.parseBoolean(Feature.getProperty("AltRequireClanCastle", "False"));
                 ALT_FESTIVAL_MIN_PLAYER         					= Integer.parseInt(Feature.getProperty("AltFestivalMinPlayer", "5"));
@@ -1472,8 +1483,8 @@ public final class Config
                 MAX_MONSTER_ANIMATION						= Integer.parseInt(General.getProperty("MaxMonsterAnimation", "20"));
                 COORD_SYNCHRONIZE							= Integer.parseInt(General.getProperty("CoordSynchronize", "-1"));
                 GRIDS_ALWAYS_ON								= Boolean.parseBoolean(General.getProperty("GridsAlwaysOn", "False"));
-                GRID_NEIGHBOR_TURNON_TIME					= Integer.parseInt(General.getProperty("GridNeighborTurnOnTime", "30"));
-                GRID_NEIGHBOR_TURNOFF_TIME					= Integer.parseInt(General.getProperty("GridNeighborTurnOffTime", "300"));
+                GRID_NEIGHBOR_TURNON_TIME					= Integer.parseInt(General.getProperty("GridNeighborTurnOnTime", "1"));
+                GRID_NEIGHBOR_TURNOFF_TIME					= Integer.parseInt(General.getProperty("GridNeighborTurnOffTime", "90"));
                 GEODATA										= Integer.parseInt(General.getProperty("GeoData", "0"));
                 FORCE_GEODATA								= Boolean.parseBoolean(General.getProperty("ForceGeoData", "True"));
                 ZONE_TOWN									= Integer.parseInt(General.getProperty("ZoneTown", "0"));
@@ -1545,6 +1556,19 @@ public final class Config
                 ONLY_GM_ITEMS_FREE							= Boolean.parseBoolean(General.getProperty("OnlyGMItemsFree", "True"));
                 JAIL_IS_PVP									= Boolean.parseBoolean(General.getProperty("JailIsPvp", "True"));
                 JAIL_DISABLE_CHAT							= Boolean.parseBoolean(General.getProperty("JailDisableChat", "True"));
+
+
+                CUSTOM_SPAWNLIST_TABLE						= Boolean.valueOf(General.getProperty("CustomSpawnlistTable", "false"));
+                SAVE_GMSPAWN_ON_CUSTOM						= Boolean.valueOf(General.getProperty("SaveGmSpawnOnCustom", "false"));
+                DELETE_GMSPAWN_ON_CUSTOM					= Boolean.valueOf(General.getProperty("DeleteGmSpawnOnCustom", "false"));
+                CUSTOM_NPC_TABLE							= Boolean.valueOf(General.getProperty("CustomNpcTable", "false"));
+                CUSTOM_ETCITEM_TABLE						= Boolean.valueOf(General.getProperty("CustomEtcitemTable", "false"));
+                CUSTOM_ARMOR_TABLE							= Boolean.valueOf(General.getProperty("CustomArmorTable", "false"));
+                CUSTOM_ARMORSETS_TABLE						= Boolean.valueOf(General.getProperty("CustomArmorSetsTable", "false"));
+                CUSTOM_WEAPON_TABLE							= Boolean.valueOf(General.getProperty("CustomWeaponTable", "false"));
+                CUSTOM_TELEPORT_TABLE						= Boolean.valueOf(General.getProperty("CustomTeleportTable", "false"));
+                CUSTOM_DROPLIST_TABLE						= Boolean.valueOf(General.getProperty("CustomDroplistTable", "false"));
+                CUSTOM_MERCHANT_TABLES						= Boolean.valueOf(General.getProperty("CustomMerchantTables", "false"));
                 
                 //L2JTW Configuration
                 
@@ -1558,6 +1582,7 @@ public final class Config
                 ALT_GAME_ATKSPD                  		     		= Integer.parseInt(General.getProperty("AltGameAtkSpd", "1200"));
                 ALLOW_3RD_CLASS                  		     		= Boolean.parseBoolean(General.getProperty("Allow3rdClass", "False"));
                 USE_JP_RULE_OF_BOSSZONE								= Boolean.parseBoolean(General.getProperty("UseJPBossZone", "true"));
+
             }
             catch (Exception e)
             {

@@ -77,7 +77,6 @@ import net.sf.l2j.gameserver.model.actor.instance.L2SummonInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2TrapInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance.SkillDat;
 import net.sf.l2j.gameserver.model.actor.knownlist.CharKnownList;
-import net.sf.l2j.gameserver.model.actor.knownlist.ObjectKnownList.KnownListAsynchronousUpdateTask;
 import net.sf.l2j.gameserver.model.actor.stat.CharStat;
 import net.sf.l2j.gameserver.model.actor.status.CharStatus;
 import net.sf.l2j.gameserver.model.entity.Duel;
@@ -244,13 +243,30 @@ public abstract class L2Character extends L2Object
 	/**
 	 * This will return true if the player is transformed,<br>
 	 * but if the player is not transformed it will return false.
-	 * @return
+	 * @return transformation status
 	 */
 	public boolean charIsTransformed()
 	{
 		if (this instanceof L2PcInstance)
 		{
 			if (((L2PcInstance)this).isTransformed())
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * This will return true if the player is GM,<br>
+	 * but if the player is not GM it will return false.
+	 * @return GM status
+	 */
+	public boolean charIsGM()
+	{
+		if (this instanceof L2PcInstance)
+		{
+			if (((L2PcInstance)this).isGM())
 			{
 				return true;
 			}
@@ -4382,12 +4398,7 @@ public abstract class L2Character extends L2Object
 			if (this instanceof L2PcInstance) ((L2PcInstance)this).revalidateZone(true);
 		}
 		sendPacket(new StopMove(this));
-		if (updateKnownObjects) ThreadPoolManager.getInstance().executeTask(new KnownListAsynchronousUpdateTask(this));
 	}
-
-
-
-
 
 
 	/**
