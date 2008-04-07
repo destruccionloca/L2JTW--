@@ -18,13 +18,7 @@ import static net.sf.l2j.gameserver.ai.CtrlIntention.AI_INTENTION_ACTIVE;
 import static net.sf.l2j.gameserver.ai.CtrlIntention.AI_INTENTION_ATTACK;
 import static net.sf.l2j.gameserver.ai.CtrlIntention.AI_INTENTION_IDLE;
 
-import java.util.List;
 import java.util.concurrent.Future;
-
-import javolution.util.FastList;
-import java.util.Map;
-import javolution.util.FastMap;
-
 import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.GameTimeController;
 import net.sf.l2j.gameserver.GeoData;
@@ -39,7 +33,6 @@ import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.model.L2Effect;
 import net.sf.l2j.gameserver.model.L2Summon;
-import net.sf.l2j.gameserver.model.L2NpcAIData;
 import net.sf.l2j.gameserver.model.L2Skill.SkillTargetType;
 import net.sf.l2j.gameserver.model.actor.instance.L2DoorInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2FestivalMonsterInstance;
@@ -54,7 +47,6 @@ import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2RaidBossInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2RiftInvaderInstance;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
-import net.sf.l2j.gameserver.taskmanager.DecayTaskManager;
 import net.sf.l2j.util.Rnd;
 import net.sf.l2j.gameserver.util.Util;
 
@@ -85,19 +77,14 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
     
     /** For attack AI, analysis of mob and its targets */
     private SelfAnalysis _selfAnalysis = new SelfAnalysis();
-    private TargetAnalysis _mostHatedAnalysis = new TargetAnalysis();
-    private TargetAnalysis _secondMostHatedAnalysis = new TargetAnalysis();
+    //private TargetAnalysis _mostHatedAnalysis = new TargetAnalysis();
+    //private TargetAnalysis _secondMostHatedAnalysis = new TargetAnalysis();
     
     
     private String clan;
     private String enemyClan;
-    private int enemyRange;
-    private boolean canchat;
-    private int npcchat_delay = 0;
-    private int radius=0;
-    //private boolean cancast;
+
     private int timepass = 0;
-    private boolean canreach = false;
     private int chaostime = 0;
     private boolean iscasting = false;
     private L2NpcTemplate _skillrender;
@@ -597,8 +584,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
                 z1 = npc.getZ();
             }
 
-            //_log.config("Curent pos ("+getX()+", "+getY()+"), moving to ("+x1+", "+y1+").");
-            // Move the actor to Location (x,y,z) server side AND client side by sending Server->Client packet CharMoveToLocation (broadcast)
+           
             moveTo(x1, y1, z1);
         }
     }
@@ -647,7 +633,6 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
             _actor.setWalking();
             return;
         }
-        _log.warning("AI - Phase 1");
         //Return when Attack been disable
         if(_actor.isAttackingDisabled())
         	return;
@@ -659,13 +644,8 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         L2Character MostHate = ((L2Attackable) _actor).getMostHated();
         try
         {
-        	//if(getAttackTarget() == null || getAttackTarget()==_actor)
-        	//setAttackTarget(MostHate);
-        	//if(getTarget()==null || _actor.getTarget() == null || getTarget()==_actor || _actor.getTarget()==_actor)
-        	//{
-        		setTarget(MostHate);
-        		_actor.setTarget(MostHate);
-        	//}
+       		setTarget(MostHate);
+       		_actor.setTarget(MostHate);
             dist = Math.sqrt(_actor.getPlanDistanceSq(getAttackTarget().getX(), getAttackTarget().getY()));
             dist2= (int)dist;
             range = _actor.getPhysicalAttackRange() + _actor.getTemplate().collisionRadius + getAttackTarget().getTemplate().collisionRadius;
@@ -780,7 +760,6 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         	
         }
 
-        _log.warning("AI - Phase 2 - If mob skills = null then Phase 4 begin");
         if(_skillrender.hasSkill())
         {
         //-------------------------------------------------------------------------------
@@ -809,7 +788,6 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
     				}
     				if(GeoData.getInstance().canSeeTarget(_actor,leader))
     				{
-    					_log.warning("HEAL -1 : "+leader.getName());
     					L2Object target = getAttackTarget();
     					_actor.setTarget(leader);
     					clientStopMoving(null);
@@ -831,7 +809,6 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
     				}
     					clientStopMoving(null);
     					L2Object target = getAttackTarget();
-    					_log.warning("HEAL -2 : SELF");
     					_actor.setTarget(_actor);
     					_actor.doCast(sk);
         				_actor.setTarget(target);
@@ -860,7 +837,6 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 					{
 	    				if(GeoData.getInstance().canSeeTarget(_actor,targets))
 	    				{
-	    					_log.warning("HEAL -3 : "+obj.getName());
 	    					_actor.setTarget(obj);
 	    					clientStopMoving(null);
 	    					L2Object target = getAttackTarget();
@@ -874,7 +850,6 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 				{
 
 					L2Object target = getAttackTarget();
-					_log.warning("HEAL -4 : PARTY");
 					_actor.setTarget(_actor);
 					clientStopMoving(null);
 					_actor.doCast(sk);
@@ -883,7 +858,6 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 				}
     		}
         }
-        _log.warning("AI - Phase 3");
         //-------------------------------------------------------------------------------
         //Res Skill Condition
         if(_skillrender.hasResSkill())
@@ -918,7 +892,6 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
     				}
         		}        	
         	}
-        	_log.warning("AI - Phase 3 - RES");
     		for(L2Skill sk:_skillrender._resskills)
     		{
 				if((sk.getMpConsume()>=_actor.getCurrentMp()
@@ -963,7 +936,6 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         }
         }
 
-        _log.warning("AI - Phase 4");
         //-------------------------------------------------------------------------------
         //Immobilize Condition
         if((_actor.isRooted() && (dist > range || getAttackTarget().isMoving()))
@@ -976,7 +948,6 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         iscasting = false;
         //--------------------------------------------------------------------------------
         //Skill Use 
-        _log.warning("AI - Phase 5");
         if(_skillrender.hasSkill())
         {
         if(Rnd.get(100)<=((L2NpcInstance)_actor).getSkillChance())
@@ -995,7 +966,6 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
             	Cast(skills);
 			if(iscasting)
 			{
-				_log.warning("AI - Phase 5 - Random Cast: True");
 				return;
 			}
 			
@@ -1011,19 +981,16 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 				Cast(sk);
 				if(iscasting)
 				{
-					_log.warning("AI - Phase 5 - Loop Cast: True");
 					return;
 				}
 				else continue;
     		}
         }
         
-        _log.warning("AI - Phase 6");
         //--------------------------------------------------------------------------------
         //Long/Short Range skill Usage
         if(((L2NpcInstance)_actor).hasLSkill()||((L2NpcInstance)_actor).hasSSkill())
         {
-        	_log.warning("AI - L/S Range Skill Task");
         	if(((L2NpcInstance)_actor).hasSSkill()&& dist2 <= 150 && Rnd.get(100) <= ((L2NpcInstance)_actor).getSSkillChance())
         	{
         		
@@ -1069,7 +1036,6 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         }
 
         
-        _log.warning("AI - Phase 7");
       //--------------------------------------------------------------------------------
       // Starts Melee or Primary Skill
         if(dist2>range || !GeoData.getInstance().canSeeTarget(_actor, getAttackTarget()))
@@ -1096,10 +1062,8 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
     
     private void Melee(int type)
     {
-    	_log.warning("AI - MELEE TASk START");
     	if(type!=0)
     	{
-    		_log.warning("AI - MELEE TASk - Primary Attack:"+type);
     		boolean check = true;
 	    	switch(type)
 	    	{
@@ -1169,7 +1133,6 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
     	}
 
     	_accessor.doAttack(getAttackTarget());
-    	_log.warning("AI - MELEE TASK END");
     }
     private void Cast(L2Skill sk)
     {
@@ -1266,7 +1229,6 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 		    				}
 		    				if(GeoData.getInstance().canSeeTarget(_actor,leader))
 		    				{
-		    					_log.warning("HEAL -1 : "+leader.getName());
 		    					clientStopMoving(null);
 		    					iscasting=true;
 		    					L2Object target = getAttackTarget();
@@ -1279,7 +1241,6 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 		        	}    
 		        		if(Rnd.get(100)<(100-percentage)/3)
 		        		{
-		        			_log.warning("HEAL -2 : SELF");
 		        				clientStopMoving(null);
 		        				iscasting=true;
 		    					L2Object target = getAttackTarget();
@@ -1303,7 +1264,6 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 							{
 			    				if(GeoData.getInstance().canSeeTarget(_actor,targets))
 			    				{
-			    					_log.warning("HEAL -3 : "+obj.getName());
 			    					clientStopMoving(null);
 			    					iscasting=true;
 			    					L2Object target = getAttackTarget();
@@ -1328,7 +1288,6 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 			    				{
 									if(obj.getCurrentHp()<obj.getMaxHp() && Rnd.get(100)<=20)
 									{
-										_log.warning("HEAL -4 : "+obj.getName());
 										clientStopMoving(null);
 										iscasting=true;
 										L2Object target = getAttackTarget();
@@ -1799,7 +1758,6 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 							L2Character target = SkillTargetReconsider(sk);
 							if (target != null)
 							{
-								_log.warning("UNDEFINE SKILL AI - 1");
 								clientStopMoving(null);
 								iscasting=true;
 								L2Object targets = getAttackTarget();
@@ -1812,7 +1770,6 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 					}
 					else
 					{
-						_log.warning("UNDEFINE SKILL AI - 2");
 						clientStopMoving(null);
 						iscasting=true;
 						//L2Object targets = getAttackTarget();
@@ -1890,7 +1847,6 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 					}
 					if(cancast)
 					{
-						_log.warning("Movement - immo skill");
 						clientStopMoving(null);
 						//L2Object target = getAttackTarget();
 						//_actor.setTarget(_actor);
@@ -1928,7 +1884,6 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 					}
 					if(cancast)
 					{
-						_log.warning("Movement - cot skill");
 						clientStopMoving(null);
 						//L2Object target = getAttackTarget();
 						//_actor.setTarget(_actor);
@@ -1965,7 +1920,6 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 					}
 					if(cancast)
 					{
-						_log.warning("Movement - debuff skill");
 						clientStopMoving(null);
 						//L2Object target = getAttackTarget();
 						//_actor.setTarget(_actor);
@@ -1994,7 +1948,6 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 					L2Effect[] effects = (getAttackTarget()).getAllEffects();
 					if(effects==null || effects.length == 0)
 						continue;
-					_log.warning("Movement - negative skill");
 					clientStopMoving(null);
 					//L2Object target = getAttackTarget();
 					//_actor.setTarget(_actor);
@@ -2019,7 +1972,6 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 					}
 					if(!GeoData.getInstance().canSeeTarget(_actor,getAttackTarget()))
 						continue;
-					_log.warning("Movement - atk skill");
 					clientStopMoving(null);
 					//L2Object target = getAttackTarget();
 					//_actor.setTarget(_actor);

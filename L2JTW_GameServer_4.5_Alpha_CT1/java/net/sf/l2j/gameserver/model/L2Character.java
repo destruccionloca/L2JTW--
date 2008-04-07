@@ -32,7 +32,6 @@ import javolution.util.FastTable;
 import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.GameTimeController;
 import net.sf.l2j.gameserver.GeoData;
-import net.sf.l2j.gameserver.Olympiad;
 import net.sf.l2j.gameserver.ThreadPoolManager;
 import net.sf.l2j.gameserver.ai.CtrlEvent;
 import net.sf.l2j.gameserver.ai.CtrlIntention;
@@ -51,7 +50,7 @@ import net.sf.l2j.gameserver.model.L2Skill.SkillTargetType;
 import net.sf.l2j.gameserver.model.L2Skill.SkillType;
 import net.sf.l2j.gameserver.model.actor.instance.L2ArtefactInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2BoatInstance;
-import net.sf.l2j.gameserver.model.actor.instance.L2CubicInstance;
+import net.sf.l2j.gameserver.model.actor.instance.L2CommanderInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2ControlTowerInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2DecoyInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2DoorInstance;
@@ -69,13 +68,10 @@ import net.sf.l2j.gameserver.model.actor.instance.L2SiegeGuardInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2RiftInvaderInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PetInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PlayableInstance;
-import net.sf.l2j.gameserver.model.actor.instance.L2RiftInvaderInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2SiegeFlagInstance;
-import net.sf.l2j.gameserver.model.actor.instance.L2SiegeGuardInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2SiegeSummonInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2SummonInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2TrapInstance;
-import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance.SkillDat;
 import net.sf.l2j.gameserver.model.actor.knownlist.CharKnownList;
 import net.sf.l2j.gameserver.model.actor.stat.CharStat;
 import net.sf.l2j.gameserver.model.actor.status.CharStatus;
@@ -92,15 +88,12 @@ import net.sf.l2j.gameserver.serverpackets.ChangeWaitType;
 import net.sf.l2j.gameserver.serverpackets.CharInfo;
 import net.sf.l2j.gameserver.serverpackets.EtcStatusUpdate; 
 import net.sf.l2j.gameserver.serverpackets.MoveToLocation; 
-import net.sf.l2j.gameserver.serverpackets.ExOlympiadSpelledInfo;
 import net.sf.l2j.gameserver.serverpackets.FlyToLocation;
 import net.sf.l2j.gameserver.serverpackets.L2GameServerPacket;
-import net.sf.l2j.gameserver.serverpackets.AbnormalStatusUpdate; 
 import net.sf.l2j.gameserver.serverpackets.MagicSkillCanceld;
 import net.sf.l2j.gameserver.serverpackets.MagicSkillLaunched;
 import net.sf.l2j.gameserver.serverpackets.MagicSkillUse;
 import net.sf.l2j.gameserver.serverpackets.NpcInfo;
-import net.sf.l2j.gameserver.serverpackets.PartySpelled;
 import net.sf.l2j.gameserver.serverpackets.PetInfo;
 import net.sf.l2j.gameserver.serverpackets.RelationChanged;
 import net.sf.l2j.gameserver.serverpackets.Revive;
@@ -121,10 +114,8 @@ import net.sf.l2j.gameserver.templates.L2NpcTemplate;
 import net.sf.l2j.gameserver.templates.L2Weapon;
 import net.sf.l2j.gameserver.templates.L2WeaponType;
 import net.sf.l2j.gameserver.util.Util;
-import net.sf.l2j.gameserver.util.Broadcast;
 import net.sf.l2j.util.Point3D;
 import net.sf.l2j.util.Rnd;
-import net.sf.l2j.gameserver.serverpackets.MoveToLocation; 
 
 /**
  * Mother class of all character objects of the world (PC, NPC...)<BR><BR>
@@ -202,7 +193,6 @@ public abstract class L2Character extends L2Object
     private int _RaidAI = 0;
     private int _RPMin = 0;
     */
-    private boolean _isFirstAtk = false;
 	public static boolean _isNPC;
     public static int CRIT_ATTACK;
 	
@@ -338,7 +328,8 @@ public abstract class L2Character extends L2Object
 			!(this instanceof L2TrapInstance) && !(this instanceof L2FriendlyMobInstance) &&
 			!(this instanceof L2DecoyInstance) && !(this instanceof L2SiegeSummonInstance) &&
 			!(this instanceof L2PetInstance) && !(this instanceof L2SummonInstance) &&
-			!(this instanceof L2SiegeFlagInstance) && !(this instanceof L2EffectPointInstance))
+			!(this instanceof L2SiegeFlagInstance) && !(this instanceof L2EffectPointInstance) &&
+			!(this instanceof L2CommanderInstance))
 			setIsInvul(true);
 	}
 
@@ -4563,10 +4554,10 @@ public abstract class L2Character extends L2Object
 
 		// GEODATA MOVEMENT CHECKS AND PATHFINDING
 		m.onGeodataPathIndex = -1; // Initialize not on geodata path
+		
 		if (Config.GEODATA > 0 
-		    && !this.isFlying()
-		    //&& !this.isInsideZone(ZONE_WATER) // TODO: change geodata to return correct Z and check if exploiting possible
-		    && !(this instanceof L2NpcWalkerInstance)) // currently flying characters not checked
+			&& !isFlying() // flying chars not checked - even canSeeTarget doesn't work yet
+			&& !(this instanceof L2NpcWalkerInstance)) // npc walkers not checked
 		{
 			double originalDistance = distance;
 			int originalX = x;
@@ -4605,7 +4596,8 @@ public abstract class L2Character extends L2Object
 				// location different if destination wasn't reached (or just z coord is different)
 				x = destiny.getX();
 				y = destiny.getY();
-				z = destiny.getZ();
+				if (!isInsideZone(ZONE_WATER)) // check: perhaps should be inside moveCheck
+					z = destiny.getZ();
 				distance = Math.sqrt((x - curX)*(x - curX) + (y - curY)*(y - curY));
 				
 			}
@@ -4621,7 +4613,15 @@ public abstract class L2Character extends L2Object
 					int gx = (curX - L2World.MAP_MIN_X) >> 4;
 					int gy = (curY - L2World.MAP_MIN_Y) >> 4;
 				
-                	m.geoPath = GeoPathFinding.getInstance().findPath(gx, gy, (short)curZ, gtx, gty, (short)originalZ);
+                	// TODO: Find closest path node we can access, e.g.
+					// Node start = GeoPathFinding.getInstance().readNode(gx, gy, (short)curZ);
+					// if (start == null) 
+					//   no path node...
+					// Location temp = GeoData.getInstance().moveCheck(curX, curY, curZ, start.getLoc().getX(), start.getLoc().getY(), start.getLoc().getZ());
+					// if ((temp.getX() != start.getLoc().getX()) || (temp.getY() != start.getLoc().getY()))
+					//   cannot reach closest...
+							
+					m.geoPath = GeoPathFinding.getInstance().findPath(gx, gy, (short)curZ, gtx, gty, (short)originalZ);
                 	if (m.geoPath == null || m.geoPath.size() < 2) // No path found
                 	{
                 		// Even though there's no path found (remember geonodes aren't perfect), 
@@ -4670,20 +4670,6 @@ public abstract class L2Character extends L2Object
                 				return;
                 			}
                 		}
-
-                		// not in use: final check if we can indeed reach first path node (path nodes sometimes aren't accurate enough)
-                		// but if the node is very far, then a shorter check (like 3 blocks) would be enough
-                		// something similar might be needed for end
-                		/*
-                		Location destiny = GeoData.getInstance().moveCheck(curX, curY, curZ, x, y, z);
-                		if (destiny.getX() != x || destiny.getY() != y)
-                		{
-                			m.geoPath = null;
-            				getAI().stopFollow();
-            				getAI().setIntention(CtrlIntention.AI_INTENTION_IDLE);
-            				return;
-                		}
-                		*/
 
                 		dx = (x - curX);
                 		dy = (y - curY);
@@ -6575,7 +6561,7 @@ public abstract class L2Character extends L2Object
 	}
 
 	/**
-	 * Return True if the target is facing th L2Character.<BR><BR>
+	 * Return True if the target is facing the L2Character.<BR><BR>
 	 */
 	public boolean isInFrontOf(L2Character target)
 	{

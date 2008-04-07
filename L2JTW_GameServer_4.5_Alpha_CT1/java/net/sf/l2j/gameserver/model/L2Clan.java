@@ -62,6 +62,7 @@ public class L2Clan
 	private int _allyId;
 	private int _level;
 	private int _hasCastle;
+	private int _hasFort;
 	private int _hasHideout;
     private boolean _hasCrest;
     private int _hiredGuards;
@@ -533,6 +534,13 @@ public class L2Clan
 	{
 		return _hasCastle;
 	}
+	 /**
+     * @return
+     */
+    public int getHasFort()
+    {
+        return _hasFort;
+    }
 	/**
 	 * @return
 	 */
@@ -594,6 +602,13 @@ public class L2Clan
 	{
 		_hasCastle = hasCastle;
 	}
+	/**
+     * @param hasFort The hasFort to set.
+     */
+    public void setHasFort(int hasFort)
+    {
+        _hasFort = hasFort;
+    }
 	/**
 	 * @param hasHideout The hasHideout to set.
 	 */

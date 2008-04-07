@@ -41,6 +41,7 @@ import net.sf.l2j.gameserver.idfactory.IdFactory;
 import net.sf.l2j.gameserver.instancemanager.BaiumManager;
 import net.sf.l2j.gameserver.instancemanager.CastleManager;
 import net.sf.l2j.gameserver.instancemanager.DimensionalRiftManager;
+import net.sf.l2j.gameserver.instancemanager.FortManager;
 import net.sf.l2j.gameserver.instancemanager.QuestManager;
 import net.sf.l2j.gameserver.instancemanager.TownManager;
 import net.sf.l2j.gameserver.instancemanager.games.Lottery;
@@ -67,6 +68,7 @@ import net.sf.l2j.gameserver.model.actor.stat.NpcStat;
 import net.sf.l2j.gameserver.model.actor.status.NpcStatus;
 import net.sf.l2j.gameserver.model.entity.CTF;
 import net.sf.l2j.gameserver.model.entity.Castle;
+import net.sf.l2j.gameserver.model.entity.Fort;
 import net.sf.l2j.gameserver.model.entity.L2Event;
 import net.sf.l2j.gameserver.model.quest.Quest;
 import net.sf.l2j.gameserver.model.quest.QuestState;
@@ -132,6 +134,9 @@ public class L2NpcInstance extends L2Character
 
     /** The castle index in the array of L2Castle this L2NpcInstance belongs to */
     private int _castleIndex = -2;
+    
+    /** The fortress index in the array of L2Fort this L2NpcInstance belongs to */
+    private int _fortIndex = -2;
 
     public boolean isEventMob = false;
 //L2JTW addon start ========================================
@@ -1493,6 +1498,29 @@ public class L2NpcInstance extends L2Character
 		if (_castleIndex < 0) return null;
 
 		return CastleManager.getInstance().getCastles().get(_castleIndex);
+    }
+    
+    /** Return the L2Fort this L2NpcInstance belongs to. */
+    public final Fort getFort()
+    {
+        // Get Fort this NPC belongs to (excluding L2Attackable)
+        if (_fortIndex < 0)
+        {
+            Fort fort = FortManager.getInstance().getFort(getX(), getY(), getZ());
+            if (fort != null)
+            {
+                _fortIndex = FortManager.getInstance().getFortIndex(fort.getFortId());
+            }
+            if (_fortIndex < 0)
+            {
+                _fortIndex = FortManager.getInstance().findNearestFortIndex(this);
+            }
+        }
+        if (_fortIndex < 0)
+        {
+            return null;
+        }
+        return FortManager.getInstance().getForts().get(_fortIndex);
     }
 
     public final boolean getIsInTown()
