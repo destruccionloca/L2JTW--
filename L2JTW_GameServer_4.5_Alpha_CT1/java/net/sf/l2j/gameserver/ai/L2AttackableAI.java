@@ -76,7 +76,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
     private boolean _thinking; // to prevent recursive thinking
     
     /** For attack AI, analysis of mob and its targets */
-    private SelfAnalysis _selfAnalysis = new SelfAnalysis();
+    //private SelfAnalysis _selfAnalysis = new SelfAnalysis();
     //private TargetAnalysis _mostHatedAnalysis = new TargetAnalysis();
     //private TargetAnalysis _secondMostHatedAnalysis = new TargetAnalysis();
     
@@ -98,7 +98,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
     {
         super(accessor);
         _skillrender = NpcTable.getInstance().getTemplate(((L2NpcInstance)_actor).getTemplate().npcId);
-        _selfAnalysis.init();
+        //_selfAnalysis.init();
         _attackTimeout = Integer.MAX_VALUE;
         _globalAggro = -10; // 10 seconds timeout of ATTACK after respawn
     }
@@ -203,8 +203,8 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
                     return false;
             }
             
-            if (_selfAnalysis.cannotMoveOnLand && !target.isInsideZone(L2Character.ZONE_WATER))
-                return false;
+            //if (_selfAnalysis.cannotMoveOnLand && !target.isInsideZone(L2Character.ZONE_WATER))
+            //    return false;
         }
 
         // Check if the actor is a L2GuardInstance
@@ -369,6 +369,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         _attackTimeout = MAX_ATTACK_TIMEOUT + GameTimeController.getGameTicks();
 
         // self and buffs
+        /*
         if (_selfAnalysis.lastBuffTick+100 < GameTimeController.getGameTicks())
         {
           for (L2Skill sk : _selfAnalysis.buffSkills)
@@ -392,6 +393,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
             }
           }
         }
+        */
         // Manage the Attack Intention : Stop current Attack (if necessary), Start a new Attack and Launch Think Event
         super.onIntentionAttack(target);
     }
