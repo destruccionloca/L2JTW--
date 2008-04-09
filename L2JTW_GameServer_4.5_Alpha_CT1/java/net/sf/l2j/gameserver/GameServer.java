@@ -183,6 +183,7 @@ import net.sf.l2j.gameserver.handler.skillhandlers.Spoil;
 import net.sf.l2j.gameserver.handler.skillhandlers.StrSiegeAssault;
 import net.sf.l2j.gameserver.handler.skillhandlers.SummonFriend;
 import net.sf.l2j.gameserver.handler.skillhandlers.SummonTreasureKey;
+import net.sf.l2j.gameserver.handler.skillhandlers.ShiftTarget;
 import net.sf.l2j.gameserver.handler.skillhandlers.Sweep;
 import net.sf.l2j.gameserver.handler.skillhandlers.TakeCastle;
 import net.sf.l2j.gameserver.handler.skillhandlers.TakeFort;
@@ -561,6 +562,7 @@ public class GameServer
         _skillHandler.registerSkillHandler(new DeluxeKey());
         _skillHandler.registerSkillHandler(new Sow());
         _skillHandler.registerSkillHandler(new Soul());
+        _skillHandler.registerSkillHandler(new ShiftTarget());
         _skillHandler.registerSkillHandler(new Harvest());
         _skillHandler.registerSkillHandler(new GetPlayer());
         _skillHandler.registerSkillHandler(new TransformDispel());

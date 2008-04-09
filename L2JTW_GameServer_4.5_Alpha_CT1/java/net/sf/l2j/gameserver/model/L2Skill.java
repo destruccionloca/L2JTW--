@@ -230,6 +230,7 @@ public abstract class L2Skill
         HARVEST,
         GET_PLAYER,
         AGATHION(L2SkillAgathion.class),
+        SHIFT_TARGET,
 
     	// Creation
     	COMMON_CRAFT,
