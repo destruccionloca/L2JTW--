@@ -15,6 +15,7 @@
 package net.sf.l2j.gameserver.handler.skillhandlers;
 
 
+import java.util.logging.Logger;
 
 import net.sf.l2j.gameserver.handler.ISkillHandler;
 import net.sf.l2j.gameserver.model.L2Attackable;
@@ -28,6 +29,7 @@ import net.sf.l2j.gameserver.model.L2Skill.SkillType;
 
 public class ShiftTarget implements ISkillHandler
 {
+	private static Logger _log = Logger.getLogger(Pdam.class.getName());
     
     private static final SkillType[] SKILL_IDS = {SkillType.SHIFT_TARGET};
 

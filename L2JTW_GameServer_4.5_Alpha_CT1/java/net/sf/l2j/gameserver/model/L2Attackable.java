@@ -283,7 +283,7 @@ public class L2Attackable extends L2NpcInstance
     /** Have this L2Attackable to reward Exp and SP on Die? **/
     private boolean _mustGiveExpSp;
     
-    public FastList _hatelist;
+    public FastList<L2Character> _hatelist;
     /**
      * Constructor of L2Attackable (use L2Character and L2NpcInstance constructor).<BR><BR>
      *
@@ -992,7 +992,7 @@ public class L2Attackable extends L2NpcInstance
         return result;
     }
     
-    public List<L2Character> getHateList()
+    public FastList<L2Character> getHateList()
     {
     	if (getAggroListRP().isEmpty() || isAlikeDead()) return null;
 
@@ -1004,7 +1004,7 @@ public class L2Attackable extends L2NpcInstance
 	    			 
              for (AggroInfo ai : getAggroListRP().values())
              {
-            	 if (ai == null)
+            	 if (ai._attacker == null)
             		 continue;
             	 _hatelist.add(ai._attacker);
              }

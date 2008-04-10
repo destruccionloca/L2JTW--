@@ -775,7 +775,7 @@ public class L2NpcInstance extends L2Character
     	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
     	for (L2NpcAIData AI: npcData.getAIData())
     	{
-    		if (AI == null || getClan() == "")
+    		if (AI == null || AI.getClan() == "")
     			return "none";
     		else
     		return AI.getClan();
