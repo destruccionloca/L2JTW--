@@ -6785,12 +6785,12 @@ public final class L2PcInstance extends L2PlayableInstance
 					if (_reuseTimeStamps.containsKey(skillId))
 					{
 						TimeStamp t = _reuseTimeStamps.remove(skillId);
-						statement.setDouble(6, t.hasNotPassed() ? t.getReuse() : 0 );
+						statement.setLong(6, t.hasNotPassed() ? t.getReuse() : 0 );
 						statement.setDouble(7, t.hasNotPassed() ? t.getStamp() : 0 );
 					}
                     else
 					{
-						statement.setDouble(6, 0);
+						statement.setLong(6, 0);
 						statement.setDouble(7, 0);
 					}
 					
@@ -6813,7 +6813,7 @@ public final class L2PcInstance extends L2PlayableInstance
 					statement.setInt (3, -1);
 					statement.setInt (4, -1);
 					statement.setInt (5, -1);
-					statement.setDouble(6, t.getReuse());
+					statement.setLong(6, t.getReuse());
 					statement.setDouble(7, t.getStamp());
 					statement.setInt (8, 1);
 					statement.setInt (9, getClassIndex());
@@ -7087,7 +7087,7 @@ public final class L2PcInstance extends L2PlayableInstance
 				int skillLvl = rset.getInt("skill_level");
 				int effectCount = rset.getInt("effect_count");
 				int effectCurTime = rset.getInt("effect_cur_time");
-				double reuseDelay = rset.getDouble("reuse_delay");
+				double reuseDelay = rset.getInt("reuse_delay");
 				double systime = rset.getDouble("systime");
 
 				// Just incase the admin minipulated this table incorrectly :x
