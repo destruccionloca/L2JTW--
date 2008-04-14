@@ -330,7 +330,7 @@ public final class L2NpcTemplate extends L2CharTemplate
 	    	    	// if the category exists, add the drop to this category.
 	    			if (cat.getCategoryType() == categoryType)
 	    			{
-	    				cat.addDropData(drop);
+	    				cat.addDropData(drop, type.equalsIgnoreCase("L2RaidBoss") || type.equalsIgnoreCase("L2GrandBoss"));
 	    				catExists = true;
 	    				break;
 	    			}
@@ -338,7 +338,7 @@ public final class L2NpcTemplate extends L2CharTemplate
 	    		if (!catExists)
 	    		{
 	    			L2DropCategory cat = new L2DropCategory(categoryType);
-	    			cat.addDropData(drop);
+	    			cat.addDropData(drop, type.equalsIgnoreCase("L2RaidBoss") || type.equalsIgnoreCase("L2GrandBoss"));
 	    			_categories.add(cat);
 	    		}
 	    	}

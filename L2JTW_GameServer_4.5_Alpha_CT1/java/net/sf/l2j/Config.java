@@ -258,6 +258,8 @@ public final class Config
     public static boolean	ALT_GAME_TIREDNESS;
     public static boolean	ENABLE_MODIFY_SKILL_DURATION;
     public static Map<Integer, Integer> SKILL_DURATION_LIST;
+    public static boolean   ENABLE_MODIFY_SKILL_REUSE;
+    public static Map<Integer, Integer> SKILL_REUSE_LIST;
     public static boolean	AUTO_LEARN_SKILLS;
     public static boolean	AUTO_LOOT_HERBS;
     public static byte		BUFFS_MAX_AMOUNT;
@@ -526,6 +528,17 @@ public final class Config
     public static long		ALT_OLY_IWAIT;
     public static long		ALT_OLY_WPERIOD;
     public static long		ALT_OLY_VPERIOD;
+    public static int		ALT_OLY_CLASSED;
+    public static int		ALT_OLY_NONCLASSED;
+    public static int		ALT_OLY_BATTLE_REWARD_ITEM;
+    public static int		ALT_OLY_CLASSED_RITEM_C;
+    public static int		ALT_OLY_NONCLASSED_RITEM_C;
+    public static int		ALT_OLY_COMP_RITEM;
+    public static int		ALT_OLY_GP_PER_POINT;
+    public static int		ALT_OLY_MIN_POINT_FOR_EXCH;
+    public static int		ALT_OLY_HERO_POINTS;
+    public static String	ALT_OLY_RESTRICTED_ITEMS;
+    public static List<Integer> LIST_OLY_RESTRICTED_ITEMS = new FastList<Integer>();
     public static int		ALT_MANOR_REFRESH_TIME;
     public static int		ALT_MANOR_REFRESH_MIN;
     public static int		ALT_MANOR_APPROVE_TIME;
@@ -707,6 +720,9 @@ public final class Config
     public static boolean	L2JMOD_WEDDING_SAMESEX;
     public static boolean	L2JMOD_WEDDING_FORMALWEAR;
     public static int		L2JMOD_WEDDING_DIVORCE_COSTS;
+    public static boolean	BANKING_SYSTEM_ENABLED;
+    public static int		BANKING_SYSTEM_GOLDBARS;
+    public static int		BANKING_SYSTEM_ADENA;
     
     /** ************************************************** **/
 	/** L2JMods Settings -End                              **/
@@ -792,6 +808,8 @@ public final class Config
     public static float		RATE_CONSUMABLE_COST;
     /** Rate for dropped items */
     public static float		RATE_DROP_ITEMS;
+    /** Rate for dropped items by Raid Bosses */
+    public static float		RATE_DROP_ITEMS_BY_RAID;
     /** Rate for spoiled items */
     public static float		RATE_DROP_SPOIL;
     /** Rate for manor items */
@@ -1230,6 +1248,36 @@ public final class Config
                         }
                     }
                 }
+                ENABLE_MODIFY_SKILL_REUSE = Boolean.parseBoolean(Character.getProperty("EnableModifySkillReuse", "false"));
+
+                // Create Map only if enabled
+                if (ENABLE_MODIFY_SKILL_REUSE)
+                {
+                    SKILL_REUSE_LIST = new FastMap<Integer, Integer>();
+                    String[] propertySplit;
+                    propertySplit = Character.getProperty("SkillReuseList", "").split(";");
+                    for (String skill : propertySplit)
+                    {
+                        String[] skillSplit = skill.split(",");
+                        if (skillSplit.length != 2)
+                        {
+                            System.out.println("[SkillReuseList]: invalid config property -> SkillReuseList \"" + skill + "\"");
+                        } else
+                        {
+                            try
+                            {
+                                SKILL_REUSE_LIST.put(Integer.valueOf(skillSplit[0]), Integer.valueOf(skillSplit[1]));
+                            } catch (NumberFormatException nfe)
+                            {
+                                if (!skill.equals(""))
+                                {
+                                    System.out.println("[SkillReuseList]: invalid config property -> SkillList \"" + skillSplit[0] + "\"" + skillSplit[1]);
+                                }
+                            }
+                        }
+                    }
+                }
+                
                 AUTO_LEARN_SKILLS					= Boolean.parseBoolean(Character.getProperty("AutoLearnSkills", "false"));
                 AUTO_LOOT_HERBS						= Boolean.parseBoolean(Character.getProperty("AutoLootHerbs", "true"));
                 BUFFS_MAX_AMOUNT					= Byte.parseByte(Character.getProperty("maxbuffamount","24"));
@@ -1528,6 +1576,21 @@ public final class Config
                 ALT_OLY_IWAIT								= Long.parseLong(General.getProperty("AltOlyIWait","300000"));
                 ALT_OLY_WPERIOD								= Long.parseLong(General.getProperty("AltOlyWPeriod","604800000"));
                 ALT_OLY_VPERIOD								= Long.parseLong(General.getProperty("AltOlyVPeriod","86400000"));
+                ALT_OLY_CLASSED								= Integer.parseInt(General.getProperty("AltOlyClassedParticipants","5"));
+                ALT_OLY_NONCLASSED							= Integer.parseInt(General.getProperty("AltOlyNonClassedParticipants","9"));
+                ALT_OLY_BATTLE_REWARD_ITEM					= Integer.parseInt(General.getProperty("AltOlyBattleRewItem","6651"));
+                ALT_OLY_CLASSED_RITEM_C						= Integer.parseInt(General.getProperty("AltOlyClassedRewItemCount","50"));
+                ALT_OLY_NONCLASSED_RITEM_C					= Integer.parseInt(General.getProperty("AltOlyNonClassedRewItemCount","30"));
+                ALT_OLY_COMP_RITEM							= Integer.parseInt(General.getProperty("AltOlyCompRewItem","6651"));
+                ALT_OLY_GP_PER_POINT						= Integer.parseInt(General.getProperty("AltOlyGPPerPoint","1000"));
+                ALT_OLY_MIN_POINT_FOR_EXCH					= Integer.parseInt(General.getProperty("AltOlyMinPointForExchange","50"));
+                ALT_OLY_HERO_POINTS							= Integer.parseInt(General.getProperty("AltOlyHeroPoints","300"));
+                ALT_OLY_RESTRICTED_ITEMS					= General.getProperty("AltOlyRestrictedItems");
+                LIST_OLY_RESTRICTED_ITEMS					= new FastList<Integer>();
+                                							for (String id : ALT_OLY_RESTRICTED_ITEMS.split(","))
+                                							{
+                                								LIST_OLY_RESTRICTED_ITEMS.add(Integer.parseInt(id));
+                                							}
                 ALT_MANOR_REFRESH_TIME						= Integer.parseInt(General.getProperty("AltManorRefreshTime","20"));
                 ALT_MANOR_REFRESH_MIN						= Integer.parseInt(General.getProperty("AltManorRefreshMin","00"));
                 ALT_MANOR_APPROVE_TIME						= Integer.parseInt(General.getProperty("AltManorApproveTime","6"));
@@ -1648,6 +1711,7 @@ public final class Config
                 RATE_DROP_ADENA                 = Float.parseFloat(ratesSettings.getProperty("RateDropAdena", "1."));
                 RATE_CONSUMABLE_COST            = Float.parseFloat(ratesSettings.getProperty("RateConsumableCost", "1."));
                 RATE_DROP_ITEMS                 = Float.parseFloat(ratesSettings.getProperty("RateDropItems", "1."));
+                RATE_DROP_ITEMS_BY_RAID         = Float.parseFloat(ratesSettings.getProperty("RateRaidDropItems", "1."));
                 RATE_DROP_SPOIL                 = Float.parseFloat(ratesSettings.getProperty("RateDropSpoil", "1."));
                 RATE_DROP_MANOR                 = Integer.parseInt(ratesSettings.getProperty("RateDropManor", "1"));
                 RATE_DROP_QUEST                 = Float.parseFloat(ratesSettings.getProperty("RateDropQuest", "1."));
@@ -1824,6 +1888,10 @@ public final class Config
                         }
                     }
                 }
+                
+                BANKING_SYSTEM_ENABLED	= Boolean.parseBoolean(L2JModSettings.getProperty("BankingEnabled", "false"));
+                BANKING_SYSTEM_GOLDBARS	= Integer.parseInt(L2JModSettings.getProperty("BankingGoldbarCount", "1"));
+                BANKING_SYSTEM_ADENA	= Integer.parseInt(L2JModSettings.getProperty("BankingAdenaCount", "500000000"));
 
             }
             catch (Exception e)
@@ -2243,6 +2311,7 @@ public final class Config
         else if (pName.equalsIgnoreCase("RateDropAdena")) RATE_DROP_ADENA = Float.parseFloat(pValue);
         else if (pName.equalsIgnoreCase("RateConsumableCost")) RATE_CONSUMABLE_COST = Float.parseFloat(pValue);
         else if (pName.equalsIgnoreCase("RateDropItems")) RATE_DROP_ITEMS = Float.parseFloat(pValue);
+        else if (pName.equalsIgnoreCase("RateRaidDropItems")) RATE_DROP_ITEMS_BY_RAID = Float.parseFloat(pValue);
         else if (pName.equalsIgnoreCase("RateDropSpoil")) RATE_DROP_SPOIL = Float.parseFloat(pValue);
         else if (pName.equalsIgnoreCase("RateDropManor")) RATE_DROP_MANOR = Integer.parseInt(pValue);
         else if (pName.equalsIgnoreCase("RateDropQuest")) RATE_DROP_QUEST = Float.parseFloat(pValue);

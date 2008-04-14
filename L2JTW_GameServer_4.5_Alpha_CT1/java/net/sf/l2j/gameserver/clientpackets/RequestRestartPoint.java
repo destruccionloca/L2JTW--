@@ -67,6 +67,7 @@ public final class RequestRestartPoint extends L2GameClientPacket
 		    Location loc = null;
             Castle castle = null;
             Fort fort = null;
+            Boolean isInDefense = false;
 		    
 		    // force jail
 		    if (activeChar.isInJail())
@@ -97,29 +98,41 @@ public final class RequestRestartPoint extends L2GameClientPacket
 		            break;
 		            
 		        case 2: // to castle
-		            Boolean isInDefense = false;
 		            castle = CastleManager.getInstance().getCastle(activeChar);
-                    fort = FortManager.getInstance().getFort(activeChar);
+                    
 		            if (castle != null && castle.getSiege().getIsInProgress())
 		            {
 		                //siege in progress
 		                if (castle.getSiege().checkIsDefender(activeChar.getClan()))
 		                    isInDefense = true;
 		            }
+		            if (activeChar.getClan().getHasCastle() == 0  && !isInDefense )
+		            {
+		                //cheater
+		                activeChar.sendMessage("You may not use this respawn point!");
+		                Util.handleIllegalPlayerAction(activeChar, "Player " + activeChar.getName() + " used respawn cheat.", IllegalPlayerAction.PUNISH_KICK);
+		                return;
+		            }
+		            loc = MapRegionTable.getInstance().getTeleToLocation(activeChar, MapRegionTable.TeleportWhereType.Castle);
+		            break;
+
+		        case 3: // to fortress
+                    fort = FortManager.getInstance().getFort(activeChar);
+                    
                     if (fort != null && fort.getSiege().getIsInProgress())
                     {
                         //siege in progress
                         if (fort.getSiege().checkIsDefender(activeChar.getClan()))
                             isInDefense = true;
                     }
-		            if ((activeChar.getClan().getHasCastle() == 0 && activeChar.getClan().getHasFort() == 0 ) && !isInDefense )
+		            if (activeChar.getClan().getHasFort() == 0  && !isInDefense )
 		            {
 		                //cheater
 		                activeChar.sendMessage("無法在此地點執行!");
 		                Util.handleIllegalPlayerAction(activeChar, "Player " + activeChar.getName() + " used respawn cheat.", IllegalPlayerAction.PUNISH_KICK);
 		                return;
 		            }
-		            loc = MapRegionTable.getInstance().getTeleToLocation(activeChar, MapRegionTable.TeleportWhereType.Castle);
+		            loc = MapRegionTable.getInstance().getTeleToLocation(activeChar, MapRegionTable.TeleportWhereType.Fortress);
 		            break;
 		            
 		        case 4: // to siege HQ

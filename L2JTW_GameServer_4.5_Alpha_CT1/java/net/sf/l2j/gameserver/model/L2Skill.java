@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 
 import javolution.text.TextBuilder;
 import javolution.util.FastList;
+import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.GeoData;
 import net.sf.l2j.gameserver.datatables.HeroSkillTable;
 import net.sf.l2j.gameserver.datatables.SkillTable;
@@ -599,8 +600,17 @@ public abstract class L2Skill
         _hitTime = set.getInteger("hitTime", 0);
         _coolTime = set.getInteger("coolTime", 0);
         
-        //_skillInterruptTime = set.getInteger("hitTime", _hitTime / 2);
-        _reuseDelay = set.getInteger("reuseDelay", 0);
+        if (Config.ENABLE_MODIFY_SKILL_REUSE && Config.SKILL_REUSE_LIST.containsKey(_id))
+        {
+                if ( Config.DEBUG )
+                        _log.info("*** Skill " + _name + " (" + _level + ") changed reuse from " + set.getInteger("reuseDelay", 0) + " to " + Config.SKILL_REUSE_LIST.get(_id) + " seconds.");
+                _reuseDelay = Config.SKILL_REUSE_LIST.get(_id);
+        }
+        else
+        {
+            _reuseDelay = set.getInteger("reuseDelay", 0);
+        }
+        
         _buffDuration = set.getInteger("buffDuration", 0);
 
         _skillRadius = set.getInteger("skillRadius", 80);
@@ -1727,7 +1737,7 @@ public abstract class L2Skill
                 // Go through the L2Character _knownList
                 for (L2Object obj : activeChar.getKnownList().getKnownObjects().values())
                 {
-                    if (obj != null && (obj instanceof L2Attackable || obj instanceof L2PlayableInstance))
+                    if (obj instanceof L2Attackable || obj instanceof L2PlayableInstance)
                     {
                         // Don't add this target if this is a Pc->Pc pvp casting and pvp condition not met
                         if (obj == activeChar || obj == src || ((L2Character)obj).isDead()) continue;
@@ -1799,7 +1809,7 @@ public abstract class L2Skill
                 // Go through the L2Character _knownList
                 for (L2Object obj : activeChar.getKnownList().getKnownObjects().values())
                 {
-                    if (obj != null && (obj instanceof L2Attackable || obj instanceof L2PlayableInstance))
+                    if (obj instanceof L2Attackable || obj instanceof L2PlayableInstance)
                     {
                         // Don't add this target if this is a Pc->Pc pvp casting and pvp condition not met
                         if (obj == activeChar || obj == src || ((L2Character)obj).isDead()) continue;
@@ -1891,7 +1901,6 @@ public abstract class L2Skill
 
                 for (L2Object obj : activeChar.getKnownList().getKnownObjects().values())
                 {
-                    if (obj == null) continue;
                 	if (!(obj instanceof L2Attackable || obj instanceof L2PlayableInstance)) continue;
                     if (obj == cha) continue;
                     target = (L2Character) obj;
@@ -2008,7 +2017,7 @@ public abstract class L2Skill
 
                 for (L2Object obj : activeChar.getKnownList().getKnownObjects().values())
                 {
-                    if (obj == null || obj == cha)
+                    if (obj == cha)
                     	continue;
 
                     if (!(obj instanceof L2Attackable
@@ -2131,7 +2140,6 @@ public abstract class L2Skill
 
                 for (L2Object obj : activeChar.getKnownList().getKnownObjects().values())
                 {
-                    if (obj == null) continue;
                 	if (!(obj instanceof L2Attackable || obj instanceof L2PlayableInstance)) continue;
                     if (obj == cha) continue;
                     target = (L2Character) obj;
@@ -2233,7 +2241,6 @@ public abstract class L2Skill
 
                 for (L2Object obj : activeChar.getKnownList().getKnownObjects().values())
                 {
-                    if (obj == null) continue;
                 	if (!Util.checkIfInRange(radius, activeChar, obj, true)) continue;
 
                     if (obj instanceof L2Attackable && obj != target) targetList.add((L2Character) obj);
@@ -2386,7 +2393,7 @@ public abstract class L2Skill
                         // Get Clan Members
                         for (L2Object newTarget : activeChar.getKnownList().getKnownObjects().values())
                         {
-                            if (newTarget == null || !(newTarget instanceof L2PcInstance)) continue;
+                            if (!(newTarget instanceof L2PcInstance)) continue;
                             if ((((L2PcInstance) newTarget).getAllyId() == 0 || ((L2PcInstance) newTarget).getAllyId() != player.getAllyId())
                                 && (((L2PcInstance) newTarget).getClan() == null || ((L2PcInstance) newTarget).getClanId() != player.getClanId()))
                                 continue;
@@ -2608,7 +2615,6 @@ public abstract class L2Skill
                 if (activeChar.getKnownList() != null)
                 	for (L2Object obj : activeChar.getKnownList().getKnownObjects().values())
                     {
-                        if (obj == null) continue;
                         if (!(obj instanceof L2Attackable || obj instanceof L2PlayableInstance) || ((L2Character) obj).isDead()
                             || ((L2Character) obj) == activeChar) continue;
 
@@ -2736,7 +2742,6 @@ public abstract class L2Skill
                 if (cha != null && cha.getKnownList() != null)
                     for (L2Object obj : cha.getKnownList().getKnownObjects().values())
                     {
-                        if (obj == null) continue;
                     	if (obj instanceof L2NpcInstance)
                     		target = (L2NpcInstance) obj;
                     	else if (obj instanceof L2SummonInstance)

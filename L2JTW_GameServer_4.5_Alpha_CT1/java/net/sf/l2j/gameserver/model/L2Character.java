@@ -151,8 +151,8 @@ public abstract class L2Character extends L2Object
 	private boolean _isFakeDeath                            = false; // Fake death
 	private boolean _isFlying                               = false; //Is flying Wyvern?
 	private boolean _isMuted                                = false; // Cannot use magic
-	private boolean _isPhysicalMuted                       = false; // Cannot use physical skills
-	private boolean _isPhysicalAttackMuted                 = false; // Cannot use attack
+	private boolean _isPhysicalMuted                       	= false; // Cannot use physical skills
+	private boolean _isPhysicalAttackMuted                 	= false; // Cannot use attack
 	private boolean _isDead			                        = false;
 	private boolean _isImmobilized                          = false;
 	private boolean _isOverloaded                           = false; // the char is carrying too much
@@ -1660,7 +1660,7 @@ public abstract class L2Character extends L2Object
         
         if ((skill.getSkillType() == SkillType.BLOW) && (skill.getCondition() == 16 || skill.getCondition() == 8))
         {
-            int critBonus = 0;
+            int critBonus = 20;
             int critpenalty = 30;
             L2Character activeChar = this;
             if (!(target.isInFront(activeChar, 160)) && skill.getCondition() == 16)
@@ -3330,7 +3330,9 @@ public abstract class L2Character extends L2Object
         // if this is a player instance, then untransform.
         if (this instanceof L2PcInstance)
         {
-            ((L2PcInstance) this).untransform();
+            if (((L2PcInstance) this).getTransformation() != null) 
+            	// gm effect because removing skill didn't do it
+            	((L2PcInstance) this).untransform();
         }
         getAI().notifyEvent(CtrlEvent.EVT_THINK, null);
         updateAbnormalEffect();

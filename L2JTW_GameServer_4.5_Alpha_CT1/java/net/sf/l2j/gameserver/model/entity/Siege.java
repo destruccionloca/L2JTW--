@@ -904,17 +904,43 @@ public class Siege
      */
     private boolean checkIfCanRegister(L2PcInstance player)
     {
-        if (getIsRegistrationOver()) player.sendMessage("「"+ getCastle().getName() + "」的佔領戰登記時間已結束。");
-        else if (getIsInProgress()) player.sendMessage("不是攻城登記期間，因此無法登記或取消。");
+        if (getIsRegistrationOver()) 
+        	player.sendMessage("「"+ getCastle().getName() + "」的佔領戰登記時間已結束。");
+        else if (getIsInProgress()) 
+        	player.sendMessage("不是攻城登記期間，因此無法登記或取消。");
         else if (player.getClan() == null
-            || player.getClan().getLevel() < SiegeManager.getInstance().getSiegeClanMinLevel()) player.sendMessage(SiegeManager.getInstance().getSiegeClanMinLevel()+ "級以上的血盟才可以登記攻城戰。");
-        else if (player.getClan().getHasCastle() > 0) player.sendMessage("擁有城堡的血盟不能參加別的攻城戰。");
+                || player.getClan().getLevel() < SiegeManager.getInstance().getSiegeClanMinLevel()) player.sendMessage(SiegeManager.getInstance().getSiegeClanMinLevel()+ "級以上的血盟才可以登記攻城戰。");
+            else if (player.getClan().getHasCastle() > 0) player.sendMessage("擁有城堡的血盟不能參加別的攻城戰。");
+
         else if (player.getClan().getClanId() == getCastle().getOwnerId())
             player.sendPacket(new SystemMessage(SystemMessageId.CLAN_THAT_OWNS_CASTLE_IS_AUTOMATICALLY_REGISTERED_DEFENDING));
-        else if (SiegeManager.getInstance().checkIsRegistered(player.getClan(), getCastle().getCastleId())) player.sendMessage("已申請攻城戰。");
+
+        else if (SiegeManager.getInstance().checkIsRegistered(player.getClan(), getCastle().getCastleId())) 
+        	player.sendPacket(new SystemMessage(SystemMessageId.ALREADY_REQUESTED_SIEGE_BATTLE));
+        else if (checkIfAlreadyRegisteredForSameDay(player.getClan())) 
+        	player.sendPacket(new SystemMessage(SystemMessageId.APPLICATION_DENIED_BECAUSE_ALREADY_SUBMITTED_A_REQUEST_FOR_ANOTHER_SIEGE_BATTLE));
         else return true;
 
         return false;
+    }
+
+    /**
+     * Return true if the clan has already registered to a siege for the same day.<BR><BR>
+     * @param clan The L2Clan of the player trying to register
+     */
+    public boolean checkIfAlreadyRegisteredForSameDay(L2Clan clan)
+    {
+    	for (Siege siege : SiegeManager.getInstance().getSieges())
+    	{
+    		if (siege == this) continue;
+    		if (siege.getSiegeDate().get(Calendar.DAY_OF_WEEK) == this.getSiegeDate().get(Calendar.DAY_OF_WEEK))
+    		{
+    			if (siege.checkIsAttacker(clan)) return true;
+    			if (siege.checkIsDefender(clan)) return true;
+    			if (siege.checkIsDefenderWaiting(clan)) return true;
+    		}
+    	}
+    	return false;
     }
 
     /**

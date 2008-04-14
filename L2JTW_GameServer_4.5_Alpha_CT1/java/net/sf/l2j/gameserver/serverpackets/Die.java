@@ -84,8 +84,10 @@ public class Die extends L2GameServerPacket
         writeD(0x01);                                                   // 6d 00 00 00 00 - to nearest village
         if (_clan != null)
         {
-            L2SiegeClan siegeClan = null;
-            Boolean isInDefense = false;
+            Boolean isInCastleDefense = false;
+            Boolean isInFortDefense = false;
+
+        	L2SiegeClan siegeClan = null;
             Castle castle = CastleManager.getInstance().getCastle(_activeChar);
 			Fort fort = FortManager.getInstance().getFort(_activeChar);
 			if (castle != null && castle.getSiege().getIsInProgress())
@@ -93,7 +95,7 @@ public class Die extends L2GameServerPacket
             	//siege in progress
                 siegeClan = castle.getSiege().getAttackerClan(_clan);
                 if (siegeClan == null && castle.getSiege().checkIsDefender(_clan)){
-                	isInDefense = true;
+                	isInCastleDefense = true;
                 }
             }
             else if (fort != null && fort.getSiege().getIsInProgress())
@@ -101,26 +103,31 @@ public class Die extends L2GameServerPacket
                 //siege in progress
                 siegeClan = fort.getSiege().getAttackerClan(_clan);
                 if (siegeClan == null && fort.getSiege().checkIsDefender(_clan)){
-                    isInDefense = true;
+                	isInFortDefense = true;
                 }
             }
 
             writeD(_clan.getHasHideout() > 0 ? 0x01 : 0x00);            // 6d 01 00 00 00 - to hide away
-            writeD((_clan.getHasCastle() > 0 || _clan.getHasFort() > 0)  ||
-            	   isInDefense? 0x01 : 0x00);             				// 6d 02 00 00 00 - to castle
+            writeD(_clan.getHasCastle() > 0  ||
+            		isInCastleDefense? 0x01 : 0x00);             		// 6d 02 00 00 00 - to castle
             writeD(siegeClan != null &&
-            	   !isInDefense &&
+            	   !isInCastleDefense && ! isInFortDefense &&
                    siegeClan.getFlag().size() > 0 ? 0x01 : 0x00);       // 6d 03 00 00 00 - to siege HQ
+            writeD(_sweepable ? 0x01 : 0x00);                               // sweepable  (blue glow)
+            writeD(_access >= REQUIRED_LEVEL? 0x01: 0x00);                  // 6d 04 00 00 00 - to FIXED
+            writeD(_clan.getHasFort() > 0  || isInFortDefense? 0x01 : 0x00);    // 6d 05 00 00 00 - to fortress
+
         }
         else
         {
             writeD(0x00);                                               // 6d 01 00 00 00 - to hide away
             writeD(0x00);                                               // 6d 02 00 00 00 - to castle
             writeD(0x00);                                               // 6d 03 00 00 00 - to siege HQ
+            writeD(_sweepable ? 0x01 : 0x00);                               // sweepable  (blue glow)
+            writeD(_access >= REQUIRED_LEVEL? 0x01: 0x00);                  // 6d 04 00 00 00 - to FIXED
+            writeD(0x00);    // 6d 05 00 00 00 - to fortress
         }
 
-        writeD(_sweepable ? 0x01 : 0x00);                               // sweepable  (blue glow)
-        writeD(_access >= REQUIRED_LEVEL? 0x01: 0x00);                  // 6d 04 00 00 00 - to FIXED
     }
 
     /* (non-Javadoc)

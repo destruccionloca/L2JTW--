@@ -151,7 +151,6 @@ import net.sf.l2j.gameserver.serverpackets.ExFishingEnd;
 import net.sf.l2j.gameserver.serverpackets.ExFishingStart;
 import net.sf.l2j.gameserver.serverpackets.ExOlympiadMode;
 import net.sf.l2j.gameserver.serverpackets.ExOlympiadSpelledInfo;
-import net.sf.l2j.gameserver.serverpackets.ExOlympiadUserInfo;
 import net.sf.l2j.gameserver.serverpackets.ExOlympiadUserInfoSpectator;
 import net.sf.l2j.gameserver.serverpackets.ExSetCompassZoneCode;
 import net.sf.l2j.gameserver.serverpackets.ExSpawnEmitter;
@@ -184,6 +183,7 @@ import net.sf.l2j.gameserver.serverpackets.Ride;
 import net.sf.l2j.gameserver.serverpackets.SetupGauge;
 import net.sf.l2j.gameserver.serverpackets.ShortBuffStatusUpdate;
 import net.sf.l2j.gameserver.serverpackets.ShortCutInit;
+import net.sf.l2j.gameserver.serverpackets.SkillCoolTime;
 import net.sf.l2j.gameserver.serverpackets.SkillList;
 import net.sf.l2j.gameserver.serverpackets.Snoop;
 import net.sf.l2j.gameserver.serverpackets.SocialAction;
@@ -249,7 +249,8 @@ public final class L2PcInstance extends L2PlayableInstance
 	private static final String DELETE_SKILL_SAVE = "DELETE FROM character_skills_save WHERE char_obj_id=? AND class_index=?";
 
 	// Character Character SQL String Definitions:
-    private static final String UPDATE_CHARACTER = "UPDATE characters SET level=?,maxHp=?,curHp=?,maxCp=?,curCp=?,maxMp=?,curMp=?,face=?,hairStyle=?,hairColor=?,heading=?,x=?,y=?,z=?,exp=?,expBeforeDeath=?,sp=?,karma=?,pvpkills=?,pkkills=?,rec_have=?,rec_left=?,clanid=?,race=?,classid=?,deletetime=?,title=?,accesslevel=?,online=?,isin7sdungeon=?,clan_privs=?,wantspeace=?,base_class=?,onlinetime=?,in_jail=?,jail_timer=?,newbie=?,nobless=?,power_grade=?,subpledge=?,last_recom_date=?,lvl_joined_academy=?,apprentice=?,sponsor=?,varka_ketra_ally=?,clan_join_expiry_time=?,clan_create_expiry_time=?,char_name=?,death_penalty_level=? WHERE obj_id=?";
+    private static final String INSERT_CHARACTER = "INSERT INTO characters (account_name,obj_Id,char_name,level,maxHp,curHp,maxCp,curCp,maxMp,curMp,face,hairStyle,hairColor,sex,exp,sp,karma,pvpkills,pkkills,clanid,race,classid,deletetime,cancraft,title,accesslevel,online,isin7sdungeon,clan_privs,wantspeace,base_class,newbie,nobless,power_grade,last_recom_date) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+	private static final String UPDATE_CHARACTER = "UPDATE characters SET level=?,maxHp=?,curHp=?,maxCp=?,curCp=?,maxMp=?,curMp=?,face=?,hairStyle=?,hairColor=?,heading=?,x=?,y=?,z=?,exp=?,expBeforeDeath=?,sp=?,karma=?,pvpkills=?,pkkills=?,rec_have=?,rec_left=?,clanid=?,race=?,classid=?,deletetime=?,title=?,accesslevel=?,online=?,isin7sdungeon=?,clan_privs=?,wantspeace=?,base_class=?,onlinetime=?,in_jail=?,jail_timer=?,newbie=?,nobless=?,power_grade=?,subpledge=?,last_recom_date=?,lvl_joined_academy=?,apprentice=?,sponsor=?,varka_ketra_ally=?,clan_join_expiry_time=?,clan_create_expiry_time=?,char_name=?,death_penalty_level=? WHERE obj_id=?";
     private static final String RESTORE_CHARACTER = "SELECT account_name, obj_Id, char_name, level, maxHp, curHp, maxCp, curCp, maxMp, curMp, face, hairStyle, hairColor, sex, heading, x, y, z, exp, expBeforeDeath, sp, karma, pvpkills, pkkills, clanid, race, classid, deletetime, cancraft, title, rec_have, rec_left, accesslevel, online, char_slot, lastAccess, clan_privs, wantspeace, base_class, onlinetime, isin7sdungeon, in_jail, jail_timer, newbie, nobless, power_grade, subpledge, last_recom_date, lvl_joined_academy, apprentice, sponsor, varka_ketra_ally,clan_join_expiry_time,clan_create_expiry_time,death_penalty_level FROM characters WHERE obj_id=?";
 
     // Character Subclass SQL String Definitions:
@@ -277,7 +278,6 @@ public final class L2PcInstance extends L2PlayableInstance
 	private static final String UPDATE_CHAR_TRANSFORM = "UPDATE characters SET transform_id=? WHERE obj_Id=?";
 
 	public static final int REQUEST_TIMEOUT = 15;
-
 	public static final int STORE_PRIVATE_NONE = 0;
 	public static final int STORE_PRIVATE_SELL = 1;
 	public static final int STORE_PRIVATE_BUY = 3;
@@ -428,6 +428,8 @@ public final class L2PcInstance extends L2PlayableInstance
     private boolean _OlympiadStart = false;
     private int _olympiadGameId = -1;
     private int _olympiadSide = -1;
+    public int olyBuff = 0;
+    public int dmgDealt = 0;
 
     /** Duel */
     private boolean _isInDuel = false;
@@ -457,7 +459,7 @@ public final class L2PcInstance extends L2PlayableInstance
     
     private L2Transformation _transformation;
     
-    private static int _transformationId;
+    private static int _transformationId = 0;
 
 	/** The table containing all L2RecipeList of the L2PcInstance */
 	private Map<Integer, L2RecipeList> _dwarvenRecipeBook = new FastMap<Integer, L2RecipeList>();
@@ -3667,13 +3669,13 @@ public final class L2PcInstance extends L2PlayableInstance
         {
         	// TODO: implement new OlympiadUserInfo
         	for (L2PcInstance player : getKnownList().getKnownPlayers().values()) {
-    			if (player.getOlympiadGameId()==getOlympiadGameId()){
+    			if (player.getOlympiadGameId()==getOlympiadGameId() && player.isOlympiadStart()){
     				if (Config.DEBUG)
 						_log.fine("Send status for Olympia window of " + getObjectId() + "(" + getName() + ") to " + player.getObjectId() + "(" + player.getName() +"). CP: " + getCurrentCp() + " HP: " + getCurrentHp() + " MP: " + getCurrentMp());
-    				player.sendPacket(new ExOlympiadUserInfo(this));
+    				player.sendPacket(new ExOlympiadUserInfoSpectator(this, 1));
     			}
     		}
-            if(Olympiad.getInstance().getSpectators(_olympiadGameId) != null)
+            if(Olympiad.getInstance().getSpectators(_olympiadGameId) != null && this.isOlympiadStart())
             {
                 for(L2PcInstance spectator : Olympiad.getInstance().getSpectators(_olympiadGameId))
                 {
@@ -3707,7 +3709,7 @@ public final class L2PcInstance extends L2PlayableInstance
         
         // Create the olympiad spectator packet if needed
         ExOlympiadSpelledInfo os = null;
-        if (this.isInOlympiadMode())
+        if (this.isInOlympiadMode() && this.isOlympiadStart())
         {
             os = new ExOlympiadSpelledInfo(this);
         }
@@ -4219,7 +4221,8 @@ public final class L2PcInstance extends L2PlayableInstance
             restoreSkills();
             _transformation.onUntransform();
             _transformation = null;
-            this.broadcastUserInfo();
+            broadcastUserInfo();
+            sendPacket(new SkillCoolTime(this));
         }
     }
     
@@ -4238,19 +4241,28 @@ public final class L2PcInstance extends L2PlayableInstance
         return transformation.getId();
     }
     
+    // TODO: Clean code. Looks like this is used for non-cursedweapon transformations
+    public int transformId()
+    {
+       return _transformationId;
+    }
+    
     public void transformInsertInfo()
     {
-        java.sql.Connection con = null;
+    	_transformationId = getTranformationId();
+    	java.sql.Connection con = null;
+    	PreparedStatement statement = null;
         try
         {
             con = L2DatabaseFactory.getInstance().getConnection();
-            PreparedStatement statement;
+            
             
             statement = con.prepareStatement(UPDATE_CHAR_TRANSFORM);
-            statement.setInt(1, getTranformationId());
-            statement.setInt(2, getObjectId());
+            statement.setInt(1, _transformationId);
+            statement.setInt(2, this.getObjectId());
             statement.execute();
             statement.close();
+            
         }
         catch (Exception e)
         {
@@ -4262,12 +4274,7 @@ public final class L2PcInstance extends L2PlayableInstance
         }
     }
     
-    public int transformId()
-    {
-       return transformSelectInfo();
-    }
-
-    private int transformSelectInfo()
+    public int transformSelectInfo()
     {
         java.sql.Connection con = null;
         try
@@ -4295,7 +4302,8 @@ public final class L2PcInstance extends L2PlayableInstance
 
     public void transformUpdateInfo()
     {
-        java.sql.Connection con = null;
+    	_transformationId = 0;
+    	java.sql.Connection con = null;
         try
         {
             con = L2DatabaseFactory.getInstance().getConnection();
@@ -6067,7 +6075,10 @@ public final class L2PcInstance extends L2PlayableInstance
 	 */
 	public void broadcastKarma()
 	{
-		sendPacket(new UserInfo(this));
+        StatusUpdate su = new StatusUpdate(getObjectId());
+        su.addAttribute(StatusUpdate.KARMA, getKarma());
+        sendPacket(su);
+
 		for (L2PcInstance player : getKnownList().getKnownPlayers().values()) {
 			player.sendPacket(new RelationChanged(this, getRelation(player), isAutoAttackable(player)));
 		}
@@ -6127,13 +6138,7 @@ public final class L2PcInstance extends L2PlayableInstance
 		{
 			con = L2DatabaseFactory.getInstance().getConnection();
 			PreparedStatement statement;
-			statement = con.prepareStatement(
-			                                 "INSERT INTO characters " +
-			                                 "(account_name,obj_Id,char_name,level,maxHp,curHp,maxCp,curCp,maxMp,curMp," +
-			                                 "face,hairStyle,hairColor,sex,exp,sp,karma,pvpkills,pkkills,clanid,race," +
-			                                 "classid,deletetime,cancraft,title,accesslevel,online,isin7sdungeon,clan_privs," +
-			                                 "wantspeace,base_class,newbie,nobless,power_grade,last_recom_date) " +
-											 "values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+			statement = con.prepareStatement(INSERT_CHARACTER);
 			statement.setString(1, _accountName);
 			statement.setInt(2, getObjectId());
 			statement.setString(3, getName());
@@ -6294,16 +6299,9 @@ public final class L2PcInstance extends L2PlayableInstance
 				player.setUptime(System.currentTimeMillis());
 
 				currentHp = rset.getDouble("curHp");
-				player.setCurrentHp(rset.getDouble("curHp"));
 				currentCp = rset.getDouble("curCp");
-				player.setCurrentCp(rset.getDouble("curCp"));
 				currentMp = rset.getDouble("curMp");
-				player.setCurrentMp(rset.getDouble("curMp"));
-				if (currentHp < 0.5) {
-					player.setIsDead(true);
-					player.stopHpMpRegeneration();
-				}
-				
+
 				//Check recs
 				player.checkRecom(rset.getInt("rec_have"),rset.getInt("rec_left"));
 
@@ -6379,11 +6377,20 @@ public final class L2PcInstance extends L2PlayableInstance
 			// Note that Clan, Noblesse and Hero skills are given separately and not here.
 			player.restoreCharData();
 			player.rewardSkills();
+			
+		    // buff and status icons
+	        if (Config.STORE_SKILL_COOLTIME)
+	            player.restoreEffects();
 
 			// Restore current Cp, HP and MP values
 			player.setCurrentCp(currentCp);
 			player.setCurrentHp(currentHp);
 			player.setCurrentMp(currentMp);
+			
+			if (currentHp < 0.5) {
+				player.setIsDead(true);
+				player.stopHpMpRegeneration();
+			}
 
 			// Restore pet if exists in the world
 			player.setPet(L2World.getInstance().getPet(player.getObjectId()));
@@ -6806,8 +6813,8 @@ public final class L2PcInstance extends L2PlayableInstance
 					statement.setInt (3, -1);
 					statement.setInt (4, -1);
 					statement.setInt (5, -1);
-					statement.setLong(6, t.getReuse());
-					statement.setLong(7, t.getStamp());
+					statement.setDouble(6, t.getReuse());
+					statement.setDouble(7, t.getStamp());
 					statement.setInt (8, 1);
 					statement.setInt (9, getClassIndex());
 					statement.setInt(10, buff_index);
@@ -7150,8 +7157,6 @@ public final class L2PcInstance extends L2PlayableInstance
 		finally {
 			try {con.close();} catch (Exception e) {}
 		}
-
-		updateEffectIcons();
 	}
 
 	/**
@@ -9377,6 +9382,7 @@ public final class L2PcInstance extends L2PlayableInstance
         regiveTemporarySkills();
         rewardSkills();
         restoreEffects();
+        updateEffectIcons();
         sendPacket(new EtcStatusUpdate(this));
         
         //if player has quest 422: Repent Your Sins, remove it
@@ -9790,7 +9796,7 @@ public final class L2PcInstance extends L2PlayableInstance
 		// Force a revalidation
 		revalidateZone(true);
 
-		if (Config.PLAYER_SPAWN_PROTECTION > 0)
+		if ((Config.PLAYER_SPAWN_PROTECTION > 0) && !isInOlympiadMode())
             setProtection(true);
 
 		// Modify the position of the tamed beast if necessary (normal pets are handled by super...though
@@ -11230,6 +11236,11 @@ public final class L2PcInstance extends L2PlayableInstance
         }
         if (mcrit)
             sendPacket(new SystemMessage(SystemMessageId.CRITICAL_HIT_MAGIC));
+        
+        if (isInOlympiadMode() && (target instanceof L2PcInstance))
+        {
+        	dmgDealt += damage;
+        }
 
 		SystemMessage sm = new SystemMessage(SystemMessageId.YOU_DID_S1_DMG);
 		sm.addNumber(damage);
@@ -11341,5 +11352,5 @@ public final class L2PcInstance extends L2PlayableInstance
         sendPacket(new CameraMode(0));
     }
 // Addon End ==================================================
-    
+
 }

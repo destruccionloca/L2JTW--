@@ -2752,6 +2752,12 @@ public class L2NpcInstance extends L2Character
                 else
                     filename = Olympiad.OLYMPIAD_HTML_FILE + "monument.htm";
                 break;
+            case 36402:
+            	if (player.olyBuff > 0 && !player.inObserverMode())
+                    filename = Olympiad.OLYMPIAD_HTML_FILE + "olympiad_buffs.htm";
+            	else
+            		filename = Olympiad.OLYMPIAD_HTML_FILE + "olympiad_nobuffs.htm";
+                break;
             default:
                 if (npcId >= 31865 && npcId <= 31918)
                 {

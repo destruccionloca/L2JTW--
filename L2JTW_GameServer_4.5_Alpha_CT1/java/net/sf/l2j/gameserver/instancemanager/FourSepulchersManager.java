@@ -939,7 +939,7 @@ public class FourSepulchersManager
 			else
 			{
 				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-				sm.addString("条?を?たしていないため、入場が?否されました。");
+				sm.addString("ｱ｣ｲﾅ,ｵLｪkｶi､J.");
 				player.sendPacket(sm);
 			}
 		}
@@ -980,7 +980,7 @@ public class FourSepulchersManager
 			else
 			{
 				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-				sm.addString("条?を?たしていないため、入場が?否されました。");
+				sm.addString("ｱ｣ｲﾅ,ｵLｪkｶi､J.");
 				player.sendPacket(sm);
 			}
 		}
