@@ -61,12 +61,13 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>>
 
 	public GameClientState state;
 
+	public boolean PTSClient;
 	// Info
     private String _accountName;
     private SessionKey _sessionId;
 	private L2PcInstance _activeChar;
 	private ReentrantLock _activeCharLock = new ReentrantLock();
-
+	
 	private boolean _isAuthedGG;
 	private long _connectionStartTime;
 	private List<Integer> _charSlotMapping = new FastList<Integer>();
@@ -608,5 +609,10 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>>
 				_log.severe(e.toString());
 			}
 		}
+	}
+	
+	public void setClientType(boolean PTS)
+	{
+		PTSClient = PTS;
 	}
 }

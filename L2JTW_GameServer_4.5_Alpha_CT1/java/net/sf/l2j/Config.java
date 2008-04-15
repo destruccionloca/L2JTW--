@@ -64,8 +64,9 @@ public final class Config
     public static String CTF_EVEN_TEAMS;
     /** Decay Time */
     public static int DECAY_TIME;
+    public static boolean PTS_CLIENT;
  // addon =========================================================
-    
+
     /***************************************************************************
      * Custom CONFIG                                                           *
      **************************************************************************/
@@ -1371,10 +1372,7 @@ public final class Config
                 PARTY_XP_CUTOFF_METHOD				= Character.getProperty("PartyXpCutoffMethod", "percentage");
                 PARTY_XP_CUTOFF_PERCENT				= Double.parseDouble(Character.getProperty("PartyXpCutoffPercent", "3."));
                 PARTY_XP_CUTOFF_LEVEL				= Integer.parseInt(Character.getProperty("PartyXpCutoffLevel", "30"));
-                // ---------------------------------------------------
-                // L2JTW Configuration
-                // ---------------------------------------------------
-                DECAY_TIME          = Integer.parseInt(Character.getProperty("decaytime", "8500"));
+
             }
             catch (Exception e)
             {
@@ -1585,7 +1583,7 @@ public final class Config
                 ALT_OLY_GP_PER_POINT						= Integer.parseInt(General.getProperty("AltOlyGPPerPoint","1000"));
                 ALT_OLY_MIN_POINT_FOR_EXCH					= Integer.parseInt(General.getProperty("AltOlyMinPointForExchange","50"));
                 ALT_OLY_HERO_POINTS							= Integer.parseInt(General.getProperty("AltOlyHeroPoints","300"));
-                ALT_OLY_RESTRICTED_ITEMS					= General.getProperty("AltOlyRestrictedItems");
+                ALT_OLY_RESTRICTED_ITEMS					= General.getProperty("AltOlyRestrictedItems","0");
                 LIST_OLY_RESTRICTED_ITEMS					= new FastList<Integer>();
                                 							for (String id : ALT_OLY_RESTRICTED_ITEMS.split(","))
                                 							{
@@ -1634,19 +1632,7 @@ public final class Config
                 CUSTOM_TELEPORT_TABLE						= Boolean.valueOf(General.getProperty("CustomTeleportTable", "false"));
                 CUSTOM_DROPLIST_TABLE						= Boolean.valueOf(General.getProperty("CustomDroplistTable", "false"));
                 CUSTOM_MERCHANT_TABLES						= Boolean.valueOf(General.getProperty("CustomMerchantTables", "false"));
-                
-                //L2JTW Configuration
-                
-                // Alt Raidboss for allow higher level player attack low level raidboss
-                ALT_RAIDBOSS_FOSSILIZATION       = Boolean.parseBoolean(General.getProperty("AltRaidBossFossilization", "False"));
-                ALT_GAME_EXP                   						= Boolean.parseBoolean(General.getProperty("AltGameExp", "False"));
-                ALT_GAME_PENALTY                   						= Boolean.parseBoolean(General.getProperty("AltGamePenalty", "False"));
-                ALT_GAME_EXP_Level                   				= Integer.parseInt(General.getProperty("AltGameExpLevel", "50"));
-                Orator_Spawns                   						= Boolean.parseBoolean(General.getProperty("OratorSpawns", "False"));
-                Preacher_Spawns                   						= Boolean.parseBoolean(General.getProperty("PreacherSpawns", "False"));
-                ALT_GAME_ATKSPD                  		     		= Integer.parseInt(General.getProperty("AltGameAtkSpd", "1200"));
-                ALLOW_3RD_CLASS                  		     		= Boolean.parseBoolean(General.getProperty("Allow3rdClass", "False"));
-                USE_JP_RULE_OF_BOSSZONE								= Boolean.parseBoolean(General.getProperty("UseJPBossZone", "true"));
+
 
             }
             catch (Exception e)
@@ -2020,8 +2006,34 @@ public final class Config
                 _log.warning("Could not load HexID file ("+HEXID_FILE+"). Hopefully login will give us one.");
             }
          // addon =========================================================
-            // JP Custom Setting
+            // Custom Setting
+            try
+            {
+                Properties customSettings      = new Properties();
+                InputStream is              = new FileInputStream(new File(CUSTOM_FILE));
+                customSettings.load(is);
+                is.close();
 
+                // ---------------------------------------------------
+                // L2JTW Configuration
+                // ---------------------------------------------------
+                DECAY_TIME        									= Integer.parseInt(customSettings.getProperty("decaytime", "8500"));
+                ALT_RAIDBOSS_FOSSILIZATION      					= Boolean.parseBoolean(customSettings.getProperty("AltRaidBossFossilization", "False"));
+                ALT_GAME_EXP                   						= Boolean.parseBoolean(customSettings.getProperty("AltGameExp", "False"));
+                ALT_GAME_PENALTY                   					= Boolean.parseBoolean(customSettings.getProperty("AltGamePenalty", "False"));
+                ALT_GAME_EXP_Level                   				= Integer.parseInt(customSettings.getProperty("AltGameExpLevel", "50"));
+                Orator_Spawns                   					= Boolean.parseBoolean(customSettings.getProperty("OratorSpawns", "False"));
+                Preacher_Spawns                   					= Boolean.parseBoolean(customSettings.getProperty("PreacherSpawns", "False"));
+                ALT_GAME_ATKSPD                  		     		= Integer.parseInt(customSettings.getProperty("AltGameAtkSpd", "1200"));
+                ALLOW_3RD_CLASS                  		     		= Boolean.parseBoolean(customSettings.getProperty("Allow3rdClass", "False"));
+                USE_JP_RULE_OF_BOSSZONE								= Boolean.parseBoolean(customSettings.getProperty("UseJPBossZone", "true"));
+                PTS_CLIENT											= Boolean.parseBoolean(customSettings.getProperty("PTSClient", "true"));
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                throw new Error("Failed to Load "+PVP_CONFIG_FILE+" File.");
+            }
             // JP Four-Sepulchers Custom Setting
             try
             {
