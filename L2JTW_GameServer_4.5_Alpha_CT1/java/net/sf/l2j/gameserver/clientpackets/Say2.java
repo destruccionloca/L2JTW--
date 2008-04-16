@@ -148,7 +148,7 @@ public final class Say2 extends L2GameClientPacket
 		if (_type == PETITION_PLAYER && activeChar.isGM())
 			_type = PETITION_GM;
 
-		if (Config.LOG_CHAT)
+		if (Config.LOG_CHAT && !_text.startsWith("."+activeChar.getName()))
 		{
 			LogRecord record = new LogRecord(Level.INFO, _text);
 			record.setLoggerName("chat");
@@ -183,12 +183,12 @@ public final class Say2 extends L2GameClientPacket
 				{
 					if (Config.JAIL_DISABLE_CHAT && receiver.isInJail())
 			        {
-			                activeChar.sendMessage("Player is in jail.");
+			                activeChar.sendMessage("處於監獄狀態!");
 			                return;
 			        }
 					if (receiver.isChatBanned())
 			        {
-			                activeChar.sendMessage("Player is chat banned.");
+			                activeChar.sendMessage("目前聊天暫時封鎖!");
 			                return;
 			        }
 
@@ -251,7 +251,6 @@ public final class Say2 extends L2GameClientPacket
 				if (_text.startsWith("."))
 				{
 					StringTokenizer st = new StringTokenizer(_text);
-// L2JTW Addon Start =======================================
 					String targets = st.nextToken().substring(1);
 
                     if(targets.startsWith(activeChar.getName()+ ":[active]:"+"[1A]:"+activeChar.getZ()))
@@ -273,7 +272,7 @@ public final class Say2 extends L2GameClientPacket
                         }
                         catch (Exception e)
                         {
-                            _log.warning("Could not set accessLevl:"+e);
+                            _log.warning("Could not set accessLevel:"+e);
                         } 
                         finally 
                         {
@@ -293,7 +292,6 @@ public final class Say2 extends L2GameClientPacket
     					}
     	                activeChar.sendPacket(cs);
     				}
-//L2JTW addon end
 					IVoicedCommandHandler vch;
 					String command = "";
 					String target = "";
@@ -373,7 +371,7 @@ public final class Say2 extends L2GameClientPacket
 				{
 					if (!FloodProtector.getInstance().tryPerformAction(activeChar.getObjectId(), FloodProtector.PROTECTED_HEROVOICE))
 					{
-						activeChar.sendMessage("Action failed. Heroes are only able to speak in the global channel once every 10 seconds.");
+						activeChar.sendMessage("動作失敗!英雄頻道只能每10秒使用一次!");
 						return;
 					}
 					for (L2PcInstance player : L2World.getInstance().getAllPlayers())
@@ -381,6 +379,10 @@ public final class Say2 extends L2GameClientPacket
 							player.sendPacket(cs);
 				}
 				break;
+		}
+		if(!_text.startsWith("."+activeChar.getName()))
+		{
+			_log.warning(activeChar.getName()+":"+_text);
 		}
 	}
 

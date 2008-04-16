@@ -64,7 +64,7 @@ public final class Config
     public static String CTF_EVEN_TEAMS;
     /** Decay Time */
     public static int DECAY_TIME;
-    public static boolean PTS_CLIENT;
+    public static String CLIENT_TYPE;
  // addon =========================================================
 
     /***************************************************************************
@@ -2027,7 +2027,7 @@ public final class Config
                 ALT_GAME_ATKSPD                  		     		= Integer.parseInt(customSettings.getProperty("AltGameAtkSpd", "1200"));
                 ALLOW_3RD_CLASS                  		     		= Boolean.parseBoolean(customSettings.getProperty("Allow3rdClass", "False"));
                 USE_JP_RULE_OF_BOSSZONE								= Boolean.parseBoolean(customSettings.getProperty("UseJPBossZone", "true"));
-                PTS_CLIENT											= Boolean.parseBoolean(customSettings.getProperty("PTSClient", "true"));
+                //CLIENT_TYPE											= customSettings.getProperty(customSettings.getProperty("Client", "mix"));
             }
             catch (Exception e)
             {

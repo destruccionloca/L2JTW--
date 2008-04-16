@@ -661,7 +661,25 @@ public class Castle
 
 	public final String getName()
 	{
-	    return _name;
+		if(_name.equalsIgnoreCase("Aden"))
+			return "¨È¤B«°";
+		else if (_name.equalsIgnoreCase("Dion"))
+			return "¨f®¦«°";
+		else if (_name.equalsIgnoreCase("Giran"))
+			return "©_©¥«°";
+		else if (_name.equalsIgnoreCase("Gludio"))
+			return "¥j¾|¤B«°";
+		else if	(_name.equalsIgnoreCase("Goddard"))
+			return "°ª¹F¯S«°";
+		else if (_name.equalsIgnoreCase("Innadril"))
+			return "¦]¯Ç¼w§Q«°";
+		else if (_name.equalsIgnoreCase("Oren"))
+			return "¼Ú·ç«°";
+		else if (_name.equalsIgnoreCase("Rune"))
+			return "¾|¦]«°";
+		else if (_name.equalsIgnoreCase("Schuttgart"))
+			return "­×¥[¯S«°";
+		else return _name;
 	}
 
 	public final int getOwnerId()
