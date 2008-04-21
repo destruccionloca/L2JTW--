@@ -41,7 +41,7 @@ public class Scrolls implements IItemHandler
 											8594, 8595, 8596, 8597, 8598, 8599, // scrolls of recovery
 											8954, 8955, 8956,                   // primeval crystal
 											9146, 9147, 9148, 9149, 9150, 9151, 9152, 9153, 9154, 9155,
-											9648, 9649, 9650, 9651, 9652, 9653, 9654, 9655, 9897, 10131, 10132, 10133, 10134, 10135, 10136, 10137, 10138, 10151, 10274 // transformation scrolls 
+                                            9897, 10131, 10132, 10133, 10134, 10135, 10136, 10137, 10138, 10151, 10274 // transformation scrolls
                                    		  };
 
 	public void useItem(L2PlayableInstance playable, L2ItemInstance item)
@@ -132,12 +132,13 @@ public class Scrolls implements IItemHandler
 	   			activeChar.sendPacket(new SystemMessage(SystemMessageId.INCOMPATIBLE_ITEM_GRADE));
 	   		return;
 	   	}
-	   	else if (itemId >= 9648 && itemId <= 9655||itemId == 9897||itemId>=10131 &&itemId <=10138||itemId == 10151||itemId == 10274) //transformation scrolls 
-	   	 	if (activeChar.getPet() != null || activeChar.isTransformed()) 
-	   	 	{ 
-	   	 	    activeChar.sendPacket(new SystemMessage(SystemMessageId.S1_CANNOT_BE_USED).addItemName(itemId)); 
-	   	 	    return; 
-	   	 	} 
+
+        else if (itemId == 9897||itemId>=10131 &&itemId <=10138||itemId == 10151||itemId == 10274) //transformation scrolls
+            if (activeChar.getPet() != null || activeChar.isTransformed())
+            {
+                activeChar.sendPacket(new SystemMessage(SystemMessageId.S1_CANNOT_BE_USED).addItemName(itemId));
+                return;
+            }
 	   	else if (itemId >= 8954 && itemId <= 8956)
 	   	{
 	   		if (activeChar.getLevel() < 76)

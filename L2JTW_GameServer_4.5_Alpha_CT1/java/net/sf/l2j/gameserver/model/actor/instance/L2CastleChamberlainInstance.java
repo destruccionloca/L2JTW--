@@ -442,7 +442,9 @@ public class L2CastleChamberlainInstance extends L2MerchantInstance
                     msg.append("<tr>");
                     msg.append("<td>調整稅率</td>");
                     msg.append("<td><edit var=\"value\" width=40><br>");
-                    msg.append("<button value=\"調整\" action=\"bypass -h npc_%objectId%_tax_set $value\" width=80 height=15></td>");
+
+                    msg.append("<button value=\"調整\" action=\"bypass -h npc_%objectId%_tax_set $value\" width=80 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"></td>");
+
                     msg.append("</tr>");
                     msg.append("</table>");
                     msg.append("</center>");

@@ -547,10 +547,17 @@ public class AdminEditNpc implements IAdminCommandHandler {
 	private void storeTradeList(int itemID, int price, int tradeListID, int order)
 	{
 		java.sql.Connection con = null;
+		String STORE;
+		if (Config.CUSTOM_MERCHANT_TABLES)
+		 STORE = "INSERT INTO custom_merchant_buylists (`item_id`,`price`,`shop_id`,`order`) values ("+itemID+","+price+","+tradeListID+","+order+")";
+		else
+		 STORE = "INSERT INTO merchant_buylists (`item_id`,`price`,`shop_id`,`order`) values ("+itemID+","+price+","+tradeListID+","+order+")";
+		
 		try
 		{
 			con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement stmt = con.prepareStatement("INSERT INTO merchant_buylists (`item_id`,`price`,`shop_id`,`order`) values ("+itemID+","+price+","+tradeListID+","+order+")");
+			
+			PreparedStatement stmt = con.prepareStatement(STORE);
 			stmt.execute();
 			stmt.close();
 		}
@@ -574,10 +581,15 @@ public class AdminEditNpc implements IAdminCommandHandler {
 	private void updateTradeList(int itemID, int price, int tradeListID, int order)
 	{
 		java.sql.Connection con = null;
+		String STORE;
+		if (Config.CUSTOM_MERCHANT_TABLES)
+			STORE = "UPDATE custom_merchant_buylists SET `price`='"+price+"' WHERE `shop_id`='"+tradeListID+"' AND `order`='"+order+"'";
+		else
+			STORE = "UPDATE merchant_buylists SET `price`='"+price+"' WHERE `shop_id`='"+tradeListID+"' AND `order`='"+order+"'";
 		try
 		{
 			con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement stmt = con.prepareStatement("UPDATE merchant_buylists SET `price`='"+price+"' WHERE `shop_id`='"+tradeListID+"' AND `order`='"+order+"'");
+			PreparedStatement stmt = con.prepareStatement(STORE);
 			stmt.execute();
 			stmt.close();
 		}catch (SQLException esql)
@@ -600,10 +612,15 @@ public class AdminEditNpc implements IAdminCommandHandler {
 	private void deleteTradeList(int tradeListID, int order)
 	{
 		java.sql.Connection con = null;
+		String STORE;
+		if (Config.CUSTOM_MERCHANT_TABLES)
+			STORE = "DELETE FROM custom_merchant_buylists WHERE `shop_id`='"+tradeListID+"' AND `order`='"+order+"'";
+		else
+			STORE = "DELETE FROM merchant_buylists WHERE `shop_id`='"+tradeListID+"' AND `order`='"+order+"'";
 		try
 		{
 			con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement stmt = con.prepareStatement("DELETE FROM merchant_buylists WHERE `shop_id`='"+tradeListID+"' AND `order`='"+order+"'");
+			PreparedStatement stmt = con.prepareStatement(STORE);
 			stmt.execute();
 			stmt.close();
 		}
@@ -628,10 +645,15 @@ public class AdminEditNpc implements IAdminCommandHandler {
 	{
 		java.sql.Connection con = null;
 		int order = 0;
+		String STORE;
+		if (Config.CUSTOM_MERCHANT_TABLES)
+			STORE = "SELECT * FROM custom_merchant_buylists WHERE `shop_id`='"+tradeListID+"' AND `item_id` ='"+itemID+"' AND `price` = '"+price+"'";
+		else
+			STORE = "SELECT * FROM merchant_buylists WHERE `shop_id`='"+tradeListID+"' AND `item_id` ='"+itemID+"' AND `price` = '"+price+"'";
 		try
 		{
 			con = L2DatabaseFactory.getInstance().getConnection();
-			PreparedStatement stmt = con.prepareStatement("SELECT * FROM merchant_buylists WHERE `shop_id`='"+tradeListID+"' AND `item_id` ='"+itemID+"' AND `price` = '"+price+"'");
+			PreparedStatement stmt = con.prepareStatement(STORE);
 			ResultSet rs = stmt.executeQuery();
 			rs.first();
 

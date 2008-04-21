@@ -1311,7 +1311,10 @@ public class L2NpcInstance extends L2Character
 //L2JTW addon end ==========================================
                     else
                     {
-                        Quest[] qlst = getTemplate().getEventQuests(Quest.QuestEventType.NPC_FIRST_TALK);
+                    	Quest[] qlsa = getTemplate().getEventQuests(Quest.QuestEventType.QUEST_START);
+                    	if ( (qlsa != null) && qlsa.length > 0)
+                    		player.setLastQuestNpcObject(getObjectId());
+                        Quest[] qlst = getTemplate().getEventQuests(Quest.QuestEventType.ON_FIRST_TALK);
                         if ( (qlst != null) && qlst.length == 1)
                             qlst[0].notifyFirstTalk(this, player);
                         else
@@ -1448,8 +1451,10 @@ public class L2NpcInstance extends L2Character
             html1.append("<tr><td>STR</td><td>"+getSTR()+"</td><td>DEX</td><td>"+getDEX()+"</td><td>CON</td><td>"+getCON()+"</td></tr>");
             html1.append("<tr><td>INT</td><td>"+getINT()+"</td><td>WIT</td><td>"+getWIT()+"</td><td>MEN</td><td>"+getMEN()+"</td></tr>");
             html1.append("</table>");
+
+
             html1.append("<br><center><font color=\"LEVEL\">[掉落資訊]</font></center>");
-            html1.append("機率︰<font color=\"ff0000\">50%+</font> <font color=\"00ff00\">30%+</font> <font color=\"0000ff\">低於 30%</font>");
+            html1.append("<br>機率: <font color=\"ff0000\">50%+</font> <font color=\"00ff00\">30%+</font> <font color=\"0000ff\">低於 30%</font>");
             html1.append("<table border=0 width=\"100%\">");
 
             if (getTemplate().getDropData()!=null)
@@ -1459,11 +1464,11 @@ public class L2NpcInstance extends L2Character
 	    	    	String name = ItemTable.getInstance().getTemplate(drop.getItemId()).getName();
 
 	    	    	if(drop.getChance() >= 600000)
-	    	    		html1.append("<tr><td><font color=\"ff0000\">" + name + "</font></td><td>" + (drop.isQuestDrop()?"Quest":(cat.isSweep()?"Sweep":"Drop")) + "</td></tr>");
+	    	    		html1.append("<tr><td><font color=\"ff0000\">" + name + "</font></td><td>" + (drop.isQuestDrop()?"任務":(cat.isSweep()?"回收":"掉落")) + "</td></tr>");
 	    	    	else if(drop.getChance() >= 300000)
-	    	    		html1.append("<tr><td><font color=\"00ff00\">" + name + "</font></td><td>" + (drop.isQuestDrop()?"Quest":(cat.isSweep()?"Sweep":"Drop")) + "</td></tr>");
+	    	    		html1.append("<tr><td><font color=\"00ff00\">" + name + "</font></td><td>" + (drop.isQuestDrop()?"任務":(cat.isSweep()?"回收":"掉落")) + "</td></tr>");
 	    	    	else
-	    	    		html1.append("<tr><td><font color=\"0000ff\">" + name + "</font></td><td>" + (drop.isQuestDrop()?"Quest":(cat.isSweep()?"Sweep":"Drop")) + "</td></tr>");
+	    	    		html1.append("<tr><td><font color=\"0000ff\">" + name + "</font></td><td>" + (drop.isQuestDrop()?"任務":(cat.isSweep()?"回收":"掉落")) + "</td></tr>");
 	    	    }
 
     	    html1.append("</table>");
@@ -2022,7 +2027,7 @@ public class L2NpcInstance extends L2Character
         Quest[] starts = getTemplate().getEventQuests(Quest.QuestEventType.QUEST_START);
         
         // Quests are limited between 1 and 999 because those are the quests that are supported by the client.  
-        // By limitting them there, we are allowed to create custom quests at higher IDs without interfering  
+        // By limiting them there, we are allowed to create custom quests at higher IDs without interfering  
         if (awaits != null) 
         {
             for (QuestState x : awaits) 
@@ -2890,8 +2895,8 @@ public class L2NpcInstance extends L2Character
         
         super.onSpawn();
 
-        if (getTemplate().getEventQuests(Quest.QuestEventType.NPC_SPAWNED) != null)
-            for (Quest quest: getTemplate().getEventQuests(Quest.QuestEventType.NPC_SPAWNED))
+        if (getTemplate().getEventQuests(Quest.QuestEventType.ON_SPAWN) != null)
+            for (Quest quest: getTemplate().getEventQuests(Quest.QuestEventType.ON_SPAWN))
                 quest.notifySpawn(this);
     }
     

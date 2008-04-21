@@ -258,15 +258,17 @@ public class AdminSkill implements IAdminCommandHandler {
 		NpcHtmlMessage adminReply = new NpcHtmlMessage(5);
 		TextBuilder replyMSG = new TextBuilder("<html><body>");
 		replyMSG.append("<table width=260><tr>");
-		replyMSG.append("<td width=40><button value=\"首頁\" action=\"bypass -h admin_admin\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
+
+		replyMSG.append("<td width=40><button value=\"首頁\" action=\"bypass -h admin_admin\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"></td>");
 		replyMSG.append("<td width=180><center>角色選單</center></td>");
-		replyMSG.append("<td width=40><button value=\"返回\" action=\"bypass -h admin_show_skills\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
+		replyMSG.append("<td width=40><button value=\"返回\" action=\"bypass -h admin_show_skills\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"></td>");
+
 		replyMSG.append("</tr></table>");
 		replyMSG.append("<br><br>");
 		replyMSG.append("<center>編輯 <font color=\"LEVEL\">" + player.getName() + "</font></center>");
-		replyMSG.append("<br><table width=270><tr><td>等級：" + player.getLevel() + " " + player.getTemplate().className + "</td></tr></table>");
-		replyMSG.append("<br><table width=270><tr><td>注意：修改將會造成破壞遊戲平衡</td></tr>");
-		replyMSG.append("<tr><td>ruin the game...</td></tr></table>");
+		replyMSG.append("<br><table width=300><tr><td>等級：" + player.getLevel() + " " + player.getTemplate().className + "</td></tr></table>");
+		replyMSG.append("<br><table width=300><tr><td>注意：修改將會造成破壞遊戲平衡</td></tr>");
+		replyMSG.append("<tr><td></td></tr></table>");
 		replyMSG.append("<br><center>選取想要移除的技能：</center>");
 		replyMSG.append("<br>");
 		String pages = "<center><table width=270><tr>";
@@ -287,8 +289,10 @@ public class AdminSkill implements IAdminCommandHandler {
 		replyMSG.append("<tr><td>Id: </td>");
 		replyMSG.append("<td><edit var=\"id_to_remove\" width=110></td></tr>");
 		replyMSG.append("</table></center>");
-		replyMSG.append("<center><button value=\"移除技能\" action=\"bypass -h admin_remove_skill $id_to_remove\" width=110 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></center>");
-		replyMSG.append("<br><center><button value=\"返回\" action=\"bypass -h admin_current_player\" width=40 height=15></center>");
+
+		replyMSG.append("<center><button value=\"移除技能\" action=\"bypass -h admin_remove_skill $id_to_remove\" width=110 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"></center>");
+		replyMSG.append("<br><center><button value=\"返回\" action=\"bypass -h admin_current_player\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"></center>");
+
 		replyMSG.append("</body></html>");
 		adminReply.setHtml(replyMSG.toString());
 		activeChar.sendPacket(adminReply);

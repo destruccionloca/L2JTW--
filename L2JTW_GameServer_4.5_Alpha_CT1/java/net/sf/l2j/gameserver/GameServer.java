@@ -12,12 +12,15 @@
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package net.sf.l2j.gameserver;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -45,6 +48,7 @@ import net.sf.l2j.gameserver.datatables.ItemTable;
 import net.sf.l2j.gameserver.datatables.LevelUpData;
 import net.sf.l2j.gameserver.datatables.MapRegionTable;
 import net.sf.l2j.gameserver.datatables.NobleSkillTable;
+import net.sf.l2j.gameserver.datatables.NpcBufferTable;
 import net.sf.l2j.gameserver.datatables.NpcTable;
 import net.sf.l2j.gameserver.datatables.NpcWalkerRoutesTable;
 import net.sf.l2j.gameserver.datatables.SkillSpellbookTable;
@@ -361,6 +365,8 @@ public class GameServer
 		// L2EMU_ADD by Rayan. L2J - BigBro
 		if(Config.ALLOW_NPC_WALKERS)
 		    NpcWalkerRoutesTable.getInstance().load();
+		
+		NpcBufferTable.getInstance();
 		
 		RecipeController.getInstance();
 
@@ -727,7 +733,37 @@ public class GameServer
         sc.setSelectorSleepTime(20);
         
 		_selectorThread = new SelectorThread<L2GameClient>(sc, gph, gph, null);
-		_selectorThread.openServerSocket(null, Config.PORT_GAME);
+		
+		InetAddress bindAddress = null;
+		if (!Config.GAMESERVER_HOSTNAME.equals("*"))
+		{
+			try
+			{
+				bindAddress = InetAddress.getByName(Config.GAMESERVER_HOSTNAME);
+			}
+			catch (UnknownHostException e1)
+			{
+				_log.severe("WARNING: The GameServer bind address is invalid, using all avaliable IPs. Reason: "+e1.getMessage());
+				if (Config.DEVELOPER)
+				{
+					e1.printStackTrace();
+				}
+			}
+		}
+		
+		try
+		{
+			_selectorThread.openServerSocket(bindAddress, Config.PORT_GAME);
+		}
+		catch (IOException e)
+		{
+			_log.severe("FATAL: Failed to open server socket. Reason: "+e.getMessage());
+			if (Config.DEVELOPER)
+			{
+				e.printStackTrace();
+			}
+			System.exit(1);
+		}
 		_selectorThread.start();
 		_log.config("Maximum Numbers of Connected Players: " + Config.MAXIMUM_ONLINE_USERS);
 	}

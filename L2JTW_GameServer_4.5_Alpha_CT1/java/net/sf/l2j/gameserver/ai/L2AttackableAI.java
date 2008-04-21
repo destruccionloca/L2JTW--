@@ -184,6 +184,11 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
             if (!(me instanceof L2RaidBossInstance) && ((L2PcInstance)target).isSilentMoving())
                 return false;
 
+            // TODO: Ideally, autoattack condition should be called from the AI script.  In that case,
+            // it should only implement the basic behaviors while the script will add more specific
+            // behaviors (like varka/ketra alliance, etc).  Once implemented, remove specialized stuff
+            // from this location.  (Fulminus)
+            
             // Check if player is an ally (comparing mem addr)
             if (me.getFactionId() == "varka" && ((L2PcInstance)target).isAlliedWithVarka())
                 return false;
@@ -443,6 +448,28 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
                     if (!(targetPlayer.isFestivalParticipant())) continue;
                 }
 
+                /*
+                 * Temporarily adding this commented code as a concept to be used eventually.
+                 * However, the way it is written below will NOT work correctly.  The NPC
+                 * should only notify Aggro Range Enter when someone enters the range from outside.
+                 * Instead, the below code will keep notifying even while someone remains within 
+                 * the range.  Perhaps we need a short knownlist of range = aggroRange for just
+                 * people who are actively within the npc's aggro range?...(Fulminus) 
+                // notify AI that a playable instance came within aggro range
+                if ((obj instanceof L2PcInstance) || (obj instanceof L2Summon))
+                {
+                    if ( !((L2Character)obj).isAlikeDead()
+                            && !npc.isInsideRadius(obj, npc.getAggroRange(), true, false) )
+                    {
+                    	L2PcInstance targetPlayer = (obj instanceof L2PcInstance)? (L2PcInstance) obj: ((L2Summon) obj).getOwner();
+                        if (npc.getTemplate().getEventQuests(Quest.QuestEventType.ON_AGGRO_RANGE_ENTER) !=null)
+                        	for (Quest quest: npc.getTemplate().getEventQuests(Quest.QuestEventType.ON_AGGRO_RANGE_ENTER))
+                        		quest.notifyAggroRangeEnter(npc, targetPlayer, (obj instanceof L2Summon));
+                    }
+                }
+                */
+                // TODO: The AI Script ought to handle aggro behaviors in onSee.  Once implemented, aggro behaviors ought
+                // to be removed from here.  (Fulminus)
                 // For each L2Character check if the target is autoattackable
                 if (autoAttackCondition(target)) // check aggression
                 {
@@ -1989,10 +2016,16 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 			*/
         }
 		timepass = timepass + 1;
-		if (_actor.isRooted()|| timepass>=5)
+		if (_actor.isRooted())
 		{
 			timepass = 0;
 			TargetReconsider();
+			return;
+		}
+		else if(timepass>=5)
+		{
+			timepass = 0;
+			AggroReconsider();
 			return;
 		}
 		
@@ -2298,12 +2331,11 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
     	if(actor.getAttackByList()!=null)
     	for(L2Character obj: actor.getHateList())
     	{
-    		if(!GeoData.getInstance().canSeeTarget(_actor,obj) || obj.isDead())
+    		if(!GeoData.getInstance().canSeeTarget(_actor,obj) || obj.isDead()||obj == getAttackTarget())
 				continue;
             try
             {
-                _actor.setTarget(getAttackTarget());
-                dist = Math.sqrt(_actor.getPlanDistanceSq(obj.getX(), getAttackTarget().getY()));
+                dist = Math.sqrt(_actor.getPlanDistanceSq(obj.getX(), obj.getY()));
                 dist2= dist;
                 range = _actor.getPhysicalAttackRange() + _actor.getTemplate().collisionRadius + obj.getTemplate().collisionRadius;
                 if(obj.isMoving())
@@ -2313,6 +2345,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
             {
                 continue;
             }
+            
             if(dist2<=range)
             {
             	if(MostHate!=null)
@@ -2379,21 +2412,18 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
     
     private void AggroReconsider()
     {
-        //double dist = 0;
-        double dist2 = 0;
-        //int range = 0;
+
     	L2Attackable actor = (L2Attackable)_actor;
     	L2Character MostHate = ((L2Attackable) _actor).getMostHated();
     	if(actor.getAttackByList()!=null)
     	for(L2Character obj: actor.getHateList())
     	{
-    		if(!GeoData.getInstance().canSeeTarget(_actor,obj) || obj.isDead())
+    		if(!GeoData.getInstance().canSeeTarget(_actor,obj) || obj.isDead()|| obj == getAttackTarget())
 				continue;
             try
             {
                 _actor.setTarget(getAttackTarget());
-                if(obj.isMoving())
-                	dist2 = dist2 - 70;
+
             }
             catch (NullPointerException e)
             {
@@ -2408,7 +2438,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
             	return;
             
     	}
-      	 for (L2Character obj : _actor.getKnownList().getKnownCharactersInRadius(800))
+      	 for (L2Character obj : _actor.getKnownList().getKnownCharactersInRadius(1000))
          {
       		 if(!GeoData.getInstance().canSeeTarget(_actor,obj))
 				continue;
@@ -2417,7 +2447,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
              	if(MostHate!=null)
                 	actor.addDamageHate(obj,actor.getHating(MostHate),actor.getHating(MostHate));
                 else
-                	actor.addDamageHate(obj,0,2000);
+                	actor.addDamageHate(obj,2000,2000);
             	_actor.setTarget(obj);
             	setAttackTarget(obj);
             	

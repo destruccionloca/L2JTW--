@@ -1160,9 +1160,18 @@ public class L2CharacterAI extends AbstractAI
             // water movement analysis
             if (_actor instanceof L2NpcInstance)
             {
-                // well, lol..
-                if (((L2NpcInstance)_actor).getNpcId() == 20314) // great white shark
-                    cannotMoveOnLand = true;
+            	int npcId = ((L2NpcInstance)_actor).getNpcId();
+            	
+            	switch (npcId)
+            	{
+            		case 20314: // great white shark
+            		case 20849: // Light Worm
+            			cannotMoveOnLand = true;
+            			break;
+            		default:
+            			cannotMoveOnLand = false;
+            			break;
+            	}
             }
             // skill analysis
             for (L2Skill sk : _actor.getAllSkills())

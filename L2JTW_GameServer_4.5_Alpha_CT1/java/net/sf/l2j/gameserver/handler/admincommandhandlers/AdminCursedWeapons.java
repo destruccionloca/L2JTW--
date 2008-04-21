@@ -104,22 +104,25 @@ public class AdminCursedWeapons implements IAdminCommandHandler {
 						replyMSG.append("<tr><td>持有者:</td><td>"+ (pl==null?"null" : pl.getName())+"</td></tr>");
 						replyMSG.append("<tr><td>性向:</td><td>"+String.valueOf(cw.getPlayerKarma())+"</td></tr>");
 						replyMSG.append("<tr><td>殺人數量:</td><td>"+String.valueOf(cw.getPlayerPkKills())+"/"+String.valueOf(cw.getNbKills())+"</td></tr>");
-						replyMSG.append("<tr><td>剩下時間:</td><td>"+String.valueOf(cw.getTimeLeft()/60000)+" 分.</td></tr>");
-						replyMSG.append("<tr><td><button value=\"移除\" action=\"bypass -h admin_cw_remove "+String.valueOf(itemId)+"\" width=73 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
-						replyMSG.append("<td><button value=\"繼續\" action=\"bypass -h admin_cw_goto "+String.valueOf(itemId)+"\" width=73 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
+						replyMSG.append("<tr><td>剩餘時間:</td><td>"+String.valueOf(cw.getTimeLeft()/60000)+" 分鐘.</td></tr>");
+						replyMSG.append("<tr><td><button value=\"移除\" action=\"bypass -h admin_cw_remove "+String.valueOf(itemId)+"\" width=73 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"></td>");
+						replyMSG.append("<td><button value=\"繼續\" action=\"bypass -h admin_cw_goto "+String.valueOf(itemId)+"\" width=73 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"></td></tr>");
 					}
 					else if (cw.isDropped())
 					{
-						replyMSG.append("<tr><td>Position:</td><td>掉落在地上</td></tr>");
-						replyMSG.append("<tr><td>剩下時間:</td><td>"+String.valueOf(cw.getTimeLeft()/60000)+" min.</td></tr>");
+
+						replyMSG.append("<tr><td>位置:</td><td>掉落在地上</td></tr>");
+						replyMSG.append("<tr><td>剩下時間:</td><td>"+String.valueOf(cw.getTimeLeft()/60000)+" 分鐘.</td></tr>");
 						replyMSG.append("<tr><td>殺人數量:</td><td>"+String.valueOf(cw.getNbKills())+"</td></tr>");
-						replyMSG.append("<tr><td><button value=\"移除\" action=\"bypass -h admin_cw_remove "+String.valueOf(itemId)+"\" width=73 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
-						replyMSG.append("<td><button value=\"繼續\" action=\"bypass -h admin_cw_goto "+String.valueOf(itemId)+"\" width=73 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
+						replyMSG.append("<tr><td><button value=\"移除\" action=\"bypass -h admin_cw_remove "+String.valueOf(itemId)+"\" width=73 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"></td>");
+						replyMSG.append("<td><button value=\"繼續\" action=\"bypass -h admin_cw_goto "+String.valueOf(itemId)+"\" width=73 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"></td></tr>");
+
 					}
 					else
 					{
-						replyMSG.append("<tr><td>Position:</td><td>並不存在。</td></tr>");
-						replyMSG.append("<tr><td><button value=\"交給對方\" action=\"bypass -h admin_cw_add "+String.valueOf(itemId)+"\" width=99 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td><td></td></tr>");
+
+						replyMSG.append("<tr><td>位置:</td><td>並不存在。</td></tr>");
+						replyMSG.append("<tr><td><button value=\"交給目標\" action=\"bypass -h admin_cw_add "+String.valueOf(itemId)+"\" width=99 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df></td><td></td></tr>");
 					}
 					replyMSG.append("</table>");
 					replyMSG.append("<br>");

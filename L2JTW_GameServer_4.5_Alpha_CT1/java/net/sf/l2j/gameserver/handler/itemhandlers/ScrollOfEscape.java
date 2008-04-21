@@ -22,8 +22,8 @@ import net.sf.l2j.gameserver.datatables.MapRegionTable;
 import net.sf.l2j.gameserver.datatables.SkillTable;
 import net.sf.l2j.gameserver.handler.IItemHandler;
 import net.sf.l2j.gameserver.instancemanager.CastleManager;
-import net.sf.l2j.gameserver.instancemanager.FortManager;
 import net.sf.l2j.gameserver.instancemanager.ClanHallManager;
+import net.sf.l2j.gameserver.instancemanager.FortManager;
 import net.sf.l2j.gameserver.instancemanager.GrandBossManager;
 import net.sf.l2j.gameserver.model.L2ItemInstance;
 import net.sf.l2j.gameserver.model.L2Skill;
@@ -60,7 +60,7 @@ public class ScrollOfEscape implements IItemHandler
         L2PcInstance activeChar = (L2PcInstance)playable;
 
         // Thanks nbd
-        if (!TvTEvent.onEscapeUse(activeChar.getName()))
+        if (!TvTEvent.onEscapeUse(activeChar.getObjectId()))
         {
         	activeChar.sendPacket(ActionFailed.STATIC_PACKET);
         	return;
