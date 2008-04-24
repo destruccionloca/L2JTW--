@@ -170,7 +170,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         if (target instanceof L2FolkInstance || target instanceof L2DoorInstance) return false;
 
         // Check if the target isn't dead, is in the Aggro range and is at the same height
-        if (target.isAlikeDead() || (target instanceof L2PcInstance && me.isInsideRadius(target, me.getAggroRange(), false, false)) 
+        if (target.isAlikeDead() || (target instanceof L2PcInstance && !me.isInsideRadius(target, me.getAggroRange(), false, false)) 
         		||Math.abs(_actor.getZ() - target.getZ()) > 300) return false;
 
         // Check if the target is a L2PcInstance
