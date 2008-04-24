@@ -61,18 +61,7 @@ public final class L2GamePacketHandler extends TCPHeaderHandler<L2GameClient> im
 
 		ReceivablePacket<L2GameClient> msg = null;
 		GameClientState state = client.getState();
-		//_log.warning("STATE:" +client.getState());
-		if(client.getState() == state.CONNECTED)
-		switch(opcode)
-		{		
-				case 0x2b:
-					client.setClientType(true);
-					break;
-				case 0x48: 
-					client.setClientType(false);
-					break;
-		}
-		//if(client.PTSClient)
+
 		switch (state)
 		{
 			case CONNECTED:
@@ -859,8 +848,6 @@ public final class L2GamePacketHandler extends TCPHeaderHandler<L2GameClient> im
 				}
 				break;
 		}
-		
-		
 		return msg;
 	}
 

@@ -32,7 +32,6 @@ import net.sf.l2j.gameserver.ThreadPoolManager;
 import net.sf.l2j.gameserver.LoginServerThread.SessionKey;
 import net.sf.l2j.gameserver.communitybbs.Manager.RegionBBSManager;
 import net.sf.l2j.gameserver.datatables.SkillTable;
-import net.sf.l2j.gameserver.instancemanager.CleanUpManager;
 import net.sf.l2j.gameserver.model.CharSelectInfoPackage;
 import net.sf.l2j.gameserver.model.L2World;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
@@ -61,13 +60,12 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>>
 
 	public GameClientState state;
 
-	public boolean PTSClient;
 	// Info
     private String _accountName;
     private SessionKey _sessionId;
 	private L2PcInstance _activeChar;
 	private ReentrantLock _activeCharLock = new ReentrantLock();
-	
+
 	private boolean _isAuthedGG;
 	private long _connectionStartTime;
 	private List<Integer> _charSlotMapping = new FastList<Integer>();
@@ -252,9 +250,6 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>>
 		L2PcInstance character = L2PcInstance.load(objid);
 		if (character.getClanId() != 0)
 			return character;
-
-		// [L2J_JP EDIT - TSL] deleteCharByObjId(objid);
-		CleanUpManager.getInstance().deleteCharByObjId(objid);
 
         character.deleteMe();
 		deleteCharByObjId(objid);
@@ -609,10 +604,5 @@ public final class L2GameClient extends MMOClient<MMOConnection<L2GameClient>>
 				_log.severe(e.toString());
 			}
 		}
-	}
-	
-	public void setClientType(boolean PTS)
-	{
-		PTSClient = PTS;
 	}
 }

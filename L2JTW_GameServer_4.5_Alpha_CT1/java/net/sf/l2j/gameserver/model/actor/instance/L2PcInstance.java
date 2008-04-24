@@ -2952,7 +2952,9 @@ public final class L2PcInstance extends L2PlayableInstance
         {
             if (sendMessage)
             {
-                sendPacket(new SystemMessage(SystemMessageId.NOT_ENOUGH_ITEMS));
+				SystemMessage sm = new SystemMessage(1987);
+	            sm.addString("所需物品不足");
+				sendPacket(sm);
             }
             return false;
         }
@@ -4271,11 +4273,17 @@ public final class L2PcInstance extends L2PlayableInstance
     public void transformInsertInfo()
     {
     	_transformationId = getTranformationId();
+    	
+    	if (_transformationId == L2Transformation.TRANSFORM_AKAMANAH
+    			|| _transformationId == L2Transformation.TRANSFORM_ZARICHE)
+    		return;
+    	
     	Connection con = null;
+    	PreparedStatement statement = null;
         try
         {
             con = L2DatabaseFactory.getInstance().getConnection();
-            PreparedStatement statement = con.prepareStatement(UPDATE_CHAR_TRANSFORM);
+            statement = con.prepareStatement("UPDATE characters SET transform_id=? WHERE obj_Id=?");
 
             statement.setInt(1, _transformationId);
             statement.setInt(2, this.getObjectId());
@@ -4328,10 +4336,11 @@ public final class L2PcInstance extends L2PlayableInstance
     {
     	_transformationId = 0;
     	Connection con = null;
+    	PreparedStatement statement = null;
         try
         {
             con = L2DatabaseFactory.getInstance().getConnection();
-            PreparedStatement statement = con.prepareStatement(UPDATE_CHAR_TRANSFORM);
+            statement = con.prepareStatement("UPDATE characters SET transform_id=? WHERE obj_Id=?");
             
             statement.setInt(1, 0);
             statement.setInt(2, getObjectId());
@@ -4674,34 +4683,33 @@ public final class L2PcInstance extends L2PlayableInstance
      * <li>Kill the L2PcInstance </li><BR><BR>
      *
      *
-     * @param i The HP decrease value
-     * @param attacker The L2Character who attacks
+     * @param deadPlayer - Player that has died.
      *
      *
 	 * @see net.sf.l2j.gameserver.model.actor.instance.L2PlayableInstance#doDie(net.sf.l2j.gameserver.model.L2Character)
 	 */
 	@Override
-	public boolean doDie(L2Character killer)
+	public boolean doDie(L2Character deadPlayer)
 	{
 		// Kill the L2PcInstance
-		if (!super.doDie(killer))
+		if (!super.doDie(deadPlayer))
 			return false;
 
-		if (killer != null)
+		if (deadPlayer != null)
 		{
 			L2PcInstance pk = null;
-			if (killer instanceof L2PcInstance)
-				pk = (L2PcInstance) killer;
+			if (deadPlayer instanceof L2PcInstance)
+				pk = (L2PcInstance) deadPlayer;
 
-			TvTEvent.onKill(killer, this);
+			TvTEvent.onKill(deadPlayer, this);
 
 			if (atEvent && pk != null)
 			{
 				pk.kills.add(getName());
 			}
-            if (killer instanceof L2PcInstance)
+            if (deadPlayer instanceof L2PcInstance)
             {
-                if (((L2PcInstance)killer)._inEventCTF && _inEventCTF)
+                if (((L2PcInstance)deadPlayer)._inEventCTF && _inEventCTF)
                 {
                     if (CTF._teleport || CTF._started)
                     {
@@ -4735,7 +4743,7 @@ public final class L2PcInstance extends L2PlayableInstance
 			// Issues drop of Cursed Weapon.
 			if (isCursedWeaponEquipped())
 			{
-				CursedWeaponsManager.getInstance().drop(_cursedWeaponEquippedId, killer);
+				CursedWeaponsManager.getInstance().drop(_cursedWeaponEquippedId, deadPlayer);
 			}
 			else if (isCombatFlagEquipped())
             {
@@ -4747,21 +4755,17 @@ public final class L2PcInstance extends L2PlayableInstance
 				if (pk == null || !pk.isCursedWeaponEquipped())
 				{
 					//if (getKarma() > 0)
-						onDieDropItem(killer);  // Check if any item should be dropped
+						onDieDropItem(deadPlayer);  // Check if any item should be dropped
 
 					if (!(isInsideZone(ZONE_PVP) && !isInsideZone(ZONE_SIEGE)))
 					{
-						boolean isKillerPc = (killer instanceof L2PcInstance);
-		                if (isKillerPc && ((L2PcInstance)killer).getClan() != null
-		                               && getClan() != null
-                                   && !isAcademyMember()
-                                   && !(((L2PcInstance)killer).isAcademyMember())
-		                               && _clan.isAtWarWith(((L2PcInstance) killer).getClanId())
-		                               && ((L2PcInstance)killer).getClan().isAtWarWith(_clan.getClanId()))
+						boolean isDeadPlayerPc = (deadPlayer instanceof L2PcInstance);
+		                if (isDeadPlayerPc && ((L2PcInstance)deadPlayer).getClan() != null && getClan() != null && !isAcademyMember() && !(((L2PcInstance)deadPlayer).isAcademyMember()) && _clan.isAtWarWith(((L2PcInstance) deadPlayer).getClanId()) && ((L2PcInstance)deadPlayer).getClan().isAtWarWith(_clan.getClanId()))
 		                {
 		                    if (getClan().getReputationScore() > 0) // when your reputation score is 0 or below, the other clan cannot acquire any reputation points
-		                		((L2PcInstance) killer).getClan().setReputationScore(((L2PcInstance) killer).getClan().getReputationScore()+2, true);
-		                    if (((L2PcInstance)killer).getClan().getReputationScore() > 0) // when the opposing sides reputation score is 0 or below, your clans reputation score does not decrease
+		                		((L2PcInstance) deadPlayer).getClan().setReputationScore(((L2PcInstance) deadPlayer).getClan().getReputationScore()+2, true);
+		                    
+		                    if (((L2PcInstance)deadPlayer).getClan().getReputationScore() > 0) // when the opposing sides reputation score is 0 or below, your clans reputation score does not decrease
 		                    	_clan.setReputationScore(_clan.getReputationScore()-2, true);
 		                }
 						if (Config.ALT_GAME_DELEVEL)
@@ -4810,7 +4814,7 @@ public final class L2PcInstance extends L2PlayableInstance
 			getParty().getDimensionalRift().getDeadMemberList().add(this);
 
 		// calculate death penalty buff
-		calculateDeathPenaltyBuffLevel(killer);
+		calculateDeathPenaltyBuffLevel(deadPlayer);
 
 		stopRentPet();
 		stopWaterTask();
@@ -6652,6 +6656,7 @@ public final class L2PcInstance extends L2PlayableInstance
 		storeCharSub();
 		storeEffect();
 		storeRecipeBook();
+		transformInsertInfo();
 	}
 
 	private void storeCharBase()
@@ -8133,8 +8138,11 @@ public final class L2PcInstance extends L2PlayableInstance
         	}
         }
 
-        // If all conditions are checked, create a new SkillDat object and set the player _currentSkill
-        setCurrentSkill(skill, forceUse, dontMove);
+       /* If all conditions are checked, create a new SkillDat object and set the player _currentSkill
+        * If skill is potion, do not save data into _currentSkill so that previous casting
+        * intention can be easily retaken later
+        */
+        if (!skill.isPotion()) setCurrentSkill(skill, forceUse, dontMove);
 
 		// Check if the active L2Skill can be casted (ex : not sleeping...), Check if the target is correct and Notify the AI with AI_INTENTION_CAST and target
         super.useMagic(skill);
@@ -9739,14 +9747,18 @@ public final class L2PcInstance extends L2PlayableInstance
 		if((Pet && getPet() != null && getPet().isDead()) || (!Pet && isDead()))
 		{
 			_reviveRequested = 1;
+			int restoreExp = 0;
 			if (isPhoenixBlessed())
-			    _revivePower=100;
+				_revivePower=100;
 			else
-			    _revivePower = Formulas.getInstance().calculateSkillResurrectRestorePercent(skill.getPower(), Reviver.getWIT());
+				_revivePower = Formulas.getInstance().calculateSkillResurrectRestorePercent(skill.getPower(), Reviver.getWIT());
+			
+			restoreExp = (int)Math.round((getExpBeforeDeath() - getExp()) * _revivePower / 100);
+			    
 			_revivePet = Pet;
 			
 			ConfirmDlg dlg = new ConfirmDlg(SystemMessageId.RESSURECTION_REQUEST.getId());
-			sendPacket(dlg.addString(Reviver.getName()).addString(((int) _revivePower)+" %"));
+			sendPacket(dlg.addString(Reviver.getName()).addString(""+restoreExp));
 		}
 	}
 
@@ -10939,7 +10951,7 @@ public final class L2PcInstance extends L2PlayableInstance
         increaseSouls(1);
 
         if (npc != null)
-            sendPacket(new ExSpawnEmitter(this, npc));
+        	broadcastPacket(new ExSpawnEmitter(this, npc), 500);
     }
     
     /**

@@ -1587,7 +1587,7 @@ public final class Formulas
 	}
 
 	/** Returns true in case when ATTACK is canceled due to hit */
-	public final boolean calcAtkBreak(L2Character target, double dmg)
+	public final boolean calcAtkBreak(L2Character target,L2Character activeChar, double dmg)
 	{
 
 	    if (target instanceof L2PcInstance)
@@ -1627,8 +1627,14 @@ public final class Formulas
         
         if (target instanceof L2Attackable)
         {
-            if(rate >50)
-            rate = 50;
+            if(rate >95)
+            rate = 95;
+            else
+            rate = 85;
+        }
+        if(target.getLevel()< activeChar.getLevel() && rate <50)
+        {
+        	rate = 50;
         }
         if (target.isRaid())
         {
@@ -1638,7 +1644,56 @@ public final class Formulas
         return Rnd.get(100) < rate;
 	}
 
+	/** Returns true in case when ATTACK is canceled due to hit */
+	public final boolean calcAtkBreak(L2Character target, double dmg)
+	{
 
+	    if (target instanceof L2PcInstance)
+        {
+            if (((L2PcInstance)target).getForceBuff() != null)
+                return true;
+        }
+	    
+        double init = 0;
+
+
+		if (Config.ALT_GAME_CANCEL_CAST && target.isCastingNow()) 
+			init = 45;
+		else return false;
+		/*
+
+		if (Config.ALT_GAME_CANCEL_BOW && target.isAttackingNow())
+		{
+			L2Weapon wpn = target.getActiveWeaponItem();
+			if (wpn != null && wpn.getItemType() == L2WeaponType.BOW) init = 15;
+		}
+		*/
+        if (init <= 0) return false; // No attack break
+
+        // Chance of break is higher with higher dmg
+        init += Math.sqrt(13*dmg);  
+
+        // Chance is affected by target MEN
+        init -= (MENbonus[target.getMEN()] * 100 - 100);
+
+        // Calculate all modifiers for ATTACK_CANCEL
+        double rate = target.calcStat(Stats.ATTACK_CANCEL, init, null, null); 
+
+        // Adjust the rate to be between 1 and 99
+        if (rate > 50) rate = 50;
+        else if (rate < 1) rate = 1;
+
+        if(rate <50)
+        {
+        	rate = 50;
+        }
+        if (target.isRaid())
+        {
+            rate = 100;
+        }
+
+        return Rnd.get(100) < rate;
+	}
 	/** Calculate delay (in milliseconds) before next ATTACK */
 	public final int calcPAtkSpd(@SuppressWarnings("unused")
 	L2Character attacker, @SuppressWarnings("unused")

@@ -456,6 +456,8 @@ public abstract class L2Character extends L2Object
 			getPet().setFollowStatus(false);
 			getPet().teleToLocation(getPosition().getX() + Rnd.get(-100,100), getPosition().getY() + Rnd.get(-100,100), getPosition().getZ(), false);
 			getPet().setFollowStatus(true);
+			getPet().broadcastPacket(new PetInfo(getPet()));
+			getPet().updateEffectIcons(true);
 		}
 
 	}
@@ -3137,7 +3139,8 @@ public abstract class L2Character extends L2Object
 		for(L2Effect e : effects)
 		{
 			// Stop active skills effects of the selected type
-			if (e.getEffectType() == type) e.exit();
+			if (e.getEffectType() == type)
+				e.exit();
 		}
 	}
 
@@ -3325,17 +3328,28 @@ public abstract class L2Character extends L2Object
     public final void stopTransformation(L2Effect effect)
     {
         if (effect == null)
+        {
             stopEffects(L2Effect.EffectType.TRANSFORMATION);
+        }
         else
+        {
             removeEffect(effect);
+        }
         
-        // if this is a player instance, then untransform.
+        // if this is a player instance, then untransform, also set the transform_id column equal to 0 if not cursed.
         if (this instanceof L2PcInstance)
         {
-            if (((L2PcInstance) this).getTransformation() != null) 
-            	// gm effect because removing skill didn't do it
+            if (((L2PcInstance) this).getTransformation() != null)
+            {
             	((L2PcInstance) this).untransform();
+            }
+
+            if(!((L2PcInstance) this).isCursedWeaponEquipped())
+            {
+            	((L2PcInstance) this).transformUpdateInfo();
+            }
         }
+        
         getAI().notifyEvent(CtrlEvent.EVT_THINK, null);
         updateAbnormalEffect();
     }
@@ -4393,6 +4407,7 @@ public abstract class L2Character extends L2Object
 			if (this instanceof L2PcInstance) ((L2PcInstance)this).revalidateZone(true);
 		}
 		sendPacket(new StopMove(this));
+		if (Config.MOVE_BASED_KNOWNLIST) this.getKnownList().findObjects();
 	}
 
 
@@ -5422,7 +5437,7 @@ public abstract class L2Character extends L2Object
                 getAI().clientStartAutoAttack();
 
 				// Manage attack or cast break of the target (calculating rate, sending message...)
-				if (!target.isRaid() && Formulas.getInstance().calcAtkBreak(target, damage))
+				if (!target.isRaid() && Formulas.getInstance().calcAtkBreak(target,this, damage))
 				{
 					target.breakAttack();
 					target.breakCast();
@@ -6215,6 +6230,10 @@ public abstract class L2Character extends L2Object
         {
             L2PcInstance currPlayer = (L2PcInstance)this;
             SkillDat queuedSkill = currPlayer.getQueuedSkill();
+            
+         // Rescuing old skill cast task if exist
+         if (skill.isPotion())
+        	 queuedSkill = currPlayer.getCurrentSkill();
 
             currPlayer.setCurrentSkill(null, false, false);
 

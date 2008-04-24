@@ -95,25 +95,27 @@ public class RegionBBSManager extends BaseBBSManager
 	private void showOldCommunityPI(L2PcInstance activeChar, String name)
 	{
         TextBuilder htmlCode = new TextBuilder("<html><body><br>");
-		htmlCode.append("<table border=0><tr><td FIXWIDTH=15></td><td align=center>L2J Community Board<img src=\"sek.cbui355\" width=610 height=1></td></tr><tr><td FIXWIDTH=15></td><td>");
+		htmlCode.append("<table border=0><tr><td FIXWIDTH=15></td><td align=center>L2JTW 社群系統<img src=\"sek.cbui355\" width=610 height=1></td></tr><tr><td FIXWIDTH=15></td><td>");
 		L2PcInstance player = L2World.getInstance().getPlayer(name);
 
 		if (player != null)
 		{
-		    String sex = "Male";
+		    String sex = "男性";
 		    if (player.getAppearance().getSex())
 		    {
-		        sex = "Female";
+		        sex = "女性";
 		    }
-		    String levelApprox = "low";
-		    if (player.getLevel() >= 60)
-		        levelApprox = "very high";
+		    String levelApprox = "新手";
+		    if (player.getLevel() >= 70)
+		        levelApprox = "70+";
+		    else if (player.getLevel() >= 60)
+		        levelApprox = "60+";
 		    else if (player.getLevel() >= 40)
-		        levelApprox = "high";
+		        levelApprox = "40+";
 		    else if (player.getLevel() >= 20)
-		        levelApprox = "medium";
+		        levelApprox = "20+";
 		    htmlCode.append("<table border=0><tr><td>"+player.getName()+" ("+sex+" "+player.getTemplate().className+"):</td></tr>");
-		    htmlCode.append("<tr><td>Level: "+levelApprox+"</td></tr>");
+		    htmlCode.append("<tr><td>等級: "+levelApprox+"</td></tr>");
 		    htmlCode.append("<tr><td><br></td></tr>");
 
 		    if (activeChar != null && (activeChar.isGM() || player.getObjectId() == activeChar.getObjectId()
@@ -127,9 +129,9 @@ public class RegionBBSManager extends BaseBBSManager
 		            nextLevelExpNeeded = nextLevelExp-player.getExp();
 		        }
 
-		        htmlCode.append("<tr><td>Level: "+player.getLevel()+"</td></tr>");
-		        htmlCode.append("<tr><td>Experience: "+player.getExp()+"/"+nextLevelExp+"</td></tr>");
-		        htmlCode.append("<tr><td>Experience needed for level up: "+nextLevelExpNeeded+"</td></tr>");
+		        htmlCode.append("<tr><td>等級: "+player.getLevel()+"</td></tr>");
+		        htmlCode.append("<tr><td>經驗值: "+player.getExp()+"/"+nextLevelExp+"</td></tr>");
+		        htmlCode.append("<tr><td>經驗值需求: "+nextLevelExpNeeded+"</td></tr>");
 		        htmlCode.append("<tr><td><br></td></tr>");
 		    }
 
@@ -138,23 +140,38 @@ public class RegionBBSManager extends BaseBBSManager
 		    int m = (uptime-(h*3600))/60;
 		    int s = ((uptime-(h*3600))-(m*60));
 
-		    htmlCode.append("<tr><td>Uptime: "+h+"h "+m+"m "+s+"s</td></tr>");
+		    htmlCode.append("<tr><td>上線時間: "+h+"小時 "+m+"分鐘 "+s+"秒</td></tr>");
 		    htmlCode.append("<tr><td><br></td></tr>");
 
 		    if (player.getClan() != null)
 		    {
-		        htmlCode.append("<tr><td>Clan: "+player.getClan().getName()+"</td></tr>");
+		        htmlCode.append("<tr><td>血盟: "+player.getClan().getName()+"</td></tr>");
 		        htmlCode.append("<tr><td><br></td></tr>");
 		    }
 
-		    htmlCode.append("<tr><td><multiedit var=\"pm\" width=240 height=40><button value=\"Send PM\" action=\"Write Region PM "+player.getName()+" pm pm pm\" width=110 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr><tr><td><br><button value=\"Back\" action=\"bypass _bbsloc\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr></table>");
+		    htmlCode.append("<tr><td><multiedit var=\"pm\" width=240 height=40><button value=\"密語\" action=\"Write Region PM "+player.getName()+" pm pm pm\" width=110 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr><tr><td><br><button value=\"返回\" action=\"bypass _bbsloc\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr></table>");
+            if(activeChar.isGM())
+            {
+                /** admin manage button */
+                htmlCode.append("<br><br>======= 人物管理 =======");
+                htmlCode.append("<table><tr><td>");
+                htmlCode.append("<button value=\"狀態\" action=\"bypass -h admin_character_list " +player.getName()+ "\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td><td>");
+                htmlCode.append("<button value=\"移動\" action=\"bypass -h admin_teleportto " +player.getName()+ "\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td><td>");
+                htmlCode.append("<button value=\"召喚\" action=\"bypass -h admin_recall " +player.getName()+ "\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+                htmlCode.append("</td></tr><tr></tr><tr><td>");
+                htmlCode.append("<button value=\"復活\" action=\"bypass -h admin_res " +player.getName()+ "\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td><td>");
+                htmlCode.append("<button value=\"治癒\" action=\"bypass -h admin_heal " +player.getName()+ "\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td><td>");
+                htmlCode.append("<button value=\"回歸\" action=\"bypass -h admin_sendhome " +player.getName()+ "\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+                htmlCode.append("</td></tr></table>");
+            }
 		    htmlCode.append("</td></tr></table>");
-	          htmlCode.append("</body></html>");
+
+	        htmlCode.append("</body></html>");
 	          separateAndSend(htmlCode.toString(),activeChar);
 		}
 		else
 		{
-			ShowBoard sb = new ShowBoard("<html><body><br><br><center>No player with name "+name+"</center><br><br></body></html>","101");
+			ShowBoard sb = new ShowBoard("<html><body><br><br><center>查詢不到該人物 [ "+name+" ]</center><br><br></body></html>","101");
 			activeChar.sendPacket(sb);
 			activeChar.sendPacket(new ShowBoard(null,"102"));
 			activeChar.sendPacket(new ShowBoard(null,"103"));
@@ -181,7 +198,7 @@ public class RegionBBSManager extends BaseBBSManager
 		if (ar1.equals("PM"))
 		{
             TextBuilder htmlCode = new TextBuilder("<html><body><br>");
-            htmlCode.append("<table border=0><tr><td FIXWIDTH=15></td><td align=center>L2J Community Board<img src=\"sek.cbui355\" width=610 height=1></td></tr><tr><td FIXWIDTH=15></td><td>");
+            htmlCode.append("<table border=0><tr><td FIXWIDTH=15></td><td align=center>L2JTW 社群系統<img src=\"sek.cbui355\" width=610 height=1></td></tr><tr><td FIXWIDTH=15></td><td>");
 
             try
             {
@@ -189,24 +206,24 @@ public class RegionBBSManager extends BaseBBSManager
             	L2PcInstance receiver = L2World.getInstance().getPlayer(ar2);
             	if (receiver == null)
             	{
-            		htmlCode.append("Player not found!<br><button value=\"Back\" action=\"bypass _bbsloc;playerinfo;"+ar2+"\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+            		htmlCode.append("該玩家無法查詢!<br><button value=\"返回\" action=\"bypass _bbsloc;playerinfo;"+ar2+"\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
             		htmlCode.append("</td></tr></table></body></html>");
             		separateAndSend(htmlCode.toString(),activeChar);
             		return;
             	}
         		if (Config.JAIL_DISABLE_CHAT && receiver.isInJail())
 		        {
-		                activeChar.sendMessage("Player is in jail.");
+		                activeChar.sendMessage("該人物處於GM詢問處.");
 		                return;
 		        }
 				if (receiver.isChatBanned())
 		        {
-		                activeChar.sendMessage("Player is chat banned.");
+		                activeChar.sendMessage("該人物已被禁言.");
 		                return;
 		        }
                 if (activeChar.isInJail() && Config.JAIL_DISABLE_CHAT)
                 {
-                    activeChar.sendMessage("You can not chat while in jail.");
+                    activeChar.sendMessage("該人物處於GM詢問處.");
                     return;
                 }
 
@@ -225,7 +242,7 @@ public class RegionBBSManager extends BaseBBSManager
             		{
             			receiver.sendPacket(cs);
             			activeChar.sendPacket(new CreatureSay(activeChar.getObjectId(), Say2.TELL, "->" + receiver.getName(), ar3));
-            			htmlCode.append("Message Sent<br><button value=\"Back\" action=\"bypass _bbsloc;playerinfo;"+receiver.getName()+"\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+            			htmlCode.append("訊息傳送<br><button value=\"返回\" action=\"bypass _bbsloc;playerinfo;"+receiver.getName()+"\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
             			htmlCode.append("</td></tr></table></body></html>");
             			separateAndSend(htmlCode.toString(),activeChar)  ;
 					}
@@ -353,44 +370,45 @@ public class RegionBBSManager extends BaseBBSManager
 	        String tdOpen = "<td align=left valign=top>";
 	        String trClose = "</tr>";
 	        String trOpen = "<tr>";
-	        String colSpacer = "<td FIXWIDTH=15></td>";
+	        String colSpacer = "<td FIXWIDTH=30></td>";
 
 	        htmlCode.append("<table>");
 
 	        htmlCode.append(trOpen);
-	        htmlCode.append("<td align=left valign=top>Server Restarted: " + GameServer.dateTimeServerStarted.getTime() + tdClose);
+	        htmlCode.append("<td align=left valign=top>伺服器啟動時間:" + GameServer.dateTimeServerStarted.getTime() + tdClose);
 	        htmlCode.append(trClose);
 
 	        htmlCode.append("</table>");
-
-	        htmlCode.append("<table>");
-
-	        htmlCode.append(trOpen);
-	        htmlCode.append(tdOpen + "XP Rate: x" + Config.RATE_XP + tdClose);
-	        htmlCode.append(colSpacer);
-	        htmlCode.append(tdOpen + "Party XP Rate: x" +  Config.RATE_XP * Config.RATE_PARTY_XP + tdClose);
-	        htmlCode.append(colSpacer);
-	        htmlCode.append(tdOpen + "XP Exponent: " + Config.ALT_GAME_EXPONENT_XP + tdClose);
-	        htmlCode.append(trClose);
-
-	        htmlCode.append(trOpen);
-	        htmlCode.append(tdOpen + "SP Rate: x" + Config.RATE_SP + tdClose);
-	        htmlCode.append(colSpacer);
-	        htmlCode.append(tdOpen + "Party SP Rate: x" + Config.RATE_SP * Config.RATE_PARTY_SP + tdClose);
-	        htmlCode.append(colSpacer);
-	        htmlCode.append(tdOpen + "SP Exponent: " + Config.ALT_GAME_EXPONENT_SP + tdClose);
-	        htmlCode.append(trClose);
-
-	        htmlCode.append(trOpen);
-	        htmlCode.append(tdOpen + "Drop Rate: " + Config.RATE_DROP_ITEMS + tdClose);
-	        htmlCode.append(colSpacer);
-	        htmlCode.append(tdOpen + "Spoil Rate: " + Config.RATE_DROP_SPOIL + tdClose);
-	        htmlCode.append(colSpacer);
-	        htmlCode.append(tdOpen + "Adena Rate: " + Config.RATE_DROP_ADENA + tdClose);
-	        htmlCode.append(trClose);
-
-	        htmlCode.append("</table>");
-
+	        if(Config.SHOWRATE)
+	        {
+		        htmlCode.append("<table>");
+	
+		        htmlCode.append(trOpen);
+		        htmlCode.append(tdOpen + "經驗值倍率: x" + Config.RATE_XP + tdClose);
+		        htmlCode.append(colSpacer);
+		        htmlCode.append(tdOpen + "經驗值倍率 (組隊): x" +  Config.RATE_XP * Config.RATE_PARTY_XP + tdClose);
+		        htmlCode.append(colSpacer);
+		        htmlCode.append(tdOpen + "額外經驗值倍率: " + Config.ALT_GAME_EXPONENT_XP + tdClose);
+		        htmlCode.append(trClose);
+	
+		        htmlCode.append(trOpen);
+		        htmlCode.append(tdOpen + "技能值倍率: x" + Config.RATE_SP + tdClose);
+		        htmlCode.append(colSpacer);
+		        htmlCode.append(tdOpen + "技能值倍率 (組隊): x" + Config.RATE_SP * Config.RATE_PARTY_SP + tdClose);
+		        htmlCode.append(colSpacer);
+		        htmlCode.append(tdOpen + "額外技能值倍率: " + Config.ALT_GAME_EXPONENT_SP + tdClose);
+		        htmlCode.append(trClose);
+	
+		        htmlCode.append(trOpen);
+		        htmlCode.append(tdOpen + "掉落倍率: " + Config.RATE_DROP_ITEMS + tdClose);
+		        htmlCode.append(colSpacer);
+		        htmlCode.append(tdOpen + "回收倍率: " + Config.RATE_DROP_SPOIL + tdClose);
+		        htmlCode.append(colSpacer);
+		        htmlCode.append(tdOpen + "金錢倍率: " + Config.RATE_DROP_ADENA + tdClose);
+		        htmlCode.append(trClose);
+	
+		        htmlCode.append("</table>");
+	        }
 	        htmlCode.append("<table>");
 	        htmlCode.append(trOpen);
 	        htmlCode.append("<td><img src=\"sek.cbui355\" width=600 height=1><br></td>");
@@ -398,13 +416,13 @@ public class RegionBBSManager extends BaseBBSManager
 
             htmlCode.append(trOpen);
             htmlCode.append(tdOpen + L2World.getInstance().getAllVisibleObjectsCount()
-                + " Object count</td>");
+                + " 物件</td>");
             htmlCode.append(trClose);
 
 	        htmlCode.append(trOpen);
-	        htmlCode.append(tdOpen + getOnlineCount("gm") + " Player(s) Online</td>");
+	        htmlCode.append(tdOpen + getOnlineCount("gm") + " 個玩家在線上</td>");
 	        htmlCode.append(trClose);
-	        htmlCode.append("</table>");
+	        htmlCode.append("</table><br><br><br>");
 
             int cell = 0;
 	        if (Config.BBS_SHOW_PLAYERLIST)
@@ -418,7 +436,7 @@ public class RegionBBSManager extends BaseBBSManager
     
     	            if (cell == 1) htmlCode.append(trOpen);
     
-    	            htmlCode.append("<td align=left valign=top FIXWIDTH=110><a action=\"bypass _bbsloc;playerinfo;"
+    	            htmlCode.append("<td align=left valign=top FIXWIDTH=150><a action=\"bypass _bbsloc;playerinfo;"
     	                + player.getName() + "\">");
     
     	            if (player.isGM()) htmlCode.append("<font color=\"LEVEL\">" + player.getName()
@@ -450,16 +468,16 @@ public class RegionBBSManager extends BaseBBSManager
 		        htmlCode.append("<table border=0 width=600>");
 
 		        htmlCode.append("<tr>");
-	            if (page == 1) htmlCode.append("<td align=right width=190><button value=\"Prev\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
-	            else htmlCode.append("<td align=right width=190><button value=\"Prev\" action=\"bypass _bbsloc;page;"
+	            if (page == 1) htmlCode.append("<td align=right width=190><button value=\"上一頁\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
+	            else htmlCode.append("<td align=right width=190><button value=\"上一頁\" action=\"bypass _bbsloc;page;"
 	                + (page - 1)
 	                + "\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
 	            htmlCode.append("<td FIXWIDTH=10></td>");
-	            htmlCode.append("<td align=center valign=top width=200>Displaying " + (((page - 1) * Config.NAME_PAGE_SIZE_COMMUNITYBOARD) + 1) + " - "
-	                + (((page -1) * Config.NAME_PAGE_SIZE_COMMUNITYBOARD) + getOnlinePlayers(page).size()) + " player(s)</td>");
+	            htmlCode.append("<td align=center valign=top width=200>顯示範圍 " + (((page - 1) * Config.NAME_PAGE_SIZE_COMMUNITYBOARD) + 1) + " - "
+	                + (((page -1) * Config.NAME_PAGE_SIZE_COMMUNITYBOARD) + getOnlinePlayers(page).size()) + " 個玩家</td>");
 	            htmlCode.append("<td FIXWIDTH=10></td>");
-	            if (getOnlineCount("gm") <= (page * Config.NAME_PAGE_SIZE_COMMUNITYBOARD)) htmlCode.append("<td width=190><button value=\"Next\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
-	            else htmlCode.append("<td width=190><button value=\"Next\" action=\"bypass _bbsloc;page;"
+	            if (getOnlineCount("gm") <= (page * Config.NAME_PAGE_SIZE_COMMUNITYBOARD)) htmlCode.append("<td width=190><button value=\"下一頁\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
+	            else htmlCode.append("<td width=190><button value=\"下一頁\" action=\"bypass _bbsloc;page;"
 	                + (page + 1)
 	                + "\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
 	            htmlCode.append("</tr>");
@@ -474,38 +492,41 @@ public class RegionBBSManager extends BaseBBSManager
 	        htmlCode.append("<table>");
 
 	        htmlCode.append(trOpen);
-	        htmlCode.append("<td align=left valign=top>Server Restarted: " + GameServer.dateTimeServerStarted.getTime() + tdClose);
+	        htmlCode.append("<td align=left valign=top>伺服器啟動時間:" + GameServer.dateTimeServerStarted.getTime() + tdClose);
 	        htmlCode.append(trClose);
 
 	        htmlCode.append("</table>");
 
-	        htmlCode.append("<table>");
-
-	        htmlCode.append(trOpen);
-	        htmlCode.append(tdOpen + "XP Rate: " + Config.RATE_XP + tdClose);
-	        htmlCode.append(colSpacer);
-	        htmlCode.append(tdOpen + "Party XP Rate: " + Config.RATE_PARTY_XP + tdClose);
-	        htmlCode.append(colSpacer);
-	        htmlCode.append(tdOpen + "XP Exponent: " + Config.ALT_GAME_EXPONENT_XP + tdClose);
-	        htmlCode.append(trClose);
-
-	        htmlCode.append(trOpen);
-	        htmlCode.append(tdOpen + "SP Rate: " + Config.RATE_SP + tdClose);
-	        htmlCode.append(colSpacer);
-	        htmlCode.append(tdOpen + "Party SP Rate: " + Config.RATE_PARTY_SP + tdClose);
-	        htmlCode.append(colSpacer);
-	        htmlCode.append(tdOpen + "SP Exponent: " + Config.ALT_GAME_EXPONENT_SP + tdClose);
-	        htmlCode.append(trClose);
-
-	        htmlCode.append(trOpen);
-	        htmlCode.append(tdOpen + "Drop Rate: " + Config.RATE_DROP_ITEMS + tdClose);
-	        htmlCode.append(colSpacer);
-	        htmlCode.append(tdOpen + "Spoil Rate: " + Config.RATE_DROP_SPOIL + tdClose);
-	        htmlCode.append(colSpacer);
-	        htmlCode.append(tdOpen + "Adena Rate: " + Config.RATE_DROP_ADENA + tdClose);
-	        htmlCode.append(trClose);
-
-	        htmlCode.append("</table>");
+	        if(Config.SHOWRATE)
+	        {
+		        htmlCode.append("<table>");
+	
+		        htmlCode.append(trOpen);
+		        htmlCode.append(tdOpen + "經驗值倍率: x" + Config.RATE_XP + tdClose);
+		        htmlCode.append(colSpacer);
+		        htmlCode.append(tdOpen + "經驗值倍率 (組隊): x" +  Config.RATE_XP * Config.RATE_PARTY_XP + tdClose);
+		        htmlCode.append(colSpacer);
+		        htmlCode.append(tdOpen + "額外經驗值倍率: " + Config.ALT_GAME_EXPONENT_XP + tdClose);
+		        htmlCode.append(trClose);
+	
+		        htmlCode.append(trOpen);
+		        htmlCode.append(tdOpen + "技能值倍率: x" + Config.RATE_SP + tdClose);
+		        htmlCode.append(colSpacer);
+		        htmlCode.append(tdOpen + "技能值倍率 (組隊): x" + Config.RATE_SP * Config.RATE_PARTY_SP + tdClose);
+		        htmlCode.append(colSpacer);
+		        htmlCode.append(tdOpen + "額外技能值倍率: " + Config.ALT_GAME_EXPONENT_SP + tdClose);
+		        htmlCode.append(trClose);
+	
+		        htmlCode.append(trOpen);
+		        htmlCode.append(tdOpen + "掉落倍率: " + Config.RATE_DROP_ITEMS + tdClose);
+		        htmlCode.append(colSpacer);
+		        htmlCode.append(tdOpen + "回收倍率: " + Config.RATE_DROP_SPOIL + tdClose);
+		        htmlCode.append(colSpacer);
+		        htmlCode.append(tdOpen + "金錢倍率: " + Config.RATE_DROP_ADENA + tdClose);
+		        htmlCode.append(trClose);
+	
+		        htmlCode.append("</table>");
+	        }
 
 	        htmlCode.append("<table>");
 	        htmlCode.append(trOpen);
@@ -513,9 +534,9 @@ public class RegionBBSManager extends BaseBBSManager
 	        htmlCode.append(trClose);
 
 	        htmlCode.append(trOpen);
-	        htmlCode.append(tdOpen + getOnlineCount("pl") + " Player(s) Online</td>");
+	        htmlCode.append(tdOpen + getOnlineCount("pl") + " 個玩家在線上</td>");
 	        htmlCode.append(trClose);
-	        htmlCode.append("</table>");
+	        htmlCode.append("</table><br><br><br>");
 
 	        if (Config.BBS_SHOW_PLAYERLIST) 
 	        {
@@ -532,7 +553,7 @@ public class RegionBBSManager extends BaseBBSManager
     
     	            if (cell == 1) htmlCode.append(trOpen);
     
-    	            htmlCode.append("<td align=left valign=top FIXWIDTH=110><a action=\"bypass _bbsloc;playerinfo;"
+    	            htmlCode.append("<td align=left valign=top FIXWIDTH=150><a action=\"bypass _bbsloc;playerinfo;"
     	                + player.getName() + "\">");
     
     	            if (player.isGM()) htmlCode.append("<font color=\"LEVEL\">" + player.getName()
@@ -564,16 +585,16 @@ public class RegionBBSManager extends BaseBBSManager
 		        htmlCode.append("<table border=0 width=600>");
 
 		        htmlCode.append("<tr>");
-	            if (page == 1) htmlCode.append("<td align=right width=190><button value=\"Prev\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
-	            else htmlCode.append("<td align=right width=190><button value=\"Prev\" action=\"bypass _bbsloc;page;"
+	            if (page == 1) htmlCode.append("<td align=right width=190><button value=\"上一頁\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
+	            else htmlCode.append("<td align=right width=190><button value=\"上一頁\" action=\"bypass _bbsloc;page;"
 	                + (page - 1)
 	                + "\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
 	            htmlCode.append("<td FIXWIDTH=10></td>");
-	            htmlCode.append("<td align=center valign=top width=200>Displaying " + (((page - 1) * Config.NAME_PAGE_SIZE_COMMUNITYBOARD) + 1) + " - "
-	                + (((page -1) * Config.NAME_PAGE_SIZE_COMMUNITYBOARD) + getOnlinePlayers(page).size()) + " player(s)</td>");
+	            htmlCode.append("<td align=center valign=top width=200>顯示範圍 " + (((page - 1) * Config.NAME_PAGE_SIZE_COMMUNITYBOARD) + 1) + " - "
+	                + (((page -1) * Config.NAME_PAGE_SIZE_COMMUNITYBOARD) + getOnlinePlayers(page).size()) + " 個玩家</td>");
 	            htmlCode.append("<td FIXWIDTH=10></td>");
-	            if (getOnlineCount("pl") <= (page * Config.NAME_PAGE_SIZE_COMMUNITYBOARD)) htmlCode.append("<td width=190><button value=\"Next\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
-	            else htmlCode.append("<td width=190><button value=\"Next\" action=\"bypass _bbsloc;page;"
+	            if (getOnlineCount("pl") <= (page * Config.NAME_PAGE_SIZE_COMMUNITYBOARD)) htmlCode.append("<td width=190><button value=\"下一頁\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
+	            else htmlCode.append("<td width=190><button value=\"下一頁\" action=\"bypass _bbsloc;page;"
 	                + (page + 1)
 	                + "\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
 	            htmlCode.append("</tr>");

@@ -65,6 +65,7 @@ public final class Config
     /** Decay Time */
     public static int DECAY_TIME;
     public static String CLIENT_TYPE;
+    public static boolean SHOWRATE;
  // addon =========================================================
 
     /***************************************************************************
@@ -493,6 +494,7 @@ public final class Config
     public static int		GRID_NEIGHBOR_TURNOFF_TIME;
     public static int		GEODATA;
     public static boolean	FORCE_GEODATA;
+    public static boolean 	MOVE_BASED_KNOWNLIST;
     public static int		ZONE_TOWN;
     public static boolean	ACTIVATE_POSITION_RECORDER;
     public static String	DEFAULT_GLOBAL_CHAT;
@@ -724,6 +726,9 @@ public final class Config
     public static boolean	BANKING_SYSTEM_ENABLED;
     public static int		BANKING_SYSTEM_GOLDBARS;
     public static int		BANKING_SYSTEM_ADENA;
+    public static boolean	L2JMOD_ENABLE_WAREHOUSESORTING_CLAN;
+    public static boolean	L2JMOD_ENABLE_WAREHOUSESORTING_PRIVATE;
+    public static boolean	L2JMOD_ENABLE_WAREHOUSESORTING_FREIGHT;
     
     /** ************************************************** **/
 	/** L2JMods Settings -End                              **/
@@ -1018,10 +1023,15 @@ public final class Config
     /** Type of set object */
     public static ObjectSetType   SET_TYPE;
 
-    /** Chance that an item will succesfully be enchanted */
+    /** Chance that an item will successfully be enchanted */
     public static int ENCHANT_CHANCE_WEAPON;
     public static int ENCHANT_CHANCE_ARMOR;
     public static int ENCHANT_CHANCE_JEWELRY;
+    
+    public static int BLESSED_ENCHANT_CHANCE_WEAPON;
+    public static int BLESSED_ENCHANT_CHANCE_ARMOR;
+    public static int BLESSED_ENCHANT_CHANCE_JEWELRY;
+
     /** Maximum level of enchantment */
     public static int ENCHANT_MAX_WEAPON;
     public static int ENCHANT_MAX_ARMOR;
@@ -1320,6 +1330,9 @@ public final class Config
                 ENCHANT_CHANCE_WEAPON				= Integer.parseInt(Character.getProperty("EnchantChanceWeapon", "68"));
                 ENCHANT_CHANCE_ARMOR				= Integer.parseInt(Character.getProperty("EnchantChanceArmor", "52"));
                 ENCHANT_CHANCE_JEWELRY				= Integer.parseInt(Character.getProperty("EnchantChanceJewelry", "54"));
+                BLESSED_ENCHANT_CHANCE_WEAPON		= Integer.parseInt(Character.getProperty("BlessedEnchantChanceWeapon", "68"));
+                BLESSED_ENCHANT_CHANCE_ARMOR		= Integer.parseInt(Character.getProperty("BlessedEnchantChanceArmor", "52"));
+                BLESSED_ENCHANT_CHANCE_JEWELRY		= Integer.parseInt(Character.getProperty("BlessedEnchantChanceJewelry", "54"));
                 ENCHANT_MAX_WEAPON					= Integer.parseInt(Character.getProperty("EnchantMaxWeapon", "255"));
                 ENCHANT_MAX_ARMOR					= Integer.parseInt(Character.getProperty("EnchantMaxArmor", "255"));
                 ENCHANT_MAX_JEWELRY					= Integer.parseInt(Character.getProperty("EnchantMaxJewelry", "255"));
@@ -1535,6 +1548,7 @@ public final class Config
                 GRID_NEIGHBOR_TURNOFF_TIME					= Integer.parseInt(General.getProperty("GridNeighborTurnOffTime", "90"));
                 GEODATA										= Integer.parseInt(General.getProperty("GeoData", "0"));
                 FORCE_GEODATA								= Boolean.parseBoolean(General.getProperty("ForceGeoData", "True"));
+                MOVE_BASED_KNOWNLIST						= Boolean.parseBoolean(General.getProperty("MoveBasedKnownlist", "False"));
                 ZONE_TOWN									= Integer.parseInt(General.getProperty("ZoneTown", "0"));
                 ACTIVATE_POSITION_RECORDER					= Boolean.parseBoolean(General.getProperty("ActivatePositionRecorder", "False"));
                 DEFAULT_GLOBAL_CHAT							= General.getProperty("GlobalChat", "ON");
@@ -1772,7 +1786,11 @@ public final class Config
                 L2JMOD_WEDDING_SAMESEX                  = Boolean.parseBoolean(L2JModSettings.getProperty("WeddingAllowSameSex", "False"));
                 L2JMOD_WEDDING_FORMALWEAR               = Boolean.parseBoolean(L2JModSettings.getProperty("WeddingFormalWear", "True"));
                 L2JMOD_WEDDING_DIVORCE_COSTS            = Integer.parseInt(L2JModSettings.getProperty("WeddingDivorceCosts", "20"));
-                
+
+                L2JMOD_ENABLE_WAREHOUSESORTING_CLAN     = Boolean.valueOf(L2JModSettings.getProperty("EnableWarehouseSortingClan", "False"));
+                L2JMOD_ENABLE_WAREHOUSESORTING_PRIVATE  = Boolean.valueOf(L2JModSettings.getProperty("EnableWarehouseSortingPrivate", "False"));
+                L2JMOD_ENABLE_WAREHOUSESORTING_FREIGHT  = Boolean.valueOf(L2JModSettings.getProperty("EnableWarehouseSortingFreight", "False"));
+
                 /** L2JMOD CTF System **/
                 CTF_EVEN_TEAMS					= L2JModSettings.getProperty("CTFEvenTeams", "BALANCE");
 
@@ -2027,6 +2045,7 @@ public final class Config
                 ALT_GAME_ATKSPD                  		     		= Integer.parseInt(customSettings.getProperty("AltGameAtkSpd", "1200"));
                 ALLOW_3RD_CLASS                  		     		= Boolean.parseBoolean(customSettings.getProperty("Allow3rdClass", "False"));
                 USE_JP_RULE_OF_BOSSZONE								= Boolean.parseBoolean(customSettings.getProperty("UseJPBossZone", "true"));
+                SHOWRATE											= Boolean.parseBoolean(customSettings.getProperty("ShowRate", "false"));
                 //CLIENT_TYPE											= customSettings.getProperty(customSettings.getProperty("Client", "mix"));
             }
             catch (Exception e)
@@ -2536,8 +2555,12 @@ public final class Config
         else if (pName.equalsIgnoreCase("TvTEventInterval")) TVT_EVENT_INTERVAL = Integer.parseInt(pValue);
         else if (pName.equalsIgnoreCase("TvTEventParticipationTime")) TVT_EVENT_PARTICIPATION_TIME = Integer.parseInt(pValue);
         else if (pName.equalsIgnoreCase("TvTEventRunningTime")) TVT_EVENT_RUNNING_TIME = Integer.parseInt(pValue);
-        else if (pName.equalsIgnoreCase("TvTEventParticipationNpcId")) TVT_EVENT_PARTICIPATION_NPC_ID = Integer.parseInt(pValue);
-        
+
+        // L2JMOD Warehouse Sorting
+        else if (pName.equalsIgnoreCase("EnableWarehouseSortingClan")) L2JMOD_ENABLE_WAREHOUSESORTING_CLAN = Boolean.parseBoolean(pValue);
+        else if (pName.equalsIgnoreCase("EnableWarehouseSortingPrivate")) L2JMOD_ENABLE_WAREHOUSESORTING_PRIVATE = Boolean.parseBoolean(pValue);
+        else if (pName.equalsIgnoreCase("EnableWarehouseSortingFreight")) L2JMOD_ENABLE_WAREHOUSESORTING_FREIGHT = Boolean.parseBoolean(pValue);
+
         // L2JMOD CTF System
         else if (pName.equalsIgnoreCase("CTFEvenTeams"))  CTF_EVEN_TEAMS = pValue;
 

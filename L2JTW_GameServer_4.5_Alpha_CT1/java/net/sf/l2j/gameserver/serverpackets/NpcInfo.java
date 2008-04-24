@@ -585,7 +585,7 @@ public final class NpcInfo extends L2GameServerPacket
 			writeD(charcolor);
 			writeD(charface);
 
-			writeS(_activeChar.getTitle());
+			writeS(_title);
 
 			writeD(0);
 			writeD(0);

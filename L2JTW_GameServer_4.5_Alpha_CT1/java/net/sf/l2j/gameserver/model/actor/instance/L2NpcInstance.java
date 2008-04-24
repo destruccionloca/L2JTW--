@@ -762,7 +762,7 @@ public class L2NpcInstance extends L2Character
     	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
     	for (L2NpcAIData AI: npcData.getAIData())
     	{
-    		if (AI == null || AI.getEnemyClan() == "")
+    		if (AI == null || AI.getEnemyClan() == ""|| AI.getEnemyClan() == null)
     			return "none";
     		else
     		return AI.getEnemyClan();
@@ -775,7 +775,7 @@ public class L2NpcInstance extends L2Character
     	L2NpcTemplate npcData = NpcTable.getInstance().getTemplate(this.getTemplate().npcId);
     	for (L2NpcAIData AI: npcData.getAIData())
     	{
-    		if (AI == null || AI.getClan() == "")
+    		if (AI == null || AI.getClan() == "" || AI.getClan() == null)
     			return "none";
     		else
     		return AI.getClan();
@@ -2313,7 +2313,7 @@ public class L2NpcInstance extends L2Character
         int neededmoney = 100;
         SystemMessage sm;
         if (!player.reduceAdena("RestoreCP", neededmoney, player.getLastFolkNPC(), true)) return;
-        player.setCurrentCp(getCurrentCp()+5000);
+        player.setCurrentCp(player.getMaxCp());
         //cp restored
         sm = new SystemMessage(SystemMessageId.S1_CP_WILL_BE_RESTORED);
         sm.addString(player.getName());
