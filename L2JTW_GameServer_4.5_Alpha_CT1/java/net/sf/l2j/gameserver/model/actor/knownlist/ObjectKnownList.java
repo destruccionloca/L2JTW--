@@ -17,12 +17,10 @@ package net.sf.l2j.gameserver.model.actor.knownlist;
 import java.util.Map;
 
 import javolution.util.FastMap;
-import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2WorldRegion;
 import net.sf.l2j.gameserver.model.actor.instance.L2BoatInstance;
-import net.sf.l2j.gameserver.model.actor.instance.L2GuardInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PlayableInstance;
 import net.sf.l2j.gameserver.util.Util;
@@ -54,8 +52,6 @@ public class ObjectKnownList
 
         // Check if object is not inside distance to watch object
         if (!Util.checkIfInShortRadius(getDistanceToWatchObject(object), getActiveObject(), object, true)) return false;
-        if(Math.abs(object.getZ()-getActiveObject().getZ()) > 600) return false;
-
 
         return (getKnownObjects().put(object.getObjectId(), object) == null);
     }
@@ -108,7 +104,7 @@ public class ObjectKnownList
     }
     
     // Remove invisible and too far L2Object from _knowObject and if necessary from _knownPlayers of the L2Character
-    public final void forgetObjects(boolean fullCheck)
+    public void forgetObjects(boolean fullCheck)
     {
     	// Go through knownObjects
     	for (L2Object object: getKnownObjects().values())
@@ -116,8 +112,7 @@ public class ObjectKnownList
     		if (!fullCheck && !(object instanceof L2PlayableInstance))
     			continue;
 
-    		// Remove all invisible object
-    		// Remove all too far object
+    		// Remove all objects invisible or too far
     		if (
     				!object.isVisible() ||
     				!Util.checkIfInShortRadius(getDistanceToForgetObject(object), getActiveObject(), object, true)
@@ -130,11 +125,7 @@ public class ObjectKnownList
     				}
     				else if(((L2PcInstance)getActiveObject()).isInBoat())
     				{
-    					if(((L2PcInstance)getActiveObject()).getBoat() == object)
-    					{
-    						//
-    					}
-    					else
+    					if(((L2PcInstance)getActiveObject()).getBoat() != object)
     					{
     						removeKnownObject(object);
     					}

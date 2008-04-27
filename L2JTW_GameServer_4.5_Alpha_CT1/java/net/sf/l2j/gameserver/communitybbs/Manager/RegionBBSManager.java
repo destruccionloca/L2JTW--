@@ -375,7 +375,7 @@ public class RegionBBSManager extends BaseBBSManager
 	        htmlCode.append("<table>");
 
 	        htmlCode.append(trOpen);
-	        htmlCode.append("<td align=left valign=top>伺服器啟動時間:" + GameServer.dateTimeServerStarted.getTime() + tdClose);
+	        htmlCode.append("<td align=left valign=top>伺服器啟動時間<br>" + GameServer.dateTimeServerStarted.getTime() + tdClose);
 	        htmlCode.append(trClose);
 
 	        htmlCode.append("</table>");
@@ -492,7 +492,7 @@ public class RegionBBSManager extends BaseBBSManager
 	        htmlCode.append("<table>");
 
 	        htmlCode.append(trOpen);
-	        htmlCode.append("<td align=left valign=top>伺服器啟動時間:" + GameServer.dateTimeServerStarted.getTime() + tdClose);
+	        htmlCode.append("<td align=left valign=top>伺服器啟動時間<br>" + GameServer.dateTimeServerStarted.getTime() + tdClose);
 	        htmlCode.append(trClose);
 
 	        htmlCode.append("</table>");

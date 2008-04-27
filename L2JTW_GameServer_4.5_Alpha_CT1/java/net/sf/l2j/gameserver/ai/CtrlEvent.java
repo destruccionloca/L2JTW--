@@ -32,6 +32,8 @@ public enum CtrlEvent {
 	EVT_AGGRESSION,
 	/** Actor is in stun state */
 	EVT_STUNNED,
+	/** Actor is paralyzed or petrified */
+	EVT_PARALYZED,
 	/** Actor starts/stops sleeping */
 	EVT_SLEEPING,
 	/** Actor is in rooted state (cannot move) */
@@ -68,10 +70,8 @@ public enum CtrlEvent {
 	EVT_CONFUSED,
 	/** The character cannot cast spells anymore **/
 	EVT_MUTED,
-    /** The character cannot use skill anymore **/
-    EVT_SLAM,
 	/** The character flee in randoms directions **/
-	EVT_AFFRAID,
+	EVT_AFRAID,
 	/** The character finish casting **/
 	EVT_FINISH_CASTING,
 	/** The character betrayed its master */

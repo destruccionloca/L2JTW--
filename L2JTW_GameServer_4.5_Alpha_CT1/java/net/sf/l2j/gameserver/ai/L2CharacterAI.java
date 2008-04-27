@@ -28,13 +28,14 @@ import java.util.List;
 
 import javolution.util.FastList;
 import net.sf.l2j.Config;
+import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.GeoData;
 import net.sf.l2j.gameserver.Universe;
 import net.sf.l2j.gameserver.model.L2Attackable;
 import net.sf.l2j.gameserver.model.L2CharPosition;
 import net.sf.l2j.gameserver.model.L2Character;
-import net.sf.l2j.gameserver.model.L2Effect;
 import net.sf.l2j.gameserver.model.L2Object;
+import net.sf.l2j.gameserver.model.L2Effect;
 import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.model.L2Skill.SkillTargetType;
 import net.sf.l2j.gameserver.model.actor.instance.L2BoatInstance;
@@ -559,7 +560,25 @@ public class L2CharacterAI extends AbstractAI
      *
      */
     @Override
-	protected void onEvtStunned(L2Character attacker)
+    protected void onEvtStunned(L2Character attacker)
+    {
+        // Stop the actor auto-attack client side by sending Server->Client packet AutoAttackStop (broadcast)
+        _actor.broadcastPacket(new AutoAttackStop(_actor.getObjectId()));
+        if (AttackStanceTaskManager.getInstance().getAttackStanceTask(_actor))
+            AttackStanceTaskManager.getInstance().removeAttackStanceTask(_actor);
+
+        // Stop Server AutoAttack also
+        setAutoAttacking(false);
+
+        // Stop the actor movement server side AND client side by sending Server->Client packet StopMove/StopRotation (broadcast)
+        clientStopMoving(null);
+
+        // Launch actions corresponding to the Event onAttacked (only for L2AttackableAI after the stunning periode)
+        onEvtAttacked(attacker);
+    }
+
+    @Override
+    protected void onEvtParalyzed(L2Character attacker)
     {
         // Stop the actor auto-attack client side by sending Server->Client packet AutoAttackStop (broadcast)
         _actor.broadcastPacket(new AutoAttackStop(_actor.getObjectId()));
@@ -1327,6 +1346,7 @@ public class L2CharacterAI extends AbstractAI
         }
     }
     
+    
     public boolean canAura(L2Skill sk)
     {
     	if(sk.getTargetType() == SkillTargetType.TARGET_AURA 
@@ -1504,5 +1524,4 @@ public class L2CharacterAI extends AbstractAI
     	}
     	return false;
     }
-
 }

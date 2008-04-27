@@ -13,12 +13,13 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package net.sf.l2j.gameserver.skills.effects;
-import net.sf.l2j.gameserver.skills.Env;
+
 import net.sf.l2j.gameserver.ai.CtrlIntention;
 import net.sf.l2j.gameserver.model.L2Effect;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
+import net.sf.l2j.gameserver.skills.Env;
 
 
 class EffectRelax extends L2Effect
@@ -73,10 +74,11 @@ class EffectRelax extends L2Effect
 		if (getEffected().getCurrentHp()+1 > getEffected().getMaxHp()) {
 			if(getSkill().isToggle())
 			{
-				getEffected().sendPacket(new SystemMessage(SystemMessageId.SKILL_HAS_BEEN_DEACTIVATED_AS_HP_WAS_FULLY_RECOVERED));
+				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
+				sm.addString("Fully rested. Effect of " + getSkill().getName() + " has been removed.");
+				getEffected().sendPacket(sm);
 				//if (getEffected() instanceof L2PcInstance)
 					//((L2PcInstance)getEffected()).standUp();
-
                 retval = false;
 			}
 		}

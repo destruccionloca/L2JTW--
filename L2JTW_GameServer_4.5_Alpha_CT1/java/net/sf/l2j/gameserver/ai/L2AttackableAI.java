@@ -1230,7 +1230,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 	    if(getAttackTarget().isMoving())
 	    	dist2 = dist2 - 400;
 
-    	boolean cancast = false;
+    	boolean cancast = true;
     	switch(sk.getSkillType())
     	{
     		

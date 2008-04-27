@@ -274,10 +274,9 @@ public class PcKnownList extends PlayableKnownList
     {
         int knownlistSize = getKnownObjects().size();
 
-        if (knownlistSize <= 25) return 3000; // empty field
-        if (knownlistSize <= 35) return 2500;
-        if (knownlistSize <= 70) return 2000;
-
+        if (knownlistSize <= 25) return 3400; // empty field
+        if (knownlistSize <= 35) return 2900;
+        if (knownlistSize <= 70) return 2300;
         else return 1700; // Siege, TOI, city
     }
 }

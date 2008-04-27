@@ -41,7 +41,10 @@ public class GetPlayer implements ISkillHandler
         		L2PcInstance trg = (L2PcInstance)target;
         		if (trg.isAlikeDead()) continue;
         		//trg.teleToLocation(activeChar.getX(), activeChar.getY(), activeChar.getZ(), true);
-        		trg.teleToLocation(activeChar.getX()+Rnd.get(-10,10), activeChar.getY()+Rnd.get(-10,10), activeChar.getZ());
+        		trg.stopMove(null, false);
+        		trg.abortAttack();
+        		trg.abortCast();
+        		trg.setXYZ(activeChar.getX()+Rnd.get(-10,10), activeChar.getY()+Rnd.get(-10,10), activeChar.getZ());
         		trg.sendPacket(new ValidateLocation(trg));
         	}
         }

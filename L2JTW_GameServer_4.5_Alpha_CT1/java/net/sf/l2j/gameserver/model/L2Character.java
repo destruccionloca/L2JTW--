@@ -216,18 +216,92 @@ public abstract class L2Character extends L2Object
 	public static final int ZONE_JAIL = 256;
 	public static final int ZONE_MONSTERTRACK = 512;
 
-	private int _currentZones = 0;
+	private byte _currentPVPZones = 0;
+	private byte _currentPeaceZones = 0;
+	private byte _currentSiegeZones = 0;
+	private byte _currentMotherTreeZones = 0;
+	private byte _currentClanHallZones = 0;
+	private byte _currentUnusedZones = 0;
+	private byte _currentNoLandingZones = 0;
+	private byte _currentWaterZones = 0;
+	private byte _currentJailZones = 0;
+	private byte _currentMonsterTrackZones = 0;
 
 	public boolean isInsideZone(int zone)
 	{
-		return ((_currentZones & zone) != 0);
+		switch(zone)
+		{
+			case ZONE_PVP:
+				return (_currentPVPZones > 0);
+			case ZONE_PEACE:
+				return (_currentPeaceZones > 0);
+			case ZONE_SIEGE:
+				return (_currentSiegeZones > 0);
+			case ZONE_MOTHERTREE:
+				return (_currentMotherTreeZones > 0);
+			case ZONE_CLANHALL:
+				return (_currentClanHallZones > 0);
+			case ZONE_UNUSED:
+				return (_currentUnusedZones > 0);
+			case ZONE_NOLANDING:
+				return (_currentNoLandingZones > 0);
+			case ZONE_WATER:
+				return (_currentWaterZones > 0);
+			case ZONE_JAIL:
+				return (_currentJailZones > 0);
+			case ZONE_MONSTERTRACK:
+				return (_currentMonsterTrackZones > 0);
+			default:
+				return false;
+		}
 	}
 	public void setInsideZone(int zone, boolean state)
 	{
-		if (state)
-			_currentZones |= zone;
-		else if (isInsideZone(zone)) // zone overlap possible
-			_currentZones ^= zone;
+		switch(zone)
+		{
+			case ZONE_PVP:
+				if (state) _currentPVPZones++;
+				else _currentPVPZones--;
+				break;
+			case ZONE_PEACE:
+				if (state) _currentPeaceZones++;
+				else _currentPeaceZones--;
+				break; 
+			case ZONE_SIEGE:
+				if (state) _currentSiegeZones++;
+				else _currentSiegeZones--;
+				break;
+			case ZONE_MOTHERTREE:
+				if (state) _currentMotherTreeZones++;
+				else _currentMotherTreeZones--;
+				break;
+			case ZONE_CLANHALL:
+				if (state) _currentClanHallZones++;
+				else _currentClanHallZones--;
+				break;
+			case ZONE_UNUSED:
+				if (state) _currentUnusedZones++;
+				else _currentUnusedZones--;
+				break;
+			case ZONE_NOLANDING:
+				if (state) _currentNoLandingZones++;
+				else _currentNoLandingZones--;
+				break;
+			case ZONE_WATER:
+				if (state) _currentWaterZones++;
+				else _currentWaterZones--;
+				break;
+			case ZONE_JAIL:
+				if (state) _currentJailZones++;
+				else _currentJailZones--;
+				break;
+			case ZONE_MONSTERTRACK:
+				if (state) _currentMonsterTrackZones++;
+				else _currentMonsterTrackZones--;
+				break;
+			default:
+				return;
+		}
 	}
 	
 	/**
@@ -456,7 +530,7 @@ public abstract class L2Character extends L2Object
 			getPet().setFollowStatus(false);
 			getPet().teleToLocation(getPosition().getX() + Rnd.get(-100,100), getPosition().getY() + Rnd.get(-100,100), getPosition().getZ(), false);
 			getPet().setFollowStatus(true);
-			getPet().broadcastPacket(new PetInfo(getPet()));
+			getPet().sendPacket(new PetInfo(getPet()));
 			getPet().updateEffectIcons(true);
 		}
 
@@ -1367,10 +1441,10 @@ public abstract class L2Character extends L2Object
 				if(this instanceof L2Attackable && obj instanceof L2PcInstance && getTarget() instanceof L2Attackable)
                     continue;
                 
-                if(this instanceof L2Attackable && obj instanceof L2Attackable && ((L2Attackable)this).getEnemyRange() == 0 && ((L2Attackable)this).getEnemyClan() == null && ((L2Attackable)this).getIsChaos()==0)
+                if(this instanceof L2Attackable && obj instanceof L2Attackable && ((L2Attackable)this).getEnemyRange() == 0 && ((L2Attackable)this).getEnemyClan().equals("none") && ((L2Attackable)this).getIsChaos()==0)
                 continue;
                 
-                if(this instanceof L2Attackable && obj instanceof L2Attackable && ((L2Attackable)this).getEnemyClan()!=((L2Attackable)obj).getFactionId() && ((L2Attackable)this).getIsChaos()==0)
+                if(this instanceof L2Attackable && obj instanceof L2Attackable && !((L2Attackable)this).getEnemyClan().equals(((L2Attackable)obj).getClan()) && ((L2Attackable)this).getIsChaos()==0)
                 continue;
                 
 				temp = (L2Character) obj;
@@ -1612,7 +1686,11 @@ public abstract class L2Character extends L2Object
 		if (skill.getTargetType() == SkillTargetType.TARGET_AURA
 				|| skill.getTargetType() == SkillTargetType.TARGET_FRONT_AURA
 				|| skill.getTargetType() == SkillTargetType.TARGET_BEHIND_AURA
-				|| skill.getTargetType() == SkillTargetType.TARGET_GROUND)
+				|| skill.getTargetType() == SkillTargetType.TARGET_GROUND
+				|| skill.getTargetType() == L2Skill.SkillTargetType.TARGET_PARTY
+				|| skill.getTargetType() == L2Skill.SkillTargetType.TARGET_SELF
+				|| skill.getTargetType() == L2Skill.SkillTargetType.TARGET_CLAN 
+				|| skill.getTargetType() == L2Skill.SkillTargetType.TARGET_ALLY)
 		{
 			target = this;
 		}
@@ -1630,12 +1708,7 @@ public abstract class L2Character extends L2Object
 					skill.getSkillType() == SkillType.COMBATPOINTHEAL ||
 					skill.getSkillType() == SkillType.MANAHEAL ||
 					skill.getSkillType() == SkillType.REFLECT ||
-					skill.getSkillType() == SkillType.SEED ||
-					skill.getTargetType() == L2Skill.SkillTargetType.TARGET_SELF ||
-					skill.getTargetType() == L2Skill.SkillTargetType.TARGET_PET ||
-					skill.getTargetType() == L2Skill.SkillTargetType.TARGET_PARTY ||
-					skill.getTargetType() == L2Skill.SkillTargetType.TARGET_CLAN ||
-					skill.getTargetType() == L2Skill.SkillTargetType.TARGET_ALLY)
+					skill.getTargetType() == L2Skill.SkillTargetType.TARGET_PET)
 			{
 				target = (L2Character) targets[0];
 
@@ -2523,6 +2596,7 @@ public abstract class L2Character extends L2Object
 				_flyType = FlyType.valueOf(_skill.getFlyType());
 
 				broadcastPacket(new FlyToLocation(_actor,_target,_flyType));
+				_actor.setXYZ(_target.getX(), _target.getY(), _target.getZ());
 			}
 			catch (Throwable e)
 			{
@@ -2900,6 +2974,12 @@ public abstract class L2Character extends L2Object
 				if (_effects.get(i) == effect)
 				{
 					_effects.remove(i);
+					if (this instanceof L2PcInstance)
+					{
+						SystemMessage sm = new SystemMessage(SystemMessageId.EFFECT_S1_DISAPPEARED);
+						sm.addSkillName(effect.getSkill().getId());
+						sendPacket(sm);
+					}
 					break;
 				}
 			}
@@ -2947,7 +3027,7 @@ public abstract class L2Character extends L2Object
 	public final void startFear()
 	{
 		setIsAfraid(true);
-		getAI().notifyEvent(CtrlEvent.EVT_AFFRAID);
+		getAI().notifyEvent(CtrlEvent.EVT_AFRAID);
 		updateAbnormalEffect();
 	}
 
@@ -3026,6 +3106,17 @@ public abstract class L2Character extends L2Object
 		getAI().notifyEvent(CtrlEvent.EVT_STUNNED, null);
 		updateAbnormalEffect();
 	}
+
+	public final void startParalyze()
+	{
+		setIsParalyzed(true);
+		/* Aborts any attacks/casts if paralyzed */
+		abortAttack();
+		abortCast();
+		getAI().notifyEvent(CtrlEvent.EVT_PARALYZED, null);
+		updateAbnormalEffect();
+	}
+
 	public final void startBetray()
 	{
 		setIsBetrayed(true);
@@ -3315,7 +3406,19 @@ public abstract class L2Character extends L2Object
 		getAI().notifyEvent(CtrlEvent.EVT_THINK, null);
 		updateAbnormalEffect();
 	}
-	
+
+	public final void stopParalyze(L2Effect effect)
+	{
+		if (effect == null)
+			stopEffects(L2Effect.EffectType.PARALYZE);
+		else
+			removeEffect(effect);
+
+		setIsParalyzed(false);
+		getAI().notifyEvent(CtrlEvent.EVT_THINK, null);
+		updateAbnormalEffect();
+	}
+
 	/**
      * Stop L2Effect: Transformation<BR><BR>
      *
@@ -3495,6 +3598,8 @@ public abstract class L2Character extends L2Object
         L2Effect eventNotInUse = null;
         for (int i=0; i<effects.size(); i++) {
             e = effects.get(i);
+            if(e==null)
+            	continue;
             if (e.getSkill() == skill)
             {
             	if (e.getInUse()) return e;
@@ -4406,7 +4511,7 @@ public abstract class L2Character extends L2Object
 			setHeading(pos.heading);
 			if (this instanceof L2PcInstance) ((L2PcInstance)this).revalidateZone(true);
 		}
-		sendPacket(new StopMove(this));
+		broadcastPacket(new StopMove(this));
 		if (Config.MOVE_BASED_KNOWNLIST) this.getKnownList().findObjects();
 	}
 
@@ -6116,7 +6221,7 @@ public abstract class L2Character extends L2Object
 			  {
 				L2Character target = (L2Character) targets[i];
 
-				if (skill.getSkillType() == L2Skill.SkillType.BUFF || skill.getSkillType() == L2Skill.SkillType.SEED)
+				if (skill.getSkillType() == L2Skill.SkillType.BUFF)
 				{
 					SystemMessage smsg = new SystemMessage(SystemMessageId.YOU_FEEL_S1_EFFECT);
 					smsg.addSkillName(skill.getId());
@@ -6936,19 +7041,20 @@ public abstract class L2Character extends L2Object
     {
         return isDead();
     }
-    
+
     public final void startPhysicalAttackMuted()
     {
-       setIsPhysicalAttackMuted(true);
-    }    
-    
+        setIsPhysicalAttackMuted(true);
+        abortAttack();
+    }
+
     public final void stopPhysicalAttackMuted(L2Effect effect)
     {
-       if (effect == null)
-           stopEffects(L2Effect.EffectType.PHYSICAL_ATTACK_MUTE);
-       else
+        if (effect == null)
+            stopEffects(L2Effect.EffectType.PHYSICAL_ATTACK_MUTE);
+        else
             removeEffect(effect);
   
-       setIsPhysicalAttackMuted(false);
-    }  
+        setIsPhysicalAttackMuted(false);
+    }
 }

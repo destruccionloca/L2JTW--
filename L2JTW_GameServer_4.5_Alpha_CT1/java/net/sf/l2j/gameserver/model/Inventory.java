@@ -270,12 +270,12 @@ public abstract class Inventory extends ItemContainer
 
 			if(passiveSkill != null)
 			{
-				player.removeSkill(passiveSkill, false);
+				player.removeItemSkill(passiveSkill);
 				player.sendSkillList();
 			}
 			if(enchant4Skill != null)
 			{
-				player.removeSkill(enchant4Skill, false);
+				player.removeItemSkill(enchant4Skill);
 				player.sendSkillList(); 
 			}
     	}
@@ -311,12 +311,12 @@ public abstract class Inventory extends ItemContainer
 
 			if(passiveSkill != null)
 			{
-	    		player.addSkill(passiveSkill, false);
+	    		player.addItemSkill(passiveSkill);
 	    		player.sendSkillList(); 
 			}
 			if(enchant4Skill != null)
 			{
-				player.addSkill(enchant4Skill, false);
+				player.addItemSkill(enchant4Skill);
 				player.sendSkillList(); 
 			}
 

@@ -1,4 +1,4 @@
- /*
+/*
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
@@ -13,8 +13,9 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package net.sf.l2j.gameserver.skills.effects;
-import net.sf.l2j.gameserver.skills.Env;
+
 import net.sf.l2j.gameserver.model.L2Effect;
+import net.sf.l2j.gameserver.skills.Env;
 
 public class EffectStunSelf extends L2Effect
 {

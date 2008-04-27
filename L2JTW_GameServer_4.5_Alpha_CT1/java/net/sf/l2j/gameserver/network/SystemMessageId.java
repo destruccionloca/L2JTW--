@@ -295,13 +295,7 @@ public enum SystemMessageId
      * Message: The enchantment has failed! Your +$s1 $s2 has been crystallized.
      */
     ENCHANTMENT_FAILED_S1_S2_EVAPORATED(65),
-
-    /**
-     * ID: 67<br>
-     * Message: $s1 has invited you to the join the clan, $s2. Do you wish to join?
-     */
-    S1_HAS_INVITED_YOU_TO_JOIN_THE_CLAN_S2(67),
-
+    
     /**
      * ID: 66<br>
      * Message: $s1 has invited you to his/her party. Do you accept the invitation?
@@ -309,7 +303,30 @@ public enum SystemMessageId
     S1_INVITED_YOU_TO_PARTY(66),
 
     /**
+     * ID: 67<br>
+     * Message: "$s1 has invited you to the join the clan, $s2. Do you wish to join?"
+     */
+    S1_HAS_INVITED_YOU_TO_JOIN_THE_CLAN_S2(67),
+    
+    /**
+     * ID: 68<br>
+     * Message: "Would you like to withdraw from the $s1 clan? If you leave, you will have to wait at least a day before joining another clan."
+     */
+    WOULD_YOU_LIKE_TO_WITHDRAW_FROM_THE_S1_CLAN(68),
+    
+    /**
+     * ID: 69<br>
+     * Message: "Would you like to dismiss $s1 from the clan? If you do so, you will have to wait at least a day before accepting a new member."
+     */
+    WOULD_YOU_LIKE_TO_DISMISS_S1_FROM_THE_CLAN(69),
+    
+    /**
+     * ID: 70<br>
+     * Message: "Do you wish to disperse the clan, $s1?"
+     */
+    DO_YOU_WISH_TO_DISPERSE_THE_CLAN_S1(70),
 
+    /**
      * ID: 79<br>
      * Message: This name already exists.
      */
@@ -524,6 +541,12 @@ public enum SystemMessageId
      * Message: Your skill was removed due to a lack of MP.
      */
     SKILL_REMOVED_DUE_LACK_MP(140),
+    
+    /**
+     * ID: 141<br>
+     * Message: "Once the trade is confirmed, the item cannot be moved again."
+     */
+    ONCE_THE_TRADE_IS_CONFIRMED_THE_ITEM_CANNOT_BE_MOVED_AGAIN(141),
 
     /**
      * ID: 142<br>
@@ -656,6 +679,12 @@ public enum SystemMessageId
      * Message: $s1 has requested to become friends.
      */
     S1_REQUESTED_TO_BECOME_FRIENDS(168),
+    
+    /**
+     * ID: 169<br>
+     * Message: "Accept friendship 0/1 (1 to accept, 0 to deny)"
+     */
+    ACCEPT_THE_FRIENDSHIP(169),
 
     /**
      * ID: 170<br>
@@ -669,15 +698,13 @@ public enum SystemMessageId
      */
     S1_NOT_ON_YOUR_FRIENDS_LIST(171),
 
-
     /**
      * ID: 176<br>
      * Message: That person is in message refusal mode.
      */
-    SKILL_HAS_BEEN_DEACTIVATED_AS_HP_WAS_FULLY_RECOVERED(175),
+    THE_PERSON_IS_IN_MESSAGE_REFUSAL_MODE(176),
 
     /**
-
      * ID: 177<br>
      * Message: Message refusal mode.
      */
@@ -754,9 +781,14 @@ public enum SystemMessageId
      * Message: The party has dispersed.
      */
     PARTY_DISPERSED(203),
+    
+    /**
+     * ID: 211<br>
+     * Message: "You may only register a 16 x 12 pixel, 256-color BMP."
+     */
+    YOU_MAY_ONLY_REGISTER_A_16_BY_12_PIXEL_256_COLOR_BMP(211),
 
     /**
-
      * ID: 212<br>
      * Message: You are not a clan member and cannot perform this action.
      */
@@ -836,15 +868,13 @@ public enum SystemMessageId
 
     /**
      * ID: 231<br>
-     * Message: After a clan member is dismissed from a clan, the clan
-     * must wait at least a day before accepting a new member.
+     * Message: "After a clan member is dismissed from a clan, the clan must wait at least a day before accepting a new member."
      */
     YOU_MUST_WAIT_BEFORE_ACCEPTING_A_NEW_MEMBER(231),
 
     /**
      * ID: 232<br>
-     * Message: After leaving or having been dismissed from a clan,
-     * you must wait at least a day before joining another clan.
+     * Message: "After leaving or having been dismissed from a clan, you must wait at least a day before joining another clan."
      */
     YOU_MUST_WAIT_BEFORE_JOINING_ANOTHER_CLAN(232),
 
@@ -986,6 +1016,12 @@ public enum SystemMessageId
      * Message: You have left a combat zone.
      */
     LEFT_COMBAT_ZONE(284),
+    
+    /**
+     * ID: 294<br>
+     * Message: "Because your clan is not currently on the offensive in a Clan Hall siege war, it cannot summon its base camp."
+     */
+    BECAUSE_YOUR_CLAN_IS_NOT_CURRENTLY_ON_THE_OFFENSIVE_IN_A_CLAN_HALL_SIEGE_WAR_IT_CANNOT_SUMMON_ITS_BASE_CAMP(294),
 
     /**
      * ID: 295<br>
@@ -1109,7 +1145,7 @@ public enum SystemMessageId
 
     /**
      * ID: 343<br>
-     * Message: Sweeper failed, target not spoiled.
+     * Message: "Sweeper failed, target not spoiled."
      */
     SWEEPER_FAILED_TARGET_NOT_SPOILED(343),
 
@@ -1628,7 +1664,7 @@ public enum SystemMessageId
 
     /**
      * ID: 527<br>
-     * Message: $s1 leader, $s2, has requested an alliance.
+     * Message: "$s1 leader, $s2, has requested an alliance."
      */
     S2_ALLIANCE_LEADER_OF_S1_REQUESTED_ALLIANCE(527),
 
@@ -1637,6 +1673,12 @@ public enum SystemMessageId
      * Message: Unable to find file at target location.
      */
     FILE_NOT_FOUND(528),
+    
+    /**
+     * ID: 529<br>
+     * Message: "You may only register an 8 x 12 pixel, 256-color BMP."
+     */
+    YOU_MAY_ONLY_REGISTER_AN_8_BY_12_PIXEL_256_COLOR_BMP(529),
 
     /**
      * ID: 530<br>
@@ -1718,7 +1760,7 @@ public enum SystemMessageId
 
     /**
      * ID: 549<br>
-     * Message: To create an alliance, your clan must be Level 5 or higher.
+     * Message: "To create an alliance, your clan must be Level 5 or higher."
      */
     TO_CREATE_AN_ALLY_YOU_CLAN_MUST_BE_LEVEL_5_OR_HIGHER(549),
 
@@ -1736,8 +1778,7 @@ public enum SystemMessageId
 
     /**
      * ID: 552<br>
-     * Message: During the grace period for dissolving a clan, the registration or
-     * deletion of a clan's crest is not allowed.
+     * Message: "During the grace period for dissolving a clan, the registration or deletion of a clan's crest is not allowed."
      */
     CANNOT_SET_CREST_WHILE_DISSOLUTION_IN_PROGRESS(552),
 
@@ -2039,30 +2080,6 @@ public enum SystemMessageId
      */
     DISSAPEARED_ADENA(672),
 
-	/**
-	 * ID: 673<br>
-	 * Message: Only a clan leader whose clan is of level 2 or higher is allowed to participate in a clan hall auction.
-	 */
-	ONLY_A_CLAN_LEADER_WHOSE_CLAN_IS_OF_LEVEL_2(673),
-
-	/**
-	 * ID: 676<br>
-	 * Message: Since you have already submitted a bid, you are not allowed to participate in another auction at this time.
-	 */
-	SINCE_YOU_HAVE_ALREADY_SUBMITTED_A_BID(676),
-
-	/**
-	 * ID: 679<br>
-	 * Message: You have canceled your bid.
-	 */
-	YOU_HAVE_CANCELED_YOUR_BID(679),
-
-	/**
-	 * ID: 680<br>
-	 * Message: You cannot participate in an auction.
-	 */
-	YOU_CANNOT_PARTICIPATE_IN_AN_AUCTION(680),
-
     /**
      * ID: 681<br>
      * Message: The clan does not own a clan hall.
@@ -2098,7 +2115,7 @@ public enum SystemMessageId
      * Message: The purchase is complete.
      */
     THE_PURCHASE_IS_COMPLETE(700),
-     
+
     /**
      * ID: 703<br>
      * Message: ======<GM List>======
@@ -2202,8 +2219,8 @@ public enum SystemMessageId
      * ID: 749<br>
      * Message: The effect of $s1 has been removed.
      */
-	EFFECT_S1_DISAPPEARED(749),
-
+	//EFFECT_S1_DISAPPEARED(749),
+	EFFECT_S1_DISAPPEARED(92),
     /**
      * ID: 750<br>
      * Message: There are no other skills to learn.
@@ -2267,14 +2284,12 @@ public enum SystemMessageId
     YOU_MAY_CREATE_UP_TO_48_MACROS(797),
 
     /**
-
      * ID: 810<br>
      * Message: Invalid macro. Refer to the Help file for instructions.
      */
-    YOU_ARE_STUCK(809),
+    INVALID_MACRO(810),
 
     /**
-
      * ID: 816<br>
      * Message: Tickets are now available for Monster Race $s1!
      */
@@ -2565,103 +2580,103 @@ public enum SystemMessageId
 
     /**
      * ID: 910<br>
-     * Message: Current location : $s1, $s2, $s3 (Near Talking Island Village)
+     * Message: "Current location : $s1, $s2, $s3 (Near Talking Island Village)"
      */
     LOC_TI_S1_S2_S3(910),
 
     /**
      * ID: 911<br>
-     * Message: Current location : $s1, $s2, $s3 (Near Gludin Village)
+     * Message: "Current location : $s1, $s2, $s3 (Near Gludin Village)"
      */
     LOC_GLUDIN_S1_S2_S3(911),
 
     /**
      * ID: 912<br>
-     * Message: Current location : $s1, $s2, $s3 (Near the Town of Gludio)
+     * Message: "Current location : $s1, $s2, $s3 (Near the Town of Gludio)"
      */
     LOC_GLUDIO_S1_S2_S3(912),
 
     /**
      * ID: 913<br>
-     * Message: Current location : $s1, $s2, $s3 (Near the Neutral Zone)
+     * Message: "Current location : $s1, $s2, $s3 (Near the Neutral Zone)"
      */
     LOC_NETRAL_ZONE_S1_S2_S3(913),
 
     /**
      * ID: 914<br>
-     * Message: Current location : $s1, $s2, $s3 (Near the Elven Village)
+     * Message: "Current location : $s1, $s2, $s3 (Near the Elven Village)"
      */
     LOC_ELVEN_S1_S2_S3(914),
 
     /**
      * ID: 915<br>
-     * Message: Current location : $s1, $s2, $s3 (Near the Dark Elf Village)
+     * Message: "Current location : $s1, $s2, $s3 (Near the Dark Elf Village)"
      */
     LOC_DARK_ELVEN_S1_S2_S3(915),
 
     /**
      * ID: 916<br>
-     * Message: Current location : $s1, $s2, $s3 (Near the Town of Dion)
+     * Message: "Current location : $s1, $s2, $s3 (Near the Town of Dion)"
      */
     LOC_DION_S1_S2_S3(916),
 
     /**
      * ID: 917<br>
-     * Message: Current location : $s1, $s2, $s3 (Near the Floran Village)
+     * Message: "Current location : $s1, $s2, $s3 (Near the Floran Village)"
      */
     LOC_FLORAN_S1_S2_S3(917),
 
     /**
      * ID: 918<br>
-     * Message: Current location : $s1, $s2, $s3 (Near the Town of Giran)
+     * Message: "Current location : $s1, $s2, $s3 (Near the Town of Giran)"
      */
     LOC_GIRAN_S1_S2_S3(918),
 
     /**
      * ID: 919<br>
-     * Message: Current location : $s1, $s2, $s3 (Near Giran Harbor)
+     * Message: "Current location : $s1, $s2, $s3 (Near Giran Harbor)"
      */
     LOC_GIRAN_HARBOR_S1_S2_S3(919),
 
     /**
      * ID: 920<br>
-     * Message: Current location : $s1, $s2, $s3 (Near the Orc Village)
+     * Message: "Current location : $s1, $s2, $s3 (Near the Orc Village)"
      */
     LOC_ORC_S1_S2_S3(920),
 
     /**
      * ID: 921<br>
-     * Message: Current location : $s1, $s2, $s3 (Near the Dwarven Village)
+     * Message: "Current location : $s1, $s2, $s3 (Near the Dwarven Village)"
      */
     LOC_DWARVEN_S1_S2_S3(921),
 
     /**
      * ID: 922<br>
-     * Message: Current location : $s1, $s2, $s3 (Near the Town of Oren)
+     * Message: "Current location : $s1, $s2, $s3 (Near the Town of Oren)"
      */
     LOC_OREN_S1_S2_S3(922),
 
     /**
      * ID: 923<br>
-     * Message: Current location : $s1, $s2, $s3 (Near Hunters Village)
+     * Message: "Current location : $s1, $s2, $s3 (Near Hunters Village)"
      */
     LOC_HUNTER_S1_S2_S3(923),
 
     /**
      * ID: 924<br>
-     * Message: Current location : $s1, $s2, $s3 (Near Aden Castle Town)
+     * Message: "Current location : $s1, $s2, $s3 (Near Aden Castle Town)"
      */
     LOC_ADEN_S1_S2_S3(924),
 
     /**
      * ID: 925<br>
-     * Message: Current location : $s1, $s2, $s3 (Near the Coliseum)
+     * Message: "Current location : $s1, $s2, $s3 (Near the Coliseum)"
      */
     LOC_COLISEUM_S1_S2_S3(925),
 
     /**
      * ID: 926<br>
-     * Message: Current location : $s1, $s2, $s3 (Near Heine)
+     * Message: "Current location : $s1, $s2, $s3 (Near Heine)"
      */
     LOC_HEINE_S1_S2_S3(926),
 
@@ -2905,7 +2920,6 @@ public enum SystemMessageId
      * Message: Monster race tickets are no longer available.
      */
     MONSRACE_TICKETS_NOT_AVAILABLE(1046),
-
 
     /**
      * ID: 1050<br>
@@ -3680,18 +3694,17 @@ public enum SystemMessageId
      */
     THE_GAME_WILL_START_IN_S1_SECOND_S(1495),
 
-
     /**
      * ID: 1496<br>
-     * Message: The match has started, fight!
+     * Message: "The match has started, fight!"
      */
     STARTS_THE_GAME(1496),
 
     /**
      * ID: 1497<br>
-     * Message: Congratulations $s1, you win the match!
+     * Message: Congratulations $C1, you win the match!
      */
-    S1_HAS_WON_THE_GAME(1497),
+    C1_HAS_WON_THE_GAME(1497),
 
     /**
      * ID: 1498<br>
@@ -3774,7 +3787,7 @@ public enum SystemMessageId
 
     /**
      * ID: 1511<br>
-     * Message: While a pet is attempting to resurrect, it cannot help in resurrecting its master.
+     * Message: :While a pet is attempting to resurrect, it cannot help in resurrecting its master."
      */
     MASTER_CANNOT_RES(1511),
 
@@ -3828,13 +3841,13 @@ public enum SystemMessageId
 
     /**
      * ID: 1537<br>
-     * Message: Current Location: $s1, $s2, $s3 (near Rune Village)
+     * Message: "Current Location: $s1, $s2, $s3 (near Rune Village)"
      */
     LOC_RUNE_S1_S2_S3(1537),
 
     /**
      * ID: 1538<br>
-     * Message: Current Location: $s1, $s2, $s3 (near the Town of Goddard)
+     * Message: "Current Location: $s1, $s2, $s3 (near the Town of Goddard)"
      */
     LOC_GODDARD_S1_S2_S3(1538),
 
@@ -3951,7 +3964,7 @@ public enum SystemMessageId
 
     /**
      * ID: 1605<br>
-     * Message: * Here, you can buy only seeds of $s1 Manor.
+     * Message: "* Here, you can buy only seeds of $s1 Manor."
      */
     HERE_YOU_CAN_BUY_ONLY_SEEDS_OF_S1_MANOR(1605),
 
@@ -4011,6 +4024,12 @@ public enum SystemMessageId
      * Battles in the Grand Olympiad Games are now over!
      */
     THE_OLYMPIAD_GAME_HAS_ENDED(1642),
+    
+    /**
+     * ID: 1643
+     * Message: "Current Location: $s1, $s2, $s3 (Dimensional Gap)"
+     */
+    CURRENT_LOCATION_S1_S2_S3_DIMENSIONAL_GAP(1643),
 
 	/**
      * ID: 1651<br>
@@ -4020,7 +4039,7 @@ public enum SystemMessageId
 
     /**
      * ID: 1655<br>
-     * Message: You caught something smelly and scary, maybe you should throw it back!?
+     * Message: "You caught something smelly and scary, maybe you should throw it back!?"
      */
     YOU_CAUGHT_SOMETHING_SMELLY_THROW_IT_BACK(1655),
 
@@ -4163,7 +4182,7 @@ public enum SystemMessageId
 
     /**
      * ID: 1714<br>
-     * Message: Current Location: $s1, $s2, $s3 (Near the Town of Schuttgart)
+     * Message: "Current Location: $s1, $s2, $s3 (Near the Town of Schuttgart)"
      */
     LOC_SCHUTTGART_S1_S2_S3(1714),
 
@@ -4207,9 +4226,7 @@ public enum SystemMessageId
 
     /**
      * ID: 1749<br>
-     * Message: Congratulations! You will now graduate from the Clan Academy and leave
-     * your current clan. As a graduate of the academy, you can immediately
-     * join a clan as a regular member without being subject to any penalties
+     * Message: Congratulations! You will now graduate from the Clan Academy and leave your current clan. As a graduate of the academy, you can immediately join a clan as a regular member without being subject to any penalties."
      */
     ACADEMY_MEMBERSHIP_TERMINATED(1749),
 
@@ -4227,21 +4244,21 @@ public enum SystemMessageId
 
     /**
      * ID: 1757<br>
-     * Message: Your apprentice, $s1, has logged out.
+     * Message: Your apprentice, $C1, has logged out.
      */
-    YOUR_APPRENTICE_S1_HAS_LOGGED_OUT(1757),
+    YOUR_APPRENTICE_C1_HAS_LOGGED_OUT(1757),
 
     /**
      * ID: 1758<br>
      * Message: Your sponsor, $s1, has logged in.
      */
-    YOUR_SPONSOR_S1_HAS_LOGGED_IN(1758),
+    YOUR_SPONSOR_C1_HAS_LOGGED_IN(1758),
 
     /**
      * ID: 1759<br>
      * Message: Your sponsor, $s1, has logged out.
      */
-    YOUR_SPONSOR_S1_HAS_LOGGED_OUT(1759),
+    YOUR_SPONSOR_C1_HAS_LOGGED_OUT(1759),
 
     /**
      * ID: 1762<br>
@@ -4564,7 +4581,6 @@ public enum SystemMessageId
      * Message: Your Death Penalty is now level $s1.
      */
     DEATH_PENALTY_LEVEL_S1_ADDED(1916),
-
 
     /**
      * ID: 1917<br>
@@ -5000,7 +5016,7 @@ public enum SystemMessageId
      */
     SKILL_ENCHANT_FAILED_S1_LEVEL_WILL_REMAIN(2074),
 
-        /**
+    /**
      * ID: 2085<br>
      * Message: Shout and trade chatting cannot be used while possessing a cursed weapon.
      */
@@ -5194,46 +5210,62 @@ public enum SystemMessageId
 
     /**
      * ID: 2259<br>
-     * Message: Current Location: $s1, $s2, $s3 (near Fantasy Island)
+     * Message: Current Location: $s1, $s2, $s3 (near Fantasy Isle)
      */
-
 	LOC_FANTASY_ISLAND_S1_S2_S3(2259),
-	
-    /**
-	    * ID: 75<br>
-	    * Message: ID Does not exist.
-	*/
-	ID_DOES_NOT_EXIST(75),
-    /**
-     * ID: 1474<br>
-     * Message: $s1 is not available.
-     */
-    S1_IS_NOT_AVAILABLE(1474),
+
+    
+    
+	/**
+	 * ID: 676<br>
+	 * Message: Since you have already submitted a bid, you are not allowed to participate in another auction at this time.
+	 */
+	SINCE_YOU_HAVE_ALREADY_SUBMITTED_A_BID(676),
+
+	/**
+	 * ID: 679<br>
+	 * Message: You have canceled your bid.
+	 */
+	YOU_HAVE_CANCELED_YOUR_BID(679),
+
+	/**
+	 * ID: 680<br>
+	 * Message: You cannot participate in an auction.
+	 */
+	YOU_CANNOT_PARTICIPATE_IN_AN_AUCTION(680),
+	/**
+	 * ID: 673<br>
+	 * Message: Only a clan leader whose clan is of level 2 or higher is allowed to participate in a clan hall auction.
+	 */
+	ONLY_A_CLAN_LEADER_WHOSE_CLAN_IS_OF_LEVEL_2(673),
 	/**
 	 * ID: 1883<br>
 	 * Message: This is the initial period.
 	 */
 	THIS_IS_THE_INITIAL_PERIOD(1883),
     /**
-	    * ID: 204<br>
-	    * Message: Incorrect name. Please try again.
-	    */
+	* ID: 75<br>
+	* Message: ID Does not exist.
+	*/
+	ID_DOES_NOT_EXIST(75),
+	/**
+	* ID: 1474<br>
+	* Message: $s1 is not available.
+	*/
+	S1_IS_NOT_AVAILABLE(1474),
+
+	/**
+	* ID: 204<br>
+	* Message: Incorrect name. Please try again.
+	*/
 	 INCORRECT_NAME_PLEASE_TRY_AGAIN(204),
-    /**
-     * ID: 176<br>
-     * Message: That person is in message refusal mode.
-     */
-     THE_PERSON_IS_IN_MESSAGE_REFUSAL_MODE(176),
-    /**
-     * ID: 810<br>
-     * Message: Invalid macro. Refer to the Help file for instructions.
-     */
-     INVALID_MACRO(810),
-    /**
-     * ID: 1473<br>
-     * Message: $s1 not enough.
-     */
-     ITEM_NOT_ENOUGH(1473);
+
+	/**
+	* ID: 1473<br>
+	* Message: $s1 not enough.
+	*/
+	ITEM_NOT_ENOUGH(1473);
+
 
     private int _id;
 

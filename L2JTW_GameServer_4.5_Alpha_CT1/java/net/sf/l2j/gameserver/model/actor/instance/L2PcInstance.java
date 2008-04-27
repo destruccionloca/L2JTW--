@@ -716,7 +716,7 @@ public final class L2PcInstance extends L2PlayableInstance
 	private double _mpUpdateDecCheck = .0;
 	private double _mpUpdateInterval = .0;
 
-	
+	private FastList<L2Skill> _oldskills;
 	//---------------------------------------
 	//L2JTW Add-on
 	/** The hexadecimal Color of players name (white is 0xFFFFFF) */
@@ -4683,33 +4683,34 @@ public final class L2PcInstance extends L2PlayableInstance
      * <li>Kill the L2PcInstance </li><BR><BR>
      *
      *
-     * @param deadPlayer - Player that has died.
+     * @param i The HP decrease value
+     * @param attacker The L2Character who attacks
      *
      *
 	 * @see net.sf.l2j.gameserver.model.actor.instance.L2PlayableInstance#doDie(net.sf.l2j.gameserver.model.L2Character)
 	 */
 	@Override
-	public boolean doDie(L2Character deadPlayer)
+	public boolean doDie(L2Character killer)
 	{
 		// Kill the L2PcInstance
-		if (!super.doDie(deadPlayer))
+		if (!super.doDie(killer))
 			return false;
 
-		if (deadPlayer != null)
+		if (killer != null)
 		{
 			L2PcInstance pk = null;
-			if (deadPlayer instanceof L2PcInstance)
-				pk = (L2PcInstance) deadPlayer;
+			if (killer instanceof L2PcInstance)
+				pk = (L2PcInstance) killer;
 
-			TvTEvent.onKill(deadPlayer, this);
+			TvTEvent.onKill(killer, this);
 
 			if (atEvent && pk != null)
 			{
 				pk.kills.add(getName());
 			}
-            if (deadPlayer instanceof L2PcInstance)
+            if (killer instanceof L2PcInstance)
             {
-                if (((L2PcInstance)deadPlayer)._inEventCTF && _inEventCTF)
+                if (((L2PcInstance)killer)._inEventCTF && _inEventCTF)
                 {
                     if (CTF._teleport || CTF._started)
                     {
@@ -4743,7 +4744,7 @@ public final class L2PcInstance extends L2PlayableInstance
 			// Issues drop of Cursed Weapon.
 			if (isCursedWeaponEquipped())
 			{
-				CursedWeaponsManager.getInstance().drop(_cursedWeaponEquippedId, deadPlayer);
+				CursedWeaponsManager.getInstance().drop(_cursedWeaponEquippedId, killer);
 			}
 			else if (isCombatFlagEquipped())
             {
@@ -4755,17 +4756,21 @@ public final class L2PcInstance extends L2PlayableInstance
 				if (pk == null || !pk.isCursedWeaponEquipped())
 				{
 					//if (getKarma() > 0)
-						onDieDropItem(deadPlayer);  // Check if any item should be dropped
+						onDieDropItem(killer);  // Check if any item should be dropped
 
 					if (!(isInsideZone(ZONE_PVP) && !isInsideZone(ZONE_SIEGE)))
 					{
-						boolean isDeadPlayerPc = (deadPlayer instanceof L2PcInstance);
-		                if (isDeadPlayerPc && ((L2PcInstance)deadPlayer).getClan() != null && getClan() != null && !isAcademyMember() && !(((L2PcInstance)deadPlayer).isAcademyMember()) && _clan.isAtWarWith(((L2PcInstance) deadPlayer).getClanId()) && ((L2PcInstance)deadPlayer).getClan().isAtWarWith(_clan.getClanId()))
+						boolean isKillerPc = (killer instanceof L2PcInstance);
+		                if (isKillerPc && ((L2PcInstance)killer).getClan() != null
+		                               && getClan() != null
+                                   && !isAcademyMember()
+                                   && !(((L2PcInstance)killer).isAcademyMember())
+		                               && _clan.isAtWarWith(((L2PcInstance) killer).getClanId())
+		                               && ((L2PcInstance)killer).getClan().isAtWarWith(_clan.getClanId()))
 		                {
 		                    if (getClan().getReputationScore() > 0) // when your reputation score is 0 or below, the other clan cannot acquire any reputation points
-		                		((L2PcInstance) deadPlayer).getClan().setReputationScore(((L2PcInstance) deadPlayer).getClan().getReputationScore()+2, true);
-		                    
-		                    if (((L2PcInstance)deadPlayer).getClan().getReputationScore() > 0) // when the opposing sides reputation score is 0 or below, your clans reputation score does not decrease
+		                		((L2PcInstance) killer).getClan().setReputationScore(((L2PcInstance) killer).getClan().getReputationScore()+2, true);
+		                    if (((L2PcInstance)killer).getClan().getReputationScore() > 0) // when the opposing sides reputation score is 0 or below, your clans reputation score does not decrease
 		                    	_clan.setReputationScore(_clan.getReputationScore()-2, true);
 		                }
 						if (Config.ALT_GAME_DELEVEL)
@@ -4814,7 +4819,7 @@ public final class L2PcInstance extends L2PlayableInstance
 			getParty().getDimensionalRift().getDeadMemberList().add(this);
 
 		// calculate death penalty buff
-		calculateDeathPenaltyBuffLevel(deadPlayer);
+		calculateDeathPenaltyBuffLevel(killer);
 
 		stopRentPet();
 		stopWaterTask();
@@ -6915,7 +6920,47 @@ public final class L2PcInstance extends L2PlayableInstance
 		else
 			return super.removeSkill(skill);
 	}
+	public L2Skill addItemSkill(L2Skill newSkill)
+	{
 
+		for(L2Skill sk:this.getAllSkills())
+		{
+			if(sk.getId() == newSkill.getId())
+			{
+				if(sk.getLevel() <= newSkill.getLevel())
+				{
+					if (_oldskills == null)
+						_oldskills = new FastList<L2Skill>();
+
+						_oldskills.add(sk);
+					// Add a skill to the L2PcInstance _skills and its Func objects to the calculator set of the L2PcInstance
+					L2Skill oldSkill = super.addSkill(newSkill);
+					return oldSkill;
+				}
+				else return null;
+			}
+		}
+		// Add or update a L2PcInstance skill in the character_skills table of the database
+		
+		L2Skill oldSkill = super.addSkill(newSkill);
+		return oldSkill;
+	}
+	public L2Skill removeItemSkill(L2Skill skill)
+	{
+		if(_oldskills!=null)
+		for(L2Skill sk:_oldskills)
+		{
+			if(sk.getId() == skill.getId())
+			{
+					_oldskills.remove(sk);
+					// Add a skill to the L2PcInstance _skills and its Func objects to the calculator set of the L2PcInstance
+					L2Skill oldSkill = super.addSkill(sk);
+					return oldSkill;
+
+			}
+		}
+		return super.removeSkill(skill);
+	}
 	/**
 	 * Remove a skill from the L2Character and its Func objects from calculator set of the L2Character and save update in the character_skills table of the database.<BR><BR>
 	 *

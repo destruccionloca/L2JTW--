@@ -1632,10 +1632,6 @@ public final class Formulas
             else
             rate = 85;
         }
-        if(target.getLevel()< activeChar.getLevel() && rate <50)
-        {
-        	rate = 50;
-        }
         if (target.isRaid())
         {
             rate = 100;

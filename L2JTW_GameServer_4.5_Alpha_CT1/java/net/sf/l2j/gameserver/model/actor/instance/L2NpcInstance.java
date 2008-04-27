@@ -57,7 +57,6 @@ import net.sf.l2j.gameserver.model.L2NpcCharData;
 import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.model.L2Spawn;
-import net.sf.l2j.gameserver.model.L2Summon;
 import net.sf.l2j.gameserver.model.L2World;
 import net.sf.l2j.gameserver.model.L2WorldRegion;
 import net.sf.l2j.gameserver.model.MobGroupTable;
@@ -228,46 +227,6 @@ public class L2NpcInstance extends L2Character
     public boolean hasRandomAnimation()
     {
         return (Config.MAX_NPC_ANIMATION > 0);
-    }
-
-    public class destroyTemporalNPC implements Runnable
-    {
-        private L2Spawn _oldSpawn;
-
-        public destroyTemporalNPC(L2Spawn spawn)
-        {
-            _oldSpawn = spawn;
-        }
-
-        public void run()
-        {
-            try
-            {
-                _oldSpawn.getLastSpawn().deleteMe();
-                _oldSpawn.stopRespawn();
-                SpawnTable.getInstance().deleteSpawn(_oldSpawn, false);
-            }
-            catch (Throwable t) {
-                t.printStackTrace();
-            }
-        }
-    }
-
-    public class destroyTemporalSummon implements Runnable
-    {
-        L2Summon _summon;
-        L2PcInstance _player;
-
-        public destroyTemporalSummon(L2Summon summon, L2PcInstance player)
-        {
-            _summon = summon;
-            _player = player;
-        }
-
-        public void run()
-        {
-            _summon.unSummon(_player);
-        }
     }
 
     /**
@@ -1033,11 +992,8 @@ public class L2NpcInstance extends L2Character
      * Send a packet NpcInfo with state of abnormal effect to all L2PcInstance in the _KnownPlayers of the L2NpcInstance.<BR><BR>
      */
     @Override
-	public void updateAbnormalEffect()
+    public void updateAbnormalEffect()
     {
-        //NpcInfo info = new NpcInfo(this);
-        //broadcastPacket(info);
-
         // Send a Server->Client packet NpcInfo with state of abnormal effect to all L2PcInstance in the _KnownPlayers of the L2NpcInstance
         for (L2PcInstance player : getKnownList().getKnownPlayers().values())
             if (player != null)
@@ -1053,7 +1009,7 @@ public class L2NpcInstance extends L2Character
      * <li> object is a L2PlayableInstance : 1500 </li>
      * <li> others : 500 </li><BR><BR>
      *
-     * <B><U> Overriden in </U> :</B><BR><BR>
+     * <B><U> Override in </U> :</B><BR><BR>
      * <li> L2Attackable</li><BR><BR>
      *
      * @param object The Object to add to _knownObject
@@ -2999,30 +2955,44 @@ public class L2NpcInstance extends L2Character
     public void setLHandId(int newWeaponId)
     {
         _currentLHandId = newWeaponId;
+        updateAbnormalEffect();
     }
+
     public void setRHandId(int newWeaponId)
     {
         _currentRHandId = newWeaponId;
+        updateAbnormalEffect();
     }
+
+    public void setLRHandId(int newLWeaponId,int newRWeaponId)
+    {
+        _currentRHandId = newRWeaponId;
+        _currentLHandId = newLWeaponId;
+        updateAbnormalEffect();
+    }
+
     public void setCollisionHeight(int height)
     {
         _currentCollisionHeight = height;
     }
+
     public void setCollisionRadius(int radius)
     {
-    	_currentCollisionRadius = radius;
+        _currentCollisionRadius = radius;
     }
+
     public int getCollisionHeight()
     {
-    	return _currentCollisionHeight;
+        return _currentCollisionHeight;
     }
+
     public int getCollisionRadius()
     {
-    	return _currentCollisionRadius;
+        return _currentCollisionRadius;
     }
     
     public boolean rechargeAutoSoulShot(boolean physical, boolean magic)
-	{
+    {
     	if (this.getTemplate().ssRate == 0) return false;
 
     	L2Weapon weaponItem = getActiveWeaponItem();

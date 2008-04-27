@@ -252,7 +252,7 @@ public class L2Clan
         newLeader.setClan(this);
         newLeader.setPledgeClass(member.calculatePledgeClass(newLeader));
         newLeader.setClanPrivileges(L2Clan.CP_ALL);
-        if (getLevel() >= 4)
+        if (getLevel() >= SiegeManager.getInstance().getSiegeClanMinLevel())
         {
         	SiegeManager.getInstance().addSiegeSkills(newLeader);
         }
@@ -2022,7 +2022,7 @@ public class L2Clan
             case 0:
             {
                 // Upgrade to 1
-                if (player.getSp() >= 35000 && player.getAdena() >= 650000)
+                if (player.getSp() >= 20000 && player.getAdena() >= 650000)
                 {
                     if (player.reduceAdena("ClanLvl", 650000, player.getTarget(), true))
                     {
@@ -2039,7 +2039,7 @@ public class L2Clan
             case 1:
             {
                 // Upgrade to 2
-                if (player.getSp() >= 150000 && player.getAdena() >= 2500000)
+                if (player.getSp() >= 100000 && player.getAdena() >= 2500000)
                 {
                     if (player.reduceAdena("ClanLvl", 2500000, player.getTarget(), true))
                     {
@@ -2056,7 +2056,7 @@ public class L2Clan
             case 2:
             {
                 // Upgrade to 3
-                if (player.getSp() >= 500000 && player.getInventory().getItemByItemId(1419) != null)
+                if (player.getSp() >= 350000 && player.getInventory().getItemByItemId(1419) != null)
                 {
                     // itemId 1419 == Blood Mark
                     if (player.destroyItemByItemId("ClanLvl", 1419, 1, player.getTarget(), false))
@@ -2079,7 +2079,7 @@ public class L2Clan
             case 3:
             {
                 // Upgrade to 4
-                if (player.getSp() >= 1400000 && player.getInventory().getItemByItemId(3874) != null)
+                if (player.getSp() >= 1000000 && player.getInventory().getItemByItemId(3874) != null)
                 {
                     // itemId 3874 == Alliance Manifesto
                 	if (player.destroyItemByItemId("ClanLvl", 3874, 1, player.getTarget(), false))
@@ -2102,7 +2102,7 @@ public class L2Clan
             case 4:
             {
                 // Upgrade to 5
-                if (player.getSp() >= 3500000 && player.getInventory().getItemByItemId(3870) != null)
+                if (player.getSp() >= 2500000 && player.getInventory().getItemByItemId(3870) != null)
                 {
                     // itemId 3870 == Seal of Aspiration
                 	if (player.destroyItemByItemId("ClanLvl", 3870, 1, player.getTarget(), false))
@@ -2166,7 +2166,7 @@ public class L2Clan
                 break;
             case 8:
             	// Upgrade to 9
-                if(getReputationScore() >= 40000 && player.getInventory().getItemByItemId(9910) != null && getMembersCount() >= 140)
+                if(getReputationScore() >= 40000 && player.getInventory().getItemByItemId(9910) != null && getMembersCount() >= 120)
                 {
                 	// itemId 9910 == Blood Oath
                 	if (player.destroyItemByItemId("ClanLvl", 9910, 150, player.getTarget(), false))
@@ -2254,11 +2254,11 @@ public class L2Clan
         if (getLeader().isOnline())
         {
         	L2PcInstance leader = getLeader().getPlayerInstance();
-            if (3 < level)
+            if (4 < level)
             {
             	SiegeManager.getInstance().addSiegeSkills(leader);
             }
-            else if (4 > level)
+            else if (5 > level)
             {
             	SiegeManager.getInstance().removeSiegeSkills(leader);
             }
