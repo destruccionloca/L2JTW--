@@ -2013,7 +2013,7 @@ public final class Formulas
 			value = skill.getEffectPower();
 			type = skill.getEffectType();
             
-          _log.warning("TYPE:"+skill.getEffectType());
+          //_log.warning("TYPE:"+skill.getEffectType());
 		}
 		// TODO: Temporary fix for skills with EffectPower = 0 or EffectType not set
 		if (value == 0 || type == null)

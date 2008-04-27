@@ -482,8 +482,8 @@ public final class QuestState
             if (count > 1)
             {
     			SystemMessage smsg = new SystemMessage(SystemMessageId.EARNED_S2_S1_S);
-    			smsg.addNumber(count);
                 smsg.addItemName(item.getItemId());
+    			smsg.addNumber(count);
     			getPlayer().sendPacket(smsg);
             } else
             {

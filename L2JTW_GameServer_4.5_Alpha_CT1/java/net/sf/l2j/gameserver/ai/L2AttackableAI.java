@@ -2345,6 +2345,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
             	return obj;
             }
     	}
+    	if(!(_actor instanceof L2GuardInstance))
       	 for (L2Character obj : _actor.getKnownList().getKnownCharactersInRadius(range))
          {
       		 if(obj == null || !GeoData.getInstance().canSeeTarget(_actor,obj))
@@ -2415,6 +2416,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
             	return;
             }
     	}
+    	if(!(_actor instanceof L2GuardInstance))
       	 for (L2Character obj : _actor.getKnownList().getKnownCharactersInRadius(range))
          {
       		 if(obj == null || !GeoData.getInstance().canSeeTarget(_actor,obj))
@@ -2496,6 +2498,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
             	return;
             
     	}
+    	if(!(_actor instanceof L2GuardInstance))
       	 for (L2Character obj : _actor.getKnownList().getKnownCharactersInRadius(1000))
          {
       		 if(obj == null || !GeoData.getInstance().canSeeTarget(_actor,obj))

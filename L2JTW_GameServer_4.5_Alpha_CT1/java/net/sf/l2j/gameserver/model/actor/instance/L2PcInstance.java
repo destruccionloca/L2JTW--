@@ -3089,8 +3089,8 @@ public final class L2PcInstance extends L2PlayableInstance
 		if (sendMessage)
 		{
 			SystemMessage sm = new SystemMessage(SystemMessageId.DISSAPEARED_ITEM);
-            sm.addNumber(count);
             sm.addItemName(itemId);
+            sm.addNumber(count);
 			sendPacket(sm);
 		}
 
