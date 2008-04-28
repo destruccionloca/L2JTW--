@@ -2219,8 +2219,8 @@ public enum SystemMessageId
      * ID: 749<br>
      * Message: The effect of $s1 has been removed.
      */
-	//EFFECT_S1_DISAPPEARED(749),
-	EFFECT_S1_DISAPPEARED(92),
+	EFFECT_S1_DISAPPEARED(749),
+	//EFFECT_S1_DISAPPEARED(92),
     /**
      * ID: 750<br>
      * Message: There are no other skills to learn.

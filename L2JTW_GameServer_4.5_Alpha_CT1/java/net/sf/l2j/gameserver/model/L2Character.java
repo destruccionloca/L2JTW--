@@ -540,7 +540,7 @@ public abstract class L2Character extends L2Object
 			getPet().setFollowStatus(false);
 			getPet().teleToLocation(getPosition().getX() + Rnd.get(-100,100), getPosition().getY() + Rnd.get(-100,100), getPosition().getZ(), false);
 			getPet().setFollowStatus(true);
-			getPet().sendPacket(new PetInfo(getPet()));
+			sendPacket(new PetInfo(getPet()));
 			getPet().updateEffectIcons(true);
 		}
 
@@ -2976,20 +2976,15 @@ public abstract class L2Character extends L2Object
 				}
 			}
 
-
 			// Remove the active skill L2effect from _effects of the L2Character
 			// The Integer key of _effects is the L2Skill Identifier that has created the effect
 			for (int i=0; i<_effects.size(); i++)
 			{
 				if (_effects.get(i) == effect)
 				{
+					
 					_effects.remove(i);
-					if (this instanceof L2PcInstance)
-					{
-						SystemMessage sm = new SystemMessage(SystemMessageId.EFFECT_S1_DISAPPEARED);
-						sm.addSkillName(effect.getSkill().getId());
-						sendPacket(sm);
-					}
+
 					break;
 				}
 			}
@@ -6195,7 +6190,7 @@ public abstract class L2Character extends L2Object
 	}
 	
 	/*
-	 * Runs in the end of skill casting 
+	 * Runs in the end of skill casting 	
 	 */
 	public void onMagicHitTimer(L2Object[] targets, L2Skill skill, int coolTime, boolean instant)
 	{
@@ -6225,30 +6220,31 @@ public abstract class L2Character extends L2Object
 		try {
 			
 			// Go through targets table
-			for (int i = 0;i < targets.length;i++)
+			for (int i = 0; i < targets.length; i++)
 			{
-			  if (targets[i] instanceof L2PlayableInstance)
-			  {
-				L2Character target = (L2Character) targets[i];
-
-				if (skill.getSkillType() == L2Skill.SkillType.BUFF)
+				if (targets[i] instanceof L2PlayableInstance)
 				{
-					SystemMessage smsg = new SystemMessage(SystemMessageId.YOU_FEEL_S1_EFFECT);
-					smsg.addSkillName(skill.getId());
-					target.sendPacket(smsg);
+					L2Character target = (L2Character) targets[i];
+					
+					if (skill.getSkillType() == L2Skill.SkillType.BUFF)
+					{
+						SystemMessage smsg = new SystemMessage(SystemMessageId.YOU_FEEL_S1_EFFECT);
+						smsg.addSkillName(skill.getId());
+						target.sendPacket(smsg);
+					}
+					
+					if (this instanceof L2PcInstance
+					        && target instanceof L2Summon)
+					{
+						((L2Summon) target).getOwner().sendPacket(new PetInfo((L2Summon) target));
+						sendPacket(new NpcInfo((L2Summon) target, this));
+						
+						// The PetInfo packet wipes the PartySpelled (list of
+						// active spells' icons). Re-add them
+						((L2Summon) target).updateEffectIcons(true);
+					}
 				}
 
-
-				if (this instanceof L2PcInstance && target instanceof L2Summon)
-				{
-					((L2Summon)target).getOwner().sendPacket(new PetInfo((L2Summon)target));
-					sendPacket(new NpcInfo((L2Summon)target, this));
-
-
-					// The PetInfo packet wipes the PartySpelled (list of active spells' icons).  Re-add them
-					((L2Summon)target).updateEffectIcons(true);
-				}
-			  }
 			}
 
 			StatusUpdate su = new StatusUpdate(getObjectId());
@@ -6256,26 +6252,41 @@ public abstract class L2Character extends L2Object
 
 			// Consume MP of the L2Character and Send the Server->Client packet StatusUpdate with current HP and MP to all other L2PcInstance to inform
 			double mpConsume = getStat().getMpConsume(skill);
+			
 			if (mpConsume > 0)
 			{
-			  getStatus().reduceMp(calcStat(Stats.MP_CONSUME_RATE,mpConsume,null,null));
-			  su.addAttribute(StatusUpdate.CUR_MP, (int) getCurrentMp());
-			  isSendStatus = true;
+				getStatus().reduceMp(calcStat(Stats.MP_CONSUME_RATE, mpConsume, null, null));
+				su.addAttribute(StatusUpdate.CUR_MP, (int) getCurrentMp());
+				isSendStatus = true;
 			}
 
 			// Consume HP if necessary and Send the Server->Client packet StatusUpdate with current HP and MP to all other L2PcInstance to inform
 			if (skill.getHpConsume() > 0)
 			{
-			  double consumeHp;
-
-			  consumeHp = calcStat(Stats.HP_CONSUME_RATE,skill.getHpConsume(),null,null);
-			  if(consumeHp+1 >= getCurrentHp())
-				consumeHp = getCurrentHp()-1.0;
-
-			  getStatus().reduceHp(consumeHp, this);
-
-			  su.addAttribute(StatusUpdate.CUR_HP, (int) getCurrentHp());
-			  isSendStatus = true;
+				double consumeHp;
+				
+				consumeHp = calcStat(Stats.HP_CONSUME_RATE, skill.getHpConsume(), null, null);
+				if (consumeHp + 1 >= getCurrentHp())
+					consumeHp = getCurrentHp() - 1.0;
+				
+				getStatus().reduceHp(consumeHp, this);
+				
+				su.addAttribute(StatusUpdate.CUR_HP, (int) getCurrentHp());
+				isSendStatus = true;
+			}
+			
+			// Consume CP if necessary and Send the Server->Client packet StatusUpdate with current CP/HP and MP to all other L2PcInstance to inform
+			if (skill.getCpConsume() > 0)
+			{
+				double consumeCp;
+				
+				consumeCp = skill.getCpConsume();
+				if (consumeCp + 1 >= getCurrentHp())
+					consumeCp = getCurrentHp() - 1.0;
+				
+				getStatus().reduceCp((int)consumeCp);
+				su.addAttribute(StatusUpdate.CUR_CP, (int) getCurrentCp());
+				isSendStatus = true;
 			}
 
 			// Send a Server->Client packet StatusUpdate with MP modification to the L2PcInstance

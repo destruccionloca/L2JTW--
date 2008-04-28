@@ -717,6 +717,7 @@ public final class L2PcInstance extends L2PlayableInstance
 	private double _mpUpdateInterval = .0;
 
 	private FastList<L2Skill> _oldskills;
+	private FastList<L2Skill> _addskills;
 	//---------------------------------------
 	//L2JTW Add-on
 	/** The hexadecimal Color of players name (white is 0xFFFFFF) */
@@ -3305,7 +3306,11 @@ public final class L2PcInstance extends L2PlayableInstance
 		if (item == null)
 		{
 			if (sendMessage)
-                sendPacket(new SystemMessage(SystemMessageId.ITEM_NOT_ENOUGH));
+			{
+				SystemMessage sm = new SystemMessage(1987);
+				sm.addString("所需物品不足");
+				sendPacket(sm);
+			}
 
 			return null;
 		}
@@ -6927,12 +6932,14 @@ public final class L2PcInstance extends L2PlayableInstance
 		{
 			if(sk.getId() == newSkill.getId())
 			{
-				if(sk.getLevel() <= newSkill.getLevel())
+				if(sk.getLevel() < newSkill.getLevel())
 				{
 					if (_oldskills == null)
 						_oldskills = new FastList<L2Skill>();
-
+					if (_addskills == null)
+						_addskills = new FastList<L2Skill>();
 						_oldskills.add(sk);
+						_addskills.add(newSkill);
 					// Add a skill to the L2PcInstance _skills and its Func objects to the calculator set of the L2PcInstance
 					L2Skill oldSkill = super.addSkill(newSkill);
 					return oldSkill;
@@ -6941,7 +6948,9 @@ public final class L2PcInstance extends L2PlayableInstance
 			}
 		}
 		// Add or update a L2PcInstance skill in the character_skills table of the database
-		
+		if (_addskills == null)
+			_addskills = new FastList<L2Skill>();
+		_addskills.add(newSkill);
 		L2Skill oldSkill = super.addSkill(newSkill);
 		return oldSkill;
 	}
@@ -6952,14 +6961,26 @@ public final class L2PcInstance extends L2PlayableInstance
 		{
 			if(sk.getId() == skill.getId())
 			{
-					_oldskills.remove(sk);
+					
 					// Add a skill to the L2PcInstance _skills and its Func objects to the calculator set of the L2PcInstance
 					L2Skill oldSkill = super.addSkill(sk);
+					_addskills.remove(skill);
+					_oldskills.remove(sk);
 					return oldSkill;
 
 			}
 		}
-		return super.removeSkill(skill);
+		if(_addskills!=null)
+		for(L2Skill sk:_addskills)
+		{
+			if(sk.getId() == skill.getId() && sk.getLevel()==skill.getLevel())
+			{
+				_addskills.remove(skill);
+				return super.removeSkill(skill);
+			}
+		}
+		return null;
+		
 	}
 	/**
 	 * Remove a skill from the L2Character and its Func objects from calculator set of the L2Character and save update in the character_skills table of the database.<BR><BR>
@@ -7870,15 +7891,17 @@ public final class L2PcInstance extends L2PlayableInstance
             	if (sklType == L2Skill.SkillType.SUMMON)
                 {
             		SystemMessage sm = new SystemMessage(SystemMessageId.SUMMONING_SERVITOR_COSTS_S2_S1);
-            		sm.addNumber(skill.getItemConsume());
             		sm.addItemName(skill.getItemConsumeId());
+            		sm.addNumber(skill.getItemConsume());
             		sendPacket(sm);
             		return;
                 }
             	else
                 {
             		// Send a System Message to the caster
-            		sendPacket(new SystemMessage(SystemMessageId.ITEM_NOT_ENOUGH));
+    				SystemMessage sm = new SystemMessage(1987);
+    	            sm.addString("所需物品不足");
+    				sendPacket(sm);
             		return;
                 }
             }

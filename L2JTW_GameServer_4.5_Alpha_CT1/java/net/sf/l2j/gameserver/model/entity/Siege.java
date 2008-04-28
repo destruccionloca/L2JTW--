@@ -181,25 +181,25 @@ public class Siege
 				}
 				else if ((timeRemaining <= 13600000) && (timeRemaining > 600000))
 				{
-					announceToPlayer("攻城戰將在 " + Math.round(timeRemaining / 60000) + " 分鐘後開始。", false);
+					announceToPlayer(getCastle().getName() + "攻城戰將在 " + Math.round(timeRemaining / 60000) + " 分鐘後開始。", false);
 
 					ThreadPoolManager.getInstance().scheduleGeneral(new ScheduleStartSiegeTask(_castleInst), timeRemaining - 600000); // Prepare task for 10 minute left.
 
 	            }
 	            else if ((timeRemaining <= 600000) && (timeRemaining > 300000))
 	            {
-	                announceToPlayer("攻城戰將在" + Math.round(timeRemaining / 60000) + " 分鐘後開始。", false);
+	                announceToPlayer(getCastle().getName() + "攻城戰將在" + Math.round(timeRemaining / 60000) + " 分鐘後開始。", false);
 					ThreadPoolManager.getInstance().scheduleGeneral(new ScheduleStartSiegeTask(_castleInst), timeRemaining - 300000); // Prepare task for 5 minute left.
 				}
 				else if ((timeRemaining <= 300000) && (timeRemaining > 10000))
 				{
-				    announceToPlayer("攻城戰將在" + Math.round(timeRemaining / 60000) + " 秒後開始。", false);
+				    announceToPlayer(getCastle().getName() + "攻城戰將在" + Math.round(timeRemaining / 60000) + " 秒後開始。", false);
 
 					ThreadPoolManager.getInstance().scheduleGeneral(new ScheduleStartSiegeTask(_castleInst), timeRemaining - 10000); // Prepare task for 10 seconds count down
 				}
 				else if ((timeRemaining <= 10000) && (timeRemaining > 0))
 				{
-				    announceToPlayer("攻城戰將在" + Math.round(timeRemaining / 60000) + " 秒後開始。", false);
+				    announceToPlayer(getCastle().getName() + "攻城戰將在" + Math.round(timeRemaining / 60000) + " 秒後開始。", false);
 
 					ThreadPoolManager.getInstance().scheduleGeneral(new ScheduleStartSiegeTask(_castleInst), timeRemaining); // Prepare task for second count down
 				}

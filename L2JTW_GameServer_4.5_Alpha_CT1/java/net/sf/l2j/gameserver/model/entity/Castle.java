@@ -672,7 +672,7 @@ public class Castle
 		else if	(_name.equalsIgnoreCase("Goddard"))
 			return "高達特城";
 		else if (_name.equalsIgnoreCase("Innadril"))
-			return "因納德利城";
+			return "因納得立城";
 		else if (_name.equalsIgnoreCase("Oren"))
 			return "歐瑞城";
 		else if (_name.equalsIgnoreCase("Rune"))
