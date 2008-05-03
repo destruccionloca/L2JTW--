@@ -488,7 +488,6 @@ public class AdminSkill implements IAdminCommandHandler {
 			activeChar.sendSkillList(); 
 		}
 		else
-
 			activeChar.sendMessage("資料錯誤。");
 		removeSkillsPage(activeChar, 0); //Back to previous page	
 
@@ -538,7 +537,7 @@ public class AdminSkill implements IAdminCommandHandler {
 				activeChar.sendMessage("增加血盟技能︰ "+skillname+" 給予血盟 "+player.getClan().getName()+"。");
 				
 				activeChar.getClan().broadcastToOnlineMembers(new PledgeSkillList(activeChar.getClan()));  
-				for(L2PcInstance member: activeChar.getClan().getOnlineMembers(""))  
+				for(L2PcInstance member: activeChar.getClan().getOnlineMembers(0))  
 				{  
 					member.sendSkillList();  
 				}  

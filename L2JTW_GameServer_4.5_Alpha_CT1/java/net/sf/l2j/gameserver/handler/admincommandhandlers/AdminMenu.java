@@ -127,7 +127,7 @@ public class AdminMenu implements IAdminCommandHandler
 					teleportCharacter(player,x,y,z,activeChar, "Admin is teleporting you.");
 					return true;
 				}
-				L2PcInstance[] members = clan.getOnlineMembers("");
+				L2PcInstance[] members = clan.getOnlineMembers(0);
 				for(int i = 0; i < members.length; i++)
 					teleportCharacter(members[i], x, y, z, activeChar, "Your clan is being teleported by an Admin.");
 			}
@@ -155,17 +155,21 @@ public class AdminMenu implements IAdminCommandHandler
 				st.nextToken();
 				String player = st.nextToken();
 				L2PcInstance plyr = L2World.getInstance().getPlayer(player);
+				String text;
+
 				if (plyr != null)
 				{
 					plyr.logout();
-					SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-					sm.addString("金埃產 " + plyr.getName() + "");
+
+					text = "金埃產 " + plyr.getName() + "";
+
 				}
 				else
 				{
 					SystemMessage sm = new SystemMessage(SystemMessageId.TARGET_IS_NOT_FOUND_IN_THE_GAME);
 					activeChar.sendPacket(sm);
 				}
+
 			}
 			showMainPage(activeChar);
 		}
@@ -289,23 +293,19 @@ public class AdminMenu implements IAdminCommandHandler
 			if (result.next())
 			{
 				String acc_name = result.getString(1);
+
+				String text;
 				if(acc_name.length() > 0)
 				{
 					LoginServerThread.getInstance().sendAccessLevel(acc_name, banLevel);
-					SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-					sm.addString("砞竚眀腹单眖 "+player+"  "+banLevel+"");
-					activeChar.sendPacket(sm);
+
+					text = "砞竚眀腹单眖 "+player+"  "+banLevel+"";
 				}
 				else
 				{
-					SystemMessage sm = new SystemMessage(SystemMessageId.TARGET_IS_NOT_FOUND_IN_THE_GAME);
+					SystemMessage sm = new SystemMessage(SystemMessageId.ID_DOES_NOT_EXIST);
 					activeChar.sendPacket(sm);
 				}
-			}
-			else
-			{
-				SystemMessage sm = new SystemMessage(SystemMessageId.ID_DOES_NOT_EXIST);
-				activeChar.sendPacket(sm);
 			}
 			statement.close();
 		}

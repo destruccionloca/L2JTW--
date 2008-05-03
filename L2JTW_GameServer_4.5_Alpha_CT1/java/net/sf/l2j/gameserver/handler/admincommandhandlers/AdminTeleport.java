@@ -263,12 +263,11 @@ public class AdminTeleport implements IAdminCommandHandler
             activeChar.getAI().setIntention(CtrlIntention.AI_INTENTION_IDLE);
             activeChar.teleToLocation(x, y, z, false);
 
-            SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-            sm.addString("傳送至 " + Cords);
-            activeChar.sendPacket(sm);
-        } catch (NoSuchElementException nsee)
+            activeChar.sendMessage("傳送至 " + Cords);
+        }
+        catch (NoSuchElementException nsee)
         {
-            activeChar.sendMessage("Wrong or no Coordinates given.");
+            activeChar.sendMessage("錯誤座標");
         }
 
     }
@@ -458,9 +457,7 @@ public class AdminTeleport implements IAdminCommandHandler
                 SpawnTable.getInstance().addNewSpawn(spawn, true);
                 spawn.init();
 
-                //SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-                //sm.addString("創造 " + template1.name + " 在 " + target.getObjectId() + ".");
-                //activeChar.sendPacket(sm);
+                activeChar.sendMessage("創造 " + template1.name + " 在 " + target.getObjectId() + ".");
 
                 if (Config.DEBUG)
                 {

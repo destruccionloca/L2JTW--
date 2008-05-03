@@ -16,13 +16,13 @@ package net.sf.l2j.gameserver.model.actor.instance;
 
 import net.sf.l2j.gameserver.ai.CtrlIntention;
 import net.sf.l2j.gameserver.datatables.SkillTable;
-import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.ActionFailed;
 import net.sf.l2j.gameserver.serverpackets.MyTargetSelected;
 import net.sf.l2j.gameserver.serverpackets.NpcHtmlMessage;
-import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.serverpackets.ValidateLocation;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
+import net.sf.l2j.gameserver.serverpackets.SystemMessage;
+import net.sf.l2j.gameserver.network.SystemMessageId;
 
 public class L2WyvernManagerInstance extends L2CastleChamberlainInstance
 {
@@ -46,16 +46,12 @@ public class L2WyvernManagerInstance extends L2CastleChamberlainInstance
         	{
         		if(player.isMounted())
         		{
-        			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-        			sm.addString("已有召喚使魔。");
-        			player.sendPacket(sm);
+        			player.sendMessage("已有召喚使魔。");
         			return;
         		}
         		else
         		{
-        			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-        			sm.addString("請先召喚座龍。");
-        			player.sendPacket(sm);
+        			player.sendMessage("請先召喚座龍。");
         			return;
         		}
         	}
@@ -65,9 +61,7 @@ public class L2WyvernManagerInstance extends L2CastleChamberlainInstance
         		{
         			if (player.getPet().getLevel() < 55)
         			{
-        				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-                		sm.addString("座龍尚未達到需求的等級。");
-                		player.sendPacket(sm);
+                		player.sendMessage("座龍尚未達到需求的等級。");
                 		return;
         			}
         			else
@@ -77,9 +71,7 @@ public class L2WyvernManagerInstance extends L2CastleChamberlainInstance
         				{
         				    player.getInventory().destroyItemByItemId("Wyvern", 1460, 10, player, player.getTarget());
         				    player.addSkill(SkillTable.getInstance().getInfo(4289, 1));
-        				    SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-        				    sm.addString("飛龍召喚成功!");
-        				    player.sendPacket(sm);
+        				    player.sendMessage("飛龍召喚成功!");
         				}
                         return;
         			}
@@ -90,14 +82,13 @@ public class L2WyvernManagerInstance extends L2CastleChamberlainInstance
                     sm.addItemName(1460);
             		sm.addString("10");
             		player.sendPacket(sm);
+
             		return;
         		}
             }
         	else
         	{
-        		SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-        		sm.addString("無法召喚寵物。");
-        		player.sendPacket(sm);
+        		player.sendMessage("無法召喚寵物。");
         		return;
         	}
         }

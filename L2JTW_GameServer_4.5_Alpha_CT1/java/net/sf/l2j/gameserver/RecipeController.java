@@ -208,9 +208,9 @@ public class RecipeController
 		// check if already busy (possible in alt mode only)
 		if (Config.ALT_GAME_CREATION && ((maker = _activeMakers.get(player)) != null))
 		{
-			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-			sm.addString("目前處於忙碌狀態無法進行製作");
+			SystemMessage sm = new SystemMessage(SystemMessageId.S2_S1);
 			sm.addItemName(recipeList.getItemId());
+			sm.addString("目前處於忙碌狀態無法進行製作");
 			player.sendPacket(sm);
 			return;
 		}

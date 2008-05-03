@@ -125,7 +125,7 @@ public class AdminSiege implements IAdminCommandHandler
 			}
 			else if (command.equalsIgnoreCase("admin_move_defenders"))
 			{
-				activeChar.sendPacket(SystemMessage.sendString("尚未處理完成。"));
+				activeChar.sendMessage("尚未處理完成。");
 			}
 			else if (command.equalsIgnoreCase("admin_setcastle"))
 			{

@@ -20,9 +20,7 @@ import net.sf.l2j.gameserver.handler.IAdminCommandHandler;
 import net.sf.l2j.gameserver.model.GMAudit;
 import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
-import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.LeaveWorld;
-import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
 /**
  * This class handles following admin commands:
@@ -61,23 +59,18 @@ public class AdminDisconnect implements IAdminCommandHandler {
 	{
 		L2Object target = activeChar.getTarget();
 		L2PcInstance player = null;
-		if (target instanceof L2PcInstance) {
+		if (target instanceof L2PcInstance)
 			player = (L2PcInstance)target;
-		} else {
+		else
 			return;
-		}
 
-		if (player.getObjectId() == activeChar.getObjectId())
+		if (player == activeChar)
 		{
-			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-			sm.addString("無法登出。");
-			activeChar.sendPacket(sm);
+			activeChar.sendMessage("無法登出。");
 		}
 		else
 		{
-			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-			sm.addString("玩家[" + player.getName() + "]從伺服器離線。");
-			activeChar.sendPacket(sm);
+			activeChar.sendMessage("玩家[" + player.getName() + "]從伺服器離線。");
 
 			//Logout Character
 			LeaveWorld ql = new LeaveWorld();

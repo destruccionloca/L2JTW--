@@ -76,11 +76,10 @@ public class Recipes implements IItemHandler
 				else
 			    {
 					
-					SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2); 
+
         			activeChar.registerDwarvenRecipeList(rp);
         			activeChar.destroyItem("Consume", item.getObjectId(), 1, null, false);
-        			sm.addString("登記 \"" + rp.getRecipeName() + "\" 為製作卷軸。"); 
-        			activeChar.sendPacket(sm);
+        			activeChar.sendMessage("登記 \"" + rp.getRecipeName() + "\" 為製作卷軸。");
 
 			    }
         		}
@@ -109,11 +108,9 @@ public class Recipes implements IItemHandler
 				}
 				else
 			    {
-        			activeChar.registerCommonRecipeList(rp); 
-        			activeChar.destroyItem("Consume", item.getObjectId(), 1, null, false); 
-        			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2); 
-        			sm.addString("登記 \"" + rp.getRecipeName() + "\" 為製作卷軸。"); 
-        			activeChar.sendPacket(sm); 
+        			activeChar.registerCommonRecipeList(rp);
+        			activeChar.destroyItem("Consume", item.getObjectId(), 1, null, false);
+        			activeChar.sendMessage("登記 \"" + rp.getRecipeName() + "\" 為製作卷軸。");
 			    }
         		}
         		else

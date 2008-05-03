@@ -36,9 +36,6 @@ import net.sf.l2j.gameserver.model.Location;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.entity.Castle;
 import net.sf.l2j.gameserver.model.entity.Siege;
-import net.sf.l2j.gameserver.network.SystemMessageId;
-import net.sf.l2j.gameserver.serverpackets.SystemMessage;
-
 public class SiegeManager
 {
     private static final Logger _log = Logger.getLogger(SiegeManager.class.getName());
@@ -94,20 +91,21 @@ public class SiegeManager
     {
         if (activeChar == null || !(activeChar instanceof L2PcInstance)) return false;
 
-        SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
+        String text = "";
         L2PcInstance player = (L2PcInstance)activeChar;
         Castle castle = CastleManager.getInstance().getCastle(player);
 
         if (castle == null || castle.getCastleId() <= 0)
-            sm.addString("必須在城堡領地上召喚。");
+            text = "必須在城堡領地上召喚。";
         else if (!castle.getSiege().getIsInProgress())
-            sm.addString("必須在攻城戰期間使用。");
+            text = "必須在攻城戰期間使用。";
         else if (player.getClanId() != 0 && castle.getSiege().getAttackerClan(player.getClanId()) == null)
-            sm.addString("必須為攻城方才可召喚。");
+            text = "必須為攻城方才可召喚。";
         else
             return true;
 
-        if (!isCheckOnly) {player.sendPacket(sm);}
+        if (!isCheckOnly)
+            player.sendMessage(text);
         return false;
     }
 

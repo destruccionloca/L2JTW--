@@ -109,6 +109,7 @@ import net.sf.l2j.gameserver.skills.Formulas;
 import net.sf.l2j.gameserver.skills.Stats;
 import net.sf.l2j.gameserver.skills.effects.EffectCharge;
 import net.sf.l2j.gameserver.skills.funcs.Func;
+import net.sf.l2j.gameserver.skills.l2skills.L2SkillAgathion;
 import net.sf.l2j.gameserver.templates.L2CharTemplate;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
 import net.sf.l2j.gameserver.templates.L2Weapon;
@@ -554,7 +555,7 @@ public abstract class L2Character extends L2Object
 	 */
 	public void addAttackerToAttackByList (L2Character player)
 	{
-		if (player == null || player == this || getAttackByList() == null || getAttackByList().contains(player)) return;
+		if (this == null || player == null || player == this || getAttackByList() == null || getAttackByList().contains(player)) return;
 		getAttackByList().add(player);
 	}
 
@@ -699,6 +700,17 @@ public abstract class L2Character extends L2Object
 	 * <li> L2PcInstance</li><BR><BR>
 	 */
 	public void sendPacket(@SuppressWarnings("unused") L2GameServerPacket mov)
+	{
+		// default implementation
+	}
+
+	/**
+	 * Not Implemented.<BR><BR>
+	 *
+	 * <B><U> Overriden in </U> :</B><BR><BR>
+	 * <li> L2PcInstance</li><BR><BR>
+	 */
+	public void sendMessage(@SuppressWarnings("unused") String text)
 	{
 		// default implementation
 	}
@@ -5889,6 +5901,20 @@ public abstract class L2Character extends L2Object
 			if (oldSkill != null)
 				removeStatsOwner(oldSkill);
 
+			if(this instanceof L2PcInstance)
+			{
+				L2PcInstance player = ((L2PcInstance)this);
+				if(player._addskills !=null && player._oldskills == null)
+				{
+					for(L2Skill sk:player._addskills)
+					{
+						if(sk.getId()==newSkill.getId() && sk.getLevel() < newSkill.getLevel())
+							player._addskills.remove(sk);
+					}
+				}
+			}
+				
+			
 			// Add Func objects of newSkill to the calculator set of the L2Character
 			addStatFuncs(newSkill.getStatFuncs(null, this));
 		}
@@ -5941,6 +5967,12 @@ public abstract class L2Character extends L2Object
 			{
 				removeStatsOwner(oldSkill);
 				stopSkillEffects(oldSkill.getId());
+			}
+
+			if (oldSkill instanceof L2SkillAgathion && this instanceof L2PcInstance && ((L2PcInstance)this).getAgathionId() > 0)
+			{
+				((L2PcInstance)this).setAgathionId(0);
+				((L2PcInstance)this).broadcastUserInfo();
 			}
 		}
 
@@ -6008,12 +6040,14 @@ public abstract class L2Character extends L2Object
         if (effects != null) {
             for (L2Effect e : effects) {
                 if (e != null) {
-                    if ((e.getSkill().getSkillType() == L2Skill.SkillType.BUFF ||
-                        e.getSkill().getSkillType() == L2Skill.SkillType.DEBUFF ||
+                    if (e.getShowIcon() &&
+                       (e.getSkill().getSkillType() == L2Skill.SkillType.BUFF ||
                         e.getSkill().getSkillType() == L2Skill.SkillType.REFLECT ||
                         e.getSkill().getSkillType() == L2Skill.SkillType.HEAL_PERCENT ||
                         e.getSkill().getSkillType() == L2Skill.SkillType.MANAHEAL_PERCENT) &&
-                        !(e.getSkill().getId() > 4360  && e.getSkill().getId() < 4367)) { // 7s buffs
+                      !(e.getSkill().getId() > 4360  &&
+                        e.getSkill().getId() < 4367))
+                    { // 7s buffs
                         numBuffs++;
                     }
                 }
@@ -6542,7 +6576,7 @@ public abstract class L2Character extends L2Object
 					{
 						if (activeWeapon.getSkillEffects(this, target, skill).length > 0 && this instanceof L2PcInstance)
 						{
-							sendPacket(SystemMessage.sendString("目標受到武器特殊屬性影響!"));
+							sendMessage("目標受到武器特殊屬性影響!");
 						}
 					}
 				}

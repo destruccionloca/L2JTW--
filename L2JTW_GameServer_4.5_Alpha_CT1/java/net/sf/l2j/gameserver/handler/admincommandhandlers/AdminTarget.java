@@ -19,8 +19,6 @@ import net.sf.l2j.gameserver.handler.IAdminCommandHandler;
 import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2World;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
-import net.sf.l2j.gameserver.network.SystemMessageId;
-import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
 /**
  * This class handles following admin commands:
@@ -45,28 +43,30 @@ public class AdminTarget implements IAdminCommandHandler {
 		return ADMIN_COMMANDS;
 	}
 
-	private boolean checkLevel(int level) {
+	private boolean checkLevel(int level)
+	{
 		return (level >= REQUIRED_LEVEL);
 	}
 
-	private void handleTarget(String command, L2PcInstance activeChar) {
-		try {
+	private void handleTarget(String command, L2PcInstance activeChar)
+	{
+		try
+		{
 			String targetName = command.substring(13);
 			L2Object obj = L2World.getInstance().getPlayer(targetName);
-			if ((obj != null) && (obj instanceof L2PcInstance)) {
-				obj.onAction(activeChar);
-			} 
-			else 
+			if ((obj != null) && (obj instanceof L2PcInstance))
 			{
-				SystemMessage sm = new SystemMessage(SystemMessageId.TARGET_IS_NOT_FOUND_IN_THE_GAME);
-				activeChar.sendPacket(sm);
+				obj.onAction(activeChar);
+
 			}
-		} 
-		catch 
-		(IndexOutOfBoundsException e) 
+			else
+			{
+				activeChar.sendMessage("人物 "+targetName+" 無法查詢");
+			}
+		}
+		catch (IndexOutOfBoundsException e)
 		{
-			SystemMessage sm = new SystemMessage(SystemMessageId.INCORRECT_NAME_PLEASE_TRY_AGAIN);
-			activeChar.sendPacket(sm);
+			activeChar.sendMessage("請輸入正確名稱");
 		}
 	}
 }

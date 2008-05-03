@@ -171,7 +171,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 
         // Check if the target isn't dead, is in the Aggro range and is at the same height
         if (target.isAlikeDead() || (target instanceof L2PcInstance && !me.isInsideRadius(target, me.getAggroRange(), false, false)) 
-        		||Math.abs(_actor.getZ() - target.getZ()) > 300) return false;
+        		||Math.abs(_actor.getZ() - target.getZ()) > 300 || (target instanceof L2Summon && !me.isInsideRadius(target, me.getAggroRange(), false, false))) return false;
 
         // Check if the target is a L2PcInstance
         if (target instanceof L2PcInstance)
@@ -673,7 +673,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         		if (obj instanceof L2NpcInstance)
         		{
         			L2NpcInstance npc = (L2NpcInstance) obj;
-
+        			
         			if (faction_id != npc.getFactionId())
         				continue;
 
@@ -703,6 +703,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         					// TODO: notifyEvent ought to be removed from here and added in the AI script, when implemented (Fulminus) 
         					// Notify the L2Object AI with EVT_AGGRESSION
         					npc.getAI().notifyEvent(CtrlEvent.EVT_AGGRESSION, originalAttackTarget, 1);
+        					((L2Attackable)npc).addDamageHate(originalAttackTarget, 1, 1);
         					if ((originalAttackTarget instanceof L2PcInstance) || (originalAttackTarget instanceof L2Summon))
         					{
         						if (npc.getTemplate().getEventQuests(Quest.QuestEventType.ON_FACTION_CALL) != null)
@@ -710,7 +711,10 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         							L2PcInstance player = (originalAttackTarget instanceof L2PcInstance)?
         								(L2PcInstance)originalAttackTarget: ((L2Summon) originalAttackTarget).getOwner();
         							for (Quest quest: npc.getTemplate().getEventQuests(Quest.QuestEventType.ON_FACTION_CALL))
+        							{
         								quest.notifyFactionCall(npc, (L2NpcInstance) _actor, player, (originalAttackTarget instanceof L2Summon));
+        								((L2Attackable)npc).addDamageHate(originalAttackTarget, 1, 1);
+        							}
         						}
         					}
         				}
@@ -735,7 +739,11 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
             dist2= (int)dist;
             range = _actor.getPhysicalAttackRange() + _actor.getTemplate().collisionRadius + getAttackTarget().getTemplate().collisionRadius;
             if(getAttackTarget().isMoving())
+            {
             	range = range + 50;
+            	if(_actor.isMoving())
+            		range = range + 50;
+            }
         }
         catch (NullPointerException e)
         {
@@ -1874,7 +1882,11 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
             dist2= dist;
             range = _actor.getPhysicalAttackRange() + _actor.getTemplate().collisionRadius + getAttackTarget().getTemplate().collisionRadius;
             if(getAttackTarget().isMoving())
-            	range +=70;
+            {
+            		dist = dist -30;
+            	if(_actor.isMoving())
+            		dist = dist -50;
+            }
         }
         catch (NullPointerException e)
         {
@@ -2387,7 +2399,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         int range = 0;
     	L2Attackable actor = (L2Attackable)_actor;
     	L2Character MostHate = ((L2Attackable) _actor).getMostHated();
-    	if(actor.getAttackByList()!=null)
+    	if(actor.getHateList()!=null)
     	for(L2Character obj: actor.getHateList())
     	{
     		if(obj == null || !GeoData.getInstance().canSeeTarget(_actor,obj) || obj.isDead()||obj == getAttackTarget())
@@ -2475,7 +2487,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
 
     	L2Attackable actor = (L2Attackable)_actor;
     	L2Character MostHate = ((L2Attackable) _actor).getMostHated();
-    	if(actor.getAttackByList()!=null)
+    	if(actor.getHateList()!=null)
     	for(L2Character obj: actor.getHateList())
     	{
     		if(obj == null || !GeoData.getInstance().canSeeTarget(_actor,obj) || obj.isDead()|| obj == getAttackTarget())

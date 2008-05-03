@@ -15,6 +15,7 @@
 package net.sf.l2j.gameserver.handler.admincommandhandlers;
 
 import java.util.StringTokenizer;
+import java.util.logging.Logger;
 
 import javolution.text.TextBuilder;
 import net.sf.l2j.Config;
@@ -40,17 +41,15 @@ public class AdminCursedWeapons implements IAdminCommandHandler {
 	private static final String[] ADMIN_COMMANDS = {"admin_cw_info", "admin_cw_remove", "admin_cw_goto", "admin_cw_reload", "admin_cw_add", "admin_cw_info_menu"};
 	private static final int REQUIRED_LEVEL = Config.GM_MIN;
 	private int itemId;
-
+	private static final Logger _log = Logger.getLogger(CursedWeaponsManager.class.getName());
 	public boolean useAdminCommand(String command, L2PcInstance activeChar)
 	{
 		if (!Config.ALT_PRIVILEGES_ADMIN)
 			if (!(checkLevel(activeChar.getAccessLevel())))
 				return false;
 
-
 		CursedWeaponsManager cwm = CursedWeaponsManager.getInstance();
 		int id=0;
-
 
 		StringTokenizer st = new StringTokenizer(command);
 		st.nextToken();
@@ -58,17 +57,15 @@ public class AdminCursedWeapons implements IAdminCommandHandler {
 		if (command.startsWith("admin_cw_info"))
 		{
 			if (!command.contains("menu"))
-
 			{
 				activeChar.sendMessage("====== 受詛咒的武器資訊 ======");
 				for (CursedWeapon cw : cwm.getCursedWeapons())
 				{
-
 					activeChar.sendMessage("> "+cw.getName()+" ("+cw.getItemId()+")");
 					if (cw.isActivated())
 					{
 						L2PcInstance pl = cw.getPlayer();
-		        		activeChar.sendMessage("擁有人物: "+pl.getName());
+		        		activeChar.sendMessage("擁有人物: "+pl.getName()+ pl==null ? "null" : pl.getName());
 		        		activeChar.sendMessage("性向指數: "+cw.getPlayerKarma());
 		        		activeChar.sendMessage("時間剩下: "+(cw.getTimeLeft()/60000)+" 分鐘。");
 		        		activeChar.sendMessage("殺人數量: "+cw.getNbKills());
@@ -83,7 +80,7 @@ public class AdminCursedWeapons implements IAdminCommandHandler {
 					{
 						activeChar.sendMessage("並未出現。");
 					}
-					activeChar.sendPacket(new SystemMessage(SystemMessageId.FRIEND_LIST_FOOT));
+					activeChar.sendPacket(new SystemMessage(SystemMessageId.FRIEND_LIST_FOOTER));
 				}
 			}
 			else
@@ -91,16 +88,15 @@ public class AdminCursedWeapons implements IAdminCommandHandler {
 				TextBuilder replyMSG = new TextBuilder();
 				NpcHtmlMessage adminReply = new NpcHtmlMessage(5);
 				adminReply.setFile("data/html/admin/cwinfo.htm");
+				
 				for (CursedWeapon cw : cwm.getCursedWeapons())
-
 				{
-
+					_log.warning("Curse Weapon amount:"+cwm.getCursedWeapons().size());
 					itemId=cw.getItemId();
 					replyMSG.append("<table width=270><tr><td>名稱:</td><td>"+cw.getName()+"</td></tr>");
 					if (cw.isActivated())
 					{
 						L2PcInstance pl = cw.getPlayer();
-
 						replyMSG.append("<tr><td>持有者:</td><td>"+ (pl==null?"null" : pl.getName())+"</td></tr>");
 						replyMSG.append("<tr><td>性向:</td><td>"+String.valueOf(cw.getPlayerKarma())+"</td></tr>");
 						replyMSG.append("<tr><td>殺人數量:</td><td>"+String.valueOf(cw.getPlayerPkKills())+"/"+String.valueOf(cw.getNbKills())+"</td></tr>");
@@ -110,23 +106,19 @@ public class AdminCursedWeapons implements IAdminCommandHandler {
 					}
 					else if (cw.isDropped())
 					{
-
 						replyMSG.append("<tr><td>位置:</td><td>掉落在地上</td></tr>");
 						replyMSG.append("<tr><td>剩下時間:</td><td>"+String.valueOf(cw.getTimeLeft()/60000)+" 分鐘.</td></tr>");
 						replyMSG.append("<tr><td>殺人數量:</td><td>"+String.valueOf(cw.getNbKills())+"</td></tr>");
 						replyMSG.append("<tr><td><button value=\"移除\" action=\"bypass -h admin_cw_remove "+String.valueOf(itemId)+"\" width=73 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"></td>");
 						replyMSG.append("<td><button value=\"繼續\" action=\"bypass -h admin_cw_goto "+String.valueOf(itemId)+"\" width=73 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"></td></tr>");
-
 					}
 					else
 					{
-
 						replyMSG.append("<tr><td>位置:</td><td>並不存在。</td></tr>");
 						replyMSG.append("<tr><td><button value=\"交給目標\" action=\"bypass -h admin_cw_add "+String.valueOf(itemId)+"\" width=99 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df></td><td></td></tr>");
 					}
 					replyMSG.append("</table>");
 					replyMSG.append("<br>");
-
 				}
 				adminReply.replace("%cwinfo%", replyMSG.toString());
 				activeChar.sendPacket(adminReply);

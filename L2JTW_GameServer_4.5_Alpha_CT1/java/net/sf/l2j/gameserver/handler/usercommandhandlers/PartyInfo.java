@@ -37,8 +37,7 @@ public class PartyInfo implements IUserCommandHandler
 
     	if (!activeChar.isInParty())
     	{
-    		SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);  
-            sm.addString("不在隊伍內。");
+    		activeChar.sendMessage("不在隊伍內。");
     		return false;
     	}
 
@@ -70,10 +69,7 @@ public class PartyInfo implements IUserCommandHandler
         SystemMessage sm = new SystemMessage(SystemMessageId.PARTY_LEADER_S1);
     	sm.addString(partyLeader);
     	activeChar.sendPacket(sm);
-
-    	sm = new SystemMessage(SystemMessageId.S1_S2);  
-        sm.addString("隊員" + memberCount + "/9。");
-    	activeChar.sendPacket(sm);
+    	activeChar.sendMessage("隊員" + memberCount + "/9。");
 
     	activeChar.sendPacket(new SystemMessage(SystemMessageId.WAR_LIST));
 

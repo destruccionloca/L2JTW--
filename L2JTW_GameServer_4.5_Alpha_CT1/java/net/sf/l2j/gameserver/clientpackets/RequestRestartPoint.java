@@ -27,8 +27,6 @@ import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.entity.Castle;
 import net.sf.l2j.gameserver.model.entity.ClanHall;
 import net.sf.l2j.gameserver.model.entity.Fort;
-import net.sf.l2j.gameserver.network.SystemMessageId;
-import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.util.IllegalPlayerAction;
 import net.sf.l2j.gameserver.util.Util;
 
@@ -224,22 +222,20 @@ public final class RequestRestartPoint extends L2GameClientPacket
 		if (castle != null && castle.getSiege().getIsInProgress())
 		{
 			//DeathFinalizer df = new DeathFinalizer(10000);
-			SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
 			if (activeChar.getClan() != null && castle.getSiege().checkIsAttacker(activeChar.getClan()))
 			{
 				// Schedule respawn delay for attacker
 				ThreadPoolManager.getInstance().scheduleGeneral(new DeathTask(activeChar), castle.getSiege().getAttackerRespawnDelay());
-				sm.addString("將在 " + castle.getSiege().getAttackerRespawnDelay()/1000 + " 秒後復活");
-				activeChar.sendPacket(sm);
+				activeChar.sendMessage("將在 " + castle.getSiege().getAttackerRespawnDelay()/1000 + " 秒後復活");
+
 			}
 			else
 			{
 				// Schedule respawn delay for defender with penalty for CT lose
 				ThreadPoolManager.getInstance().scheduleGeneral(new DeathTask(activeChar), castle.getSiege().getDefenderRespawnDelay());
-				sm.addString("將在 " + castle.getSiege().getDefenderRespawnDelay()/1000 + " 秒後復活");
-				activeChar.sendPacket(sm);
+				activeChar.sendMessage("將在 " + castle.getSiege().getDefenderRespawnDelay()/1000 + " 秒後復活");
+
 			}
-			sm = null;
 			return;
 		}
         

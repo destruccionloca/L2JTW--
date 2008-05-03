@@ -180,6 +180,11 @@ public class EnterWorld extends L2GameClientPacket
 
         setPledgeClass(activeChar);
 
+        // Send Action list
+        activeChar.sendPacket(ExBasicActionList.DEFAULT_ACTION_LIST);
+
+        activeChar.sendSkillList();
+        
         activeChar.sendPacket(new UserInfo(activeChar));
         
         // Send Macro List
@@ -194,10 +199,7 @@ public class EnterWorld extends L2GameClientPacket
         // Send Shortcuts
         sendPacket(new ShortCutInit(activeChar));
         
-        // Send Action list
-        activeChar.sendPacket(ExBasicActionList.DEFAULT_ACTION_LIST);
 
-        activeChar.sendSkillList();
         
         activeChar.sendPacket(new HennaInfo(activeChar));
         
@@ -265,17 +267,10 @@ public class EnterWorld extends L2GameClientPacket
         
         sendPacket(new FriendList(activeChar));
         
-        SystemMessage sm = new SystemMessage(SystemMessageId.WELCOME_TO_LINEAGE);
-        sendPacket(sm);
+        sendPacket(new SystemMessage(SystemMessageId.WELCOME_TO_LINEAGE));
 
-        //if (Config.SHOW_L2J_LICENSE)
-        //{
-            sm = new SystemMessage(SystemMessageId.S1_S2);
-            sm.addString(getText("TDJKVFcgNC41IEFscGhhIGNvZGVuYW1lOiBLYW1hZWw="));check =1;
-            sendPacket(sm);
-        //}
 
-        sm = null;
+        activeChar.sendMessage(getText("TDJKVFcgNC41IEFscGhhIGNvZGVuYW1lOiBLYW1hZWw="));check =1;
 
         SevenSigns.getInstance().sendCurrentPeriodMsg(activeChar);
         Announcements.getInstance().showAnnouncements(activeChar);

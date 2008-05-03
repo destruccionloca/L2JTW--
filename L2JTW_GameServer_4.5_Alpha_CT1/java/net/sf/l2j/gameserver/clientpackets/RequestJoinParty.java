@@ -87,8 +87,7 @@ public final class RequestJoinParty extends L2GameClientPacket
 
 		if (target.isInJail() || requestor.isInJail())
         {
-			SystemMessage sm = SystemMessage.sendString("目前玩家處於監獄狀態");
-			requestor.sendPacket(sm);
+			requestor.sendMessage("目前玩家處於監獄狀態");
 			return;
 		}
 

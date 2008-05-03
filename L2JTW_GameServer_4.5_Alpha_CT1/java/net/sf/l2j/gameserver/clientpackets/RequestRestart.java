@@ -97,7 +97,7 @@ public final class RequestRestart extends L2GameClientPacket
         {
             if (SevenSignsFestival.getInstance().isFestivalInitialized())
             {
-                player.sendPacket(SystemMessage.sendString("無法在黑暗祭典進行時登出."));
+                player.sendMessage("無法在黑暗祭典進行時登出.");
                 player.sendPacket(ActionFailed.STATIC_PACKET);
                 return;
             }

@@ -238,6 +238,7 @@ public abstract class L2Skill
     	
     	// Cancel
     	CANCEL,
+    	CANCEL_DEBUFF,
     	MAGE_BANE,
     	WARRIOR_BANE,
     	NEGATE,
@@ -548,6 +549,8 @@ public abstract class L2Skill
     private final String _flyType;
     private final int _flyRadius;
 
+	private final boolean _isDebuff;
+
     protected L2Skill(StatsSet set)
     {
         _id = set.getInteger("skill_id");
@@ -583,6 +586,7 @@ public abstract class L2Skill
         
         _hitTime = set.getInteger("hitTime", 0);
         _coolTime = set.getInteger("coolTime", 0);
+        _isDebuff = set.getBool("isDebuff", false);
         
         if (Config.ENABLE_MODIFY_SKILL_REUSE && Config.SKILL_REUSE_LIST.containsKey(_id))
         {
@@ -902,6 +906,14 @@ public abstract class L2Skill
     public final int getId()
     {
         return _id;
+    }
+
+    /**
+     * @return Returns the boolean _isDebuff.
+     */
+    public final boolean isDebuff()
+    {
+        return _isDebuff;
     }
 
     public int getDisplayId()
@@ -1405,14 +1417,11 @@ public abstract class L2Skill
         if (!preCondition.test(env))
         {
 
-            //String msg = preCondition.getMessage();
-            //if (msg != null)
-            //{
-            //    SystemMessage sm = new SystemMessage(SystemMessage.S1_S2);
-            //    sm.addString(msg);
-            //    activeChar.sendPacket(sm);
-            //}
-
+            String msg = preCondition.getMessage();
+            if (msg != null)
+            {
+                activeChar.sendMessage(msg);
+            }
             return false;
         }
         
@@ -2873,9 +2882,7 @@ public abstract class L2Skill
             }
             case TARGET_ITEM:
             {
-                SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-                sm.addString("此類型技能還無法正常使用");
-                activeChar.sendPacket(sm);
+                activeChar.sendMessage("此類型技能還無法正常使用");
                 return null;
             }
             case TARGET_UNDEAD:
@@ -2953,9 +2960,7 @@ public abstract class L2Skill
             }
             default:
             {
-                SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-                sm.addString("此類型技能還無法正常使用");
-                activeChar.sendPacket(sm);
+                activeChar.sendMessage("此類型技能還無法正常使用");
                 return null;
             }
         }//end switch

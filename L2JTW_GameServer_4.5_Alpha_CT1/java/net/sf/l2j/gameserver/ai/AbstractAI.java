@@ -535,7 +535,8 @@ abstract class AbstractAI implements Ctrl
             }
 
             // Send a Server->Client packet MoveToPawn/CharMoveToLocation to the actor and all L2PcInstance in its _knownPlayers
-            if (pawn instanceof L2Character) {
+            if (pawn instanceof L2Character) 
+            {
             	if(_actor.isOnGeodataPath())
             	{
             		_actor.broadcastPacket(new MoveToLocation(_actor));
@@ -543,6 +544,7 @@ abstract class AbstractAI implements Ctrl
             	}
             	else if (sendPacket) // don't repeat unnecessarily
             		_actor.broadcastPacket(new MoveToPawn(_actor, (L2Character) pawn, offset));
+            		//_actor.broadcastPacket(new MoveToLocation(_actor));
             }
             else 
             	_actor.broadcastPacket(new MoveToLocation(_actor));
@@ -570,6 +572,32 @@ abstract class AbstractAI implements Ctrl
 
             // Calculate movement data for a move to location action and add the actor to movingObjects of GameTimeController
             _accessor.moveTo(x, y, z);
+
+            // Send a Server->Client packet CharMoveToLocation to the actor and all L2PcInstance in its _knownPlayers
+            MoveToLocation msg = new MoveToLocation(_actor);
+            _actor.broadcastPacket(msg);
+
+        }
+        else
+        {
+            _actor.sendPacket(ActionFailed.STATIC_PACKET);
+        }
+    }
+    
+    protected void moveTo(L2Character target, int offset)
+    {
+    	int x = target.getX();
+    	int y = target.getY();
+    	int z = target.getZ();
+        // Chek if actor can move
+        if (!_actor.isMovementDisabled())
+        {
+            // Set AI movement data
+            _clientMoving = true;
+            _clientMovingToPawnOffset = 0;
+
+            // Calculate movement data for a move to location action and add the actor to movingObjects of GameTimeController
+            _accessor.moveTo(x, y, z,offset);
 
             // Send a Server->Client packet CharMoveToLocation to the actor and all L2PcInstance in its _knownPlayers
             MoveToLocation msg = new MoveToLocation(_actor);

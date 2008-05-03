@@ -65,22 +65,24 @@ public class Recall implements ISkillHandler
 
 
                     // Check to see if the current player target is in a festival.
-                    if (targetChar.isFestivalParticipant()) {
-                        targetChar.sendPacket(SystemMessage.sendString("黑暗的祭典中無法使用。"));
+                    if (targetChar.isFestivalParticipant())
+                    {
+                        targetChar.sendMessage("黑暗的祭典中無法使用。");
+
                         continue;
                     }
 
                     // Check to see if player is in jail
                     if (targetChar.isInJail())
                     {
-                        targetChar.sendPacket(SystemMessage.sendString("無法在GM詢問處使用。"));
+                        targetChar.sendMessage("無法在GM詢問處使用。");
                         continue;
                     }
 
                     // Check to see if player is in a duel
                     if (targetChar.isInDuel())
                     {
-                        targetChar.sendPacket(SystemMessage.sendString("You cannot use escape skills during a duel."));
+                        targetChar.sendMessage("無法在決鬥中使用。");
                         continue;
                     }
                 }

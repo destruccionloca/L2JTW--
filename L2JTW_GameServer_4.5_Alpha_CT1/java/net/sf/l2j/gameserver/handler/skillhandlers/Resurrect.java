@@ -71,6 +71,7 @@ public class Resurrect implements ISkillHandler
         {
             activeChar.abortCast();
             activeChar.sendPacket(new SystemMessage(SystemMessageId.TARGET_IS_INCORRECT));
+
         }
 
         for (L2Character cha: targetToRes)

@@ -23,8 +23,6 @@ import net.sf.l2j.gameserver.model.L2Skill.SkillType;
 import net.sf.l2j.gameserver.model.actor.instance.L2ArtefactInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.entity.Castle;
-import net.sf.l2j.gameserver.network.SystemMessageId;
-import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.util.Util;
 
 /**
@@ -79,36 +77,27 @@ public class TakeCastle implements ISkillHandler
         if (activeChar == null || !(activeChar instanceof L2PcInstance))
             return false;
 
-        SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
+        String text = "";
         L2PcInstance player = (L2PcInstance)activeChar;
 
         if (castle == null || castle.getCastleId() <= 0)
-        {
-            sm.addString("必須在城堡地面使用此技能。");
-        }
+            text = "必須在城堡地面使用此技能。";
         else if (player.getTarget() == null && !(player.getTarget() instanceof L2ArtefactInstance))
-        {
-            sm.addString("目標必須是守護者封印。");
-        }
+            text = "目標必須是守護者封印。";
         else if (!castle.getSiege().getIsInProgress())
-        {
-            sm.addString("此技能只能在攻城戰期間使用。");
-        }
+            text = "此技能只能在攻城戰期間使用。";
         else if (!Util.checkIfInRange(200, player, player.getTarget(), true))
-        {
-            sm.addString("守護者封印距離太遠。");
-        }
+            text = "守護者封印距離太遠。";
         else if (castle.getSiege().getAttackerClan(player.getClan()) == null)
-        {
-            sm.addString("你必須是攻城方才能使用此技能。");
-        }
+            text = "你必須是攻城方才能使用此技能。";
         else
         {
             if (!isCheckOnly) castle.getSiege().announceToPlayer("血盟 " + player.getClan().getName() + " 開始在刻上守護者封印。", true);                
             return true;
         }
 
-        if (!isCheckOnly) {player.sendPacket(sm);}
+        if (!isCheckOnly)
+            player.sendMessage(text);
         return false;
     }
 }

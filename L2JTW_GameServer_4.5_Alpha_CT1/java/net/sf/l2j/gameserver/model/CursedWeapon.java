@@ -59,7 +59,7 @@ public class CursedWeapon
 	private boolean _isDropped = false;
 	// this sets the cursed weapon status to true only if a player has the cursed weapon, otherwise this should be false.
 	private boolean _isActivated = false;
-	private ScheduledFuture _removeTask;
+	private ScheduledFuture<?> _removeTask;
 
 	private int _nbKills = 0;
 	private long _endTime = 0;

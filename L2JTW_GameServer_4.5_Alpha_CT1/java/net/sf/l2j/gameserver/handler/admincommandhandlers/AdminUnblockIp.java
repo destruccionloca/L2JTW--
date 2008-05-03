@@ -19,8 +19,6 @@ import java.util.logging.Logger;
 import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.handler.IAdminCommandHandler;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
-import net.sf.l2j.gameserver.network.SystemMessageId;
-import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
 /**
  * This class handles following admin commands:
@@ -55,17 +53,14 @@ public class AdminUnblockIp implements IAdminCommandHandler
                 String ipAddress = command.substring(16);
                 if (unblockIp(ipAddress, activeChar))
                 {
-                    SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-                    sm.addString("從封鎖名單內移除IP " + ipAddress + "。");
-                    activeChar.sendPacket(sm);
+                    activeChar.sendMessage("從封鎖名單內移除IP " + ipAddress + "。");
                 }
             }
             catch (StringIndexOutOfBoundsException e)
             {
                 // Send syntax to the user
-                SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-                sm.addString("使用方法: //unblockip <ip>");
-                activeChar.sendPacket(sm);
+
+                activeChar.sendMessage("使用方法: //unblockip <ip>");
             }
         }
 

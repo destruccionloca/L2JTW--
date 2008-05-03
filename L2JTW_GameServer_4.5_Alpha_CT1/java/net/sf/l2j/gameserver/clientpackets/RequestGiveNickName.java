@@ -87,6 +87,7 @@ public class RequestGiveNickName extends L2GameClientPacket
                     activeChar.sendPacket(sm);
                     sm = null;
                 }
+
 			}
             else
             {

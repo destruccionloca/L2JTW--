@@ -21,9 +21,7 @@ import net.sf.l2j.gameserver.instancemanager.QuestManager;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.quest.Quest;
 import net.sf.l2j.gameserver.model.quest.QuestState;
-//import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.QuestList;
-//import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 
 /**
  * This class ...
@@ -58,13 +56,16 @@ public final class RequestQuestAbort extends L2GameClientPacket
             if(qs != null)
             {
         		qs.exitQuest(true);
+                activeChar.sendMessage("任務解除!");
         		QuestList ql = new QuestList();
                 activeChar.sendPacket(ql);
-            } else
+            }
+            else
             {
                 if (Config.DEBUG) _log.info("Player '"+activeChar.getName()+"' try to abort quest "+qe.getName()+" but he didn't have it started.");
             }
-        } else
+        }
+        else
         {
             if (Config.DEBUG) _log.warning("Quest (id='"+_questId+"') not found.");
 

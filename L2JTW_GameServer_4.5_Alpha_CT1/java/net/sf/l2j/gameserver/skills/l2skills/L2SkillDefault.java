@@ -17,9 +17,7 @@ package net.sf.l2j.gameserver.skills.l2skills;
 import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2Skill;
-import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.ActionFailed;
-import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.templates.StatsSet;
 
 public class L2SkillDefault extends L2Skill {
@@ -29,11 +27,11 @@ public class L2SkillDefault extends L2Skill {
 	}
 
 	@Override
-	public void useSkill(L2Character caster, @SuppressWarnings("unused") L2Object[] targets) {
+	public void useSkill(L2Character caster, @SuppressWarnings("unused") L2Object[] targets)
+	{
 		caster.sendPacket(ActionFailed.STATIC_PACKET);
-		SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-		sm.addString("技能類型尚未加入技能ID︰ " + getId() + " " + getSkillType());
-		caster.sendPacket(sm);
+
+		caster.sendMessage("技能類型尚未加入技能ID︰ " + getId() + " " + getSkillType());
 	}
 
 }

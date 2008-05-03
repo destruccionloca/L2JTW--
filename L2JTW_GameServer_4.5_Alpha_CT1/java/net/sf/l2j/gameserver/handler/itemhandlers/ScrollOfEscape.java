@@ -79,10 +79,17 @@ public class ScrollOfEscape implements IItemHandler
         if (GrandBossManager.getInstance().getZone(activeChar) != null && !activeChar.isGM())
         {
             activeChar.sendPacket(ActionFailed.STATIC_PACKET);
+<<<<<<< .mine
 
 			SystemMessage smsg = new SystemMessage(SystemMessageId.S1_IS_NOT_AVAILABLE);
 			smsg.addItemName(item.getItemId());
 			activeChar.sendPacket(smsg);
+=======
+            //activeChar.sendPacket(new SystemMessage(SystemMessageId.CANNOT_USE_SCROLL_OF_ESCAPE_INSIDE_BOSS_ZONE));
+
+            // SystemMessage doesn't exist ??!
+            activeChar.sendMessage("Cant summon target inside boss zone.");
+>>>>>>> .r2062
             return;
         }
 **/
@@ -95,10 +102,12 @@ public class ScrollOfEscape implements IItemHandler
         // 檢查玩家如果在黑暗的祭典
         if (activeChar.isFestivalParticipant())
         {
+
         	//無法使用「$s1」。
         	SystemMessage smsg = new SystemMessage(SystemMessageId.S1_IS_NOT_AVAILABLE);
 			smsg.addItemName(item.getItemId());
 			activeChar.sendPacket(smsg);
+
             return;
         }
 
@@ -187,7 +196,8 @@ public class ScrollOfEscape implements IItemHandler
                 else if(_itemId == 5858) // do nothing
                 {
                 	//血盟沒有擁有根據地。
-                	_activeChar.sendPacket(new SystemMessage(SystemMessageId.CLAN_HAS_NO_CLAN_HALL));
+                	_activeChar.sendPacket(new SystemMessage(681));
+
                     return;
                 }
                 else if(_itemId == 5859) // do nothing
@@ -196,11 +206,12 @@ public class ScrollOfEscape implements IItemHandler
         			SystemMessage smsg = new SystemMessage(SystemMessageId.S1_IS_NOT_AVAILABLE);
         			smsg.addItemName(_itemId);
                 	_activeChar.sendPacket(smsg);
+
                     return;
                 }
                 else if(_itemId == 10130) // do nothing
                 {
-                	_activeChar.sendPacket(SystemMessage.sendString("Your clan does not own a fortress."));
+                	_activeChar.sendMessage("Your clan does not own a fortress.");
                     return;
                 }
                 else

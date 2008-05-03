@@ -282,7 +282,7 @@ public class CharSelectionInfo extends L2GameServerPacket
             {
                 L2Clan clan = ClanTable.getInstance().getClan(chardata.getInt("clanid"));
                 if(clan != null)
-                    clan.removeClanMember(name, 0);
+                    clan.removeClanMember(objectId, 0);
                 
                 // [L2J_JP EDIT - TSL] L2GameClient.deleteCharByObjId(objectId);
                 CleanUpManager.getInstance().deleteCharByObjId(objectId);

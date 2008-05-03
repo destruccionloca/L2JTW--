@@ -65,6 +65,7 @@ public class Disablers implements ISkillHandler
 		L2Skill.SkillType.CONFUSE_MOB_ONLY,
 		L2Skill.SkillType.NEGATE,
 		L2Skill.SkillType.CANCEL,
+		L2Skill.SkillType.CANCEL_DEBUFF,
 		L2Skill.SkillType.PARALYZE,
 		L2Skill.SkillType.ERASE,
 		L2Skill.SkillType.MAGE_BANE,
@@ -91,7 +92,7 @@ public class Disablers implements ISkillHandler
 
         if (activeChar instanceof L2PcInstance)
         {
-            
+
         }
 
         
@@ -619,6 +620,20 @@ public class Disablers implements ISkillHandler
             		}
                     break;
             	}
+                case CANCEL_DEBUFF:
+                {
+                	L2Effect[] effects = target.getAllEffects();
+                	
+                	if (effects.length == 0 || effects == null) break;
+                	
+                	for (L2Effect e : effects)
+                	{
+                		if (e.getSkill().isDebuff())
+                			e.exit();
+                	}
+                	
+                	break;
+                }
                 case CANCEL:
                 case NEGATE:
                 {

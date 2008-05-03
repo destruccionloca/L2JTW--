@@ -60,20 +60,20 @@ public class L2SkillSummon extends L2Skill {
 				if (mastery < 0)
 					mastery = 0;
 				int count = player.getCubics().size();
-				if (count > mastery) {
-					SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-					sm.addString("已召喚"+count+"個晶體。");
-					activeChar.sendPacket(sm);
+
+				if (count > mastery)
+				{
+					activeChar.sendMessage("已召喚"+count+"個晶體。");
 					return false;
 				}
-			} else {
+			}
+			else
+			{
 				if (player.inObserverMode())
 					return false;
 				if (player.getPet() != null)
 				{
-					SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-					sm.addString("已召喚使魔。");
-					activeChar.sendPacket(sm);
+					activeChar.sendMessage("已召喚使魔。");
 					return false;
 				}
 			}
@@ -88,11 +88,9 @@ public class L2SkillSummon extends L2Skill {
 			return;
 
 		L2PcInstance activeChar = (L2PcInstance) caster;
-
-		if (_npcId == 0) {
-            SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-            sm.addString("召喚技能 "+getId()+"尚未設定完整。");
-			activeChar.sendPacket(sm);
+		if (_npcId == 0)
+		{
+			activeChar.sendMessage("召喚技能 "+getId()+"尚未設定完整。");
 			return;
 		}
 

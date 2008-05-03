@@ -561,8 +561,8 @@ public class AdminMobGroup implements IAdminCommandHandler
 			activeChar.sendMessage(mobGroup.getGroupId() + ": " + mobGroup.getActiveMobCount() + " 生存，最大值為 " +  mobGroup.getMaxMobCount() + 
 					"。編號為 " + mobGroup.getTemplate().npcId + " (" + mobGroup.getStatus() + ")");
 
+		activeChar.sendPacket(new SystemMessage(SystemMessageId.FRIEND_LIST_FOOTER));
 
-		activeChar.sendPacket(new SystemMessage(SystemMessageId.FRIEND_LIST_FOOT));
 	}
 
 	public String[] getAdminCommandList()
