@@ -94,7 +94,8 @@ public abstract class L2Effect
         IMMOBILEUNTILATTACKED,
         CHARMOFCOURAGE,
         SIGNET_EFFECT,
-        SIGNET_GROUND
+        SIGNET_GROUND,
+        WARP
     }
 
 
