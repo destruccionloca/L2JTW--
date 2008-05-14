@@ -333,6 +333,23 @@ public abstract class L2Character extends L2Object
 	}
 	
 	/**
+	 * This will return true if the player is transformed,<br>
+	 * but if the player is not transformed it will return false.
+	 * @return transformation status
+	 */
+	public void charUntransform()
+	{
+		if (this instanceof L2PcInstance)
+		{
+			if (((L2PcInstance)this).isTransformed())
+			{
+				((L2PcInstance)this).untransform();
+				return;
+			}
+		}
+	}
+	
+	/**
 	 * This will return true if the player is GM,<br>
 	 * but if the player is not GM it will return false.
 	 * @return GM status
@@ -567,26 +584,10 @@ public abstract class L2Character extends L2Object
 	 * In order to inform other players of state modification on the L2Character, server just need to go through _knownPlayers to send Server->Client Packet<BR><BR>
 	 *
 	 */
-	public final void broadcastPacket(L2GameServerPacket mov)
+	public void broadcastPacket(L2GameServerPacket mov)
 	{
-		if (!(mov instanceof CharInfo))
-			sendPacket(mov);
-
-		//if (Config.DEBUG) _log.fine("players to notify:" + knownPlayers.size() + " packet:"+mov.getType());
-
 		for (L2PcInstance player : getKnownList().getKnownPlayers().values())
-		{
-			try
-			{
-				player.sendPacket(mov);
-				if (mov instanceof CharInfo && this instanceof L2PcInstance) {
-					int relation = ((L2PcInstance)this).getRelation(player);
-					if (getKnownList().getKnownRelations().get(player.getObjectId()) != null && getKnownList().getKnownRelations().get(player.getObjectId()) != relation)
-						player.sendPacket(new RelationChanged((L2PcInstance)this, relation, player.isAutoAttackable(this)));
-        		}
-				//if(Config.DEVELOPER && !isInsideRadius(player, 3500, false, false)) _log.warning("broadcastPacket: Too far player see event!");
-        	} catch (NullPointerException e) { }
-        }
+			player.sendPacket(mov);
 	}
 
 	/**
@@ -597,26 +598,13 @@ public abstract class L2Character extends L2Object
 	 * In order to inform other players of state modification on the L2Character, server just need to go through _knownPlayers to send Server->Client Packet<BR><BR>
 	 *
 	 */
-	public final void broadcastPacket(L2GameServerPacket mov, int radiusInKnownlist)
+	public void broadcastPacket(L2GameServerPacket mov, int radiusInKnownlist)
 	{
-		if (!(mov instanceof CharInfo))
-			sendPacket(mov);
-
-		//if (Config.DEBUG) _log.fine("players to notify:" + knownPlayers.size() + " packet:"+mov.getType());
-
-        for (L2PcInstance player : getKnownList().getKnownPlayers().values())
-        {
-        	try
-        	{
-        		if (!isInsideRadius(player, radiusInKnownlist, false, false)) continue;
-        		player.sendPacket(mov);
-        		if (mov instanceof CharInfo && this instanceof L2PcInstance) {
-        			int relation = ((L2PcInstance)this).getRelation(player);
-        			if (getKnownList().getKnownRelations().get(player.getObjectId()) != null && getKnownList().getKnownRelations().get(player.getObjectId()) != relation)
-        				player.sendPacket(new RelationChanged((L2PcInstance)this, relation, player.isAutoAttackable(this)));
-        		}
-        	} catch (NullPointerException e) {}
-        }
+		for (L2PcInstance player : getKnownList().getKnownPlayers().values())
+		{
+			if (isInsideRadius(player, radiusInKnownlist, false, false))
+				player.sendPacket(mov);
+		}
 	}
 
 	/**
@@ -1615,6 +1603,17 @@ public abstract class L2Character extends L2Object
 					return;
 				break;
 			}
+			case SUMMON:
+			{
+				if (!skill.isCubic() && this instanceof L2PcInstance &&(((L2PcInstance)this).getPet() != null || ((L2PcInstance)this).isMounted()))
+				{
+					if (Config.DEBUG)
+						_log.fine("player has a pet already. ignore summon skill");
+					
+					sendPacket(new SystemMessage(SystemMessageId.YOU_ALREADY_HAVE_A_PET));
+					return;
+				}
+			}
 		}
 
 		// Check if the skill is a magic spell and if the L2Character is not muted
@@ -2067,7 +2066,10 @@ public abstract class L2Character extends L2Object
         else if (this instanceof L2PlayableInstance && ((L2PlayableInstance)this).isNoblesseBlessed())
         { 
 			((L2PlayableInstance)this).stopNoblesseBlessing(null); 
-			if (((L2PlayableInstance)this).getCharmOfLuck()) //remove Lucky Charm if player have Nobless blessing buff 
+	
+        	charUntransform(); // Untransforms character if transformed.
+			
+        	if (((L2PlayableInstance)this).getCharmOfLuck()) //remove Lucky Charm if player have Nobless blessing buff 
 				((L2PlayableInstance)this).stopCharmOfLuck(null); 
 		} 
 		else

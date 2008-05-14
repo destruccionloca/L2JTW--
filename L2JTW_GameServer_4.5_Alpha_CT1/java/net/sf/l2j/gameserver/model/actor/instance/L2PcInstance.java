@@ -454,7 +454,7 @@ public final class L2PcInstance extends L2PlayableInstance
 
 	public boolean _exploring = false;
 
-	private boolean _isSilentMoving = false;
+	
 
 	private boolean _inCrystallize;
 
@@ -3828,6 +3828,45 @@ public final class L2PcInstance extends L2PlayableInstance
 		Broadcast.toKnownPlayers(this, new NicknameChanged(this));
 	}
 
+	@Override
+	public final void broadcastPacket(L2GameServerPacket mov)
+	{
+		if (!(mov instanceof CharInfo))
+			sendPacket(mov);
+
+		for (L2PcInstance player : getKnownList().getKnownPlayers().values())
+		{
+			player.sendPacket(mov);
+			if (mov instanceof CharInfo)
+			{
+				int relation = getRelation(player);
+				if (getKnownList().getKnownRelations().get(player.getObjectId()) != null && getKnownList().getKnownRelations().get(player.getObjectId()) != relation)
+				player.sendPacket(new RelationChanged(this, relation, player.isAutoAttackable(this)));
+			}
+		}
+	}
+
+	@Override
+	public void broadcastPacket(L2GameServerPacket mov, int radiusInKnownlist)
+	{
+		if (!(mov instanceof CharInfo))
+			sendPacket(mov);
+
+		for (L2PcInstance player : getKnownList().getKnownPlayers().values())
+		{
+			if (isInsideRadius(player, radiusInKnownlist, false, false))
+			{
+				player.sendPacket(mov);
+				if (mov instanceof CharInfo)
+				{
+					int relation = getRelation(player);
+					if (getKnownList().getKnownRelations().get(player.getObjectId()) != null && getKnownList().getKnownRelations().get(player.getObjectId()) != relation)
+					player.sendPacket(new RelationChanged(this, relation, player.isAutoAttackable(this)));
+				}
+			}
+		}
+	}
+
 	/**
 	 * Return the Alliance Identifier of the L2PcInstance.<BR><BR>
 	 */
@@ -4168,7 +4207,7 @@ public final class L2PcInstance extends L2PlayableInstance
         }
     }
     
-    public void tryOpenPrivateSellStore()
+    public void tryOpenPrivateSellStore(boolean isPackageSale)
     {
         // Player shouldn't be able to set stores if he/she is alike dead (dead or fake death)
         if (this.canOpenPrivateStore())
@@ -4188,7 +4227,7 @@ public final class L2PcInstance extends L2PlayableInstance
                     this.standUp();
                 }
                 this.setPrivateStoreType(L2PcInstance.STORE_PRIVATE_SELL + 1);
-                this.sendPacket(new PrivateStoreManageListSell(this));
+                this.sendPacket(new PrivateStoreManageListSell(this, isPackageSale));
             }
         }
         else
@@ -8448,22 +8487,6 @@ public final class L2PcInstance extends L2PlayableInstance
 	public L2FolkInstance getLastFolkNPC()
 	{
 		return _lastFolkNpc;
-	}
-
-	/**
-	 * Set the Silent Moving mode Flag.<BR><BR>
-	 */
-	public void setSilentMoving(boolean flag)
-	{
-		_isSilentMoving = flag;
-	}
-
-	/**
-	 * Return True if the Silent Moving mode is active.<BR><BR>
-	 */
-	public boolean isSilentMoving()
-	{
-		return _isSilentMoving;
 	}
 
 	/**

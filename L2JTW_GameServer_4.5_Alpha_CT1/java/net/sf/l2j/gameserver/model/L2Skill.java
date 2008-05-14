@@ -443,6 +443,8 @@ public abstract class L2Skill
     private final int _summonTimeLostIdle;
     // c) how much time is lost per second of activity (fighting)
     private final int _summonTimeLostActive;
+    
+    private final boolean _isCubic;
 
     // item consume time in milliseconds
     private final int _itemConsumeTime;
@@ -577,6 +579,8 @@ public abstract class L2Skill
         _summonTotalLifeTime= set.getInteger("summonTotalLifeTime", 1200000);  // 20 minutes default
         _summonTimeLostIdle= set.getInteger("summonTimeLostIdle", 0);
         _summonTimeLostActive= set.getInteger("summonTimeLostActive", 0);
+        
+        _isCubic    = set.getBool("isCubic", false);
 
         _castRange = set.getInteger("castRange", 0);
         _effectRange = set.getInteger("effectRange", -1);
@@ -1016,6 +1020,11 @@ public abstract class L2Skill
     public final int getTimeLostActive()
     {
         return _summonTimeLostActive;
+    }
+    
+    public final boolean isCubic()
+    {
+    	return _isCubic;
     }
 
     /**
