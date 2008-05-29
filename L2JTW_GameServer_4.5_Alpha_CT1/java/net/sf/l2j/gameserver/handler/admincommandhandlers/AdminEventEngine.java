@@ -27,7 +27,6 @@ import java.util.LinkedList;
 import java.util.StringTokenizer;
 
 import javolution.text.TextBuilder;
-import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.datatables.SpawnTable;
 import net.sf.l2j.gameserver.handler.IAdminCommandHandler;
 import net.sf.l2j.gameserver.model.L2Spawn;
@@ -65,17 +64,12 @@ public class AdminEventEngine implements IAdminCommandHandler {
                                            "admin_event_control_prize",
                                            "admin_event_control_chatban",
                                            "admin_event_control_finish"};
- private static final int REQUIRED_LEVEL = Config.GM_MENU;
  private static String tempBuffer = "";
  private static String tempName = "";
  private static String tempName2 = "";
  private static boolean npcsDeleted = false;
 
 	public boolean useAdminCommand(String command, L2PcInstance activeChar) {
-        if (!Config.ALT_PRIVILEGES_ADMIN)
-        	if (!(checkLevel(activeChar.getAccessLevel()) && activeChar.isGM()))
-        		return false;
-
 		if (command.equals("admin_event")) showMainPage(activeChar);
 
         else if (command.equals("admin_event_new"))
@@ -357,12 +351,6 @@ public class AdminEventEngine implements IAdminCommandHandler {
 		return ADMIN_COMMANDS;
 	}
 
-	private boolean checkLevel(int level)
-	{
-		return (level >= REQUIRED_LEVEL);
-	}
-
-
 	String showStoredEvents(){
         File dir = new File("data/events");
         String[] files = dir.list();
@@ -375,7 +363,7 @@ public class AdminEventEngine implements IAdminCommandHandler {
         for (int i = 0; i < files.length; i++) {
 
             File file = new File("data/events/" + files[i]);
-            result+="<font color=\"LEVEL\">" + file.getName() + " </font><br><button value=\"選擇\" action=\"bypass -h admin_event_set " + file.getName() + "\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"><button value=\"檢視\" action=\"bypass -h admin_event_see " + file.getName() + "\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"><button value=\"刪除\" action=\"bypass -h admin_event_del " + file.getName() + "\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"><br><br>";
+            result+="<font color=\"LEVEL\">" + file.getName() + " </font><br><button value=\"選擇\" action=\"bypass -h admin_event_set " + file.getName() + "\" width=90 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"><button value=\"檢視\" action=\"bypass -h admin_event_see " + file.getName() + "\" width=90 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"><button value=\"刪除\" action=\"bypass -h admin_event_del " + file.getName() + "\" width=90 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"><br><br>";
         }
         return result;
    }
@@ -388,7 +376,7 @@ public class AdminEventEngine implements IAdminCommandHandler {
 		TextBuilder replyMSG = new TextBuilder("<html><body>");
 
 		replyMSG.append("<center><font color=\"LEVEL\">[ L2J 活動引擎 ]</font></center><br>");
-		replyMSG.append("<br><center><button value=\"開新活動\" action=\"bypass -h admin_event_new\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+		replyMSG.append("<br><center><button value=\"開新活動\" action=\"bypass -h admin_event_new\" width=90 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\">");
 		replyMSG.append("<center><br>活動存入<br></center>");
 		replyMSG.append(showStoredEvents());
         replyMSG.append("</body></html>");
@@ -407,12 +395,12 @@ public class AdminEventEngine implements IAdminCommandHandler {
         if(tempName.equals(""))
             replyMSG.append("輸入 //event_name 來增加新的標題");
         else replyMSG.append(tempName);
-        replyMSG.append("</font></center><br><br>活動引擎說明n<br>");
+        replyMSG.append("</font></center><br><br>活動引擎說明<br>");
        if(tempBuffer.equals(""))
             replyMSG.append("輸入 //add text 或者 //delete_buffer 來修改文字");
         else replyMSG.append(tempBuffer);
 
-       if(!(tempName.equals("")&&tempBuffer.equals(""))) replyMSG.append("<br><button value=\"恢復\" action=\"bypass -h admin_event_store\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+       if(!(tempName.equals("")&&tempBuffer.equals(""))) replyMSG.append("<br><button value=\"恢復\" action=\"bypass -h admin_event_store\" width=90 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\">");
 
 
         replyMSG.append("</body></html>");
@@ -428,7 +416,7 @@ public class AdminEventEngine implements IAdminCommandHandler {
 
         replyMSG.append("<center><font color=\"LEVEL\">[ L2JTW 任務引擎 ]</font></center><br>");
         replyMSG.append("<center><font color=\"LEVEL\">" + L2Event.eventName + "</font></center><br>");
-        replyMSG.append("<br><center><button value=\"修改隊伍數目 \" action=\"bypass -h admin_event_change_teams_number $event_teams_number\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"> <edit var=\"event_teams_number\" width=100 height=20><br><br>");
+        replyMSG.append("<br><center><button value=\"修改隊伍數目 \" action=\"bypass -h admin_event_change_teams_number $event_teams_number\" width=90 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"> <edit var=\"event_teams_number\" width=100 height=20><br><br>");
         replyMSG.append("<font color=\"LEVEL\">Team's Names</font><br>");
         for (int i = 0; i<teamnumbers; i++){
             replyMSG.append((i+1) + ".- <edit var=\"event_teams_name" + (i+1) + "\" width=100 height=20><br>");
@@ -437,7 +425,7 @@ public class AdminEventEngine implements IAdminCommandHandler {
         for (int i = 0; i<teamnumbers; i++){
             replyMSG.append("$event_teams_name" + (i+1) + " - ");
         }
-        replyMSG.append("\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+        replyMSG.append("\" width=90 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\">");
         replyMSG.append("</body></html>");
 
         adminReply.setHtml(replyMSG.toString());
@@ -461,7 +449,7 @@ public class AdminEventEngine implements IAdminCommandHandler {
             }
 
         }
-        L2Event.announceAllPlayers(activeChar.getName() + " 想開始一個活動 !!! (你必須尋找傭有資訊的NPC)");
+        L2Event.announceAllPlayers(activeChar.getName() + " 想開始一個活動 !!! (你必須尋找擁有資訊的NPC)");
     }
    void showEventControl(L2PcInstance activeChar){
 
@@ -472,24 +460,24 @@ public class AdminEventEngine implements IAdminCommandHandler {
        replyMSG.append("<center><font color=\"LEVEL\">[ L2JTW 活動引擎 ]</font></center><br><font color=\"LEVEL\">" + L2Event.eventName + "</font><br><br><table width=200>");
        replyMSG.append("<tr><td>確認此指令來設置隊伍數目 </td><td><edit var=\"team_number\" width=100 height=15></td></tr>");
        replyMSG.append("<tr><td>&nbsp;</td></tr>");
-       if(!npcsDeleted) replyMSG.append("<tr><td><button value=\"開始\" action=\"bypass -h admin_event_control_begin\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td><td><font color=\"LEVEL\">刪除所有活動NPC</font></td></tr>");
+       if(!npcsDeleted) replyMSG.append("<tr><td><button value=\"開始\" action=\"bypass -h admin_event_control_begin\" width=90 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"></td><td><font color=\"LEVEL\">刪除所有活動NPC</font></td></tr>");
        replyMSG.append("<tr><td>&nbsp;</td></tr>");
-       replyMSG.append("<tr><td><button value=\"傳送\" action=\"bypass -h admin_event_control_teleport $team_number\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td><td><font color=\"LEVEL\">傳送隊伍到目前位置</font></td></tr>");
+       replyMSG.append("<tr><td><button value=\"傳送\" action=\"bypass -h admin_event_control_teleport $team_number\" width=90 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"></td><td><font color=\"LEVEL\">傳送隊伍到目前位置</font></td></tr>");
        replyMSG.append("<tr><td>&nbsp;</td></tr>");
-       replyMSG.append("<tr><td><button value=\"坐下\" action=\"bypass -h admin_event_control_sit $team_number\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td><td><font color=\"LEVEL\">Sits/Stands up the team</font></td></tr>");
+       replyMSG.append("<tr><td><button value=\"坐下\" action=\"bypass -h admin_event_control_sit $team_number\" width=90 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"></td><td><font color=\"LEVEL\">Sits/Stands up the team</font></td></tr>");
        replyMSG.append("<tr><td>&nbsp;</td></tr>");
-       replyMSG.append("<tr><td><button value=\"滅亡\" action=\"bypass -h admin_event_control_kill $team_number\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td><td><font color=\"LEVEL\">滅亡選擇的隊伍</font></td></tr>");
+       replyMSG.append("<tr><td><button value=\"滅亡\" action=\"bypass -h admin_event_control_kill $team_number\" width=90 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"></td><td><font color=\"LEVEL\">滅亡選擇的隊伍</font></td></tr>");
        replyMSG.append("<tr><td>&nbsp;</td></tr>");
-       replyMSG.append("<tr><td><button value=\"復活\" action=\"bypass -h admin_event_control_res $team_number\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td><td><font color=\"LEVEL\">復活選擇的隊伍</font></td></tr>");
+       replyMSG.append("<tr><td><button value=\"復活\" action=\"bypass -h admin_event_control_res $team_number\" width=90 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"></td><td><font color=\"LEVEL\">復活選擇的隊伍</font></td></tr>");
        replyMSG.append("<tr><td>&nbsp;</td></tr>");
-       replyMSG.append("<tr><td><button value=\"變形\" action=\"bypass -h admin_event_control_poly $team_number $poly_id\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td><td><edit var=\"poly_id\" width=100 height=15><font color=\"LEVEL\">將隊伍變為NPC模樣d</font></td></tr>");
+       replyMSG.append("<tr><td><button value=\"變形\" action=\"bypass -h admin_event_control_poly $team_number $poly_id\" width=90 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"></td><td><edit var=\"poly_id\" width=100 height=15><font color=\"LEVEL\">將隊伍變為NPC模樣d</font></td></tr>");
        replyMSG.append("<tr><td>&nbsp;</td></tr>");
-       replyMSG.append("<tr><td><button value=\"恢復\" action=\"bypass -h admin_event_control_unpoly $team_number\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td><td><font color=\"LEVEL\">將隊伍變形恢復</font></td></tr>");
+       replyMSG.append("<tr><td><button value=\"恢復\" action=\"bypass -h admin_event_control_unpoly $team_number\" width=90 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"></td><td><font color=\"LEVEL\">將隊伍變形恢復</font></td></tr>");
        replyMSG.append("<tr><td>&nbsp;</td></tr>");
        replyMSG.append("<tr><td>&nbsp;</td></tr>");
-       replyMSG.append("<tr><td><button value=\"給出\" action=\"bypass -h admin_event_control_prize $team_number $n $id\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"> number <edit var=\"n\" width=100 height=15> item id <edit var=\"id\" width=100 height=15></td><td><font color=\"LEVEL\">給出物品給每一個隊員.</font></td></tr>");
+       replyMSG.append("<tr><td><button value=\"給出\" action=\"bypass -h admin_event_control_prize $team_number $n $id\" width=90 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"> number <edit var=\"n\" width=100 height=15> item id <edit var=\"id\" width=100 height=15></td><td><font color=\"LEVEL\">給出物品給每一個隊員.</font></td></tr>");
        replyMSG.append("<tr><td>&nbsp;</td></tr>");
-       replyMSG.append("<tr><td><button value=\"結束\" action=\"bypass -h admin_event_control_finish\" width=90 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td><td><font color=\"LEVEL\">結束活動彆傳送所有玩家至初始狀態</font></td></tr>");
+       replyMSG.append("<tr><td><button value=\"結束\" action=\"bypass -h admin_event_control_finish\" width=90 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"></td><td><font color=\"LEVEL\">結束活動彆傳送所有玩家至初始狀態</font></td></tr>");
        replyMSG.append("</table></body></html>");
 
        adminReply.setHtml(replyMSG.toString());

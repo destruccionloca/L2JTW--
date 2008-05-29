@@ -48,16 +48,12 @@ public class AdminFightCalculator implements IAdminCommandHandler {
         "admin_fight_calculator_show",
         "admin_fcs",
         };
-    private static final int REQUIRED_LEVEL = Config.GM_MIN;
 
     //TODO: remove from gm list etc etc
     public boolean useAdminCommand(String command, L2PcInstance activeChar)
     {
         try
         {
-            //don't check for gm status ;)
-            if (!Config.ALT_PRIVILEGES_ADMIN)
-                if (!checkLevel(activeChar.getAccessLevel())) return false;
             
             if (command.startsWith("admin_fight_calculator_show"))
                 handleShow(command.substring("admin_fight_calculator_show".length()), activeChar);
@@ -74,10 +70,6 @@ public class AdminFightCalculator implements IAdminCommandHandler {
 	
 	public String[] getAdminCommandList() {
 		return _adminCommands;
-	}
-	
-	private boolean checkLevel(int level) {
-		return (level >= REQUIRED_LEVEL);
 	}
 	
 	private void handleStart(String params, L2PcInstance activeChar) {

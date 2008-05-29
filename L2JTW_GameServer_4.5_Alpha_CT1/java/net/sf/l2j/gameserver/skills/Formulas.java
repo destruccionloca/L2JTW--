@@ -1153,7 +1153,7 @@ public final class Formulas
 		if (attacker instanceof L2PcInstance)
 		{
 			L2PcInstance pcInst = (L2PcInstance)attacker;
-			if (pcInst.isGM() && pcInst.getAccessLevel() < Config.GM_CAN_GIVE_DAMAGE)
+			if (pcInst.isGM() && !pcInst.getAccessLevel().canGiveDamage())
 					return 0;
 		}
 		if (attacker instanceof L2Attackable)
@@ -1347,7 +1347,7 @@ public final class Formulas
 		if (attacker instanceof L2PcInstance)
 		{
 			L2PcInstance pcInst = (L2PcInstance)attacker;
-			if (pcInst.isGM() && pcInst.getAccessLevel() < Config.GM_CAN_GIVE_DAMAGE)
+			if (pcInst.isGM() && !pcInst.getAccessLevel().canGiveDamage())
 				return 0;
 		}
 		if (attacker instanceof L2Attackable)

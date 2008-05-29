@@ -13629,11 +13629,14 @@ public enum SystemMessageId
 	*/
 	S1_EVADED_S2_ATTACK(2264),
 
+	
 	/**
 	* ID: 2265<br>
 	* Message: $s1's attack went astray.
 	*/
+	/*
 	S1_ATTACK_WENT_ASTRAY(2265),
+	*/
 
 	/**
 	* ID: 2266<br>

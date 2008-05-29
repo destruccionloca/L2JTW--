@@ -36,7 +36,6 @@ import net.sf.l2j.gameserver.util.Broadcast;
 public class Escape implements IUserCommandHandler
 {
     private static final int[] COMMAND_IDS = { 52 };
-    private static final int REQUIRED_LEVEL = Config.GM_ESCAPE;
 
     /* (non-Javadoc)
      * @see net.sf.l2j.gameserver.handler.IUserCommandHandler#useUserCommand(int, net.sf.l2j.gameserver.model.L2PcInstance)
@@ -54,7 +53,7 @@ public class Escape implements IUserCommandHandler
                 activeChar.isInOlympiadMode())
             return false;
 
-        int unstuckTimer = (activeChar.getAccessLevel() >= REQUIRED_LEVEL? 5000 : Config.UNSTUCK_INTERVAL*1000 );
+        int unstuckTimer = (activeChar.getAccessLevel().isGm()? 5000 : Config.UNSTUCK_INTERVAL*1000 );
 
 
         // 檢查玩家如果在黑暗祭典內
@@ -83,7 +82,7 @@ public class Escape implements IUserCommandHandler
         //不能確認是否處於無法移動的地形。5分鐘之後將逃脫到村莊。
 		//activeChar.sendPacket(new SystemMessage(SystemMessageId.YOU_ARE_STUCK));
 
-        if(activeChar.getAccessLevel() >= REQUIRED_LEVEL)
+        if(activeChar.getAccessLevel().isGm())
         {
         	activeChar.sendMessage("使用快速脫逃: 估計5秒.");
         }

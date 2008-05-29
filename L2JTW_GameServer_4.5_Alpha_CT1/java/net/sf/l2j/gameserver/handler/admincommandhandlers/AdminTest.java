@@ -46,7 +46,6 @@ import net.sf.l2j.gameserver.serverpackets.StatusUpdate;
 
 public class AdminTest implements IAdminCommandHandler
 {
-    private static final int REQUIRED_LEVEL = Config.GM_TEST;
     private static final String[] ADMIN_COMMANDS =
     {
         "admin_test", "admin_stats", "admin_skill_test",
@@ -58,9 +57,6 @@ public class AdminTest implements IAdminCommandHandler
      */
     public boolean useAdminCommand(String command, L2PcInstance activeChar)
     {
-        if (!Config.ALT_PRIVILEGES_ADMIN)
-            if (activeChar.getAccessLevel() < REQUIRED_LEVEL) return false;
-
         if (command.equals("admin_stats"))
         {
             for (String line : ThreadPoolManager.getInstance().getStats())
@@ -130,14 +126,10 @@ public class AdminTest implements IAdminCommandHandler
     {
         L2Character player;
         L2Object target = activeChar.getTarget();
-        if(target == null || !(target instanceof L2Character))
-        {
+        if(!(target instanceof L2Character))
             player = activeChar;
-        }
         else
-        {
             player = (L2Character)target;
-        }
         player.broadcastPacket(new MagicSkillUse(activeChar, player, id, 1, 1, 1));
 
     }

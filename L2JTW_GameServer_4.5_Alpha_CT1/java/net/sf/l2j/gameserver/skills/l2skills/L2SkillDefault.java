@@ -31,7 +31,7 @@ public class L2SkillDefault extends L2Skill {
 	{
 		caster.sendPacket(ActionFailed.STATIC_PACKET);
 
-		caster.sendMessage("技能類型尚未加入技能ID︰ " + getId() + " " + getSkillType());
+		caster.sendMessage("技能類型尚未加入技能ID︰ " + getId() + " " + getSkillType() +".");
 	}
 
 }

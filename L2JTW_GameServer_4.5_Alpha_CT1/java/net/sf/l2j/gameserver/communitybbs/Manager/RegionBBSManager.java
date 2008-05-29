@@ -149,19 +149,19 @@ public class RegionBBSManager extends BaseBBSManager
 		        htmlCode.append("<tr><td><br></td></tr>");
 		    }
 
-		    htmlCode.append("<tr><td><multiedit var=\"pm\" width=240 height=40><button value=\"密語\" action=\"Write Region PM "+player.getName()+" pm pm pm\" width=110 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr><tr><td><br><button value=\"返回\" action=\"bypass _bbsloc\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr></table>");
+		    htmlCode.append("<tr><td><multiedit var=\"pm\" width=240 height=40><button value=\"密語\" action=\"Write Region PM "+player.getName()+" pm pm pm\" width=110 height=15 back=\"sek.cbui94\" fore=\"L2UI_ct1.button_df\"></td></tr><tr><td><br><button value=\"返回\" action=\"bypass _bbsloc\" width=40 height=15 back=\"sek.cbui94\" fore=\"L2UI_ct1.button_df\"></td></tr></table>");
             if(activeChar.isGM())
             {
                 /** admin manage button */
                 htmlCode.append("<br><br>======= 人物管理 =======");
                 htmlCode.append("<table><tr><td>");
-                htmlCode.append("<button value=\"狀態\" action=\"bypass -h admin_character_list " +player.getName()+ "\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td><td>");
-                htmlCode.append("<button value=\"移動\" action=\"bypass -h admin_teleportto " +player.getName()+ "\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td><td>");
-                htmlCode.append("<button value=\"召喚\" action=\"bypass -h admin_recall " +player.getName()+ "\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+                htmlCode.append("<button value=\"狀態\" action=\"bypass -h admin_character_list " +player.getName()+ "\" width=50 height=15 back=\"sek.cbui94\" fore=\"L2UI_ct1.button_df\"></td><td>");
+                htmlCode.append("<button value=\"移動\" action=\"bypass -h admin_teleportto " +player.getName()+ "\" width=50 height=15 back=\"sek.cbui94\" fore=\"L2UI_ct1.button_df\"></td><td>");
+                htmlCode.append("<button value=\"召喚\" action=\"bypass -h admin_recall " +player.getName()+ "\" width=50 height=15 back=\"sek.cbui94\" fore=\"L2UI_ct1.button_df\">");
                 htmlCode.append("</td></tr><tr></tr><tr><td>");
-                htmlCode.append("<button value=\"復活\" action=\"bypass -h admin_res " +player.getName()+ "\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td><td>");
-                htmlCode.append("<button value=\"治癒\" action=\"bypass -h admin_heal " +player.getName()+ "\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td><td>");
-                htmlCode.append("<button value=\"回歸\" action=\"bypass -h admin_sendhome " +player.getName()+ "\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+                htmlCode.append("<button value=\"復活\" action=\"bypass -h admin_res " +player.getName()+ "\" width=50 height=15 back=\"sek.cbui94\" fore=\"L2UI_ct1.button_df\"></td><td>");
+                htmlCode.append("<button value=\"治癒\" action=\"bypass -h admin_heal " +player.getName()+ "\" width=50 height=15 back=\"sek.cbui94\" fore=\"L2UI_ct1.button_df\"></td><td>");
+                htmlCode.append("<button value=\"回歸\" action=\"bypass -h admin_sendhome " +player.getName()+ "\" width=50 height=15 back=\"sek.cbui94\" fore=\"L2UI_ct1.button_df\">");
                 htmlCode.append("</td></tr></table>");
             }
 		    htmlCode.append("</td></tr></table>");
@@ -206,7 +206,7 @@ public class RegionBBSManager extends BaseBBSManager
             	L2PcInstance receiver = L2World.getInstance().getPlayer(ar2);
             	if (receiver == null)
             	{
-            		htmlCode.append("該玩家無法查詢!<br><button value=\"返回\" action=\"bypass _bbsloc;playerinfo;"+ar2+"\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+            		htmlCode.append("該玩家無法查詢!<br><button value=\"返回\" action=\"bypass _bbsloc;playerinfo;"+ar2+"\" width=40 height=15 back=\"sek.cbui94\" fore=\"L2UI_ct1.button_df\">");
             		htmlCode.append("</td></tr></table></body></html>");
             		separateAndSend(htmlCode.toString(),activeChar);
             		return;
@@ -242,7 +242,7 @@ public class RegionBBSManager extends BaseBBSManager
             		{
             			receiver.sendPacket(cs);
             			activeChar.sendPacket(new CreatureSay(activeChar.getObjectId(), Say2.TELL, "->" + receiver.getName(), ar3));
-            			htmlCode.append("訊息傳送<br><button value=\"返回\" action=\"bypass _bbsloc;playerinfo;"+receiver.getName()+"\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+            			htmlCode.append("訊息傳送<br><button value=\"返回\" action=\"bypass _bbsloc;playerinfo;"+receiver.getName()+"\" width=40 height=15 back=\"sek.cbui94\" fore=\"L2UI_ct1.button_df\">");
             			htmlCode.append("</td></tr></table></body></html>");
             			separateAndSend(htmlCode.toString(),activeChar)  ;
 					}
@@ -468,18 +468,19 @@ public class RegionBBSManager extends BaseBBSManager
 		        htmlCode.append("<table border=0 width=600>");
 
 		        htmlCode.append("<tr>");
-	            if (page == 1) htmlCode.append("<td align=right width=190><button value=\"上一頁\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
+
+	            if (page == 1) htmlCode.append("<td align=right width=190><button value=\"上一頁\" width=50 height=15 back=\"sek.cbui94\" fore=\"L2UI_ct1.button_df\"></td>");
 	            else htmlCode.append("<td align=right width=190><button value=\"上一頁\" action=\"bypass _bbsloc;page;"
 	                + (page - 1)
-	                + "\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
+	                + "\" width=50 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"></td>");
 	            htmlCode.append("<td FIXWIDTH=10></td>");
 	            htmlCode.append("<td align=center valign=top width=200>顯示範圍 " + (((page - 1) * Config.NAME_PAGE_SIZE_COMMUNITYBOARD) + 1) + " - "
 	                + (((page -1) * Config.NAME_PAGE_SIZE_COMMUNITYBOARD) + getOnlinePlayers(page).size()) + " 個玩家</td>");
 	            htmlCode.append("<td FIXWIDTH=10></td>");
-	            if (getOnlineCount("gm") <= (page * Config.NAME_PAGE_SIZE_COMMUNITYBOARD)) htmlCode.append("<td width=190><button value=\"下一頁\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
+	            if (getOnlineCount("gm") <= (page * Config.NAME_PAGE_SIZE_COMMUNITYBOARD)) htmlCode.append("<td width=190><button value=\"下一頁\" width=50 height=15 back=\"sek.cbui94\" fore=\"L2UI_ct1.button_df\"></td>");
 	            else htmlCode.append("<td width=190><button value=\"下一頁\" action=\"bypass _bbsloc;page;"
 	                + (page + 1)
-	                + "\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
+	                + "\" width=50 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"></td>");
 	            htmlCode.append("</tr>");
 	            htmlCode.append("</table>");
 	        }
@@ -585,18 +586,19 @@ public class RegionBBSManager extends BaseBBSManager
 		        htmlCode.append("<table border=0 width=600>");
 
 		        htmlCode.append("<tr>");
-	            if (page == 1) htmlCode.append("<td align=right width=190><button value=\"上一頁\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
+	            if (page == 1) htmlCode.append("<td align=right width=190><button value=\"上一頁\" width=50 height=15 back=\"sek.cbui94\" fore=\"L2UI_ct1.button_df\"></td>");
 	            else htmlCode.append("<td align=right width=190><button value=\"上一頁\" action=\"bypass _bbsloc;page;"
 	                + (page - 1)
-	                + "\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
+	                + "\" width=50 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"></td>");
 	            htmlCode.append("<td FIXWIDTH=10></td>");
 	            htmlCode.append("<td align=center valign=top width=200>顯示範圍 " + (((page - 1) * Config.NAME_PAGE_SIZE_COMMUNITYBOARD) + 1) + " - "
 	                + (((page -1) * Config.NAME_PAGE_SIZE_COMMUNITYBOARD) + getOnlinePlayers(page).size()) + " 個玩家</td>");
 	            htmlCode.append("<td FIXWIDTH=10></td>");
-	            if (getOnlineCount("pl") <= (page * Config.NAME_PAGE_SIZE_COMMUNITYBOARD)) htmlCode.append("<td width=190><button value=\"下一頁\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
+	            if (getOnlineCount("pl") <= (page * Config.NAME_PAGE_SIZE_COMMUNITYBOARD)) htmlCode.append("<td width=190><button value=\"下一頁\" width=50 height=15 back=\"sek.cbui94\" fore=\"L2UI_ct1.button_df\"></td>");
 	            else htmlCode.append("<td width=190><button value=\"下一頁\" action=\"bypass _bbsloc;page;"
+
 	                + (page + 1)
-	                + "\" width=50 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
+	                + "\" width=50 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"></td>");
 	            htmlCode.append("</tr>");
 	            htmlCode.append("</table>");
 	        }

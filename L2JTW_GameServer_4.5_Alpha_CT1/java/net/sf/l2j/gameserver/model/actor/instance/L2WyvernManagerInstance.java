@@ -57,7 +57,7 @@ public class L2WyvernManagerInstance extends L2CastleChamberlainInstance
         	}
         	else if ((player.getPet().getNpcId()==12526) || (player.getPet().getNpcId()==12527) || (player.getPet().getNpcId()==12528))
             {
-        		if (player.getInventory().getItemByItemId(1460) != null && player.getInventory().getItemByItemId(1460).getCount() >= 10)
+        		if (player.getInventory().getItemByItemId(1460) != null && player.getInventory().getItemByItemId(1460).getCount() >= 25)
         		{
         			if (player.getPet().getLevel() < 55)
         			{
@@ -69,7 +69,7 @@ public class L2WyvernManagerInstance extends L2CastleChamberlainInstance
         				player.getPet().unSummon(player);
         				if (player.mount(12621, 0))
         				{
-        				    player.getInventory().destroyItemByItemId("Wyvern", 1460, 10, player, player.getTarget());
+        				    player.getInventory().destroyItemByItemId("Wyvern", 1460, 25, player, player.getTarget());
         				    player.addSkill(SkillTable.getInstance().getInfo(4289, 1));
         				    player.sendMessage("飛龍召喚成功!");
         				}
@@ -78,11 +78,7 @@ public class L2WyvernManagerInstance extends L2CastleChamberlainInstance
         		}
         		else
         		{
-        			SystemMessage sm = new SystemMessage(SystemMessageId.SUMMONING_SERVITOR_COSTS_S2_S1);
-                    sm.addItemName(1460);
-            		sm.addString("10");
-            		player.sendPacket(sm);
-
+            		player.sendMessage("需要25個B級-結晶.");
             		return;
         		}
             }

@@ -29,6 +29,7 @@ import net.sf.l2j.L2DatabaseFactory;
 import net.sf.l2j.gameserver.Item;
 import net.sf.l2j.gameserver.ThreadPoolManager;
 import net.sf.l2j.gameserver.idfactory.IdFactory;
+import net.sf.l2j.gameserver.model.GMAudit;
 import net.sf.l2j.gameserver.model.L2Attackable;
 import net.sf.l2j.gameserver.model.L2ItemInstance;
 import net.sf.l2j.gameserver.model.L2Object;
@@ -685,7 +686,7 @@ public class ItemTable
         	ScheduledFuture<?> itemLootShedule;
         	long delay = 0;
         	// if in CommandChannel and was killing a World/RaidBoss
-            if (reference != null && reference instanceof L2GrandBossInstance || reference instanceof L2RaidBossInstance)
+            if (reference instanceof L2GrandBossInstance || reference instanceof L2RaidBossInstance)
             {
             	if(((L2Attackable)reference).getFirstCommandChannelAttacked() != null
             			&& ((L2Attackable)reference).getFirstCommandChannelAttacked().meetRaidWarCondition(reference))
@@ -722,6 +723,20 @@ public class ItemTable
 			record.setLoggerName("item");
 			record.setParameters(new Object[]{item, actor, reference});
 			_logItems.log(record);
+		}
+		
+		if (actor != null)
+		{
+			if (actor.isGM())
+			{
+				String referenceName = "no-reference";
+				if (reference != null)
+				{
+					referenceName = (reference.getName() != null?reference.getName():"no-name");
+				}
+				String targetName = (actor.getTarget() != null?actor.getTarget().getName():"no-target");
+				GMAudit.auditGMAction(actor.getName(), process + "(id: " + itemId + " count: "+count+")", targetName, "L2Object referencing this action is: " + referenceName);
+			}
 		}
 
 		return item;
@@ -793,6 +808,20 @@ public class ItemTable
 				record.setLoggerName("item");
 				record.setParameters(new Object[]{item, actor, reference});
 				_logItems.log(record);
+			}
+			
+			if (actor != null)
+			{
+				if (actor.isGM())
+				{
+					String referenceName = "no-reference";
+					if (reference != null)
+					{
+						referenceName = (reference.getName() != null?reference.getName():"no-name");
+					}
+					String targetName = (actor.getTarget() != null?actor.getTarget().getName():"no-target");
+					GMAudit.auditGMAction(actor.getName(), process + "(id: " + item.getItemId() + " count: "+item.getCount()+" itemObjId: " +item.getObjectId()+")", targetName, "L2Object referencing this action is: " + referenceName);
+				}
 			}
 
 			// if it's a pet control item, delete the pet as well

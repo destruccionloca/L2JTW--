@@ -73,12 +73,8 @@ public class AdminTeleport implements IAdminCommandHandler
         "admin_tele",
         "admin_teleto",
     };
-    private static final int REQUIRED_LEVEL = Config.GM_TELEPORT;
-    private static final int REQUIRED_LEVEL2 = Config.GM_TELEPORT_OTHER;
 
     public boolean useAdminCommand(String command, L2PcInstance activeChar) {
-        if (!Config.ALT_PRIVILEGES_ADMIN)
-            if (!(checkLevel(activeChar.getAccessLevel()) && activeChar.isGM())) return false;
 
 		String target = (activeChar.getTarget() != null?activeChar.getTarget().getName():"no-target");
         GMAudit.auditGMAction(activeChar.getName(), command, target, "");
@@ -160,8 +156,7 @@ public class AdminTeleport implements IAdminCommandHandler
             {
                 String val = command.substring(25);
 
-                if (activeChar.getAccessLevel()>=REQUIRED_LEVEL2)
-            	    teleportCharacter(activeChar, val);
+           	    teleportCharacter(activeChar, val);
             }
             catch (StringIndexOutOfBoundsException e)
             {
@@ -191,8 +186,8 @@ public class AdminTeleport implements IAdminCommandHandler
             {
                 String targetName = command.substring(13);
                 L2PcInstance player = L2World.getInstance().getPlayer(targetName);
-                if (activeChar.getAccessLevel()>=REQUIRED_LEVEL2)
-            	    teleportCharacter(player, activeChar.getX(), activeChar.getY(), activeChar.getZ());
+
+           	    teleportCharacter(player, activeChar.getX(), activeChar.getY(), activeChar.getZ());
             }
             catch (StringIndexOutOfBoundsException e)
             { }
@@ -240,11 +235,6 @@ public class AdminTeleport implements IAdminCommandHandler
     public String[] getAdminCommandList()
     {
         return ADMIN_COMMANDS;
-    }
-
-    private boolean checkLevel(int level)
-    {
-        return (level >= REQUIRED_LEVEL);
     }
 
     private void teleportTo(L2PcInstance activeChar, String Cords)
@@ -311,9 +301,10 @@ public class AdminTeleport implements IAdminCommandHandler
         replyMSG.append("<edit var=\"char_cord_y\" width=110>");
         replyMSG.append("Z座標");
         replyMSG.append("<edit var=\"char_cord_z\" width=110>");
-        replyMSG.append("<button value=\"傳送\" action=\"bypass -h admin_teleport_character $char_cord_x $char_cord_y $char_cord_z\" width=60 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");	
-        replyMSG.append("<button value=\"召喚\" action=\"bypass -h admin_teleport_character " + activeChar.getX() + " " + activeChar.getY() + " " + activeChar.getZ() + "\" width=115 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
-        replyMSG.append("<center><button value=\"返回\" action=\"bypass -h admin_current_player\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></center>");
+        replyMSG.append("<button value=\"傳送\" action=\"bypass -h admin_teleport_character $char_cord_x $char_cord_y $char_cord_z\" width=60 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\">");	
+        replyMSG.append("<button value=\"召喚\" action=\"bypass -h admin_teleport_character " + activeChar.getX() + " " + activeChar.getY() + " " + activeChar.getZ() + "\" width=115 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\">");
+        replyMSG.append("<center><button value=\"返回\" action=\"bypass -h admin_current_player\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"></center>");
+
         replyMSG.append("</body></html>");
 
         adminReply.setHtml(replyMSG.toString());
@@ -380,7 +371,7 @@ public class AdminTeleport implements IAdminCommandHandler
     private void teleportToCharacter(L2PcInstance activeChar, L2Object target)
     {
         L2PcInstance player = null;
-        if (target != null && target instanceof L2PcInstance)
+        if (target instanceof L2PcInstance)
         {
             player = (L2PcInstance)target;
         }
@@ -415,7 +406,7 @@ public class AdminTeleport implements IAdminCommandHandler
     private void recallNPC(L2PcInstance activeChar)
     {
         L2Object obj = activeChar.getTarget();
-        if ((obj != null) && (obj instanceof L2NpcInstance))
+        if (obj instanceof L2NpcInstance)
         {
             L2NpcInstance target = (L2NpcInstance) obj;
 

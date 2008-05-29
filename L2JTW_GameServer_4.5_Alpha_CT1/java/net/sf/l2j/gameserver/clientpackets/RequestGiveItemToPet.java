@@ -47,7 +47,7 @@ public final class RequestGiveItemToPet extends L2GameClientPacket
 	protected void runImpl()
 	{
 		L2PcInstance player = getClient().getActiveChar();
-        if (player == null || player.getPet() == null || !(player.getPet() instanceof L2PetInstance)) return;
+        if (player == null || !(player.getPet() instanceof L2PetInstance)) return;
 
         // Alt game - Karma punishment
         if (!Config.ALT_GAME_KARMA_PLAYER_CAN_TRADE && player.getKarma() > 0) return;
@@ -61,6 +61,9 @@ public final class RequestGiveItemToPet extends L2GameClientPacket
 	// Exploit Fix for Hero weapons Uses pet Inventory to buy New One.
 	// [L2JOneo]
 	L2ItemInstance item = player.getInventory().getItemByObjectId(_objectId);
+	
+	if (item == null) return;
+	
 	if (item.isHeroItem())
 	{
 	    player.sendMessage("Duo To Hero Weapons Protection u Canot Use Pet's Inventory");

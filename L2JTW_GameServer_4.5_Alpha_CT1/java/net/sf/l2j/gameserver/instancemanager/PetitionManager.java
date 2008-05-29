@@ -520,7 +520,7 @@ public final class PetitionManager
 
 			if (currPetition.getState() != PetitionState.In_Process)
 				htmlContent.append("<button value=\"檢視\" action=\"bypass -h admin_view_petition " + currPetition.getId() + "\" " +
-		"width=\"40\" height=\"15\" back=\"sek.cbui94\" fore=\"sek.cbui92\">");
+		"width=\"40\" height=\"15\" back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\">");
 			else
 				htmlContent.append("<font color=\"999999\">狀態</font>");
 
@@ -529,9 +529,11 @@ public final class PetitionManager
 			                   dateFormat.format(new Date(currPetition.getSubmitTime())) + "</td></tr>");
 		}
 
+
 		htmlContent.append("</table><br><button value=\"重新整理\" action=\"bypass -h admin_view_petitions\" width=\"50\" " +
-		                   "height=\"15\" back=\"sek.cbui94\" fore=\"sek.cbui92\"><br><button value=\"返回\" action=\"bypass -h admin_admin\" " +
-		"width=\"40\" height=\"15\" back=\"sek.cbui94\" fore=\"sek.cbui92\"></center></body></html>");
+		                   "height=\"15\" back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"><br><button value=\"返回\" action=\"bypass -h admin_admin\" " +
+		"width=\"40\" height=\"15\" back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"></center></body></html>");
+
 
 		NpcHtmlMessage htmlMsg = new NpcHtmlMessage(0);
 		htmlMsg.setHtml(htmlContent.toString());
@@ -570,11 +572,13 @@ public final class PetitionManager
 		htmlContent.append("訴求者: " + currPetition.getPetitioner().getName() + "<br1>");
 		htmlContent.append("訴求類型: " + currPetition.getTypeAsString() + "<br>" + currPetition.getContent() + "<br>");
 		htmlContent.append("<center><button value=\"接受\" action=\"bypass -h admin_accept_petition " + currPetition.getId() + "\"" +
-		"width=\"50\" height=\"15\" back=\"sek.cbui94\" fore=\"sek.cbui92\"><br1>");
+		"width=\"50\" height=\"15\" back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"><br1>");
 		htmlContent.append("<button value=\"拒絕\" action=\"bypass -h admin_reject_petition " + currPetition.getId() + "\" " +
-		"width=\"50\" height=\"15\" back=\"sek.cbui94\" fore=\"sek.cbui92\"><br>");
-		htmlContent.append("<button value=\"返回\" action=\"bypass -h admin_view_petitions\" width=\"40\" height=\"15\" back=\"sek.cbui94\" " +
-		"fore=\"sek.cbui92\"></center>");
+
+		"width=\"50\" height=\"15\" back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"><br>");
+		htmlContent.append("<button value=\"返回\" action=\"bypass -h admin_view_petitions\" width=\"40\" height=\"15\" back=\"L2UI_ct1.button_df\" " +
+		"fore=\"L2UI_ct1.button_df\"></center>");
+
 		htmlContent.append("</body></html>");
 
 		NpcHtmlMessage htmlMsg = new NpcHtmlMessage(0);

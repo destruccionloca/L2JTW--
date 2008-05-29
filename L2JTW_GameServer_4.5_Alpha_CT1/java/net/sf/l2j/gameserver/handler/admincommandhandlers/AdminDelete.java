@@ -14,7 +14,6 @@
  */
 package net.sf.l2j.gameserver.handler.admincommandhandlers;
 
-import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.datatables.SpawnTable;
 import net.sf.l2j.gameserver.handler.IAdminCommandHandler;
 import net.sf.l2j.gameserver.instancemanager.RaidBossSpawnManager;
@@ -35,15 +34,8 @@ public class AdminDelete implements IAdminCommandHandler
 
     private static final String[] ADMIN_COMMANDS = {"admin_delete"};
 
-    private static final int REQUIRED_LEVEL = Config.GM_NPC_EDIT;
-
     public boolean useAdminCommand(String command, L2PcInstance activeChar)
     {
-        if (!Config.ALT_PRIVILEGES_ADMIN)
-        {
-            if (!(checkLevel(activeChar.getAccessLevel()) && activeChar.isGM())) return false;
-        }
-
         if (command.equals("admin_delete")) handleDelete(activeChar);
         String target = (activeChar.getTarget() != null ? activeChar.getTarget().getName() : "no-target");
         GMAudit.auditGMAction(activeChar.getName(), command, target, "");
@@ -55,16 +47,11 @@ public class AdminDelete implements IAdminCommandHandler
         return ADMIN_COMMANDS;
     }
 
-    private boolean checkLevel(int level)
-    {
-        return (level >= REQUIRED_LEVEL);
-    }
-
     // TODO: add possibility to delete any L2Object (except L2PcInstance)
     private void handleDelete(L2PcInstance activeChar)
     {
         L2Object obj = activeChar.getTarget();
-        if ((obj != null) && (obj instanceof L2NpcInstance))
+        if (obj instanceof L2NpcInstance)
         {
             L2NpcInstance target = (L2NpcInstance) obj;
             target.deleteMe();

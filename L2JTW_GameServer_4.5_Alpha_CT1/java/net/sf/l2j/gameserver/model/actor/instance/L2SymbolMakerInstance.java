@@ -61,7 +61,7 @@ public class L2SymbolMakerInstance extends L2FolkInstance
 	private void showRemoveChat(L2PcInstance player)
 	{
 		TextBuilder html1 = new TextBuilder("<html><body>");
-		html1.append("請選擇紋身移除:<br><br>");
+		html1.append("請選擇紋章移除:<br><br>");
 		boolean hasHennas = false;
 
 		for (int i=1;i<=3;i++)
@@ -76,7 +76,7 @@ public class L2SymbolMakerInstance extends L2FolkInstance
 			}
 		}
 		if (!hasHennas)
-			html1.append("並沒有任何文身可以移除!");
+			html1.append("並沒有任何紋章可以移除!");
 		html1.append("</body></html>");
 
 		insertObjectIdAndShowChatWindow(player, html1.toString());

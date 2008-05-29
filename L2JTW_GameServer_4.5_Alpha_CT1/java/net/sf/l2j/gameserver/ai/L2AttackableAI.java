@@ -161,7 +161,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         if (target.isInvul())
         {
             // However EffectInvincible requires to check GMs specially
-        	if (target instanceof L2PcInstance && ((L2PcInstance)target).isGM())
+            if (target instanceof L2PcInstance && ((L2PcInstance)target).isGM())
                 return false;
             if (target instanceof L2Summon && ((L2Summon)target).getOwner().isGM())
                 return false;
@@ -186,7 +186,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         if (target instanceof L2PcInstance)
         {
             // Don't take the aggro if the GM has the access level below or equal to GM_DONT_TAKE_AGGRO
-            if (((L2PcInstance)target).isGM() && ((L2PcInstance)target).getAccessLevel() <= Config.GM_DONT_TAKE_AGGRO)
+        	if (((L2PcInstance)target).isGM() && !((L2PcInstance)target).getAccessLevel().canTakeAggro())
                 return false;
 
             // TODO: Ideally, autoattack condition should be called from the AI script.  In that case,
@@ -217,6 +217,22 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
             //    return false;
         }
 
+        // Check if the target is a L2Summon
+        if (target instanceof L2Summon)
+        {
+        	L2PcInstance owner = ((L2Summon)target).getOwner();
+        	if (owner != null)
+        	{
+        		// Don't take the aggro if the GM has the access level below or equal to GM_DONT_TAKE_AGGRO
+                if (owner.isGM() && (owner.isInvul() || !owner.getAccessLevel().canTakeAggro()))
+                    return false;
+                // Check if player is an ally (comparing mem addr)
+                if (me.getFactionId() == "varka" && owner.isAlliedWithVarka())
+                    return false;
+                if (me.getFactionId() == "ketra" && owner.isAlliedWithKetra())
+                    return false;
+        	}
+        }
         // Check if the actor is a L2GuardInstance
         if (_actor instanceof L2GuardInstance)
         {
@@ -648,10 +664,35 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
                 _attackTimeout = MAX_ATTACK_TIMEOUT + GameTimeController.getGameTicks();
             }
         }
-
+        //------------------------------------------------------------------------------
+        //Initialize data
+        double dist = 0;
+        int dist2 = 0;
+        int range = 0;
+        L2Character MostHate = ((L2Attackable) _actor).getMostHated();
+        try
+        {
+       		setAttackTarget(MostHate);
+       		_actor.setTarget(MostHate);
+            dist = Math.sqrt(_actor.getPlanDistanceSq(getAttackTarget().getX(), getAttackTarget().getY()));
+            dist2= (int)dist;
+            range = _actor.getPhysicalAttackRange() + _actor.getTemplate().collisionRadius + getAttackTarget().getTemplate().collisionRadius;
+            if(getAttackTarget().isMoving())
+            {
+            	range = range + 50;
+            	if(_actor.isMoving())
+            		range = range + 50;
+            }
+        }
+        catch (NullPointerException e)
+        {
+            setIntention(AI_INTENTION_ACTIVE);
+            return;
+        }
+        if(_actor.getTarget() == null)
+        	AggroReconsider();
         // Check if target is dead or if timeout is expired to stop this attack
-        if (getAttackTarget() == null || getAttackTarget().isAlikeDead()
-            || _attackTimeout < GameTimeController.getGameTicks())
+        if (getAttackTarget() == null || getAttackTarget().isAlikeDead())
         {
             // Stop hating this target after the attack timeout or if target is dead
             if (getAttackTarget() != null)
@@ -666,9 +707,13 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
             _actor.setWalking();
             return;
         }
-        L2Character originalAttackTarget = getAttackTarget();
+        L2Character originalAttackTarget = null;
+        
+        if(getAttackTarget()!=null)
+        	originalAttackTarget = getAttackTarget();
+
         // Handle all L2Object of its Faction inside the Faction Range
-        if (((L2NpcInstance) _actor).getFactionId() != null)
+        if (((L2NpcInstance) _actor).getFactionId() != null && originalAttackTarget!=null)
         {
         	String faction_id = ((L2NpcInstance) _actor).getFactionId();
 
@@ -730,33 +775,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         //Return when Attack been disable
         if(_actor.isAttackingDisabled())
         	return;
-        //------------------------------------------------------------------------------
-        //Initialize data
-        double dist = 0;
-        int dist2 = 0;
-        int range = 0;
-        L2Character MostHate = ((L2Attackable) _actor).getMostHated();
-        try
-        {
-       		setAttackTarget(MostHate);
-       		_actor.setTarget(MostHate);
-            dist = Math.sqrt(_actor.getPlanDistanceSq(getAttackTarget().getX(), getAttackTarget().getY()));
-            dist2= (int)dist;
-            range = _actor.getPhysicalAttackRange() + _actor.getTemplate().collisionRadius + getAttackTarget().getTemplate().collisionRadius;
-            if(getAttackTarget().isMoving())
-            {
-            	range = range + 50;
-            	if(_actor.isMoving())
-            		range = range + 50;
-            }
-        }
-        catch (NullPointerException e)
-        {
-            setIntention(AI_INTENTION_ACTIVE);
-            return;
-        }
-        if(_actor.getTarget() == null)
-        	AggroReconsider();
+
     	// In case many mobs are trying to hit from same place, move a bit,
 		// circling around the target
 		if (!_actor.isRooted() && Rnd.nextInt(100) <= 33) // check it once per 3 seconds

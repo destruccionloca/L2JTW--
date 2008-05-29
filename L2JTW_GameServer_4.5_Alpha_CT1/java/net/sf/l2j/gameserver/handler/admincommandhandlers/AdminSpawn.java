@@ -51,15 +51,8 @@ public class AdminSpawn implements IAdminCommandHandler
 		"admin_show_npcs","admin_teleport_reload", "admin_spawnnight", "admin_spawnday" };
 	public static Logger _log = Logger.getLogger(AdminSpawn.class.getName());
 
-	private static final int REQUIRED_LEVEL = Config.GM_NPC_EDIT;
-	private static final int REQUIRED_LEVEL2 = Config.GM_TELEPORT_OTHER;
-
 	public boolean useAdminCommand(String command, L2PcInstance activeChar)
 	{
-		if (!Config.ALT_PRIVILEGES_ADMIN)
-			if (!(checkLevel(activeChar.getAccessLevel()) && activeChar.isGM()))
-				return false;
-
 		if (command.equals("admin_show_spawns"))
 			AdminHelpPage.showHelpPage(activeChar, "spawns.htm");
 		else if (command.startsWith("admin_spawn_index"))
@@ -166,18 +159,11 @@ public class AdminSpawn implements IAdminCommandHandler
 
 	}
 
-	private boolean checkLevel(int level)
-	{
-		return (level >= REQUIRED_LEVEL);
-	}
-
 	private void spawnMonster(L2PcInstance activeChar, String monsterId, int respawnTime, int mobCount,boolean permanent)
 	{
 		L2Object target = activeChar.getTarget();
 		if (target == null)
 			target = activeChar;
-		if (target != activeChar && activeChar.getAccessLevel() < REQUIRED_LEVEL2)
-			return;
 
 		L2NpcTemplate template1;
 		if (monsterId.matches("[0-9]*"))
@@ -235,8 +221,9 @@ public class AdminSpawn implements IAdminCommandHandler
 
 		// Start
 		tb.append("<html><title>創造NPC：</title><body><p> 等級："+level+"<br>總數："+mobs.length+"<br>");
-		String end1 = "<br><center><button value=\"下一頁\" action=\"bypass -h admin_spawn_index "+level+" $from$\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></center></body></html>";
-		String end2 = "<br><center><button value=\"上一頁\" action=\"bypass -h admin_show_spawns\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></center></body></html>";
+		String end1 = "<br><center><button value=\"下一頁\" action=\"bypass -h admin_spawn_index "+level+" $from$\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"></center></body></html>";
+		String end2 = "<br><center><button value=\"上一頁\" action=\"bypass -h admin_show_spawns\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"></center></body></html>";
+
 
 
 		// Loop
@@ -270,9 +257,11 @@ public class AdminSpawn implements IAdminCommandHandler
 		TextBuilder tb = new TextBuilder();
 		L2NpcTemplate[] mobs = NpcTable.getInstance().getAllNpcStartingWith(starting);
 		// Start
+
 		tb.append("<html><title>創造NPC：</title><body><p> 總數："+mobs.length+" 名稱："+starting+":<br>");
-		String end1 = "<br><center><button value=\"下一頁\" action=\"bypass -h admin_npc_index "+starting+" $from$\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></center></body></html>";
-		String end2 = "<br><center><button value=\"上一頁\" action=\"bypass -h admin_show_npcs\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></center></body></html>";
+		String end1 = "<br><center><button value=\"下一頁\" action=\"bypass -h admin_npc_index "+starting+" $from$\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"></center></body></html>";
+		String end2 = "<br><center><button value=\"上一頁\" action=\"bypass -h admin_show_npcs\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"></center></body></html>";
+
 		// Loop
 		boolean ended = true;
 		for (int i=from; i<mobs.length; i++)

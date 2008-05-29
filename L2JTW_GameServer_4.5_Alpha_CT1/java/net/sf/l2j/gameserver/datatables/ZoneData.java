@@ -40,6 +40,7 @@ import net.sf.l2j.gameserver.model.zone.form.ZoneNPoly;
 import net.sf.l2j.gameserver.model.zone.type.L2ArenaZone;
 import net.sf.l2j.gameserver.model.zone.type.L2BigheadZone;
 import net.sf.l2j.gameserver.model.zone.type.L2BossZone;
+import net.sf.l2j.gameserver.model.zone.type.L2CastleTeleportZone;
 import net.sf.l2j.gameserver.model.zone.type.L2CastleZone;
 import net.sf.l2j.gameserver.model.zone.type.L2ClanHallZone;
 //import net.sf.l2j.gameserver.model.zone.type.L2CustomZone;
@@ -51,7 +52,6 @@ import net.sf.l2j.gameserver.model.zone.type.L2JailZone;
 import net.sf.l2j.gameserver.model.zone.type.L2MotherTreeZone;
 import net.sf.l2j.gameserver.model.zone.type.L2NoLandingZone;
 import net.sf.l2j.gameserver.model.zone.type.L2OlympiadStadiumZone;
-import net.sf.l2j.gameserver.model.zone.type.L2PeaceZone;
 import net.sf.l2j.gameserver.model.zone.type.L2TownZone;
 import net.sf.l2j.gameserver.model.zone.type.L2WaterZone;
 
@@ -146,14 +146,14 @@ public class ZoneData
 								 temp = new L2FishingZone(zoneId);
 							else if (zoneType.equals("ClanHallZone"))
 								 temp = new L2ClanHallZone(zoneId);
-							else if (zoneType.equals("PeaceZone"))
-								temp = new L2PeaceZone(zoneId);
 							else if (zoneType.equals("Town"))
 								temp = new L2TownZone(zoneId);
 							else if (zoneType.equals("OlympiadStadium"))
 								temp = new L2OlympiadStadiumZone(zoneId);
 							else if (zoneType.equals("CastleZone"))
 								temp = new L2CastleZone(zoneId);
+                            else if (zoneType.equals("CastleTeleportZone"))
+                                temp = new L2CastleTeleportZone(zoneId);
 			                else if (zoneType.equals("FortZone"))
 			                    temp = new L2FortZone(zoneId);              
 							else if (zoneType.equals("DamageZone"))

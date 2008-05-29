@@ -222,14 +222,12 @@ public class Announcements
 
 		for (int i = 0; i < _announcements.size(); i++)
 		{
-
 			replyMSG.append("<table width=260><tr><td>");
 			replyMSG.append(_announcements.get(i).toString());
 			replyMSG.append("</td></tr><tr><td>");
 			replyMSG.append("<button value=\"單項公告\" action=\"bypass -h admin_one_announcement " + i + "\" width=60 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
 			replyMSG.append("&nbsp;&nbsp;&nbsp;<td><button value=\"刪除\" action=\"bypass -h admin_del_announcement " + i + "\" width=60 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\">");
 			replyMSG.append("</td></tr></table>");
-
 		}
         adminReply.replace("%announces%", replyMSG.toString());
 		activeChar.sendPacket(adminReply);

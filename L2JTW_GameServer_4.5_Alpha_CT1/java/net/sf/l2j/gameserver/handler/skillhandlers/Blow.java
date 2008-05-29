@@ -103,7 +103,7 @@ public class Blow implements ISkillHandler
 					}
 				}
 
-				if (soul && weapon != null)
+				if (soul)
 	            	weapon.setChargedSoulshot(L2ItemInstance.CHARGED_NONE);
 				if(skill.getDmgDirectlyToHP() && target instanceof L2PcInstance)
 	        	{
@@ -147,6 +147,7 @@ public class Blow implements ISkillHandler
 	        	}
 				//Possibility of a lethal strike
 				Formulas.getInstance().calcLethalHit(activeChar, target, skill);
+
 			}
 
             

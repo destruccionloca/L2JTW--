@@ -43,13 +43,9 @@ import net.sf.l2j.gameserver.serverpackets.SystemMessage;
  */
 public class AdminBan implements IAdminCommandHandler {
 	private static final String[] ADMIN_COMMANDS = {"admin_ban", "admin_unban","admin_jail","admin_unjail"};
-	private static final int REQUIRED_LEVEL = Config.GM_BAN;
 
 	public boolean useAdminCommand(String command, L2PcInstance activeChar)
 	{
-		if (!Config.ALT_PRIVILEGES_ADMIN)
-			if (!(checkLevel(activeChar.getAccessLevel())))
-				return false;
 		StringTokenizer st = new StringTokenizer(command);
 		st.nextToken();
 		String account_name = "";
@@ -65,7 +61,7 @@ public class AdminBan implements IAdminCommandHandler {
 			catch(Exception e)
 			{
 				L2Object target = activeChar.getTarget();
-				if (target!=null && target instanceof L2PcInstance)
+				if (target instanceof L2PcInstance)
 					plyr = (L2PcInstance)target;
 				else
 					activeChar.sendMessage("使用方法︰//ban [帳號名稱] (如果是空的將會鎖定目標角色)");
@@ -114,7 +110,7 @@ public class AdminBan implements IAdminCommandHandler {
 				}
 				catch (NumberFormatException nfe)
 				{
-					activeChar.sendMessage("使用方法︰//jail <角色名稱> [逞罰時間]");
+					activeChar.sendMessage("使用方法︰//jail <角色名稱> [懲罰時間]");
 				}
 				catch (NoSuchElementException nsee) {}
 				L2PcInstance playerObj = L2World.getInstance().getPlayer(player);
@@ -128,7 +124,7 @@ public class AdminBan implements IAdminCommandHandler {
 			}
 			catch (NoSuchElementException nsee)
 			{
-				activeChar.sendMessage("使用方法︰//jail <角色名稱> [逞罰時間]");
+				activeChar.sendMessage("使用方法︰//jail <角色名稱> [懲罰時間]");
 			}
 			catch(Exception e)
 			{
@@ -242,9 +238,5 @@ public class AdminBan implements IAdminCommandHandler {
 
 	public String[] getAdminCommandList() {
 		return ADMIN_COMMANDS;
-	}
-
-	private boolean checkLevel(int level) {
-		return (level >= REQUIRED_LEVEL);
 	}
 }

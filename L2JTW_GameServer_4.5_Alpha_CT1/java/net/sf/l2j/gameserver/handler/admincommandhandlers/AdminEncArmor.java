@@ -56,11 +56,10 @@ public class AdminEncArmor implements IAdminCommandHandler {
         "admin_setba",//©Ü­·13
         "admin_enchant",
         };
-    private static final int REQUIRED_LEVEL = Config.GM_MENU;
 
     public boolean useAdminCommand(String command, L2PcInstance activeChar) 
     {
-        if (!(checkLevel(activeChar.getAccessLevel()) && activeChar.isGM())) return false;
+  
         if (command.startsWith("admin_seteh"))
         {
             try
@@ -353,7 +352,5 @@ public class AdminEncArmor implements IAdminCommandHandler {
         return _adminCommands;
     }
 
-    private boolean checkLevel(int level) { 
-        return (level >= REQUIRED_LEVEL);
-    }
+
 }

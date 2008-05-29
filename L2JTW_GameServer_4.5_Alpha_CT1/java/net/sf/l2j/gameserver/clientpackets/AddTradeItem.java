@@ -16,7 +16,6 @@ package net.sf.l2j.gameserver.clientpackets;
 
 import java.util.logging.Logger;
 
-import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.model.L2World;
 import net.sf.l2j.gameserver.model.TradeList;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
@@ -76,8 +75,7 @@ public final class AddTradeItem extends L2GameClientPacket
             return;
         }
 
-        if (Config.GM_DISABLE_TRANSACTION && player.getAccessLevel() >= Config.GM_TRANSACTION_MIN
-            && player.getAccessLevel() <= Config.GM_TRANSACTION_MAX)
+        if (!player.getAccessLevel().allowTransaction())
         {
             player.sendMessage("Åv­­¤£¨¬");
             player.cancelActiveTrade();

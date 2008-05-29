@@ -12,41 +12,28 @@
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package net.sf.l2j.gameserver.skills.effects;
+package net.sf.l2j.gameserver.handler;
 
-import net.sf.l2j.gameserver.model.L2Effect;
-import net.sf.l2j.gameserver.skills.Env;
+import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 
-public final class EffectSeed extends L2Effect {
+/**
+ * Interface for chat handlers
+ *
+ * @author  durgus
+ */
+public interface IChatHandler
+{
+	/**
+	 * Handles a specific type of chat messages
+	 * @param type
+	 * @param activeChar
+	 * @param target
+	 */
+	public void handleChat(int type, L2PcInstance activeChar, String target, String text);
 
-	private int _power = 1;
-
-    public EffectSeed(Env env, EffectTemplate template)
-	{
-		super(env, template);
-	}
-
-	@Override
-	public EffectType getEffectType()
-	{
-		return EffectType.SEED;
-	}
-
-	@Override
-	public boolean onActionTime()
-    {
-    	// just stop this effect
-    	return false;
-    }
-
-    public int getPower()
-    {
-        return _power;
-    }
-
-    public void increasePower()
-    {
-        _power++;
-    }
+	/**
+	 * Returns a list of all chat types registered to this handler
+	 * @return
+	 */
+	public int[] getChatTypeList();
 }
-

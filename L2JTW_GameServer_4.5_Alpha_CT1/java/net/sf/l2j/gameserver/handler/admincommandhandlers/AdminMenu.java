@@ -52,12 +52,8 @@ public class AdminMenu implements IAdminCommandHandler
 		"admin_ban_menu",
 		"admin_unban_menu"
 	};
-	private static final int REQUIRED_LEVEL = Config.GM_ACCESSLEVEL;
 
 	public boolean useAdminCommand(String command, L2PcInstance activeChar) {
-		if (!Config.ALT_PRIVILEGES_ADMIN)
-			if (!(checkLevel(activeChar.getAccessLevel()) && activeChar.isGM())) return false;
-
 		String target = (activeChar.getTarget() != null?activeChar.getTarget().getName():"no-target");
 		GMAudit.auditGMAction(activeChar.getName(), command, target, "");
 
@@ -206,10 +202,6 @@ public class AdminMenu implements IAdminCommandHandler
 	{
 		return ADMIN_COMMANDS;
 	}
-	private boolean checkLevel(int level)
-	{
-		return (level >= REQUIRED_LEVEL);
-	}
 	private void handleKill(L2PcInstance activeChar)
 	{
 		handleKill(activeChar, null);
@@ -256,7 +248,7 @@ public class AdminMenu implements IAdminCommandHandler
 	private void teleportToCharacter(L2PcInstance activeChar, L2Object target)
 	{
 		L2PcInstance player = null;
-		if (target != null && target instanceof L2PcInstance)
+		if (target instanceof L2PcInstance)
 			player = (L2PcInstance)target;
 		else
 		{

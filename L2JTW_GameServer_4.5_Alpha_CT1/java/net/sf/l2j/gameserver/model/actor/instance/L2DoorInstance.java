@@ -182,7 +182,7 @@ public class L2DoorInstance extends L2Character
     @Override
 	public final DoorKnownList getKnownList()
     {
-    	if(super.getKnownList() == null || !(super.getKnownList() instanceof DoorKnownList))
+    	if(!(super.getKnownList() instanceof DoorKnownList))
     		setKnownList(new DoorKnownList(this));
     	return (DoorKnownList)super.getKnownList();
     }
@@ -190,7 +190,7 @@ public class L2DoorInstance extends L2Character
     @Override
 	public final DoorStat getStat()
     {
-    	if(super.getStat() == null || !(super.getStat() instanceof DoorStat))
+    	if(!(super.getStat() instanceof DoorStat))
     		setStat(new DoorStat(this));
     	return (DoorStat)super.getStat();
     }
@@ -198,7 +198,7 @@ public class L2DoorInstance extends L2Character
     @Override
 	public final DoorStatus getStatus()
     {
-    	if(super.getStatus() == null || !(super.getStatus() instanceof DoorStatus))
+    	if(!(super.getStatus() instanceof DoorStatus))
     		setStatus(new DoorStatus(this));
     	return (DoorStatus)super.getStatus();
     }
@@ -307,7 +307,7 @@ public class L2DoorInstance extends L2Character
             return true;
 
         // Doors can`t be attacked by NPCs
-        if (attacker == null || !(attacker instanceof L2PcInstance)) return false;
+        if (!(attacker instanceof L2PcInstance)) return false;
         
         // Attackable during siege by attacker only
         boolean isCastle = (getCastle() != null
@@ -444,7 +444,7 @@ public class L2DoorInstance extends L2Character
         L2PcInstance player = client.getActiveChar();
         if (player == null) return;
 
-        if (player.getAccessLevel() >= Config.GM_ACCESSLEVEL)
+        if (player.getAccessLevel().isGm())
         {
             player.setTarget(this);
             MyTargetSelected my = new MyTargetSelected(getObjectId(), player
@@ -471,10 +471,12 @@ public class L2DoorInstance extends L2Character
             html1.append("</table>");
 
             html1.append("<table><tr>");
-            html1.append("<td><button value=\"開啟\" action=\"bypass -h admin_open "+getDoorId()+"\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
-            html1.append("<td><button value=\"關閉\" action=\"bypass -h admin_close "+getDoorId()+"\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
-            html1.append("<td><button value=\"摧毀\" action=\"bypass -h admin_kill\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
-            html1.append("<td><button value=\"刪除\" action=\"bypass -h admin_delete\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td>");
+
+            html1.append("<td><button value=\"開啟\" action=\"bypass -h admin_open "+getDoorId()+"\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"></td>");
+            html1.append("<td><button value=\"關閉\" action=\"bypass -h admin_close "+getDoorId()+"\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"></td>");
+            html1.append("<td><button value=\"摧毀\" action=\"bypass -h admin_kill\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"></td>");
+            html1.append("<td><button value=\"刪除\" action=\"bypass -h admin_delete\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"></td>");
+
             html1.append("</tr></table></body></html>");
 
             html.setHtml(html1.toString());

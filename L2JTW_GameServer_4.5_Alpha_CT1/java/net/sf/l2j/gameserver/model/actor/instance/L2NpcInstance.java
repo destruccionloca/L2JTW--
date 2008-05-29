@@ -274,7 +274,7 @@ public class L2NpcInstance extends L2Character
     @Override
 	public NpcKnownList getKnownList()
 	{
-    	if(super.getKnownList() == null || !(super.getKnownList() instanceof NpcKnownList))
+    	if(!(super.getKnownList() instanceof NpcKnownList))
     		setKnownList(new NpcKnownList(this));
     	return (NpcKnownList)super.getKnownList();
 	}
@@ -282,7 +282,7 @@ public class L2NpcInstance extends L2Character
 	@Override
 	public NpcStat getStat()
 	{
-		if(super.getStat() == null || !(super.getStat() instanceof NpcStat))
+		if(!(super.getStat() instanceof NpcStat))
 			setStat(new NpcStat(this));
 		return (NpcStat)super.getStat();
 	}
@@ -290,7 +290,7 @@ public class L2NpcInstance extends L2Character
 	@Override
 	public NpcStatus getStatus()
 	{
-		if(super.getStatus() == null || !(super.getStatus() instanceof NpcStatus))
+		if(!(super.getStatus() instanceof NpcStatus))
 			setStatus(new NpcStatus(this));
 		return (NpcStatus)super.getStatus();
 	}
@@ -1309,7 +1309,7 @@ public class L2NpcInstance extends L2Character
         if (player == null) return;
 
         // Check if the L2PcInstance is a GM
-        if (player.getAccessLevel() >= Config.GM_ACCESSLEVEL)
+        if (player.getAccessLevel().isGm())
         {
             // Set the target of the L2PcInstance player
             player.setTarget(this);
@@ -1360,10 +1360,12 @@ public class L2NpcInstance extends L2Character
             html1.append("<tr><td>STR</td><td>"+getSTR()+"</td><td>DEX</td><td>"+getDEX()+"</td><td>CON</td><td>"+getCON()+"</td></tr>");
             html1.append("<tr><td>INT</td><td>"+getINT()+"</td><td>WIT</td><td>"+getWIT()+"</td><td>MEN</td><td>"+getMEN()+"</td></tr>");
             html1.append("</table>");
-            html1.append("<br><center><table><tr><td><button value=\"½s¿è\" action=\"bypass -h admin_edit_npc " + getTemplate().npcId + "\" width=100 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"><br1></td>");
-            html1.append("<td><button value=\"®ø·À\" action=\"bypass -h admin_kill\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td><br1></tr>");
-            html1.append("<tr><td><button value=\"±¼¸¨²M³æ\" action=\"bypass -h admin_show_droplist " + getTemplate().npcId + "\" width=100 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");			
-            html1.append("<td><button value=\"§R°£\" action=\"bypass -h admin_delete\" width=40 height=15 back=\"sek.cbui94\" fore=\"sek.cbui92\"></td></tr>");
+
+            html1.append("<br><center><table><tr><td><button value=\"½s¿è\" action=\"bypass -h admin_edit_npc " + getTemplate().npcId + "\" width=100 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"><br1></td>");
+            html1.append("<td><button value=\"·À¤`\" action=\"bypass -h admin_kill\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"></td><br1></tr>");
+            html1.append("<tr><td><button value=\"±¼¸¨\" action=\"bypass -h admin_show_droplist " + getTemplate().npcId + "\" width=100 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"></td></tr>");
+            html1.append("<td><button value=\"§R°£\" action=\"bypass -h admin_delete\" width=40 height=15 back=\"L2UI_ct1.button_df\" fore=\"L2UI_ct1.button_df\"></td></tr>");
+
             html1.append("</table></center><br>");
             html1.append("</body></html>");
 
@@ -3057,6 +3059,12 @@ public class L2NpcInstance extends L2Character
     	if (physical && _inventory.sshotInUse) return true;
     	if (!physical && _inventory.bshotInUse) return true;
     	return false;
+    }
+    
+    @Override
+    public NpcInventory getInventory()
+    {
+    	return _inventory;
     }
                 
 }

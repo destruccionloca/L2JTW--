@@ -43,7 +43,7 @@ public class SiegeFlag implements ISkillHandler
 
     public void useSkill(L2Character activeChar, @SuppressWarnings("unused") L2Skill skill, @SuppressWarnings("unused") L2Object[] targets)
     {
-        if (activeChar == null || !(activeChar instanceof L2PcInstance)) return;
+        if (!(activeChar instanceof L2PcInstance)) return;
 
         L2PcInstance player = (L2PcInstance)activeChar;
 
@@ -111,7 +111,7 @@ public class SiegeFlag implements ISkillHandler
 
     public static boolean checkIfOkToPlaceFlag(L2Character activeChar, Castle castle, boolean isCheckOnly)
     {
-        if (activeChar == null || !(activeChar instanceof L2PcInstance))
+        if (!(activeChar instanceof L2PcInstance))
             return false;
 
         String text = "";
@@ -119,10 +119,8 @@ public class SiegeFlag implements ISkillHandler
 
         if (castle == null || castle.getCastleId() <= 0)
             text = "必須在城堡周圍放置陣旗。";
-
         else if (!castle.getSiege().getIsInProgress())
-            text = "只能再攻城戰期間放置陣旗。";
-
+            text = "只能在攻城戰期間放置陣旗。";
         else if (castle.getSiege().getAttackerClan(player.getClan()) == null)
             text = "必須是攻城方才能放置陣旗。";
         else if (player.getClan() == null || !player.isClanLeader())
@@ -139,22 +137,22 @@ public class SiegeFlag implements ISkillHandler
     
     public static boolean checkIfOkToPlaceFlag(L2Character activeChar, Fort fort, boolean isCheckOnly)
     {
-        if (activeChar == null || !(activeChar instanceof L2PcInstance))
+        if (!(activeChar instanceof L2PcInstance))
             return false;
 
         String text = "";
         L2PcInstance player = (L2PcInstance)activeChar;
 
         if (fort == null || fort.getFortId() <= 0)
-            text = "You must be on fort ground to place a flag";
+            text = "必須在要塞周圍放置陣旗。";
         else if (!fort.getSiege().getIsInProgress())
-            text = "You can only place a flag during a siege.";
+            text = "只能在攻城戰期間放置陣旗。";
         else if (fort.getSiege().getAttackerClan(player.getClan()) == null)
-            text = "You must be an attacker to place a flag";
+            text = "必須是攻城方才能放置陣旗。";
         else if (player.getClan() == null || !player.isClanLeader())
-            text = "You must be a clan leader to place a flag";
+            text = "必須是血盟盟主。";
         else if (fort.getSiege().getAttackerClan(player.getClan()).getNumFlags() >= FortSiegeManager.getInstance().getFlagMaxCount())
-            text = "You have already placed the maximum number of flags possible";
+            text = "陣旗放置數量已達到極限。";
         else
             return true;
 

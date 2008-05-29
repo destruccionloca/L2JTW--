@@ -221,6 +221,7 @@ public class Pdam implements ISkillHandler
                         }
 
 
+
 	                		SystemMessage smsg = new SystemMessage(SystemMessageId.S1_GAVE_YOU_S2_DMG);
 	    					if(activeChar instanceof L2NpcInstance || activeChar instanceof L2Summon)
 	    					{

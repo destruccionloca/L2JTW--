@@ -48,7 +48,7 @@ public class AdminCTFEngine implements IAdminCommandHandler {
 
     public boolean useAdminCommand(String command, L2PcInstance activeChar)
     {
-        if (!(checkLevel(activeChar.getAccessLevel()) && activeChar.isGM())) return false;
+       
         
         if (command.equals("admin_ctf"))
             showMainPage(activeChar);
@@ -172,11 +172,6 @@ public class AdminCTFEngine implements IAdminCommandHandler {
     public String[] getAdminCommandList()
     {
         return _adminCommands;
-    }
-
-    private boolean checkLevel(int level) 
-    {
-        return (level >= REQUIRED_LEVEL);
     }
 
     public void showMainPage(L2PcInstance activeChar)

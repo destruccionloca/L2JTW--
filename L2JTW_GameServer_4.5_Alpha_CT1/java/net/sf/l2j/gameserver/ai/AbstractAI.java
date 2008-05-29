@@ -544,7 +544,6 @@ abstract class AbstractAI implements Ctrl
             	}
             	else if (sendPacket) // don't repeat unnecessarily
             		_actor.broadcastPacket(new MoveToPawn(_actor, (L2Character) pawn, offset));
-            		//_actor.broadcastPacket(new MoveToLocation(_actor));
             }
             else 
             	_actor.broadcastPacket(new MoveToLocation(_actor));

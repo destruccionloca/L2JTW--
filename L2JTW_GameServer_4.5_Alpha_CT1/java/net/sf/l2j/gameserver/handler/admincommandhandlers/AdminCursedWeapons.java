@@ -18,7 +18,6 @@ import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
 import javolution.text.TextBuilder;
-import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.handler.IAdminCommandHandler;
 import net.sf.l2j.gameserver.instancemanager.CursedWeaponsManager;
 import net.sf.l2j.gameserver.model.CursedWeapon;
@@ -39,14 +38,10 @@ import net.sf.l2j.gameserver.serverpackets.SystemMessage;
  */
 public class AdminCursedWeapons implements IAdminCommandHandler {
 	private static final String[] ADMIN_COMMANDS = {"admin_cw_info", "admin_cw_remove", "admin_cw_goto", "admin_cw_reload", "admin_cw_add", "admin_cw_info_menu"};
-	private static final int REQUIRED_LEVEL = Config.GM_MIN;
 	private int itemId;
 	private static final Logger _log = Logger.getLogger(CursedWeaponsManager.class.getName());
 	public boolean useAdminCommand(String command, L2PcInstance activeChar)
 	{
-		if (!Config.ALT_PRIVILEGES_ADMIN)
-			if (!(checkLevel(activeChar.getAccessLevel())))
-				return false;
 
 		CursedWeaponsManager cwm = CursedWeaponsManager.getInstance();
 		int id=0;
@@ -180,7 +175,7 @@ public class AdminCursedWeapons implements IAdminCommandHandler {
 				else
 				{
 					L2Object target = activeChar.getTarget();
-					if (target != null && target instanceof L2PcInstance)
+					if (target instanceof L2PcInstance)
 						((L2PcInstance)target).addItem("AdminCursedWeaponAdd", id, 1, target, true);
 					else
 						activeChar.addItem("AdminCursedWeaponAdd", id, 1, activeChar, true);
@@ -196,9 +191,5 @@ public class AdminCursedWeapons implements IAdminCommandHandler {
 
 	public String[] getAdminCommandList() {
 		return ADMIN_COMMANDS;
-	}
-
-	private boolean checkLevel(int level) {
-		return (level >= REQUIRED_LEVEL);
 	}
 }

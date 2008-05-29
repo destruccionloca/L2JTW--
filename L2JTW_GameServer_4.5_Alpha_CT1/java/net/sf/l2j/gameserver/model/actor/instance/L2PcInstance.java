@@ -53,6 +53,8 @@ import net.sf.l2j.gameserver.cache.HtmCache;
 import net.sf.l2j.gameserver.cache.WarehouseCacheManager;
 import net.sf.l2j.gameserver.communitybbs.BB.Forum;
 import net.sf.l2j.gameserver.communitybbs.Manager.ForumsBBSManager;
+import net.sf.l2j.gameserver.datatables.AccessLevel;
+import net.sf.l2j.gameserver.datatables.AccessLevels;
 import net.sf.l2j.gameserver.datatables.CharTemplateTable;
 import net.sf.l2j.gameserver.datatables.ClanTable;
 import net.sf.l2j.gameserver.datatables.FishTable;
@@ -162,6 +164,7 @@ import net.sf.l2j.gameserver.serverpackets.ItemList;
 import net.sf.l2j.gameserver.serverpackets.L2GameServerPacket;
 import net.sf.l2j.gameserver.serverpackets.LeaveWorld;
 import net.sf.l2j.gameserver.serverpackets.MagicSkillCanceld;
+import net.sf.l2j.gameserver.serverpackets.MagicSkillUse;
 import net.sf.l2j.gameserver.serverpackets.MyTargetSelected;
 import net.sf.l2j.gameserver.serverpackets.NicknameChanged;
 import net.sf.l2j.gameserver.serverpackets.NpcHtmlMessage;
@@ -345,7 +348,7 @@ public final class L2PcInstance extends L2PlayableInstance
 				default:
 				{
 					L2Object mainTarget = skill.getFirstOfTargetList(L2PcInstance.this);
-					if (mainTarget == null || !(mainTarget instanceof L2Character))
+					if (!(mainTarget instanceof L2Character))
 						return;
 					for (L2CubicInstance cubic : getCubics().values())
 						if (cubic.getId() != L2CubicInstance.LIFE_CUBIC)
@@ -603,9 +606,7 @@ public final class L2PcInstance extends L2PlayableInstance
     // WorldPosition used by TARGET_SIGNET_GROUND
     private Point3D _currentSkillWorldPosition;
     
-	//GM related variables
-	private boolean _isGm;
-	private int _accessLevel;
+    private AccessLevel _accessLevel;
 
 	private boolean _chatBanned = false; 		// Chat Banned
     private ScheduledFuture<?> _chatUnbanTask = null;
@@ -645,7 +646,7 @@ public final class L2PcInstance extends L2PlayableInstance
 
 	protected boolean _inventoryDisable = false;
 
-	protected Map<Integer, L2CubicInstance> _cubics = new FastMap<Integer, L2CubicInstance>();
+	protected Map<Integer, L2CubicInstance> _cubics = new FastMap<Integer, L2CubicInstance>().setShared(true);
 
 	/** Active shots. A FastSet variable would actually suffice but this was changed to fix threading stability... */
 	protected Map<Integer, Integer> _activeSoulShots = new FastMap<Integer, Integer>().setShared(true);
@@ -1015,7 +1016,7 @@ public final class L2PcInstance extends L2PlayableInstance
 	@Override
 	public final PcKnownList getKnownList()
 	{
-		if(super.getKnownList() == null || !(super.getKnownList() instanceof PcKnownList))
+		if(!(super.getKnownList() instanceof PcKnownList))
     		setKnownList(new PcKnownList(this));
 		return (PcKnownList)super.getKnownList();
 	}
@@ -1023,7 +1024,7 @@ public final class L2PcInstance extends L2PlayableInstance
 	@Override
 	public final PcStat getStat()
 	{
-		if(super.getStat() == null || !(super.getStat() instanceof PcStat))
+		if(!(super.getStat() instanceof PcStat))
     		setStat(new PcStat(this));
 		return (PcStat)super.getStat();
 	}
@@ -1031,7 +1032,7 @@ public final class L2PcInstance extends L2PlayableInstance
 	@Override
 	public final PcStatus getStatus()
 	{
-		if(super.getStatus() == null || !(super.getStatus() instanceof PcStatus))
+		if(!(super.getStatus() instanceof PcStatus))
     		setStatus(new PcStatus(this));
 		return (PcStatus)super.getStatus();
 	}
@@ -2058,7 +2059,7 @@ public final class L2PcInstance extends L2PlayableInstance
 			getSubClasses().get(_classIndex).setClassId(Id);
 		}
 		setTarget(this);
-		doCast(SkillTable.getInstance().getInfo(5103,1));
+		broadcastPacket(new MagicSkillUse(this, 5103, 1, 1000, 0));
 		setClassTemplate(Id);
 		
 		// Update class icon in party and clan
@@ -2266,15 +2267,22 @@ public final class L2PcInstance extends L2PlayableInstance
 		if (isHero())
 			setHero(true);
 
-		// Add clan skills
-		if (getClan() != null && getClan().getReputationScore() >= 0)
+		// Add clan skills 
+		if (getClan() != null)
 		{
-			L2Skill[] skills = getClan().getAllSkills();
-			for (L2Skill sk : skills)
+			L2Clan clan = getClan();
+			if (clan.getReputationScore() >= 0)
 			{
-				if(sk.getMinPledgeClass() <= getPledgeClass())
-					addSkill(sk, false);
+				L2Skill[] skills = getClan().getAllSkills();
+				for (L2Skill sk : skills)
+				{
+					if(sk.getMinPledgeClass() <= getPledgeClass())
+						addSkill(sk, false);
+				}
 			}
+			if (clan.getLevel() >= SiegeManager.getInstance().getSiegeClanMinLevel() &&
+					isClanLeader())
+				SiegeManager.getInstance().addSiegeSkills(this);
 		}
 		
 		// Reload passive skills from armors / jewels / weapons
@@ -2424,6 +2432,7 @@ public final class L2PcInstance extends L2PlayableInstance
 	/**
 	 * Return the PcInventory Inventory of the L2PcInstance contained in _inventory.<BR><BR>
 	 */
+	@Override
 	public PcInventory getInventory()
 	{
 		return _inventory;
@@ -4005,7 +4014,8 @@ public final class L2PcInstance extends L2PlayableInstance
 	 */
 	public void doAutoLoot(L2Attackable target, L2Attackable.RewardItem item)
 	{
-		if (isInParty()) getParty().distributeItem(this, item, false, target);
+		if (isInParty()&&ItemTable.getInstance().getTemplate(item.getItemId()).getItemType() != L2EtcItemType.HERB)  
+			getParty().distributeItem(this, item, false, target);
 		else if (item.getItemId() == 57) addAdena("Loot", item.getCount(), target, true);
 		else addItem("Loot", item.getItemId(), item.getCount(), target, true);
 	}
@@ -4424,7 +4434,7 @@ public final class L2PcInstance extends L2PlayableInstance
 		}
 
 		// Add the L2PcInstance to the _statusListener of the new target if it's a L2Character
-		if (newTarget != null && newTarget instanceof L2Character)
+		if (newTarget instanceof L2Character)
 		{
 			((L2Character) newTarget).addStatusListener(this);
 			TargetSelected my = new TargetSelected(getObjectId(), newTarget.getObjectId(), getX(), getY(), getZ());
@@ -4785,8 +4795,10 @@ public final class L2PcInstance extends L2PlayableInstance
 						{
 							// Reduce the Experience of the L2PcInstance in function of the calculated Death Penalty
 							// NOTE: deathPenalty +- Exp will update karma
+							// Penalty is lower if the player is at war with the pk (war has to be declared)
 							if (getSkillLevel(L2Skill.SKILL_LUCKY) < 0 || getStat().getLevel() > 9)
-								deathPenalty((pk != null && getClan() != null && pk.getClan() != null && pk.getClan().isAtWarWith(getClanId())));
+								deathPenalty(pk != null && getClan() != null && getClan().isAtWarWith(pk.getClanId()));										
+
 						} else
 						{
 							onDieUpdateKarma(); // Update karma if delevel is not allowed
@@ -5195,17 +5207,44 @@ public final class L2PcInstance extends L2PlayableInstance
 		final int lvl = getLevel();
 
 		//The death steal you some Exp
-		double percentLost = 5.0;
-		if (getLevel() >= 76)
-			percentLost = 1.0;
-		else if (getLevel() >= 40)
-			percentLost = 3.0;
+		double percentLost = 1.0;
+		
+		byte level = (byte)getLevel();
+		
+		switch (level)
+		{
+			case 81:
+				percentLost = 1.25;
+				break;
+			case 80:
+				percentLost = 1.5;
+				break;
+			case 79:
+				percentLost = 1.75;
+				break;
+			case 78:
+				percentLost = 2.0;
+				break;
+			case 77:
+				percentLost = 2.25;
+				break;
+			case 76:
+				percentLost = 2.5;
+				break;
+			default:
+				if (level < 40)
+					percentLost = 7.0;
+				else if (level >= 40 && level <= 75)
+					percentLost = 4.0;
+				
+				break;
+		}
 
 		if (getKarma() > 0)
             percentLost *= Config.RATE_KARMA_EXP_LOST;
 
 		if (isFestivalParticipant() || atwar || isInsideZone(ZONE_SIEGE))
-            percentLost /= 3.0;
+            percentLost /= 4.0;
 
 		// Calculate the Experience loss
 		long lostExp = 0;
@@ -6016,19 +6055,11 @@ public final class L2PcInstance extends L2PlayableInstance
 	}
 
 	/**
-	 * Set the _isGm Flag of the L2PcInstance.<BR><BR>
-	 */
-	public void setIsGM(boolean status)
-	{
-		_isGm = status;
-	}
-
-	/**
 	 * Return True if the L2PcInstance is a GM.<BR><BR>
 	 */
 	public boolean isGM()
 	{
-		return _isGm;
+		return getAccessLevel().isGm();
 	}
 
 	/**
@@ -6060,10 +6091,40 @@ public final class L2PcInstance extends L2PlayableInstance
 	 */
 	public void setAccessLevel(int level)
 	{
-		_accessLevel = level;
+		if (level == AccessLevels._masterAccessLevelNum)
+		{
+			_log.warning( "Setted master access level for character " + getName() + "! Just a warning to be carefull ;)" );
+			_accessLevel = AccessLevels._masterAccessLevel;
+		}
+		else if (level == AccessLevels._userAccessLevelNum)
+			_accessLevel = AccessLevels._userAccessLevel;
+		else
+		{
+			AccessLevel accessLevel = AccessLevels.getInstance().getAccessLevel(level);
 
-		if (_accessLevel > 0 || Config.EVERYBODY_HAS_ADMIN_RIGHTS)
-			setIsGM(true);
+			if (accessLevel == null)
+			{
+				if (level < 0)
+				{
+					AccessLevels.getInstance().addBanAccessLevel(level);
+					_accessLevel = AccessLevels.getInstance().getAccessLevel(level);
+				}
+				else
+				{
+					_log.warning( "Tryed to set unregistered access level " + level + " to character " + getName() + ". Setting access level without privileges!" );
+					_accessLevel = AccessLevels._userAccessLevel;
+				}
+			}
+			else
+				_accessLevel = accessLevel;
+		}
+
+		if (_accessLevel != AccessLevels._userAccessLevel)
+		{
+			getAppearance().setNameColor(_accessLevel.getNameColor());
+			getAppearance().setTitleColor(_accessLevel.getTitleColor());
+			broadcastUserInfo();
+		}
 	}
 
 	public void setAccountAccesslevel(int level)
@@ -6074,10 +6135,12 @@ public final class L2PcInstance extends L2PlayableInstance
 	/**
 	 * Return the _accessLevel of the L2PcInstance.<BR><BR>
 	 */
-	public int getAccessLevel()
+	public AccessLevel getAccessLevel()
 	{
-		if (Config.EVERYBODY_HAS_ADMIN_RIGHTS && _accessLevel <= 200)
-			return 200;
+		if (Config.EVERYBODY_HAS_ADMIN_RIGHTS)
+			return AccessLevels._masterAccessLevel;
+		else if ( _accessLevel == null ) /* This is here because inventory etc. is loaded before access level on login, so it is not null */
+			setAccessLevel(AccessLevels._userAccessLevelNum);
 
 		return _accessLevel;
 	}
@@ -6204,7 +6267,7 @@ public final class L2PcInstance extends L2PlayableInstance
 			statement.setLong(23, getDeleteTimer());
 			statement.setInt(24, hasDwarvenCraft() ? 1 : 0);
 			statement.setString(25, getTitle());
-			statement.setInt(26, getAccessLevel());
+			statement.setInt(26, getAccessLevel().getLevel());
 			statement.setInt(27, isOnline());
             statement.setInt(28, isIn7sDungeon() ? 1 : 0);
 			statement.setInt(29, getClanPrivileges());
@@ -6717,7 +6780,7 @@ public final class L2PcInstance extends L2PlayableInstance
 			statement.setInt(25, getClassId().getId());
 			statement.setLong(26, getDeleteTimer());
 			statement.setString(27, getTitle());
-			statement.setInt(28, getAccessLevel());
+			statement.setInt(28, getAccessLevel().getLevel());
 			statement.setInt(29, isOnline());
             statement.setInt(30, isIn7sDungeon() ? 1 : 0);
 			statement.setInt(31, getClanPrivileges());
@@ -7848,7 +7911,7 @@ public final class L2PcInstance extends L2PlayableInstance
         //************************************* Check skill availability *******************************************
 
         // Check if this skill is enabled (ex : reuse time)
-        if (isSkillDisabled(skill.getId()) && (getAccessLevel() < Config.GM_PEACEATTACK))
+        if (isSkillDisabled(skill.getId()) && !getAccessLevel().allowPeaceAttack())
         {
             SystemMessage sm = new SystemMessage(SystemMessageId.S1_PREPARED_FOR_REUSE);
             sm.addSkillName(skill.getId());
@@ -7860,7 +7923,7 @@ public final class L2PcInstance extends L2PlayableInstance
         }
 
         // Check if all skills are disabled
-        if (isAllSkillsDisabled() && (getAccessLevel() < Config.GM_PEACEATTACK))
+        if (isAllSkillsDisabled() && !getAccessLevel().allowPeaceAttack())
         {
             // Send a Server->Client packet ActionFailed to the L2PcInstance
             sendPacket(ActionFailed.STATIC_PACKET);
@@ -7870,58 +7933,6 @@ public final class L2PcInstance extends L2PlayableInstance
 
 
         //************************************* Check Consumables *******************************************
-
-        // Check if the caster has enough MP
-        if (getCurrentMp() < getStat().getMpConsume(skill) + getStat().getMpInitialConsume(skill))
-        {
-            // Send a System Message to the caster
-            sendPacket(new SystemMessage(SystemMessageId.NOT_ENOUGH_MP));
-
-            // Send a Server->Client packet ActionFailed to the L2PcInstance
-            sendPacket(ActionFailed.STATIC_PACKET);
-            return;
-        }
-
-        // Check if the caster has enough HP
-        if (getCurrentHp() <= skill.getHpConsume())
-        {
-            // Send a System Message to the caster
-            sendPacket(new SystemMessage(SystemMessageId.NOT_ENOUGH_HP));
-
-            // Send a Server->Client packet ActionFailed to the L2PcInstance
-            sendPacket(ActionFailed.STATIC_PACKET);
-            return;
-        }
-
-        // Check if the spell consummes an Item
-        if (skill.getItemConsume() > 0)
-        {
-            // Get the L2ItemInstance consummed by the spell
-            L2ItemInstance requiredItems = getInventory().getItemByItemId(skill.getItemConsumeId());
-
-            // Check if the caster owns enought consummed Item to cast
-            if (requiredItems == null || requiredItems.getCount() < skill.getItemConsume())
-            {
-            	// Checked: when a summon skill failed, server show required consume item count
-            	if (sklType == L2Skill.SkillType.SUMMON)
-                {
-            		SystemMessage sm = new SystemMessage(SystemMessageId.SUMMONING_SERVITOR_COSTS_S2_S1);
-            		sm.addItemName(skill.getItemConsumeId());
-            		sm.addNumber(skill.getItemConsume());
-            		sendPacket(sm);
-            		return;
-                }
-            	else
-                {
-            		// Send a System Message to the caster
-    				SystemMessage sm = new SystemMessage(1987);
-    	            sm.addString("所需物品不足");
-    				sendPacket(sm);
-            		return;
-                }
-            }
-        }
-
         // Check if spell consumes a Soul
         if (skill.getSoulConsumeCount() > 0)
         {
@@ -7987,7 +7998,7 @@ public final class L2PcInstance extends L2PlayableInstance
         // Check if this is offensive magic skill
         if (skill.isOffensive())
 		{
-			if ((isInsidePeaceZone(this, target)) && (getAccessLevel() < Config.GM_PEACEATTACK))
+			if ((isInsidePeaceZone(this, target)) && !getAccessLevel().allowPeaceAttack())
 			{
 				// If L2Character or target is in a peace zone, send a system message TARGET_IN_PEACEZONE a Server->Client packet ActionFailed
 				sendPacket(new SystemMessage(SystemMessageId.TARGET_IN_PEACEZONE));
@@ -8002,7 +8013,7 @@ public final class L2PcInstance extends L2PlayableInstance
 			}
 
             // Check if the target is attackable
-            if (!target.isAttackable() && (getAccessLevel() < Config.GM_PEACEATTACK))
+            if (!target.isAttackable() && !getAccessLevel().allowPeaceAttack())
 			{
 				// If target is not attackable, send a Server->Client packet ActionFailed
 				sendPacket(ActionFailed.STATIC_PACKET);
@@ -8159,7 +8170,7 @@ public final class L2PcInstance extends L2PlayableInstance
 			case TARGET_SELF:
 				break;
 			default:
-				if (!checkPvpSkill(target, skill) && (getAccessLevel() < Config.GM_PEACEATTACK))
+				if (!checkPvpSkill(target, skill) && !getAccessLevel().allowPeaceAttack())
                 {
 					// Send a System Message to the L2PcInstance
 					sendPacket(new SystemMessage(SystemMessageId.TARGET_IS_INCORRECT));
@@ -8221,11 +8232,8 @@ public final class L2PcInstance extends L2PlayableInstance
         	}
         }
 
-       /* If all conditions are checked, create a new SkillDat object and set the player _currentSkill
-        * If skill is potion, do not save data into _currentSkill so that previous casting
-        * intention can be easily retaken later
-        */
-        if (!skill.isPotion()) setCurrentSkill(skill, forceUse, dontMove);
+        // If all conditions are checked, create a new SkillDat object and set the player _currentSkill
+        setCurrentSkill(skill, forceUse, dontMove);
 
 		// Check if the active L2Skill can be casted (ex : not sleeping...), Check if the target is correct and Notify the AI with AI_INTENTION_CAST and target
         super.useMagic(skill);
@@ -8288,16 +8296,6 @@ public final class L2PcInstance extends L2PlayableInstance
 		}
 
 		return true;
-	}
-
-	/**
-	 * Reduce Item quantity of the L2PcInstance Inventory and send it a Server->Client packet InventoryUpdate.<BR><BR>
-	 */
-	@Override
-	public void consumeItem(int itemConsumeId, int itemCount)
-	{
-		if (itemConsumeId != 0 && itemCount != 0)
-			destroyItemByItemId("Consume", itemConsumeId, itemCount, null, false);
 	}
 
 	/**
@@ -9451,7 +9449,7 @@ public final class L2PcInstance extends L2PlayableInstance
          * 10.Unsummon any active servitor from the player.
          */
 
-        if (getPet() != null && getPet() instanceof L2SummonInstance)
+        if (getPet() instanceof L2SummonInstance)
         	getPet().unSummon(this);
 
         if (getCubics().size() > 0)
@@ -10702,9 +10700,9 @@ public final class L2PcInstance extends L2PlayableInstance
 		int pslim;
 	
 		if (getRace() == Race.Dwarf)
-			pslim = Config.MAX_PVTSTORE_SLOTS_DWARF;
+			pslim = Config.MAX_PVTSTORESELL_SLOTS_DWARF;
         else
-        	pslim = Config.MAX_PVTSTORE_SLOTS_OTHER;
+        	pslim = Config.MAX_PVTSTORESELL_SLOTS_OTHER;
 
 		pslim += (int)getStat().calcStat(Stats.P_SELL_LIM, 0, null, null);
 
@@ -10716,9 +10714,9 @@ public final class L2PcInstance extends L2PlayableInstance
 		int pblim;
 		
 		if (getRace() == Race.Dwarf)
-			pblim = Config.MAX_PVTSTORE_SLOTS_DWARF;
+			pblim = Config.MAX_PVTSTOREBUY_SLOTS_DWARF;
 		else
-			pblim = Config.MAX_PVTSTORE_SLOTS_OTHER;
+			pblim = Config.MAX_PVTSTOREBUY_SLOTS_OTHER;
 		pblim += (int)getStat().calcStat(Stats.P_BUY_LIM, 0, null, null);
 
 		return pblim;
@@ -11323,14 +11321,14 @@ public final class L2PcInstance extends L2PlayableInstance
 		// Check if hit is missed
 		if (miss)
 		{
-			sendPacket(new SystemMessage(SystemMessageId.MISSED_TARGET));
+			sendPacket(new SystemMessage(43));
 			return;
 		}
 
 		// Check if hit is critical
 		if (pcrit)
         {
-			sendPacket(new SystemMessage(SystemMessageId.CRITICAL_HIT));
+			sendPacket(new SystemMessage(SystemMessageId.S1_HAD_CRITICAL_HIT).addString(getName()));
             if (getSkillLevel(467) > 0 && target instanceof L2NpcInstance)
             {
                 L2Skill skill = SkillTable.getInstance().getInfo(467,getSkillLevel(467));
@@ -11351,7 +11349,9 @@ public final class L2PcInstance extends L2PlayableInstance
         	dmgDealt += damage;
         }
 
-		SystemMessage sm = new SystemMessage(SystemMessageId.YOU_DID_S1_DMG);
+		SystemMessage sm = new SystemMessage(SystemMessageId.S1_GAVE_S2_DAMAGE_OF_S3);
+		sm.addString(getName());
+		sm.addString((target instanceof L2PcInstance) ? ((L2PcInstance)target).getAppearance().getVisibleName() : target.getName());
 		sm.addNumber(damage);
 		sendPacket(sm);
 	}

@@ -315,7 +315,7 @@ public final class L2FestivalGuideInstance extends L2FolkInstance
                     strBuffer.append(SevenSignsFestival.getFestivalName(_festivalType) + "<br>");
 
                     if (dawnScore > 0)
-                        strBuffer.append("黎民：" + calculateDate(dawnData.getString("date")) + "。分數 " + dawnScore + "<br>" + dawnData.getString("members") + "<br>");
+                        strBuffer.append("黎明：" + calculateDate(dawnData.getString("date")) + "。分數 " + dawnScore + "<br>" + dawnData.getString("members") + "<br>");
                     else
                         strBuffer.append("黎明：無。分數 0<br>");
 
@@ -328,7 +328,7 @@ public final class L2FestivalGuideInstance extends L2FolkInstance
                         String cabalStr = "黃昏的革命軍";
 
                         if (overallData.getString("cabal").equals("dawn"))
-                            cabalStr = "黎民的君主們";
+                            cabalStr = "黎明的君主們";
 
                         strBuffer.append("<FONT color=LEVEL>歷代最高紀錄</FONT>：" + calculateDate(overallData.getString("date")) + "。分數" + overallScore + "<br>所屬陣營：" + cabalStr + "<br>" + overallData.getString("members") + "<br>");
                     }

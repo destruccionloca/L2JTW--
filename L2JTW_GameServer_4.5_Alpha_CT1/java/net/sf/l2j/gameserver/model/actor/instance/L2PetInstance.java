@@ -204,7 +204,7 @@ public class L2PetInstance extends L2Summon
     @Override
 	public PetStat getStat()
     {
-    	if(super.getStat() == null || !(super.getStat() instanceof PetStat))
+    	if(!(super.getStat() instanceof PetStat))
     		setStat(new PetStat(this));
     	return (PetStat)super.getStat();
     }
@@ -494,9 +494,6 @@ public class L2PetInstance extends L2Summon
     @Override
 	public void doRevive()
     {
-    	if (_curFed > (getMaxFed() / 10))
-    		_curFed = getMaxFed() / 10;
-
     	getOwner().removeReviving();
 
     	super.doRevive();
@@ -945,4 +942,5 @@ public class L2PetInstance extends L2Summon
     	L2World.getInstance().addPet(oldOwnerId, this);
     }
 }
+
 

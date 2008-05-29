@@ -52,45 +52,39 @@ import javolution.text.TextBuilder;
 public class AdminAdmin implements IAdminCommandHandler {
 
 
-	 private static final String[] ADMIN_COMMANDS = {
-		 "admin_admin",
-		 "admin_admin1",
-		 "admin_admin2",
-		 "admin_admin3",
-		 "admin_admin4",
-		 "admin_admin5",
-		 "admin_tw_menu",
-		 "admin_cache",
-		 "admin_play_sounds",
-		 "admin_play_sound",
-		 "admin_gmliston",
-		 "admin_gmlistoff",
-		 "admin_silence",
-		 "admin_atmosphere",
-		 "admin_diet",
-		 "admin_tradeoff",
-		 "admin_config_option", 
-		 "admin_config_altsetting",
-		 "admin_config_other",
-		 "admin_config_rate","admin_reload", 
-		 "admin_set",
-		 "admin_saveolymp",
-		 "admin_manualhero",
-		 "admin_set_mod",
-		 "admin_set",
-		 "admin_set_menu",
-		 "admin_eventmenu"
-		 };
-
-
-
-	private static final int REQUIRED_LEVEL = Config.GM_MENU;
-
+	private static final String[] ADMIN_COMMANDS =
+	{
+		"admin_admin",
+		"admin_admin1",
+		"admin_admin2",
+		"admin_admin3",
+		"admin_admin4",
+		"admin_admin5",
+		"admin_gmliston",
+		"admin_gmlistoff",
+		"admin_silence",
+		"admin_diet",
+		"admin_tradeoff",
+		"admin_reload",
+		"admin_set",
+		"admin_set_menu",
+		"admin_set_mod",
+		"admin_saveolymp",
+		"admin_manualhero",
+		"admin_sethero",
+		"admin_endolympiad",
+		"admin_cache",
+		"admin_config_altsetting",
+		"admin_config_other",
+		"admin_config_option",
+		"admin_config_rate"
+	};
+	public String[] getAdminCommandList()
+	{
+		return ADMIN_COMMANDS;
+	}
+	
 	public boolean useAdminCommand(String command, L2PcInstance activeChar) {
-
-		if (!Config.ALT_PRIVILEGES_ADMIN)
-			if (!(checkLevel(activeChar.getAccessLevel()) && activeChar.isGM()))
-				return false;
 
         //if (command.equals("admin_admin")) showMainPage(activeChar);
         //if (command.equals("admin_admin2")) showMainPage2(activeChar);
@@ -249,8 +243,8 @@ public class AdminAdmin implements IAdminCommandHandler {
 		else if (command.startsWith("admin_manualhero") || command.startsWith("admin_sethero"))
 		{
 			L2PcInstance target = null;
-            
-			if (activeChar.getTarget() != null && activeChar.getTarget() instanceof L2PcInstance)
+
+			if (activeChar.getTarget() instanceof L2PcInstance)
 			{
 				target = (L2PcInstance)activeChar.getTarget();
 				target.setHero(target.isHero()? false : true);
@@ -401,6 +395,7 @@ public class AdminAdmin implements IAdminCommandHandler {
 			{
 				if (cmd.length==2)
 					activeChar.sendMessage("使用方法: //set 函數數值。");
+
 			}
 			finally
 			{
@@ -414,16 +409,6 @@ public class AdminAdmin implements IAdminCommandHandler {
 			}
 		}
 		return true;
-	}
-
-	public String[] getAdminCommandList()
-	{
-		return ADMIN_COMMANDS;
-	}
-
-	private boolean checkLevel(int level)
-	{
-		return (level >= REQUIRED_LEVEL);
 	}
 
 
