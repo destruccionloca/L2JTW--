@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.SevenSigns;
 import net.sf.l2j.gameserver.SevenSignsFestival;
+import net.sf.l2j.gameserver.instancemanager.CastleManager;
 import net.sf.l2j.gameserver.instancemanager.ClanHallManager;
 import net.sf.l2j.gameserver.instancemanager.SiegeManager;
 import net.sf.l2j.gameserver.model.Inventory;
@@ -30,10 +31,12 @@ import net.sf.l2j.gameserver.model.L2Skill;
 import net.sf.l2j.gameserver.model.L2Summon;
 import net.sf.l2j.gameserver.model.L2Attackable;
 import net.sf.l2j.gameserver.model.L2Skill.SkillType;
+import net.sf.l2j.gameserver.model.actor.instance.L2CubicInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2DoorInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PetInstance;
+import net.sf.l2j.gameserver.model.entity.Castle;
 import net.sf.l2j.gameserver.model.entity.ClanHall;
 import net.sf.l2j.gameserver.model.entity.Siege;
 import net.sf.l2j.gameserver.network.SystemMessageId;
@@ -948,6 +951,18 @@ public final class Formulas
             	}
             }
 
+            if (player.isInsideZone(L2Character.ZONE_CASTLE) && player.getClan() != null)
+            {
+            	int castleIndex = player.getClan().getHasCastle();
+            	if (castleIndex > 0)
+            	{
+            		Castle castle = CastleManager.getInstance().getCastleById(castleIndex);
+            		if(castle != null)
+            			if (castle.getFunction(Castle.FUNC_RESTORE_HP) != null)
+            				hpRegenMultiplier *= 1+ castle.getFunction(Castle.FUNC_RESTORE_HP).getLvl()/100;
+            	}
+            }
+
 			// Mother Tree effect is calculated at last
 			if (player.isInsideZone(L2Character.ZONE_MOTHERTREE)) hpRegenBonus += 2;
 
@@ -997,6 +1012,18 @@ public final class Formulas
             		if(clansHall != null)
             			if (clansHall.getFunction(ClanHall.FUNC_RESTORE_MP) != null)
             				mpRegenMultiplier *= 1+ clansHall.getFunction(ClanHall.FUNC_RESTORE_MP).getLvl()/100;
+            	}
+            }
+
+            if (player.isInsideZone(L2Character.ZONE_CASTLE) && player.getClan() != null)
+            {
+            	int castleIndex = player.getClan().getHasCastle();
+            	if (castleIndex > 0)
+            	{
+            		Castle castle = CastleManager.getInstance().getCastleById(castleIndex);
+            		if(castle != null)
+            			if (castle.getFunction(Castle.FUNC_RESTORE_MP) != null)
+            				mpRegenMultiplier *= 1+ castle.getFunction(Castle.FUNC_RESTORE_MP).getLvl()/100;
             	}
             }
 
@@ -1486,6 +1513,58 @@ public final class Formulas
 			else
 				damage *= attacker.calcStat(Stats.PVP_PHYS_SKILL_DMG, 1, null, null);
 		}
+		return damage;
+	}
+	
+	public final double calcMagicDam(L2CubicInstance attacker, L2Character target, L2Skill skill, boolean mcrit)
+	{
+		if (target.isInvul()) return 0;
+		
+		double mAtk = attacker.getMAtk();
+		double mDef = target.getMDef(attacker.getOwner(), skill);
+		
+		double damage = 91 * Math.sqrt(mAtk) / mDef * skill.getPower() * calcSkillVulnerability(target, skill);
+		L2PcInstance owner = attacker.getOwner();
+		
+		// Failure calculation
+		if (Config.ALT_GAME_MAGICFAILURES && !calcMagicSuccess(owner, target, skill))
+		{			
+			if (calcMagicSuccess(owner, target, skill) && (target.getLevel() - skill.getMagicLevel()) <= 9){
+				if (skill.getSkillType() == SkillType.DRAIN)
+					owner.sendPacket(new SystemMessage(SystemMessageId.DRAIN_HALF_SUCCESFUL));
+				else
+					owner.sendPacket(new SystemMessage(SystemMessageId.ATTACK_FAILED));
+	
+				damage /= 2;
+			}
+			else
+			{
+				SystemMessage sm = new SystemMessage(SystemMessageId.S1_WAS_UNAFFECTED_BY_S2);
+				sm.addString(target.getName());
+				sm.addSkillName(skill.getId());
+				owner.sendPacket(sm);
+	
+				damage = 1;
+			}
+		
+			if (target instanceof L2PcInstance)
+			{
+				if (skill.getSkillType() == SkillType.DRAIN)
+				{
+					SystemMessage sm = new SystemMessage(SystemMessageId.RESISTED_S1_DRAIN);
+					sm.addString(owner.getName());
+					target.sendPacket(sm);
+				}
+				else
+				{
+					SystemMessage sm = new SystemMessage(SystemMessageId.RESISTED_S1_MAGIC);
+					sm.addString(owner.getName());
+					target.sendPacket(sm);
+				}
+			}
+		}
+		else if (mcrit) damage *= 4;
+		
 		return damage;
 	}
 
@@ -2076,6 +2155,66 @@ public final class Formulas
 				+ rate);
 		return (Rnd.get(100) < rate);
         }
+	
+	public boolean calcCubicSkillSuccess(L2CubicInstance attacker, L2Character target, L2Skill skill)
+	{
+		SkillType type = skill.getSkillType();
+		
+		if (target.isRaid()
+				&& (type == SkillType.CONFUSION || type == SkillType.MUTE || type == SkillType.PARALYZE
+					|| type == SkillType.ROOT || type == SkillType.FEAR || type == SkillType.SLEEP
+					|| type == SkillType.STUN || type == SkillType.DEBUFF || type == SkillType.AGGDEBUFF))
+				return false; // these skills should not work on RaidBoss
+		
+		// if target reflect this skill then the effect will fail
+		if (target.reflectSkill(skill)) return false;
+		
+		int value = (int) skill.getPower();
+		int lvlDepend = skill.getLevelDepend();
+		
+		if (type == SkillType.PDAM || type == SkillType.MDAM) // For additional effects on PDAM skills (like STUN, SHOCK,...)
+		{
+			value = skill.getEffectPower();
+			type = skill.getEffectType();
+		}
+
+		// TODO: Temporary fix for skills with Power = 0 or LevelDepend not set
+		if (value == 0) value = (type == SkillType.PARALYZE) ? 50 : (type == SkillType.FEAR) ? 40 : 80;
+		if (lvlDepend == 0) lvlDepend = (type == SkillType.PARALYZE || type == SkillType.FEAR) ? 1 : 2;
+
+		// TODO: Temporary fix for NPC skills with MagicLevel not set
+		// int lvlmodifier = (skill.getMagicLevel() - target.getLevel()) * lvlDepend;
+		int lvlmodifier = ((skill.getMagicLevel() > 0 ? skill.getMagicLevel() : attacker.getOwner().getLevel()) - target.getLevel())
+		* lvlDepend;
+		double statmodifier = calcSkillStatModifier(type, target);
+		double resmodifier = calcSkillVulnerability(target, skill);
+		
+		int rate = (int) ((value * statmodifier + lvlmodifier) * resmodifier);
+		if (skill.isMagic())
+			rate += (int) (Math.pow((double) attacker.getMAtk() / target.getMDef(attacker.getOwner(), skill), 0.2) * 100) - 100;
+		
+		if (rate > 99) 
+			rate = 99;
+		else 
+			if (rate < 1) 
+				rate = 1;
+		
+		if (Config.DEVELOPER)
+			_log.info(skill.getName()
+				+ ": "
+				+ value
+				+ ", "
+				+ statmodifier
+				+ ", "
+				+ lvlmodifier
+				+ ", "
+				+ resmodifier
+				+ ", "
+				+ ((int) (Math.pow((double) attacker.getMAtk()
+					/ target.getMDef(attacker.getOwner(), skill), 0.2) * 100) - 100) + " ==> "
+				+ rate);
+		return (Rnd.get(100) < rate);
+	}
 
 	public boolean calcMagicSuccess(L2Character attacker, L2Character target, L2Skill skill)
 	{

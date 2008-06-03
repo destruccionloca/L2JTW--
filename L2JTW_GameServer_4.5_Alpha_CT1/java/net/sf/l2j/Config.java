@@ -411,7 +411,40 @@ public final class Config
     /** ************************************************** **/
 	/** ClanHall Settings -End                             **/
 	/** ************************************************** **/
-	
+
+    /** ************************************************** **/
+	/** Castle Settings -Begin                           **/
+	/** ************************************************** **/
+
+    public static long 		CS_TELE_FEE_RATIO;
+    public static int 		CS_TELE1_FEE;
+    public static int 		CS_TELE2_FEE;
+    public static long 		CS_MPREG_FEE_RATIO;
+    public static int 		CS_MPREG1_FEE;
+    public static int 		CS_MPREG2_FEE;
+    public static int 		CS_MPREG3_FEE;
+    public static int 		CS_MPREG4_FEE;
+    public static long 		CS_HPREG_FEE_RATIO;
+    public static int 		CS_HPREG1_FEE;
+    public static int 		CS_HPREG2_FEE;
+    public static int 		CS_HPREG3_FEE;
+    public static int 		CS_HPREG4_FEE;
+    public static int 		CS_HPREG5_FEE;
+    public static long 		CS_EXPREG_FEE_RATIO;
+    public static int 		CS_EXPREG1_FEE;
+    public static int 		CS_EXPREG2_FEE;
+    public static int 		CS_EXPREG3_FEE;
+    public static int 		CS_EXPREG4_FEE;
+    public static long 		CS_SUPPORT_FEE_RATIO;
+    public static int 		CS_SUPPORT1_FEE;
+    public static int 		CS_SUPPORT2_FEE;
+    public static int 		CS_SUPPORT3_FEE;
+    public static int 		CS_SUPPORT4_FEE;
+    
+    /** ************************************************** **/
+	/** Castlel Settings -End                             **/
+	/** ************************************************** **/
+
     /** ************************************************** **/
 	/** Feature Settings -Begin                            **/
 	/** ************************************************** **/
@@ -508,6 +541,7 @@ public final class Config
     public static boolean	ALLOW_CURSED_WEAPONS;
     public static boolean	ALLOW_MANOR;
     public static boolean	ALLOW_NPC_WALKERS;
+    public static boolean	ALLOW_PET_WALKERS;
     public static boolean	SERVER_NEWS;
     public static String	COMMUNITY_TYPE;
     public static boolean	BBS_SHOW_PLAYERLIST;
@@ -661,7 +695,9 @@ public final class Config
     public static List<Integer> LIST_PET_RENT_NPC   = new FastList<Integer>();
     public static int		WYVERN_SPEED;
     public static int		STRIDER_SPEED;
-    public static int 		GREAT_WOLF_SPEED;
+    public static int 		FENRIR_SPEED;
+    public static int 		GREAT_SNOW_WOLF_SPEED;
+    public static int 		SNOW_FENRIR_SPEED;
     public static double	RAID_HP_REGEN_MULTIPLIER;
     public static double	RAID_MP_REGEN_MULTIPLIER;
     public static double	RAID_PDEFENCE_MULTIPLIER;
@@ -1104,6 +1140,37 @@ public final class Config
                 CH_FRONT_FEE_RATIO                                	= Long.parseLong(Feature.getProperty("ClanHallFrontPlatformFunctionFeeRatio", "259200000"));
                 CH_FRONT1_FEE                                       = Integer.parseInt(Feature.getProperty("ClanHallFrontPlatformFunctionFeeLvl1", "1300"));
                 CH_FRONT2_FEE                                       = Integer.parseInt(Feature.getProperty("ClanHallFrontPlatformFunctionFeeLvl2", "4000"));
+                
+                
+                
+                //
+				CS_TELE_FEE_RATIO                                   = Long.parseLong(Feature.getProperty("CastleTeleportFunctionFeeRatio", "604800000"));
+                CS_TELE1_FEE                                        = Integer.parseInt(Feature.getProperty("CastleTeleportFunctionFeeLvl1", "7000"));
+                CS_TELE2_FEE                                        = Integer.parseInt(Feature.getProperty("CastleTeleportFunctionFeeLvl2", "14000"));
+                CS_SUPPORT_FEE_RATIO                                = Long.parseLong(Feature.getProperty("CastleSupportFunctionFeeRatio", "86400000"));
+                CS_SUPPORT1_FEE                                     = Integer.parseInt(Feature.getProperty("CastleSupportFeeLvl1", "7000"));
+                CS_SUPPORT2_FEE                                     = Integer.parseInt(Feature.getProperty("CastleSupportFeeLvl2", "21000"));
+                CS_SUPPORT3_FEE                                     = Integer.parseInt(Feature.getProperty("CastleSupportFeeLvl3", "37000"));
+                CS_SUPPORT4_FEE                                     = Integer.parseInt(Feature.getProperty("CastleSupportFeeLvl4", "52000"));
+                CS_MPREG_FEE_RATIO                                  = Long.parseLong(Feature.getProperty("CastleMpRegenerationFunctionFeeRatio", "86400000"));
+                CS_MPREG1_FEE                                       = Integer.parseInt(Feature.getProperty("CastleMpRegenerationFeeLvl1", "2000"));
+                CS_MPREG2_FEE                                       = Integer.parseInt(Feature.getProperty("CastleMpRegenerationFeeLvl2", "6500"));
+                CS_MPREG3_FEE                                       = Integer.parseInt(Feature.getProperty("CastleMpRegenerationFeeLvl3", "13750"));
+                CS_MPREG4_FEE                                       = Integer.parseInt(Feature.getProperty("CastleMpRegenerationFeeLvl4", "20000"));
+                CS_HPREG_FEE_RATIO                                  = Long.parseLong(Feature.getProperty("CastleHpRegenerationFunctionFeeRatio", "86400000"));
+                CS_HPREG1_FEE                                       = Integer.parseInt(Feature.getProperty("CastleHpRegenerationFeeLvl1", "1000"));
+                CS_HPREG2_FEE                                       = Integer.parseInt(Feature.getProperty("CastleHpRegenerationFeeLvl2", "1500"));
+                CS_HPREG3_FEE                                       = Integer.parseInt(Feature.getProperty("CastleHpRegenerationFeeLvl3", "2250"));
+                CS_HPREG4_FEE                                      = Integer.parseInt(Feature.getProperty("CastleHpRegenerationFeeLvl14", "3270"));
+                CS_HPREG5_FEE                                      = Integer.parseInt(Feature.getProperty("CastleHpRegenerationFeeLvl15", "5166"));
+                CS_EXPREG_FEE_RATIO                                 = Long.parseLong(Feature.getProperty("CastleExpRegenerationFunctionFeeRatio", "86400000"));
+                CS_EXPREG1_FEE                                      = Integer.parseInt(Feature.getProperty("CastleExpRegenerationFeeLvl1", "9000"));
+                CS_EXPREG2_FEE                                      = Integer.parseInt(Feature.getProperty("CastleExpRegenerationFeeLvl2", "15000"));
+                CS_EXPREG3_FEE                                      = Integer.parseInt(Feature.getProperty("CastleExpRegenerationFeeLvl3", "21000"));
+                CS_EXPREG4_FEE                                      = Integer.parseInt(Feature.getProperty("CastleExpRegenerationFeeLvl4", "30000"));
+                //
+                
+                
 				ALT_GAME_REQUIRE_CASTLE_DAWN    					= Boolean.parseBoolean(Feature.getProperty("AltRequireCastleForDawn", "False"));
                 ALT_GAME_REQUIRE_CLAN_CASTLE    					= Boolean.parseBoolean(Feature.getProperty("AltRequireClanCastle", "False"));
                 ALT_FESTIVAL_MIN_PLAYER         					= Integer.parseInt(Feature.getProperty("AltFestivalMinPlayer", "5"));
@@ -1479,6 +1546,7 @@ public final class Config
                 ALLOW_CURSED_WEAPONS						= Boolean.parseBoolean(General.getProperty("AllowCursedWeapons", "False"));
                 ALLOW_MANOR									= Boolean.parseBoolean(General.getProperty("AllowManor", "False"));
                 ALLOW_NPC_WALKERS							= Boolean.parseBoolean(General.getProperty("AllowNpcWalkers", "true"));
+                ALLOW_PET_WALKERS							= Boolean.parseBoolean(General.getProperty("AllowPetWalkers", "False"));
                 SERVER_NEWS									= Boolean.parseBoolean(General.getProperty("ShowServerNews", "False"));
                 COMMUNITY_TYPE								= General.getProperty("CommunityType", "old").toLowerCase();
                 BBS_SHOW_PLAYERLIST							= Boolean.parseBoolean(General.getProperty("BBSShowPlayerList", "false"));
@@ -1586,7 +1654,9 @@ public final class Config
                                 						}
                 WYVERN_SPEED							= Integer.parseInt(NPC.getProperty("WyvernSpeed", "100"));
                 STRIDER_SPEED							= Integer.parseInt(NPC.getProperty("StriderSpeed", "80"));
-                GREAT_WOLF_SPEED						= Integer.parseInt(NPC.getProperty("GreatWolfSpeed", "80"));
+                FENRIR_SPEED						= Integer.parseInt(NPC.getProperty("FenrirSpeed", "80"));
+                SNOW_FENRIR_SPEED						= Integer.parseInt(NPC.getProperty("SnowFenrirSpeed", "80"));
+                GREAT_SNOW_WOLF_SPEED						= Integer.parseInt(NPC.getProperty("GreatSnowWolfSpeed", "80"));
                 RAID_HP_REGEN_MULTIPLIER				= Double.parseDouble(NPC.getProperty("RaidHpRegenMultiplier", "100")) /100;
                 RAID_MP_REGEN_MULTIPLIER				= Double.parseDouble(NPC.getProperty("RaidMpRegenMultiplier", "100")) /100;
                 RAID_PDEFENCE_MULTIPLIER				= Double.parseDouble(NPC.getProperty("RaidPDefenceMultiplier", "100")) /100;
@@ -2240,7 +2310,8 @@ public final class Config
         else if (pName.equalsIgnoreCase("AllowRentPet")) ALLOW_RENTPET = Boolean.parseBoolean(pValue);
         else if (pName.equalsIgnoreCase("AllowBoat")) ALLOW_BOAT = Boolean.parseBoolean(pValue);
         else if (pName.equalsIgnoreCase("AllowCursedWeapons")) ALLOW_CURSED_WEAPONS = Boolean.parseBoolean(pValue);
-        else if (pName.equalsIgnoreCase("AllowManor")) ALLOW_MANOR = Boolean.parseBoolean(pValue);        
+        else if (pName.equalsIgnoreCase("AllowManor")) ALLOW_MANOR = Boolean.parseBoolean(pValue);
+        else if (pName.equalsIgnoreCase("AllowPetWalkers")) ALLOW_PET_WALKERS = Boolean.parseBoolean(pValue);
         else if (pName.equalsIgnoreCase("BypassValidation")) BYPASS_VALIDATION = Boolean.parseBoolean(pValue);
 
         else if (pName.equalsIgnoreCase("CommunityType")) COMMUNITY_TYPE = pValue.toLowerCase();
@@ -2273,7 +2344,9 @@ public final class Config
         else if (pName.equalsIgnoreCase("CancelLesserEffect")) EFFECT_CANCELING = Boolean.parseBoolean(pValue);
         else if (pName.equalsIgnoreCase("WyvernSpeed")) WYVERN_SPEED = Integer.parseInt(pValue);
         else if (pName.equalsIgnoreCase("StriderSpeed")) STRIDER_SPEED = Integer.parseInt(pValue);
-        else if (pName.equalsIgnoreCase("WolfSpeed")) GREAT_WOLF_SPEED = Integer.parseInt(pValue);
+        else if (pName.equalsIgnoreCase("FenrirSpeed")) FENRIR_SPEED = Integer.parseInt(pValue);
+        else if (pName.equalsIgnoreCase("SnowFenrirSpeed")) SNOW_FENRIR_SPEED = Integer.parseInt(pValue);
+        else if (pName.equalsIgnoreCase("GreatSnowWolfSpeed")) GREAT_SNOW_WOLF_SPEED = Integer.parseInt(pValue);
 
         else if (pName.equalsIgnoreCase("MaximumSlotsForNoDwarf")) INVENTORY_MAXIMUM_NO_DWARF = Integer.parseInt(pValue);
         else if (pName.equalsIgnoreCase("MaximumSlotsForDwarf")) INVENTORY_MAXIMUM_DWARF = Integer.parseInt(pValue);

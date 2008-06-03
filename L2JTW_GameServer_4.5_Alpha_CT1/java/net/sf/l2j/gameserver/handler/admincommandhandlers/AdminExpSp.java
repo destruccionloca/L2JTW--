@@ -19,7 +19,6 @@ import java.util.logging.Logger;
 
 import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.handler.IAdminCommandHandler;
-import net.sf.l2j.gameserver.model.GMAudit;
 import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.network.SystemMessageId;
@@ -40,14 +39,11 @@ public class AdminExpSp implements IAdminCommandHandler {
 
 	public boolean useAdminCommand(String command, L2PcInstance activeChar)
 	{
-		GMAudit.auditGMAction(activeChar.getName(), command, (activeChar.getTarget()!=null ? activeChar.getTarget().getName() : "no-target"), "");
 		if (command.startsWith("admin_add_exp_sp"))
 		{
 			try
 			{
 				String val = command.substring(16);
-				if (!adminAddExpSp(activeChar, val))
-					GMAudit.auditGMAction(activeChar.getName(), command,  val, "");
 			}
 			catch (StringIndexOutOfBoundsException e)
 			{	//Case of missing parameter
@@ -59,8 +55,6 @@ public class AdminExpSp implements IAdminCommandHandler {
 			try
 			{
 				String val = command.substring(19);
-				if (!adminRemoveExpSP(activeChar, val))
-	                GMAudit.auditGMAction(activeChar.getName(), command,  val, "");
 			}
 			catch (StringIndexOutOfBoundsException e)
 			{   //Case of missing parameter

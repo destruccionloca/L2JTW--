@@ -664,49 +664,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
                 _attackTimeout = MAX_ATTACK_TIMEOUT + GameTimeController.getGameTicks();
             }
         }
-        //------------------------------------------------------------------------------
-        //Initialize data
-        double dist = 0;
-        int dist2 = 0;
-        int range = 0;
-        L2Character MostHate = ((L2Attackable) _actor).getMostHated();
-        try
-        {
-       		setAttackTarget(MostHate);
-       		_actor.setTarget(MostHate);
-            dist = Math.sqrt(_actor.getPlanDistanceSq(getAttackTarget().getX(), getAttackTarget().getY()));
-            dist2= (int)dist;
-            range = _actor.getPhysicalAttackRange() + _actor.getTemplate().collisionRadius + getAttackTarget().getTemplate().collisionRadius;
-            if(getAttackTarget().isMoving())
-            {
-            	range = range + 50;
-            	if(_actor.isMoving())
-            		range = range + 50;
-            }
-        }
-        catch (NullPointerException e)
-        {
-            setIntention(AI_INTENTION_ACTIVE);
-            return;
-        }
-        if(_actor.getTarget() == null)
-        	AggroReconsider();
-        // Check if target is dead or if timeout is expired to stop this attack
-        if (getAttackTarget() == null || getAttackTarget().isAlikeDead())
-        {
-            // Stop hating this target after the attack timeout or if target is dead
-            if (getAttackTarget() != null)
-            {
-                L2Attackable npc = (L2Attackable) _actor;
-                npc.stopHating(getAttackTarget());
-            }
 
-            // Set the AI Intention to AI_INTENTION_ACTIVE
-            setIntention(AI_INTENTION_ACTIVE);
-
-            _actor.setWalking();
-            return;
-        }
         L2Character originalAttackTarget = null;
         
         if(getAttackTarget()!=null)
@@ -775,7 +733,52 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         //Return when Attack been disable
         if(_actor.isAttackingDisabled())
         	return;
+        //----------------------------------------------------------------
+        
+        //------------------------------------------------------------------------------
+        //Initialize data
+        double dist = 0;
+        int dist2 = 0;
+        int range = 0;
+        L2Character MostHate = ((L2Attackable) _actor).getMostHated();
+        try
+        {
+       		setAttackTarget(MostHate);
+       		_actor.setTarget(MostHate);
+            dist = Math.sqrt(_actor.getPlanDistanceSq(getAttackTarget().getX(), getAttackTarget().getY()));
+            dist2= (int)dist;
+            range = _actor.getPhysicalAttackRange() + _actor.getTemplate().collisionRadius + getAttackTarget().getTemplate().collisionRadius;
+            if(getAttackTarget().isMoving())
+            {
+            	range = range + 50;
+            	if(_actor.isMoving())
+            		range = range + 50;
+            }
+        }
+        catch (NullPointerException e)
+        {
+            setIntention(AI_INTENTION_ACTIVE);
+            return;
+        }
+        if(_actor.getTarget() == null || this.getAttackTarget() == null || this.getAttackTarget().isDead())
+        	AggroReconsider();
+        // Check if target is dead or if timeout is expired to stop this attack
+        if (getAttackTarget() == null || getAttackTarget().isAlikeDead())
+        {
+            // Stop hating this target after the attack timeout or if target is dead
+            if (getAttackTarget() != null)
+            {
+                L2Attackable npc = (L2Attackable) _actor;
+                npc.stopHating(getAttackTarget());
+            }
 
+            // Set the AI Intention to AI_INTENTION_ACTIVE
+            setIntention(AI_INTENTION_ACTIVE);
+
+            _actor.setWalking();
+            return;
+        }
+        //------------------------------------------------------
     	// In case many mobs are trying to hit from same place, move a bit,
 		// circling around the target
 		if (!_actor.isRooted() && Rnd.nextInt(100) <= 33) // check it once per 3 seconds
@@ -2455,7 +2458,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
     	if(!(_actor instanceof L2GuardInstance))
       	 for (L2Character obj : _actor.getKnownList().getKnownCharactersInRadius(range))
          {
-      		 if(obj == null || !GeoData.getInstance().canSeeTarget(_actor,obj))
+      		 if(obj == null || !GeoData.getInstance().canSeeTarget(_actor,obj) || obj == _actor)
 				continue;
     		 if(obj instanceof L2PcInstance)
     		 {
@@ -2537,11 +2540,11 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
     	if(!(_actor instanceof L2GuardInstance))
       	 for (L2Character obj : _actor.getKnownList().getKnownCharactersInRadius(1000))
          {
-      		 if(obj == null || !GeoData.getInstance().canSeeTarget(_actor,obj))
+      		 if(obj == null || !GeoData.getInstance().canSeeTarget(_actor,obj) || obj.isDead() || obj!= MostHate || obj == _actor)
 				continue;
     		 if(obj instanceof L2PcInstance)
     		 {
-             	if(MostHate!=null)
+             	if(MostHate!=null || !MostHate.isDead())
                 	actor.addDamageHate(obj,actor.getHating(MostHate),actor.getHating(MostHate));
                 else
                 	actor.addDamageHate(obj,2000,2000);

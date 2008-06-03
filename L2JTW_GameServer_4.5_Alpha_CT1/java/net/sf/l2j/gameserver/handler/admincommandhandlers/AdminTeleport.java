@@ -24,7 +24,6 @@ import net.sf.l2j.gameserver.ai.CtrlIntention;
 import net.sf.l2j.gameserver.datatables.NpcTable;
 import net.sf.l2j.gameserver.datatables.SpawnTable;
 import net.sf.l2j.gameserver.handler.IAdminCommandHandler;
-import net.sf.l2j.gameserver.model.GMAudit;
 import net.sf.l2j.gameserver.model.L2CharPosition;
 import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2Spawn;
@@ -74,11 +73,8 @@ public class AdminTeleport implements IAdminCommandHandler
         "admin_teleto",
     };
 
-    public boolean useAdminCommand(String command, L2PcInstance activeChar) {
-
-		String target = (activeChar.getTarget() != null?activeChar.getTarget().getName():"no-target");
-        GMAudit.auditGMAction(activeChar.getName(), command, target, "");
-
+    public boolean useAdminCommand(String command, L2PcInstance activeChar)
+    {
         if (command.equals("admin_teleto"))
         {
             activeChar.setTeleMode(1);

@@ -18,11 +18,13 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.ai.CtrlIntention;
-import net.sf.l2j.gameserver.datatables.AdminCommandAccessRights;
 import net.sf.l2j.gameserver.communitybbs.CommunityBoard;
+import net.sf.l2j.gameserver.datatables.AdminCommandAccessRights;
 import net.sf.l2j.gameserver.handler.AdminCommandHandler;
 import net.sf.l2j.gameserver.handler.IAdminCommandHandler;
+import net.sf.l2j.gameserver.model.GMAudit;
 import net.sf.l2j.gameserver.model.L2CharPosition;
 import net.sf.l2j.gameserver.model.L2Object;
 import net.sf.l2j.gameserver.model.L2World;
@@ -85,6 +87,8 @@ public final class RequestBypassToServer extends L2GameClientPacket
 					_log.warning("Character " + activeChar.getName() + " tryed to use admin command " + command + ", but have no access to it!");
 					return;
 				}
+				if (Config.GMAUDIT)
+					GMAudit.auditGMAction(activeChar.getName(), _command, (activeChar.getTarget() != null?activeChar.getTarget().getName():"no-target"));
 
 				ach.useAdminCommand(_command, activeChar);
 			}

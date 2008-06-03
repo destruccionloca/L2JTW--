@@ -19,7 +19,6 @@ import java.util.logging.Logger;
 
 import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.handler.IAdminCommandHandler;
-import net.sf.l2j.gameserver.model.GMAudit;
 import net.sf.l2j.gameserver.model.Inventory;
 import net.sf.l2j.gameserver.model.L2ItemInstance;
 import net.sf.l2j.gameserver.model.L2Object;
@@ -180,9 +179,12 @@ public class AdminEnchant implements IAdminCommandHandler
             player.broadcastPacket(new CharInfo(player));
             player.sendPacket(new UserInfo(player));
 
-            activeChar.sendMessage("強化裝備"+itemInstance.getItem().getName()+"從 +"+curEnchant+"到 +"+ench+"。");
-            // log
-            GMAudit.auditGMAction(activeChar.getName(), "enchant", player.getName(), itemInstance.getItem().getName() + "(" + itemInstance.getObjectId() + ")" + " from " + curEnchant + " to " + ench);
+            // informations
+            activeChar.sendMessage("強化裝備: 人物[" + player.getName() + "] 的  "
+                + itemInstance.getItem().getName() + " 從 " + curEnchant + " 到 " + ench + ".");
+            player.sendMessage("管理員更改物品強化值 "
+                + itemInstance.getItem().getName() + " 從 " + curEnchant + " 到 " + ench + ".");
+
         }
     }
 

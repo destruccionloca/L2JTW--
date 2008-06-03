@@ -21,7 +21,6 @@ import java.sql.SQLException;
 import net.sf.l2j.Config;
 import net.sf.l2j.L2DatabaseFactory;
 import net.sf.l2j.gameserver.handler.IAdminCommandHandler;
-import net.sf.l2j.gameserver.model.GMAudit;
 import net.sf.l2j.gameserver.model.L2World;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.network.SystemMessageId;
@@ -43,8 +42,7 @@ public class AdminChangeAccessLevel implements IAdminCommandHandler
 	{
 
 		handleChangeLevel(command, activeChar);
-		String target = (activeChar.getTarget() != null?activeChar.getTarget().getName():"無目標指定");
-		GMAudit.auditGMAction(activeChar.getName(), command, target, "");
+
 		return true;
 	}
 

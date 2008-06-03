@@ -124,7 +124,7 @@ public class L2SkillSummon extends L2Skill
                     else
                     {
 
-						player.addCubic(_npcId, getLevel());
+						player.addCubic(_npcId, getLevel(), getPower(), getActivationTime(), getActivationChance());
 						player.broadcastUserInfo();
                     }
 				}
@@ -147,7 +147,7 @@ public class L2SkillSummon extends L2Skill
                     activeChar.sendMessage("§w•l≥Í¶π¥π≈È°C");
                     return;
                 }
-				activeChar.addCubic(_npcId, getLevel());
+                activeChar.addCubic(_npcId, getLevel(), getPower(), getActivationTime(), getActivationChance());
 				activeChar.broadcastUserInfo();
 				return;
 			}

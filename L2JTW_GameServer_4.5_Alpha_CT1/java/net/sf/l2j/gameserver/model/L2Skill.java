@@ -29,6 +29,7 @@ import net.sf.l2j.gameserver.datatables.SkillTreeTable;
 import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.actor.instance.L2ArtefactInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2ChestInstance;
+import net.sf.l2j.gameserver.model.actor.instance.L2CubicInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2DoorInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2GuardInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
@@ -446,6 +447,10 @@ public abstract class L2Skill
     
     private final boolean _isCubic;
 
+    // cubic AI
+    private final int _activationtime;
+    private final int _activationchance;
+
     // item consume time in milliseconds
     private final int _itemConsumeTime;
     private final int _castRange;
@@ -538,7 +543,7 @@ public abstract class L2Skill
     protected FuncTemplate[] _funcTemplates;
     protected EffectTemplate[] _effectTemplates;
     protected EffectTemplate[] _effectTemplatesSelf;
-
+    
     /** Instant Kill Rate (iRate) **/  
     private final int _iRate;  
     private final boolean _iKill;  
@@ -582,6 +587,9 @@ public abstract class L2Skill
         
         _isCubic    = set.getBool("isCubic", false);
 
+        _activationtime= set.getInteger("activationtime", 8);
+        _activationchance= set.getInteger("activationchance", 30);
+        
         _castRange = set.getInteger("castRange", 0);
         _effectRange = set.getInteger("effectRange", -1);
         
@@ -1035,6 +1043,22 @@ public abstract class L2Skill
         return _itemConsumeTime;
     }
 
+    /**
+     * @return Returns the activation time for a cubic.
+     */
+    public final int getActivationTime()
+    {
+        return _activationtime;
+    }
+
+    /**
+     * @return Returns the activation chance for a cubic.
+     */
+    public final int getActivationChance()
+    {
+        return _activationchance;
+    }
+    
     /**
      * @return Returns the level.
      */
@@ -3050,49 +3074,35 @@ public abstract class L2Skill
 
         return effects.toArray(new L2Effect[effects.size()]);
     }
+    
+    public final L2Effect[] getEffects(L2CubicInstance effector, L2Character effected)
+    {
+        if (isPassive()) return _emptyEffectSet;
 
-/*
+        if (_effectTemplates == null) 
+        	return _emptyEffectSet;
+        
+        if ((!effector.equals(effected)) && effected.isInvul())
+            return _emptyEffectSet;
+
+
         List<L2Effect> effects = new FastList<L2Effect>();
 
-        for (EffectTemplate et : _effectTemplatesSelf)
+        for (EffectTemplate et : _effectTemplates)
         {
             Env env = new Env();
-            env.player = effector;
-            env.target = effector;
+            env.cubic = effector;
+            env.target = effected;
             env.skill = this;
             L2Effect e = et.getEffect(env);
-            if (e != null)                
-            {
-                //Implements effect charge
-                if (e.getEffectType()== L2Effect.EffectType.CHARGE)
-                {               
-                	env.skill = SkillTable.getInstance().getInfo(8, effector.getSkillLevel(8));
-                    EffectCharge effect = (EffectCharge) env.target.getEffect(L2Effect.EffectType.CHARGE);
-                    if (effect != null) 
-                    {
-                    	int effectcharge = effect.getLevel();
-                        if (effectcharge < _numCharges)
-                        {
-                        	effectcharge++;
-                            effect.addNumCharges(effectcharge);
-                            env.target.updateEffectIcons();
-                            SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-                            sm.addString("Charged to " + effectcharge);
-                            env.target.sendPacket(sm);
-                        }                
-                    }
-                    else effects.add(e);
-                }
-                else effects.add(e);                
-            }
+            if (e != null) effects.add(e);
         }
+
         if (effects.size() == 0) return _emptyEffectSet;
 
         return effects.toArray(new L2Effect[effects.size()]);
     }
-    */
 
-    
     public final L2Effect[] getEffectsSelf(L2Character effector)
     {
         if (isPassive()) return _emptyEffectSet;
