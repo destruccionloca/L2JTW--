@@ -741,6 +741,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         int dist2 = 0;
         int range = 0;
         L2Character MostHate = ((L2Attackable) _actor).getMostHated();
+        L2Character ctarget = (L2Character)_actor.getTarget();
         try
         {
        		setAttackTarget(MostHate);
@@ -760,7 +761,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
             setIntention(AI_INTENTION_ACTIVE);
             return;
         }
-        if(_actor.getTarget() == null || this.getAttackTarget() == null || this.getAttackTarget().isDead())
+        if(_actor.getTarget() == null || this.getAttackTarget() == null || this.getAttackTarget().isDead() || ctarget == _actor)
         	AggroReconsider();
         // Check if target is dead or if timeout is expired to stop this attack
         if (getAttackTarget() == null || getAttackTarget().isAlikeDead())
@@ -854,7 +855,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         	{
         		//Target will not reconsider in 10 second
         		if(chaostime>10)
-        		if(Rnd.get(100)<=(chaostime+_actor.getCurrentHp()/_actor.getMaxHp()*10))
+        		if(Rnd.get(100)<= 1-(_actor.getCurrentHp()*100/_actor.getMaxHp()))
         		{
         			AggroReconsider();
         			chaostime = 0;
@@ -864,21 +865,21 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
         	{
         		//Target will not reconsider in 10 second
         		if(chaostime>10)
-        		if(Rnd.get(100)<=(_actor.getCurrentHp()/_actor.getMaxHp()*15))
-        		{
-        			AggroReconsider();
-        			chaostime = 0;
-        		}
+            		if(Rnd.get(100)<= 1-(_actor.getCurrentHp()*200/_actor.getMaxHp()))
+            		{
+            			AggroReconsider();
+            			chaostime = 0;
+            		}
         	}
         	else if(_actor instanceof L2GrandBossInstance)
         	{
         		//Target will not reconsider in 10 second
         		if(chaostime>10)
-        		if(Rnd.get(100)<=(_actor.getCurrentHp()/_actor.getMaxHp()*50))
-        		{
-        			AggroReconsider();
-        			chaostime = 0;
-        		}
+            		if(Rnd.get(100)<= 1-(_actor.getCurrentHp()*300/_actor.getMaxHp()))
+            		{
+            			AggroReconsider();
+            			chaostime = 0;
+            		}
         	}
         	
         }
@@ -2429,7 +2430,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
     	if(actor.getHateList()!=null)
     	for(L2Character obj: actor.getHateList())
     	{
-    		if(obj == null || !GeoData.getInstance().canSeeTarget(_actor,obj) || obj.isDead()||obj == getAttackTarget())
+    		if(obj == null || !GeoData.getInstance().canSeeTarget(_actor,obj) || obj.isDead() || obj!= MostHate || obj == _actor || obj == getAttackTarget())
 				continue;
             try
             {
@@ -2458,7 +2459,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
     	if(!(_actor instanceof L2GuardInstance))
       	 for (L2Character obj : _actor.getKnownList().getKnownCharactersInRadius(range))
          {
-      		 if(obj == null || !GeoData.getInstance().canSeeTarget(_actor,obj) || obj == _actor)
+      		if(obj == null || !GeoData.getInstance().canSeeTarget(_actor,obj) || obj.isDead() || obj!= MostHate || obj == _actor || obj == getAttackTarget())
 				continue;
     		 if(obj instanceof L2PcInstance)
     		 {
@@ -2517,7 +2518,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
     	if(actor.getHateList()!=null)
     	for(L2Character obj: actor.getHateList())
     	{
-    		if(obj == null || !GeoData.getInstance().canSeeTarget(_actor,obj) || obj.isDead()|| obj == getAttackTarget())
+    		if(obj == null || !GeoData.getInstance().canSeeTarget(_actor,obj) || obj.isDead()|| obj == getAttackTarget() || obj == actor)
 				continue;
             try
             {
@@ -2540,7 +2541,7 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
     	if(!(_actor instanceof L2GuardInstance))
       	 for (L2Character obj : _actor.getKnownList().getKnownCharactersInRadius(1000))
          {
-      		 if(obj == null || !GeoData.getInstance().canSeeTarget(_actor,obj) || obj.isDead() || obj!= MostHate || obj == _actor)
+      		 if(obj == null || !GeoData.getInstance().canSeeTarget(_actor,obj) || obj.isDead() || obj!= MostHate || obj == _actor || obj == getAttackTarget())
 				continue;
     		 if(obj instanceof L2PcInstance)
     		 {

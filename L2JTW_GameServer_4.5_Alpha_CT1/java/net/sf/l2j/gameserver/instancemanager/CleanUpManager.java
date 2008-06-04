@@ -163,63 +163,63 @@ public class CleanUpManager
 			con = L2DatabaseFactory.getInstance().getConnection();
 			PreparedStatement statement ;
 
-        	statement = con.prepareStatement("DELETE FROM character_friends WHERE char_id=? OR friend_id=?");
+        	statement = con.prepareStatement("DELETE FROM character_friends WHERE charId=? OR friendId=?");
 			statement.setInt(1, objid);
 			statement.setInt(2, objid);
 			statement.execute();
 			statement.close();
             
-            statement = con.prepareStatement("DELETE FROM character_hennas WHERE char_obj_id=?");
+            statement = con.prepareStatement("DELETE FROM character_hennas WHERE charId=?");
             statement.setInt(1, objid);
             statement.execute();
             statement.close();
 	
-			statement = con.prepareStatement("DELETE FROM character_macroses WHERE char_obj_id=?");
+			statement = con.prepareStatement("DELETE FROM character_macroses WHERE charId=?");
 			statement.setInt(1, objid);
 			statement.execute();
 			statement.close();
 
-			statement = con.prepareStatement("DELETE FROM character_quests WHERE char_id=?");
+			statement = con.prepareStatement("DELETE FROM character_quests WHERE charId=?");
 			statement.setInt(1, objid);
 			statement.execute();
 			statement.close();
 
-			statement = con.prepareStatement("DELETE FROM character_recipebook WHERE char_id=?");
+			statement = con.prepareStatement("DELETE FROM character_recipebook WHERE charId=?");
 			statement.setInt(1, objid);
 			statement.execute();
 			statement.close();
 	
-			statement = con.prepareStatement("DELETE FROM character_shortcuts WHERE char_obj_id=?");
+			statement = con.prepareStatement("DELETE FROM character_shortcuts WHERE charId=?");
 			statement.setInt(1, objid);
 			statement.execute();
 			statement.close();
 	
-			statement = con.prepareStatement("DELETE FROM character_skills WHERE char_obj_id=?");
+			statement = con.prepareStatement("DELETE FROM character_skills WHERE charId=?");
 			statement.setInt(1, objid);
 			statement.execute();
 			statement.close();
 
-			statement = con.prepareStatement("DELETE FROM character_skills_save WHERE char_obj_id=?");
+			statement = con.prepareStatement("DELETE FROM character_skills_save WHERE charId=?");
 			statement.setInt(1, objid);
 			statement.execute();
 			statement.close();
 
-			statement = con.prepareStatement("DELETE FROM character_subclasses WHERE char_obj_id=?");
+			statement = con.prepareStatement("DELETE FROM character_subclasses WHERE charId=?");
 			statement.setInt(1, objid);
 			statement.execute();
 			statement.close();
             
-            statement = con.prepareStatement("DELETE FROM heroes WHERE char_id=?");
+            statement = con.prepareStatement("DELETE FROM heroes WHERE charId=?");
             statement.setInt(1, objid);
             statement.execute();
             statement.close();
             
-            statement = con.prepareStatement("DELETE FROM olympiad_nobles WHERE char_id=?");
+            statement = con.prepareStatement("DELETE FROM olympiad_nobles WHERE charId=?");
             statement.setInt(1, objid);
             statement.execute();
             statement.close();
             
-            statement = con.prepareStatement("DELETE FROM seven_signs WHERE char_obj_id=?");
+            statement = con.prepareStatement("DELETE FROM seven_signs WHERE charId=?");
             statement.setInt(1, objid);
             statement.execute();
             statement.close();
@@ -244,7 +244,7 @@ public class CleanUpManager
 			statement.execute();
 			statement.close();
 			
-			statement = con.prepareStatement("DELETE FROM characters WHERE obj_Id=?");
+			statement = con.prepareStatement("DELETE FROM characters WHERE charId=?");
 			statement.setInt(1, objid);
 			statement.execute();
 			statement.close();

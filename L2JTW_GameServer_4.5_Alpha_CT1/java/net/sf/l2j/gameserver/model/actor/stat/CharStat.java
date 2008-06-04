@@ -578,7 +578,7 @@ public class CharStat
     	if (_activeChar == null)
     		return 1;
     	
-    	if (_activeChar.charIsTransformed())
+    	if (_activeChar.isTransformed())
     	    return _activeChar.getTemplate().baseAtkRange;
     	// Polearm handled here for now. Basically L2PcInstance could have a function
     	// similar to FuncBowAtkRange and NPC are defined in DP. 
@@ -641,7 +641,7 @@ public class CharStat
 		val /= _activeChar.getArmourExpertisePenalty();
 		
 		// Apply max run speed cap.
-		if (val > Config.MAX_RUN_SPEED && !_activeChar.charIsGM())
+		if (val > Config.MAX_RUN_SPEED && !_activeChar.isGM())
 			val = Config.MAX_RUN_SPEED;
 		
 		return val;
