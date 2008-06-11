@@ -94,7 +94,8 @@ L2Character activeChar, L2Skill skill, L2Object[] targets)
 		if (target.isInvul() || !acted)
 		{
 			activeChar.sendPacket(new SystemMessage(SystemMessageId.MISSED_TARGET));
-		} else
+		}
+		else
 		{
 			double damage = Formulas.getInstance().calcManaDam(activeChar, target, skill, ss, bss);
 
@@ -112,46 +113,19 @@ L2Character activeChar, L2Skill skill, L2Object[] targets)
 				}
 			}
 
-			StatusUpdate sump = new StatusUpdate(target.getObjectId());
-			sump.addAttribute(StatusUpdate.CUR_MP, (int) target.getCurrentMp());
-			target.sendPacket(sump);
-			if(target instanceof L2PcInstance)
+			if (target instanceof L2PcInstance)
 			{
-				SystemMessage sm = new SystemMessage(SystemMessageId.S2_MP_HAS_BEEN_DRAINED_BY_S1);
+				StatusUpdate sump = new StatusUpdate(target.getObjectId());
+				sump.addAttribute(StatusUpdate.CUR_MP, (int) target.getCurrentMp());
+				// [L2J_JP EDIT START - TSL]
+				target.sendPacket(sump);
 
-					if(activeChar instanceof L2NpcInstance || activeChar instanceof L2Summon)
-					{
-						if(activeChar instanceof L2NpcInstance)
-						{
-						if (((L2NpcInstance)activeChar).getTemplate().serverSideName)
-						{
-							sm.addString(activeChar.getName());
-						}
-						else
-							sm.addNpcName(((L2NpcInstance)activeChar).getTemplate().idTemplate);
-						}
-						
-						if(activeChar instanceof L2Summon)
-						{
-							if (((L2Summon)activeChar).getTemplate().serverSideName)
-							{
-								sm.addString(activeChar.getName());
-							}
-							else
-								sm.addNpcName(((L2Summon)activeChar).getTemplate().idTemplate);
-						}
-							activeChar.sendPacket(sm);
-					}
-					else
-					{
-               
-		                 sm.addString(activeChar.getName());
-		                 //sm.addSkillName(skill.getId());
-		                 //activeChar.sendPacket(sm);
-					}
-					sm.addNumber((int) mp);
-					target.sendPacket(sm);
+				SystemMessage sm = new SystemMessage(SystemMessageId.S2_MP_HAS_BEEN_DRAINED_BY_S1);
+				sm.addCharName(activeChar);
+				sm.addNumber((int) mp);
+				target.sendPacket(sm);
 			}
+
 			if (activeChar instanceof L2PcInstance)
 			{
 				SystemMessage sm2 = new SystemMessage(SystemMessageId.YOUR_OPPONENTS_MP_WAS_REDUCED_BY_S1);

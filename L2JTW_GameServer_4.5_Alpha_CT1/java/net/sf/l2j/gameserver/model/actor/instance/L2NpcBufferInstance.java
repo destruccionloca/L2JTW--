@@ -25,6 +25,7 @@ import net.sf.l2j.gameserver.network.SystemMessageId;
 import net.sf.l2j.gameserver.serverpackets.ActionFailed;
 import net.sf.l2j.gameserver.serverpackets.NpcHtmlMessage;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
+import net.sf.l2j.gameserver.taskmanager.AttackStanceTaskManager;
 import net.sf.l2j.gameserver.templates.L2NpcTemplate;
 
 public class L2NpcBufferInstance extends L2NpcInstance
@@ -78,8 +79,8 @@ public class L2NpcBufferInstance extends L2NpcInstance
 
     	if (command.startsWith("Chat"))
         {
-    		String[] params = command.split(" ");
-            int val = Integer.parseInt(params[1]);
+            int val = Integer.parseInt(command.substring(5));
+
             pageVal = val;
             
             showChatWindow(playerInstance, val);
@@ -134,7 +135,7 @@ public class L2NpcBufferInstance extends L2NpcInstance
     				{
     					for (int i = 0;i < skillFeeAmount;++ i)
     					{
-     					playerInstance.destroyItemByItemId("Npc Buffer", skillFeeId, 1, playerInstance.getTarget(), true);
+    						playerInstance.destroyItemByItemId("Npc Buffer", skillFeeId, 1, playerInstance.getTarget(), true);
     					}
     				}
      			}
@@ -147,6 +148,30 @@ public class L2NpcBufferInstance extends L2NpcInstance
 				}
     			
     			showChatWindow(playerInstance, pageVal);
+    	}
+    	else if (command.startsWith("Heal"))
+    	{
+    		if (!playerInstance.isInCombat() && !AttackStanceTaskManager.getInstance().getAttackStanceTask(playerInstance))
+    		{
+				String[] healArray = command.substring(5).split(" ");
+				
+				for (String healType: healArray)
+				{
+					if (healType.equalsIgnoreCase("HP"))
+		    		{
+		    			playerInstance.setCurrentHp(playerInstance.getMaxHp());
+		    		}
+					else if (healType.equalsIgnoreCase("MP"))
+					{
+						playerInstance.setCurrentMp(playerInstance.getMaxMp());
+					}
+					else if (healType.equalsIgnoreCase("CP"))
+					{
+						playerInstance.setCurrentCp(playerInstance.getMaxCp());
+					}
+				}
+    		}
+    		showChatWindow(playerInstance, 0); // 0 = main window
     	}
 		else
 		{

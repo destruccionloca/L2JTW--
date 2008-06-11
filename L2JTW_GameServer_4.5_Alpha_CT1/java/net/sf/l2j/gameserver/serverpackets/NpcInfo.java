@@ -149,47 +149,7 @@ public final class NpcInfo extends L2GameServerPacket
 		_swimRunSpd = _flRunSpd = _flyRunSpd = _runSpd;
 		_swimWalkSpd = _flWalkSpd = _flyWalkSpd = _walkSpd;
 	}
-	public NpcInfo(L2Trap cha, L2Character attacker)
-	{
-		_activeChar = cha;
-		_idTemplate = cha.getTemplate().idTemplate;
-		_isAttackable = cha.isAutoAttackable(attacker);
-		_rhand = 0;
-		_lhand = 0;
 
-		_collisionHeight = _activeChar.getTemplate().collisionHeight;
-		_collisionRadius = _activeChar.getTemplate().collisionRadius;
-		_x = _activeChar.getX();
-
-        _collisionHeight = _activeChar.getTemplate().collisionHeight;
-        _collisionRadius = _activeChar.getTemplate().collisionRadius;
-        if (cha.getTemplate().serverSideName)
-    	{
-            _name = _activeChar.getName();
-    		_title = cha.getTitle();
-    	}
-        if (_summon.getTemplate().npcId == 16025)
-        {
-			
-        	if(_summon.getLevel() >= 60 && _summon.getLevel() < 65){        		
-        		form = 1;
-        	}else if(_summon.getLevel() >= 65){ 
-        		form = 2;
-        	}
-        }
-
-        _x = _activeChar.getX();
-		_y = _activeChar.getY();
-		_z = _activeChar.getZ();
-		_title = cha.getOwner().getName();
-		_heading = _activeChar.getHeading();
-		_mAtkSpd = _activeChar.getMAtkSpd();
-		_pAtkSpd = _activeChar.getPAtkSpd();
-		_runSpd = _activeChar.getRunSpeed();
-		_walkSpd = _activeChar.getWalkSpeed();
-		_swimRunSpd = _flRunSpd = _flyRunSpd = _runSpd;
-		_swimWalkSpd = _flWalkSpd = _flyWalkSpd = _walkSpd;
-	}
 	public NpcInfo(L2Summon cha, L2Character attacker)
 	{
 		_activeChar = cha;
@@ -268,6 +228,27 @@ public final class NpcInfo extends L2GameServerPacket
 		_swimWalkSpd = _flWalkSpd = _flyWalkSpd = _walkSpd;
 	}
 
+	public NpcInfo(L2Trap cha, L2Character attacker)
+	{
+		_activeChar = cha;
+		_idTemplate = cha.getTemplate().idTemplate;
+		_isAttackable = cha.isAutoAttackable(attacker);
+		_rhand = 0;
+		_lhand = 0;
+		_collisionHeight = _activeChar.getTemplate().collisionHeight;
+		_collisionRadius = _activeChar.getTemplate().collisionRadius;
+		_x = _activeChar.getX();
+		_y = _activeChar.getY();
+		_z = _activeChar.getZ();
+		_title = cha.getOwner().getName();
+		_heading = _activeChar.getHeading();
+		_mAtkSpd = _activeChar.getMAtkSpd();
+		_pAtkSpd = _activeChar.getPAtkSpd();
+		_runSpd = _activeChar.getRunSpeed();
+		_walkSpd = _activeChar.getWalkSpeed();
+		_swimRunSpd = _flRunSpd = _flyRunSpd = _runSpd;
+		_swimWalkSpd = _flWalkSpd = _flyWalkSpd = _walkSpd;
+	}
 	
 	  public NpcInfo(L2Decoy cha)
 	  {

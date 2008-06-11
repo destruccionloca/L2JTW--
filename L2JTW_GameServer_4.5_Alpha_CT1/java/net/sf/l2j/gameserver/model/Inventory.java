@@ -251,7 +251,6 @@ public abstract class Inventory extends ItemContainer
 	        else
 	        	return;
 
-	        L2Skill enchant4Skill = null;
 	        L2Skill _itemSkill = null;
 	        int skill_Id = 0;
 	        int skillLvl = 0;
@@ -312,12 +311,6 @@ public abstract class Inventory extends ItemContainer
 						}
 					}
 				}
-			}
-			
-			if(enchant4Skill != null)
-			{
-				player.removeItemSkill(enchant4Skill);
-				player.sendSkillList(); 
 			}
     	}
     	
@@ -644,6 +637,9 @@ public abstract class Inventory extends ItemContainer
 	 */
 	public L2ItemInstance dropItem(String process, L2ItemInstance item, L2PcInstance actor, L2Object reference)
 	{
+		if (item == null)
+			return null;
+		
 		synchronized (item)
 		{
 			if (!_items.contains(item))

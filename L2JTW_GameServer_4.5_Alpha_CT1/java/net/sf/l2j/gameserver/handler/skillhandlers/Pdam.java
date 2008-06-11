@@ -131,7 +131,7 @@ public class Pdam implements ISkillHandler
 						activeChar.stopSkillEffects(skill.getId());
 						skill.getEffects((L2Character) null, activeChar);
 						SystemMessage sm = new SystemMessage(SystemMessageId.YOU_FEEL_S1_EFFECT);
-						sm.addSkillName(skill.getId());
+						sm.addSkillName(skill);
 						activeChar.sendPacket(sm);
 					}
                 	else
@@ -143,45 +143,15 @@ public class Pdam implements ISkillHandler
                             skill.getEffects(activeChar, target);
 
                             SystemMessage sm = new SystemMessage(SystemMessageId.YOU_FEEL_S1_EFFECT);
+                            sm.addSkillName(skill);
                             target.sendPacket(sm);
                         }
                         else
                         {
-                        	if (activeChar instanceof L2PcInstance)
-                        	{
-	                       	SystemMessage sm = new SystemMessage(SystemMessageId.S1_WAS_UNAFFECTED_BY_S2);
-	      					if(target instanceof L2NpcInstance || target instanceof L2Summon)
-	      					{
-	      						if(target instanceof L2NpcInstance)
-	      						{
-	      						if (((L2NpcInstance)target).getTemplate().serverSideName)
-	      						{
-	      							sm.addString(target.getName());
-	      						}
-	      						else
-	      							sm.addNpcName(((L2NpcInstance)target).getTemplate().idTemplate);
-	      						}
-	      						
-	      						if(target instanceof L2Summon)
-	      						{
-	      						if (((L2Summon)target).getTemplate().serverSideName)
-	      						{
-	      							sm.addString(target.getName());
-	      						}
-	      						else
-	      							sm.addNpcName(((L2Summon)target).getTemplate().idTemplate);
-	      						}
-	                            sm.addSkillName(skill.getId());
-	      						activeChar.sendPacket(sm);
-      					}
-      					else
-      					{
-                       
-                         sm.addString(target.getName());
-                         sm.addSkillName(skill.getId());
-                         activeChar.sendPacket(sm);
-      					}
-                        }
+                            SystemMessage sm = new SystemMessage(SystemMessageId.S1_WAS_UNAFFECTED_BY_S2);
+                            sm.addCharName(target);
+                            sm.addSkillName(skill);
+                            activeChar.sendPacket(sm);
                         }
                 	}
                 }
@@ -220,36 +190,11 @@ public class Pdam implements ISkillHandler
                               player.setCurrentHp(player.getCurrentHp() - damage);
                         }
 
-
-
-	                		SystemMessage smsg = new SystemMessage(SystemMessageId.S1_GAVE_YOU_S2_DMG);
-	    					if(activeChar instanceof L2NpcInstance || activeChar instanceof L2Summon)
-	    					{
-	    						if(activeChar instanceof L2NpcInstance)
-	    						{
-	    						if (((L2NpcInstance)activeChar).getTemplate().serverSideName)
-	    						{
-	    							smsg.addString(activeChar.getName());
-	    						}
-	    						else
-	    							smsg.addNpcName(((L2NpcInstance)activeChar).getTemplate().idTemplate);
-	    						}
-	    						if(target instanceof L2Summon)
-	    						{
-	    						if (((L2Summon)activeChar).getTemplate().serverSideName)
-	    						{
-	    							smsg.addString(activeChar.getName());
-	    						}
-	    						else
-	    							smsg.addNpcName(((L2Summon)activeChar).getTemplate().idTemplate);
-	    						}
-	    							
-	    					}
-	    					else
-	                		smsg.addString(activeChar.getName());
-	                		smsg.addNumber(damage);
-	                		player.sendPacket(smsg);
-
+                        SystemMessage smsg = new SystemMessage(SystemMessageId.S1_RECEIVED_DAMAGE_OF_S3_FROM_S2);
+                        smsg.addPcName(player);
+                        smsg.addCharName(activeChar);
+                        smsg.addNumber(damage);
+                        player.sendPacket(smsg);
 
                     }
                     else

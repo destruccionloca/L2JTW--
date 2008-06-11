@@ -658,11 +658,6 @@ public final class L2NpcTemplate extends L2CharTemplate
 	
 	
 	
-	
-	
-	
-	
-	
     public void addBuffSkill(L2Skill skill)
 	{
 		if (_buffskills == null)
@@ -901,5 +896,10 @@ public final class L2NpcTemplate extends L2CharTemplate
     public boolean hasSkill()
 	{
     	return _hasgeneralskills;
+	}
+
+	public boolean isCustom()
+	{
+		return npcId != idTemplate;
 	}
 }

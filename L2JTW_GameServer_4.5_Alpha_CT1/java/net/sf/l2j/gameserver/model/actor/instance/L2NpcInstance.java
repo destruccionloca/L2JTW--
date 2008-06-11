@@ -2001,7 +2001,7 @@ public class L2NpcInstance extends L2Character
         {
             for (QuestState x : awaits) 
             {
-                if (!options.contains(x))
+                if (!options.contains(x.getQuest()))
                     if((x.getQuest().getQuestIntId()>0) && (x.getQuest().getQuestIntId()<1000))
                         options.add(x.getQuest());
             }
@@ -2286,7 +2286,7 @@ public class L2NpcInstance extends L2Character
         player.setCurrentCp(player.getMaxCp());
         //cp restored
         sm = new SystemMessage(SystemMessageId.S1_CP_WILL_BE_RESTORED);
-        sm.addString(player.getName());
+        sm.addPcName(player);
         player.sendPacket(sm);
     }
     

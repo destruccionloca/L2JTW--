@@ -92,14 +92,12 @@ import net.sf.l2j.gameserver.serverpackets.MagicSkillLaunched;
 import net.sf.l2j.gameserver.serverpackets.MagicSkillUse;
 import net.sf.l2j.gameserver.serverpackets.NpcInfo;
 import net.sf.l2j.gameserver.serverpackets.PetInfo;
-import net.sf.l2j.gameserver.serverpackets.RelationChanged;
 import net.sf.l2j.gameserver.serverpackets.Revive;
 import net.sf.l2j.gameserver.serverpackets.SetupGauge;
 import net.sf.l2j.gameserver.serverpackets.StatusUpdate;
 import net.sf.l2j.gameserver.serverpackets.StopMove;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.serverpackets.TeleportToLocation;
-import net.sf.l2j.gameserver.serverpackets.UserInfo;
 import net.sf.l2j.gameserver.serverpackets.FlyToLocation.FlyType;
 import net.sf.l2j.gameserver.skills.Calculator;
 import net.sf.l2j.gameserver.skills.Formulas;
@@ -1575,7 +1573,7 @@ public abstract class L2Character extends L2Object
 			if (this instanceof L2PcInstance)
 			{
 				SystemMessage sm = new SystemMessage(SystemMessageId.S1_PREPARED_FOR_REUSE);
-				sm.addSkillName(skill.getId(),skill.getLevel());
+				sm.addSkillName(skill);
 				sendPacket(sm);
 			}
 			*/
@@ -1676,7 +1674,7 @@ public abstract class L2Character extends L2Object
 					|| effect.getEffectType() == L2Effect.EffectType.SIGNET_GROUND)
 				{
 					SystemMessage sm = new SystemMessage(SystemMessageId.S1_CANNOT_BE_USED);
-					sm.addSkillName(skill.getId());
+					sm.addSkillName(skill);
 					sendPacket(sm);
 					return;
 				}
@@ -1696,7 +1694,7 @@ public abstract class L2Character extends L2Object
 			if (!canCast)
 			{
 				SystemMessage sm = new SystemMessage(SystemMessageId.S1_CANNOT_BE_USED);
-				sm.addSkillName(skill.getId());
+				sm.addSkillName(skill);
 				sendPacket(sm);
 				return;
 			}
@@ -1990,7 +1988,7 @@ public abstract class L2Character extends L2Object
 		if (this instanceof L2PcInstance && magicId != 1312)
         {
 			SystemMessage sm = new SystemMessage(SystemMessageId.USE_S1);
-			sm.addSkillName(magicId,skill.getLevel());
+			sm.addSkillName(skill);
 			sendPacket(sm);
 		}
 		
@@ -3033,6 +3031,9 @@ public abstract class L2Character extends L2Object
 
 		ChangeWaitType revive = new ChangeWaitType(this,ChangeWaitType.WT_STOP_FAKEDEATH);
 		broadcastPacket(revive);
+		//TODO: Temp hack: players see FD on ppl that are moving: Teleport to someone who uses FD - if he gets up he will fall down again for that client -
+		// even tho he is actually standing... Probably bad info in CharInfo packet?
+		broadcastPacket(new Revive(this));
 		getAI().notifyEvent(CtrlEvent.EVT_THINK, null);
 	}
 
@@ -5066,34 +5067,8 @@ public abstract class L2Character extends L2Object
             if (target instanceof L2PcInstance)
             {
                 SystemMessage sm = new SystemMessage(SystemMessageId.AVOIDED_S1S_ATTACK);
-
-                if (this instanceof L2Summon)
-                {
-                	boolean serversidename = ((L2Summon)this).getTemplate().serverSideName;
-                    int mobId = ((L2Summon)this).getTemplate().idTemplate;
-                    
-                    if (serversidename)
-                        sm.addString(((L2Summon)this).getTemplate().name);
-                    else
-                    sm.addNpcName(mobId);
-                }
-                else if (this instanceof L2NpcInstance)
-                {
-                    int mobId = ((L2NpcInstance)this).getTemplate().idTemplate;
-                    boolean serversidename = ((L2NpcInstance)this).getTemplate().serverSideName;
-                    if (Config.DEBUG) 
-                        _log.fine("mob id:" + mobId);
-                    if (serversidename||((L2NpcInstance)this).getIsChar() >0)
-                        sm.addString(((L2NpcInstance)this).getTemplate().name);
-                    else
-                    sm.addNpcName(mobId);
-                }
-                else
-                {
-                    sm.addString(getName());
-                }
-
-                ((L2PcInstance)target).sendPacket(sm);
+                sm.addCharName(this);
+                target.sendPacket(sm);
             }
         }
 
@@ -5884,7 +5859,7 @@ public abstract class L2Character extends L2Object
 					if (skill.getSkillType() == L2Skill.SkillType.BUFF)
 					{
 						SystemMessage smsg = new SystemMessage(SystemMessageId.YOU_FEEL_S1_EFFECT);
-						smsg.addSkillName(skill.getId());
+						smsg.addSkillName(skill);
 						target.sendPacket(smsg);
 					}
 					
@@ -6458,18 +6433,9 @@ public abstract class L2Character extends L2Object
 		_PvPRegTask = null;
 	}
 
-	public void updatePvPFlag(int value) {
-		if (!(this instanceof L2PcInstance))
-			return;
-		L2PcInstance player = (L2PcInstance)this;
-		if (player.getPvpFlag() == value)
-			return;
-		player.setPvpFlag(value);
-
-		player.sendPacket(new UserInfo(player));
-		for (L2PcInstance target : getKnownList().getKnownPlayers().values()) {
-			target.sendPacket(new RelationChanged(player, player.getRelation(player), player.isAutoAttackable(target)));
-		}
+	public void updatePvPFlag(int value)
+	{
+		// Overridden in L2PcInstance
 	}
 
 //	public void checkPvPFlag()

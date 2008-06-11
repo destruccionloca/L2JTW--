@@ -16,7 +16,16 @@ package net.sf.l2j.gameserver.serverpackets;
 
 import java.util.Vector;
 
+import net.sf.l2j.gameserver.model.L2Character;
+import net.sf.l2j.gameserver.model.L2Effect;
+import net.sf.l2j.gameserver.model.L2ItemInstance;
+import net.sf.l2j.gameserver.model.L2Skill;
+import net.sf.l2j.gameserver.model.L2Summon;
+import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
+import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.network.SystemMessageId;
+import net.sf.l2j.gameserver.templates.L2Item;
+import net.sf.l2j.gameserver.templates.L2NpcTemplate;
 
 /**
  * This class ...
@@ -831,12 +840,71 @@ public final class SystemMessage extends L2GameServerPacket
 		return this;
 	}
 
+	public SystemMessage addCharName(L2Character cha)
+	{
+		if (cha instanceof L2NpcInstance)
+		{
+
+             boolean serversidename = ((L2NpcInstance)cha).getTemplate().serverSideName;
+
+             if (serversidename)
+            	 addString(((L2NpcInstance)cha).getTemplate().name);
+             else
+             addNpcName((L2NpcInstance)cha);
+		}
+		if (cha instanceof L2PcInstance)
+			return addPcName((L2PcInstance)cha);
+		if (cha instanceof L2Summon)
+		{
+			boolean serversidename = ((L2Summon)cha).getTemplate().serverSideName;
+
+            if (serversidename)
+                addString(((L2Summon)cha).getTemplate().name);
+            else
+            addNpcName((L2Summon)cha);
+		}
+		return addString(cha.getName());
+	}
+
+	public SystemMessage addPcName(L2PcInstance pc)
+	{
+		return addString(pc.getAppearance().getVisibleName());
+	}
+
+	public SystemMessage addNpcName(L2NpcInstance npc)
+	{
+		return addNpcName(npc.getTemplate());
+	}
+
+	public SystemMessage addNpcName(L2Summon npc)
+	{
+		return addNpcName(npc.getNpcId());
+	}
+
+	public SystemMessage addNpcName(L2NpcTemplate tpl)
+	{
+		if (tpl.isCustom())
+			return addString(tpl.name);
+		return addNpcName(tpl.npcId);
+	}
+
 	public SystemMessage addNpcName(int id)
 	{
 		_types.add(new Integer(TYPE_NPC_NAME));
 		_values.add(new Integer(1000000 + id));
 
 		return this;
+	}
+
+	public SystemMessage addItemName(L2ItemInstance item)
+	{
+		return addItemName(item.getItem().getItemId());
+	}
+
+	public SystemMessage addItemName(L2Item item)
+	{
+		// TODO: template id for items
+		return addItemName(item.getItemId());
 	}
 
 	public SystemMessage addItemName(int id)
@@ -856,7 +924,22 @@ public final class SystemMessage extends L2GameServerPacket
 		return this;
 	}
 
-	public SystemMessage addSkillName(int id){return addSkillName(id, 1);}
+	public SystemMessage addSkillName(L2Effect effect)
+	{
+		return addSkillName(effect.getSkill());
+	}
+
+	public SystemMessage addSkillName(L2Skill skill)
+	{
+		if (skill.getId() != skill.getDisplayId()) //custom skill -  need nameId or smth like this.
+			return addString(skill.getName());
+		return addSkillName(skill.getId(), skill.getLevel());
+	}
+
+	public SystemMessage addSkillName(int id)
+	{
+		return addSkillName(id, 1);
+	}
 
 	public SystemMessage addSkillName(int id, int lvl)
 	{
@@ -931,4 +1014,6 @@ public final class SystemMessage extends L2GameServerPacket
 		return _messageId;
 	}
 }
+
+
 

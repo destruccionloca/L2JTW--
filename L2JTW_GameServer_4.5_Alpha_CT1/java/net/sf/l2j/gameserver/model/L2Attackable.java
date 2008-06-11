@@ -388,6 +388,8 @@ public class L2Attackable extends L2NpcInstance
         */
 
     	// CommandChannel
+    	if(this == null)
+    		return;
         if (_commandChannelTimer == null && this.isRaid())
         {
         	if (attacker.isInParty() && attacker.getParty().isInCommandChannel()
@@ -1428,7 +1430,7 @@ public class L2Attackable extends L2NpcInstance
 		             {
 		                 SystemMessage sm;
 		                 sm = new SystemMessage(SystemMessageId.S1_DIED_DROPPED_S3_S2);
-		                 sm.addString(getName());
+		                 sm.addCharName(this);
 		                 sm.addItemName(item.getItemId());
 		                 sm.addNumber(item.getCount());
 		                 broadcastPacket(sm);

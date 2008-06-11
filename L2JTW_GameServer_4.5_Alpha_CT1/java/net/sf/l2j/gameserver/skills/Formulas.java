@@ -1135,7 +1135,7 @@ public final class Formulas
 		//Multiplier should be removed, it's false ??
 		// TODO: Check if CritVuln effects whole part of CritDmg.
 		damage += 1.5*(attacker.calcStat(Stats.CRITICAL_DAMAGE, damage+power, target, skill)
-				* target.calcStat(Stats.CRIT_VULN, target.getTemplate().baseCritVuln, target, skill != null ? skill : null));
+				* target.calcStat(Stats.CRIT_VULN, target.getTemplate().baseCritVuln, target, skill));
 
 		// get the natural vulnerability for the template
 		if (target instanceof L2NpcInstance)
@@ -1433,8 +1433,10 @@ public final class Formulas
 				}
 				else
 				{
-					//SystemMessage sm = new SystemMessage(SystemMessageId.S1_WAS_UNAFFECTED_BY_S2);
-					attacker.sendPacket(new SystemMessage(SystemMessageId.ATTACK_FAILED));
+					SystemMessage sm = new SystemMessage(SystemMessageId.S1_WAS_UNAFFECTED_BY_S2);
+					sm.addCharName(target);
+					sm.addSkillName(skill);
+					attacker.sendPacket(sm);
 
 					damage = 1;
 				}
@@ -1445,59 +1447,13 @@ public final class Formulas
 				if (skill.getSkillType() == SkillType.DRAIN)
 				{
 					SystemMessage sm = new SystemMessage(SystemMessageId.RESISTED_S1_DRAIN);
-					if(attacker instanceof L2NpcInstance || attacker instanceof L2Summon)
-					{
-						if(attacker instanceof L2NpcInstance)
-						{
-						if (((L2NpcInstance)attacker).getTemplate().serverSideName)
-						{
-							sm.addString(attacker.getName());
-						}
-						else
-							sm.addNpcName(((L2NpcInstance)attacker).getTemplate().idTemplate);
-						}
-						if(attacker instanceof L2Summon)
-						{
-						if (((L2Summon)attacker).getTemplate().serverSideName)
-						{
-							sm.addString(attacker.getName());
-						}
-						else
-							sm.addNpcName(((L2Summon)attacker).getTemplate().idTemplate);
-						}
-							
-					}
-					else
-					sm.addString(attacker.getName());
+					sm.addCharName(attacker);
 					target.sendPacket(sm);
 				}
 				else
 				{
 					SystemMessage sm = new SystemMessage(SystemMessageId.RESISTED_S1_MAGIC);
-					if(attacker instanceof L2NpcInstance || attacker instanceof L2Summon)
-					{
-						if(attacker instanceof L2NpcInstance)
-						{
-						if (((L2NpcInstance)attacker).getTemplate().serverSideName)
-						{
-							sm.addString(attacker.getName());
-						}
-						else
-							sm.addNpcName(((L2NpcInstance)attacker).getTemplate().idTemplate);
-						}
-						if(attacker instanceof L2Summon)
-						{
-						if (((L2Summon)attacker).getTemplate().serverSideName)
-						{
-							sm.addString(attacker.getName());
-						}
-						else
-							sm.addNpcName(((L2Summon)attacker).getTemplate().idTemplate);
-						}
-							
-					}
-					else
-					sm.addString(attacker.getName());
+					sm.addCharName(attacker);
 					target.sendPacket(sm);
 				}
 			}
@@ -1540,8 +1496,8 @@ public final class Formulas
 			else
 			{
 				SystemMessage sm = new SystemMessage(SystemMessageId.S1_WAS_UNAFFECTED_BY_S2);
-				sm.addString(target.getName());
-				sm.addSkillName(skill.getId());
+				sm.addCharName(target);
+				sm.addSkillName(skill);
 				owner.sendPacket(sm);
 	
 				damage = 1;
@@ -1552,13 +1508,13 @@ public final class Formulas
 				if (skill.getSkillType() == SkillType.DRAIN)
 				{
 					SystemMessage sm = new SystemMessage(SystemMessageId.RESISTED_S1_DRAIN);
-					sm.addString(owner.getName());
+					sm.addCharName(owner);
 					target.sendPacket(sm);
 				}
 				else
 				{
 					SystemMessage sm = new SystemMessage(SystemMessageId.RESISTED_S1_MAGIC);
-					sm.addString(owner.getName());
+					sm.addCharName(owner);
 					target.sendPacket(sm);
 				}
 			}

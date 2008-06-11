@@ -68,7 +68,7 @@ public class Blow implements ISkillHandler
 						activeChar.stopSkillEffects(skill.getId());
 						skill.getEffects((L2Character) null, activeChar);
 						SystemMessage sm = new SystemMessage(SystemMessageId.YOU_FEEL_S1_EFFECT);
-						sm.addSkillName(skill.getId());
+						sm.addSkillName(skill);
 						activeChar.sendPacket(sm);
 					}
 				}
@@ -135,14 +135,14 @@ public class Blow implements ISkillHandler
 	        	       else
 	        		      player.setCurrentHp(player.getCurrentHp() - damage);
 					}
-
 	        	}
 	        	else
 	        	{
+					if(activeChar instanceof L2PcInstance)
+						activeChar.sendPacket(new SystemMessage(SystemMessageId.S1_HAD_CRITICAL_HIT).addPcName((L2PcInstance)activeChar));
 					SystemMessage sm = new SystemMessage(SystemMessageId.YOU_DID_S1_DMG);
 		            sm.addNumber((int)damage);
 		            activeChar.sendPacket(sm);
-	        		target.reduceCurrentHp(damage, activeChar);
 
 	        	}
 				//Possibility of a lethal strike

@@ -14,10 +14,8 @@
  */
 package net.sf.l2j.gameserver.model.actor.status;
 
-import net.sf.l2j.Config;
 import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.L2Summon;
-import net.sf.l2j.gameserver.model.actor.instance.L2NpcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PlayableInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2SummonInstance;
@@ -154,43 +152,8 @@ public class PcStatus extends PlayableStatus
         {
             // Send a System Message to the L2PcInstance
             SystemMessage smsg = new SystemMessage(SystemMessageId.S1_RECEIVED_DAMAGE_OF_S3_FROM_S2);
-            
             smsg.addString(getActiveChar().getName());
-
-            if (Config.DEBUG)
-                _log.fine("Attacker:" + attacker.getName());
-
-            if (attacker instanceof L2PcInstance)
-            	smsg.addString(((L2PcInstance)attacker).getAppearance().getVisibleName());
-            else if (attacker instanceof L2NpcInstance)
-            {
-                int mobId = ((L2NpcInstance)attacker).getTemplate().idTemplate;
-
-                boolean serversidename = ((L2NpcInstance)attacker).getTemplate().serverSideName;
-                if (Config.DEBUG) 
-
-                    _log.fine("mob id:" + mobId);
-
-                if (serversidename||((L2NpcInstance)attacker).getIsChar() >0)
-                    smsg.addString(((L2NpcInstance)attacker).getTemplate().name);
-                else
-                smsg.addNpcName(mobId);
-            }
-            else if (attacker instanceof L2Summon)
-            {
-            	boolean serversidename = ((L2Summon)attacker).getTemplate().serverSideName;
-                int mobId = ((L2Summon)attacker).getTemplate().idTemplate;
-
-                if (serversidename)
-                    smsg.addString(((L2Summon)attacker).getTemplate().name);
-                else
-                smsg.addNpcName(mobId);
-            }
-            else
-            {
-                smsg.addString(attacker.getName());
-            }
-
+            smsg.addCharName(attacker);
             smsg.addNumber(fullValue);
             getActiveChar().sendPacket(smsg);
         }
