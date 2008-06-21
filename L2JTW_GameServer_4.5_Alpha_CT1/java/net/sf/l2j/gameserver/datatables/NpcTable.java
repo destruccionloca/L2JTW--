@@ -305,7 +305,7 @@ public class NpcTable
                     npcCharDat.setEnchLvl(NpcCharDataTable.getInt("enchlvl"));
                     npcCharDat.setAugmentation(NpcCharDataTable.getInt("augmentation"));
                     
-		            npcDat.addCharData(npcCharDat);
+		            npcDat.setCharData(npcCharDat);
 		            cont++;
 			    }
 
@@ -362,13 +362,14 @@ public class NpcTable
                     //npcAIDat.setBaseShldDef(NpcAIDataTable.getInt("baseShldDef"));
 
                     
-                    npcDat.addAIData(npcAIDat);
+                    //npcDat.addAIData(npcAIDat);
+                    npcDat.setAIData(npcAIDat);
 		            cont++;
 			    }
 
 			    NpcAIDataTable.close();
     			statement10.close();
-				_log.config("NPC AI Data: Loaded " + cont + " AI Data.");
+				_log.config("NPC AI Data Table: Loaded " + cont + " AI Data.");
 			} 
             catch (Exception e) {
 				_log.severe("NPCTable: Error reading NPC AI Data: " + e);

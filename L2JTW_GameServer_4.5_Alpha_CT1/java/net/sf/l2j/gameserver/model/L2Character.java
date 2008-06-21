@@ -201,6 +201,8 @@ public abstract class L2Character extends L2Object
 
 	/** FastMap(Integer, L2Skill) containing all skills of the L2Character */
 	protected final Map<Integer, L2Skill> _skills;
+	/** FastMap containing the active chance skills on this character */
+	protected ChanceSkillList _chanceSkills;
 
 	/** Zone system */
 	public static final int ZONE_PVP = 1;
@@ -2215,7 +2217,7 @@ public abstract class L2Character extends L2Object
 			return;
 		}
 		// Ignore the passive skill request. why does the client send it anyway ??
-		if (skill.isPassive())
+		if (skill.isPassive() || skill.isChance())
 			return;
 
 		// Get the target for the skill
@@ -2553,7 +2555,7 @@ public abstract class L2Character extends L2Object
 						onMagicHitTimer(_targets, _skill, _coolTime, false);
 						break;
 					case 3:
-						onMagicFinalizer(_skill);
+						onMagicFinalizer(_skill, _targets[0]);
 						break;
 					default:
 						break;
@@ -4454,18 +4456,8 @@ public abstract class L2Character extends L2Object
 				// Overrides previous movement check
 				if(this instanceof L2PlayableInstance || this.isInCombat())
 				{
-					int gx = (curX - L2World.MAP_MIN_X) >> 4;
-					int gy = (curY - L2World.MAP_MIN_Y) >> 4;
-				
-                	// TODO: Find closest path node we can access, e.g.
-					// Node start = GeoPathFinding.getInstance().readNode(gx, gy, (short)curZ);
-					// if (start == null) 
-					//   no path node...
-					// Location temp = GeoData.getInstance().moveCheck(curX, curY, curZ, start.getLoc().getX(), start.getLoc().getY(), start.getLoc().getZ());
-					// if ((temp.getX() != start.getLoc().getX()) || (temp.getY() != start.getLoc().getY()))
-					//   cannot reach closest...
-							
-					m.geoPath = GeoPathFinding.getInstance().findPath(gx, gy, (short)curZ, gtx, gty, (short)originalZ);
+		
+					m.geoPath = GeoPathFinding.getInstance().findPath(curX, curY, curZ, originalX, originalY, originalZ);
                 	if (m.geoPath == null || m.geoPath.size() < 2) // No path found
                 	{
                 		// Even though there's no path found (remember geonodes aren't perfect), 
@@ -5227,6 +5219,14 @@ public abstract class L2Character extends L2Object
 					target.breakAttack();
 					target.breakCast();
 				}
+
+				// Maybe launch chance skills on us
+				if (_chanceSkills != null)
+					_chanceSkills.onHit(target, false, crit);
+
+				// Maybe launch chance skills on target
+				if (target.getChanceSkills() != null)
+					target.getChanceSkills().onHit(this, true, crit);
 			}
 
 			// Launch weapon Special ability effect if available
@@ -5588,6 +5588,17 @@ public abstract class L2Character extends L2Object
 			
 			// Add Func objects of newSkill to the calculator set of the L2Character
 			addStatFuncs(newSkill.getStatFuncs(null, this));
+
+			if (oldSkill != null && oldSkill.isChance() && _chanceSkills != null)
+			{
+				_chanceSkills.remove(oldSkill);
+			}
+			if (newSkill.isChance())
+			{
+				if (_chanceSkills == null)
+					_chanceSkills = new ChanceSkillList(this);
+				_chanceSkills.put(newSkill, newSkill.getChanceCondition());
+			}
 		}
 
 		return oldSkill;
@@ -5645,6 +5656,13 @@ public abstract class L2Character extends L2Object
 				((L2PcInstance)this).setAgathionId(0);
 				((L2PcInstance)this).broadcastUserInfo();
 			}
+
+			if (oldSkill.isChance() && _chanceSkills != null)
+			{
+				_chanceSkills.remove(oldSkill);
+				if (_chanceSkills.size() == 0)
+					_chanceSkills = null;
+			}
 		}
 
 		return oldSkill;
@@ -5663,6 +5681,11 @@ public abstract class L2Character extends L2Object
 			return new L2Skill[0];
 
 		return _skills.values().toArray(new L2Skill[_skills.values().size()]);
+	}
+
+	public ChanceSkillList getChanceSkills()
+	{
+		return _chanceSkills;
 	}
 
 	/**
@@ -5945,35 +5968,36 @@ public abstract class L2Character extends L2Object
 
 			// Launch the magic skill in order to calculate its effects
 			callSkill(skill, targets);
-		} 
-		catch (NullPointerException e) {} 
-		
+		}
+		catch (NullPointerException e) {}
+
 		if (instant || coolTime == 0)
-			onMagicFinalizer(skill);
-		else 
+			onMagicFinalizer(skill, targets[0]);
+		else
 			_skillCast = ThreadPoolManager.getInstance().scheduleEffect(new MagicUseTask(targets, skill, coolTime, 3), coolTime);
 	}
 	/*
-	 * Runs after skill hitTime+coolTime 
+	 * Runs after skill hitTime+coolTime
 	 */
-	public void onMagicFinalizer(L2Skill skill)
+	public void onMagicFinalizer(L2Skill skill, L2Object target)
 	{
 		_skillCast = null;
 		_castEndTime = 0;
 		_castInterruptTime = 0;
 		enableAllSkills();
-		
+
 		// If the skill type is listed here, notify the AI of the target with AI_INTENTION_ATTACK
 		// for offensive skills the nextintention is always null unless player wants action after skill
 		// Note: this might also work
-		// if (skill.isOffensive() && getAI().getNextIntention() == null 
+		// if (skill.isOffensive() && getAI().getNextIntention() == null
 		// && !(skill.getSkillType() == SkillType.UNLOCK) && !(skill.getSkillType() == SkillType.DELUXE_KEY_UNLOCK) && !(skill.getSkillType() == SkillType.MDAM))
-		if(skill.getTargetType()== L2Skill.SkillTargetType.TARGET_ONE || skill.getTargetType()== L2Skill.SkillTargetType.TARGET_MULTIFACE)
+
+		//if(skill.getTargetType()== L2Skill.SkillTargetType.TARGET_ONE || skill.getTargetType()== L2Skill.SkillTargetType.TARGET_MULTIFACE)
 		if (getAI().getNextIntention() == null && skill.getSkillType() == SkillType.PDAM || skill.getSkillType() == SkillType.BLOW 
 				|| skill.getSkillType() == SkillType.DRAIN_SOUL || skill.getSkillType() == SkillType.SOW 
 				|| skill.getSkillType() == SkillType.SPOIL)
 		{
-			if ((getTarget() != null) && (getTarget() instanceof L2Character))
+			if (getTarget() instanceof L2Character && getTarget() != this && target == getTarget())
 				getAI().setIntention(CtrlIntention.AI_INTENTION_ATTACK, getTarget());
 		}
 			 
@@ -6166,6 +6190,13 @@ public abstract class L2Character extends L2Object
 							sendMessage("目標受到武器特殊屬性影響!");
 						}
 					}
+
+					// Maybe launch chance skills on us
+					if (_chanceSkills != null)
+						_chanceSkills.onSkillHit(target, false, skill.isMagic(), skill.isOffensive());
+					// Maybe launch chance skills on target
+					if (target.getChanceSkills() != null)
+						target.getChanceSkills().onSkillHit(this, true, skill.isMagic(), skill.isOffensive());
 				}
 			}
 

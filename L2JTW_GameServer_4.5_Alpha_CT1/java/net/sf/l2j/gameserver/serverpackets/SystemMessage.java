@@ -848,20 +848,20 @@ public final class SystemMessage extends L2GameServerPacket
              boolean serversidename = ((L2NpcInstance)cha).getTemplate().serverSideName;
 
              if (serversidename)
-            	 addString(((L2NpcInstance)cha).getTemplate().name);
+            	 return addString(((L2NpcInstance)cha).getTemplate().name);
              else
-             addNpcName((L2NpcInstance)cha);
+            	 return addNpcName((L2NpcInstance)cha);
 		}
-		if (cha instanceof L2PcInstance)
+		else if (cha instanceof L2PcInstance)
 			return addPcName((L2PcInstance)cha);
-		if (cha instanceof L2Summon)
+		else if (cha instanceof L2Summon)
 		{
 			boolean serversidename = ((L2Summon)cha).getTemplate().serverSideName;
 
             if (serversidename)
-                addString(((L2Summon)cha).getTemplate().name);
+            	return addString(((L2Summon)cha).getTemplate().name);
             else
-            addNpcName((L2Summon)cha);
+            	return addNpcName((L2Summon)cha);
 		}
 		return addString(cha.getName());
 	}

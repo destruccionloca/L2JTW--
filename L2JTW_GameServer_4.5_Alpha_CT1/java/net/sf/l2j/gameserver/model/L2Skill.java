@@ -99,8 +99,9 @@ public abstract class L2Skill
     public static final int SKILL_FAKE_DEX = 9005;
     public static final int SKILL_FAKE_STR = 9006;
 
-    public static enum SkillOpType {
-        OP_PASSIVE, OP_ACTIVE, OP_TOGGLE
+    public static enum SkillOpType
+    {
+        OP_PASSIVE, OP_ACTIVE, OP_TOGGLE, OP_CHANCE
     }
 
     public static int skillreuse = 0;
@@ -547,7 +548,9 @@ public abstract class L2Skill
     protected FuncTemplate[] _funcTemplates;
     protected EffectTemplate[] _effectTemplates;
     protected EffectTemplate[] _effectTemplatesSelf;
-    
+
+    protected ChanceCondition _chanceCondition = null;
+
     /** Instant Kill Rate (iRate) **/  
     private final int _iRate;  
     private final boolean _iKill;  
@@ -561,7 +564,7 @@ public abstract class L2Skill
     private final int _flyRadius;
     private final float _flyCourse;
 
-	private final boolean _isDebuff;
+    private final boolean _isDebuff;
 
     protected L2Skill(StatsSet set)
     {
@@ -654,6 +657,9 @@ public abstract class L2Skill
         _minPledgeClass = set.getInteger("minPledgeClass", 0);
         _numCharges = set.getInteger("num_charges", getLevel());
         _forceId = set.getInteger("forceId", 0);
+
+        if (_operateType == SkillOpType.OP_CHANCE)
+            _chanceCondition = ChanceCondition.parse(set);
 
         _numSouls = set.getInteger("num_souls", 0);
         _soulConsume = set.getInteger("soulConsumeCount", 0);
@@ -1144,6 +1150,16 @@ public abstract class L2Skill
         return _operateType == SkillOpType.OP_TOGGLE;
     }
 
+    public final boolean isChance()
+    {
+        return _operateType == SkillOpType.OP_CHANCE;
+    }
+
+    public ChanceCondition getChanceCondition()
+    {
+        return _chanceCondition;
+    }
+
     public final boolean isDance()
     {
         return _isDance;
@@ -1472,6 +1488,21 @@ public abstract class L2Skill
         
         return true;
     }
+    public final L2Object[] getTargetList(L2Character activeChar, boolean onlyFirst)
+    {
+        // Init to null the target of the skill
+        L2Character target = null;
+
+        // Get the L2Objcet targeted by the user of the skill at this moment
+        L2Object objTarget = activeChar.getTarget();
+        // If the L2Object targeted is a L2Character, it becomes the L2Character target
+        if (objTarget instanceof L2Character)
+        {
+            target = (L2Character) objTarget;
+        }
+
+        return getTargetList(activeChar, onlyFirst, target);
+    }
 	
 	
 	/**
@@ -1493,79 +1524,18 @@ public abstract class L2Skill
 	 * @param activeChar The L2Character who use the skill
 	 * 
 	 */
-	public final L2Object[] getTargetList(L2Character activeChar, boolean onlyFirst)
-	{
-		List<L2Character> targetList = new FastList<L2Character>();
-		
-		// Get the target type of the skill 
-		// (ex : ONE, SELF, HOLY, PET, AURA, AURA_CLOSE, AREA, MULTIFACE, PARTY, CLAN, CORPSE_PLAYER, CORPSE_MOB, CORPSE_CLAN, UNLOCKABLE, ITEM, UNDEAD)
-		SkillTargetType targetType = getTargetType();
-		
-		// Init to null the target of the skill
-		L2Character target = null;
-		
-		// Get the L2Objcet targeted by the user of the skill at this moment
-		L2Object objTarget = activeChar.getTarget();
-		
-		// Get the type of the skill
-		// (ex : PDAM, MDAM, DOT, BLEED, POISON, HEAL, HOT, MANAHEAL, MANARECHARGE, AGGDAMAGE, BUFF, DEBUFF, STUN, ROOT, RESURRECT, PASSIVE...)
-		SkillType skillType = getSkillType();
-		
-		// If the L2Object targeted is a L2Character, it becomes the L2Character target
-		if(objTarget instanceof L2Character)
-		{
-			target = (L2Character) objTarget;
-		}
 
-
-
-
-        //CRIT_ATTACK = false;
-		
-        if (activeChar.isSkillDisabled(this.getId()))
-        {
+    public final L2Object[] getTargetList(L2Character activeChar, boolean onlyFirst, L2Character target)
+    {
+        List<L2Character> targetList = new FastList<L2Character>();
 
         // Get the target type of the skill
         // (ex : ONE, SELF, HOLY, PET, AURA, AURA_CLOSE, AREA, MULTIFACE, PARTY, CLAN, CORPSE_PLAYER, CORPSE_MOB, CORPSE_CLAN, UNLOCKABLE, ITEM, UNDEAD)
-       
+        SkillTargetType targetType = getTargetType();
 
-        	skillreuse=skillreuse+1;
-            if (activeChar instanceof L2PcInstance && skillreuse==100) 
-            {
-            	
-                SystemMessage sm = new SystemMessage(SystemMessageId.S1_PREPARED_FOR_REUSE);
-                sm.addSkillName(this.getId());
-                activeChar.sendPacket(sm);
-                //skillreuse = 0;
-            }
-            
-            return null;
-        }
- 
-        skillreuse= 0;
-
-        if (this.getSkillType() == SkillType.CHARGEDAM || this.getCondition()==128)
-        {
-        	if (activeChar instanceof L2PcInstance)
-            {
-
-                L2PcInstance player = (L2PcInstance)activeChar;
-                EffectCharge e = (EffectCharge)player.getFirstEffect(4271);
-                if(e == null || e.numCharges < this.getChargeNum()
-                		|| !((L2SkillChargeDmg)this).checkCondition(activeChar,activeChar.getTarget(),true))
-                {
-                	
-                    SystemMessage sm = new SystemMessage(SystemMessageId.S1_CANNOT_BE_USED);
-                    sm.addSkillName(this.getId());
-                    activeChar.sendPacket(sm);
-
-                    return null;
-                }
-            }
-        }
-
-        
-        
+        // Get the type of the skill
+        // (ex : PDAM, MDAM, DOT, BLEED, POISON, HEAL, HOT, MANAHEAL, MANARECHARGE, AGGDAMAGE, BUFF, DEBUFF, STUN, ROOT, RESURRECT, PASSIVE...)
+        SkillType skillType = getSkillType();
 
         
 		switch(targetType)

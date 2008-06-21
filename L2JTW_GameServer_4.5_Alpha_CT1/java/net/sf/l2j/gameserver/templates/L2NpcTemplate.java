@@ -140,9 +140,8 @@ public final class L2NpcTemplate extends L2CharTemplate
 	private Map<Quest.QuestEventType, Quest[]> _questEvents;
 	
 	private final List<L2NpcChatData> _chatdata = new FastList<L2NpcChatData>();
-	private final List<L2NpcCharData> _chardata = new FastList<L2NpcCharData>();
-	private final List<L2NpcAIData> _AIdata = new FastList<L2NpcAIData>();
-
+	private L2NpcAIData _AIdataStatic = new L2NpcAIData();
+	private L2NpcCharData _ChardataStatic = new L2NpcCharData();
 	
     //Skill AI
 	public FastList<L2Skill> _buffskills;
@@ -279,38 +278,27 @@ public final class L2NpcTemplate extends L2CharTemplate
 	}
 	//-----------------------------------------------------------------------
 	// Npc Char Data
-	// Under construction...
 	// By ShanSoft
 	
-	public void addCharData(L2NpcCharData chardata)
+	public void setCharData(L2NpcCharData chardata)
 	{
-
-    		_chardata.add(chardata);
-    	
+		_ChardataStatic = new L2NpcCharData();
+		_ChardataStatic = chardata;
 	}
 	//-----------------------------------------------------------------------
 	// Npc Skill Data
 	// Under construction...
 	// By ShanSoft
 	
-	public void addSkillRender(L2NpcAIData skillCategory)
-	{
 
-    		_AIdata.add(skillCategory);
-    	
-	}
 	//-----------------------------------------------------------------------
 	// Npc AI Data
-	// Under construction...
 	// By ShanSoft
-	
-	public void addAIData(L2NpcAIData aidata)
+	public void setAIData(L2NpcAIData aidata)
 	{
-
-    		_AIdata.add(aidata);
-    	
+		_AIdataStatic = new L2NpcAIData();
+		_AIdataStatic = aidata;
 	}
-	
 	//-----------------------------------------------------------------------
 	
 	// add a drop to a given category.  If the category does not exist, create it.
@@ -349,13 +337,14 @@ public final class L2NpcTemplate extends L2CharTemplate
 		return _chatdata;
 	}
 	
-	public List<L2NpcCharData> getCharData()
+
+	public L2NpcAIData getAIDataStatic()
 	{
-		return _chardata;
+		return _AIdataStatic;
 	}
-	public List<L2NpcAIData> getAIData()
+	public L2NpcCharData getCharDataStatic()
 	{
-		return _AIdata;
+		return _ChardataStatic;
 	}
     public void addRaidData(L2MinionData minion)
     {
