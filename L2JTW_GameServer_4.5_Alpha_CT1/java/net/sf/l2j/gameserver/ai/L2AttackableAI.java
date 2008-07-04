@@ -761,8 +761,10 @@ public class L2AttackableAI extends L2CharacterAI implements Runnable
             setIntention(AI_INTENTION_ACTIVE);
             return;
         }
+        /*
         if(_actor.getTarget() == null || this.getAttackTarget() == null || this.getAttackTarget().isDead() || ctarget == _actor)
         	AggroReconsider();
+        */
         // Check if target is dead or if timeout is expired to stop this attack
         if (getAttackTarget() == null || getAttackTarget().isAlikeDead())
         {

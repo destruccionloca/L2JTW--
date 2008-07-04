@@ -172,6 +172,7 @@ import net.sf.l2j.gameserver.serverpackets.ObservationMode;
 import net.sf.l2j.gameserver.serverpackets.ObservationReturn;
 import net.sf.l2j.gameserver.serverpackets.PartySmallWindowUpdate;
 import net.sf.l2j.gameserver.serverpackets.PartySpelled;
+import net.sf.l2j.gameserver.serverpackets.PetInfo;
 import net.sf.l2j.gameserver.serverpackets.PetInventoryUpdate;
 import net.sf.l2j.gameserver.serverpackets.PledgeShowInfoUpdate;
 import net.sf.l2j.gameserver.serverpackets.PledgeShowMemberListDelete;
@@ -219,6 +220,7 @@ import net.sf.l2j.util.Rnd;
 //L2JTW/JP Implement
 import net.sf.l2j.gameserver.instancemanager.AntharasManager;
 import net.sf.l2j.gameserver.instancemanager.BossZoneManager;
+import net.sf.l2j.gameserver.instancemanager.CustomZoneManager;
 import net.sf.l2j.gameserver.instancemanager.BaiumManager;
 import net.sf.l2j.gameserver.instancemanager.FourSepulchersManager;
 import net.sf.l2j.gameserver.instancemanager.SailrenManager;
@@ -415,7 +417,6 @@ public final class L2PcInstance extends L2PlayableInstance
     private int _olympiadGameId = -1;
     private int _olympiadSide = -1;
     public int olyBuff = 0;
-    public int dmgDealt = 0;
 
     /** Duel */
     private boolean _isInDuel = false;
@@ -3854,7 +3855,11 @@ public final class L2PcInstance extends L2PlayableInstance
 			{
 				int relation = getRelation(player);
 				if (getKnownList().getKnownRelations().get(player.getObjectId()) != null && getKnownList().getKnownRelations().get(player.getObjectId()) != relation)
-				player.sendPacket(new RelationChanged(this, relation, player.isAutoAttackable(this)));
+				{
+					player.sendPacket(new RelationChanged(this, relation, player.isAutoAttackable(this)));
+					if (getPet() != null)
+						player.sendPacket(new RelationChanged(getPet(), relation, player.isAutoAttackable(this)));
+				}
 			}
 		}
 	}
@@ -3874,7 +3879,11 @@ public final class L2PcInstance extends L2PlayableInstance
 				{
 					int relation = getRelation(player);
 					if (getKnownList().getKnownRelations().get(player.getObjectId()) != null && getKnownList().getKnownRelations().get(player.getObjectId()) != relation)
-					player.sendPacket(new RelationChanged(this, relation, player.isAutoAttackable(this)));
+					{
+						player.sendPacket(new RelationChanged(this, relation, player.isAutoAttackable(this)));
+						if (getPet() != null)
+							player.sendPacket(new RelationChanged(getPet(), relation, player.isAutoAttackable(this)));
+					}
 				}
 			}
 		}
@@ -4789,11 +4798,20 @@ public final class L2PcInstance extends L2PlayableInstance
                                    && !(((L2PcInstance)killer).isAcademyMember())
 		                               && _clan.isAtWarWith(((L2PcInstance) killer).getClanId())
 		                               && ((L2PcInstance)killer).getClan().isAtWarWith(_clan.getClanId()))
-		                {
-		                    if (getClan().getReputationScore() > 0) // when your reputation score is 0 or below, the other clan cannot acquire any reputation points
+		                {	
+		                	
+		                	// when your reputation score is 0 or below, the other clan cannot acquire any reputation points
+		                    if (getClan().getReputationScore() > 0) {
 		                		((L2PcInstance) killer).getClan().setReputationScore(((L2PcInstance) killer).getClan().getReputationScore()+2, true);
-		                    if (((L2PcInstance)killer).getClan().getReputationScore() > 0) // when the opposing sides reputation score is 0 or below, your clans reputation score does not decrease
+		                		getClan().broadcastToOnlineMembers(new PledgeShowInfoUpdate(_clan));
+		                		((L2PcInstance) killer).getClan().broadcastToOnlineMembers(new PledgeShowInfoUpdate(((L2PcInstance) killer).getClan()));
+		                    }
+		                 // when the opposing sides reputation score is 0 or below, your clans reputation score does not decrease
+		                    if (((L2PcInstance)killer).getClan().getReputationScore() > 0) {
 		                    	_clan.setReputationScore(_clan.getReputationScore()-2, true);
+		                    	getClan().broadcastToOnlineMembers(new PledgeShowInfoUpdate(_clan));
+		                		((L2PcInstance) killer).getClan().broadcastToOnlineMembers(new PledgeShowInfoUpdate(((L2PcInstance) killer).getClan()));
+		                    }
 		                }
 						if (Config.ALT_GAME_DELEVEL)
 						{
@@ -4801,7 +4819,7 @@ public final class L2PcInstance extends L2PlayableInstance
 							// NOTE: deathPenalty +- Exp will update karma
 							// Penalty is lower if the player is at war with the pk (war has to be declared)
 							if (getSkillLevel(L2Skill.SKILL_LUCKY) < 0 || getStat().getLevel() > 9)
-								deathPenalty(pk != null && getClan() != null && getClan().isAtWarWith(pk.getClanId()));										
+								deathPenalty(pk != null && getClan() != null && getClan().isAtWarWith(pk.getClanId()), pk != null);										
 
 						} else
 						{
@@ -4847,6 +4865,31 @@ public final class L2PcInstance extends L2PlayableInstance
 
 		stopRentPet();
 		stopWaterTask();
+		
+		// [L2J_JP ADD SANDMAN]
+    	// When the player has been annihilated, the player is banished from the Four Sepulcher.
+    	if (GrandBossManager.getInstance().checkIfInZone("FourSepulcher", this))
+       	{
+    		FourSepulchersManager.getInstance().checkAnnihilated(this);
+   		}
+    	// When the player has been annihilated, the player is banished from the lair.
+    	if (GrandBossManager.getInstance().checkIfInZone("LairofSailren", this))
+    	{
+    		SailrenManager.getInstance().checkAnnihilated(this);
+    	}
+    	if (GrandBossManager.getInstance().checkIfInZone("LairofAntharas", this))
+    	{
+    		AntharasManager.getInstance().checkAnnihilated();
+    	}
+    	if (GrandBossManager.getInstance().checkIfInZone("LairofValakas", this))
+    	{
+    		ValakasManager.getInstance().checkAnnihilated();
+    	}
+    	if (GrandBossManager.getInstance().checkIfInZone("LairofBaium", this))
+    	{
+    		BaiumManager.getInstance().checkAnnihilated();
+    	}
+    	
 		return true;
 	}
 
@@ -5204,42 +5247,74 @@ public final class L2PcInstance extends L2PlayableInstance
 	 * <li>Send a Server->Client StatusUpdate packet with its new Experience </li><BR><BR>
 	 *
 	 */
-	public void deathPenalty(boolean atwar)
+	public void deathPenalty(boolean atwar, boolean killed_by_pc)
 	{
 		// TODO Need Correct Penalty
 		// Get the level of the L2PcInstance
 		final int lvl = getLevel();
 
-		//The death steal you some Exp
-		double percentLost = 1.0;
-		
 		byte level = (byte)getLevel();
+		
+		int clan_luck = getSkillLevel(L2Skill.SKILL_CLAN_LUCK);
+		
+		double clan_luck_modificator = 1.0;	
+		
+		if (!killed_by_pc)
+		{
+			switch (clan_luck)
+			{
+				case 3:
+					clan_luck_modificator = 0.8;
+					break;
+				case 2:
+					clan_luck_modificator = 0.8;
+					break;
+				case 1:
+					clan_luck_modificator = 0.88;
+					break;
+				default:
+					clan_luck_modificator = 1.0;
+					break;				
+			}
+		}
+		else
+		{
+			switch (clan_luck)
+			{
+				case 3:
+					clan_luck_modificator = 0.5;
+					break;
+				case 2:
+					clan_luck_modificator = 0.5;
+					break;
+				case 1:
+					clan_luck_modificator = 0.5;
+					break;
+				default:
+					clan_luck_modificator = 1.0;
+					break;				
+			}
+		}	
+		
+		//The death steal you some Exp
+		double percentLost = (1.0*clan_luck_modificator);
 		
 		switch (level)
 		{
-			case 81:
-				percentLost = 1.25;
-				break;
-			case 80:
-				percentLost = 1.5;
-				break;
-			case 79:
-				percentLost = 1.75;
-				break;
 			case 78:
-				percentLost = 2.0;
+				percentLost = (1.5*clan_luck_modificator);
 				break;
 			case 77:
-				percentLost = 2.25;
+				percentLost = (2.0*clan_luck_modificator);
 				break;
 			case 76:
-				percentLost = 2.5;
+				percentLost = (2.5*clan_luck_modificator);
 				break;
 			default:
 				if (level < 40)
-					percentLost = 7.0;
+					percentLost = (7.0*clan_luck_modificator);
 				else if (level >= 40 && level <= 75)
-					percentLost = 4.0;
+					percentLost = (4.0*clan_luck_modificator);
 				
 				break;
 		}
@@ -6173,8 +6248,11 @@ public final class L2PcInstance extends L2PlayableInstance
 	public void setKarmaFlag(int flag)
 	{
 		sendPacket(new UserInfo(this));
-		for (L2PcInstance player : getKnownList().getKnownPlayers().values()) {
+		for (L2PcInstance player : getKnownList().getKnownPlayers().values())
+		{
 			player.sendPacket(new RelationChanged(this, getRelation(player), isAutoAttackable(player)));
+			if (getPet() != null)
+				player.sendPacket(new RelationChanged(getPet(), getRelation(player), isAutoAttackable(player)));
 		}
 	}
 
@@ -6187,8 +6265,11 @@ public final class L2PcInstance extends L2PlayableInstance
         su.addAttribute(StatusUpdate.KARMA, getKarma());
         sendPacket(su);
 
-		for (L2PcInstance player : getKnownList().getKnownPlayers().values()) {
+		for (L2PcInstance player : getKnownList().getKnownPlayers().values())
+		{
 			player.sendPacket(new RelationChanged(this, getRelation(player), isAutoAttackable(player)));
+			if (getPet() != null)
+				player.sendPacket(new RelationChanged(getPet(), getRelation(player), isAutoAttackable(player)));
 		}
 	}
 
@@ -9504,6 +9585,9 @@ public final class L2PcInstance extends L2PlayableInstance
         restoreSkills();
         regiveTemporarySkills();
         rewardSkills();
+        // Prevents some issues when changing between subclases that shares skills
+        if(_disabledSkills != null && !_disabledSkills.isEmpty()) 
+        	_disabledSkills.clear();
         restoreEffects();
         updateEffectIcons();
         sendPacket(new EtcStatusUpdate(this));
@@ -9541,6 +9625,7 @@ public final class L2PcInstance extends L2PlayableInstance
         sendPacket(new ShortCutInit(this));            
 
         broadcastPacket(new SocialAction(getObjectId(), 15));
+        sendPacket(new SkillCoolTime(this));
 
         //decayMe();
         //spawnMe(getX(), getY(), getZ());
@@ -9923,19 +10008,28 @@ public final class L2PcInstance extends L2PlayableInstance
 		
 		// Force a revalidation
 		revalidateZone(true);
-
+		
 		if ((Config.PLAYER_SPAWN_PROTECTION > 0) && !isInOlympiadMode())
-            setProtection(true);
-
-		// Modify the position of the tamed beast if necessary (normal pets are handled by super...though
-        // L2PcInstance is the only class that actually has pets!!! )
-		if(getTrainedBeast() != null)
+			setProtection(true);
+		
+		// Modify the position of the tamed beast if necessary
+		if (getTrainedBeast() != null)
 		{
 			getTrainedBeast().getAI().stopFollow();
-			getTrainedBeast().teleToLocation(getPosition().getX() + Rnd.get(-100,100), getPosition().getY() + Rnd.get(-100,100), getPosition().getZ(), false);
+			getTrainedBeast().teleToLocation(getPosition().getX() + Rnd.get(-100, 100), getPosition().getY() + Rnd.get(-100, 100), getPosition().getZ(), false);
 			getTrainedBeast().getAI().startFollow(this);
 		}
-
+		
+		// Modify the position of the pet if necessary
+		if (getPet() != null)
+		{
+			getPet().setFollowStatus(false);
+			getPet().teleToLocation(getPosition().getX() + Rnd.get(-100, 100), getPosition().getY() + Rnd.get(-100, 100), getPosition().getZ(), false);
+			getPet().setFollowStatus(true);
+			sendPacket(new PetInfo(getPet()));
+			getPet().updateEffectIcons(true);
+		}
+		
 	}
 
 	@Override
@@ -11248,6 +11342,11 @@ public final class L2PcInstance extends L2PlayableInstance
         return _reuseTimeStamps.values();
     }
     
+    public FastMap<Integer, TimeStamp> getReuseTimeStamp()
+    {
+    	return _reuseTimeStamps;
+    }
+    
 	/**
 	 * Simple class containing all neccessary information to maintain
 	 * valid timestamps and reuse for skills upon relog. Filter this
@@ -11366,13 +11465,13 @@ public final class L2PcInstance extends L2PlayableInstance
         }
         if (mcrit)
             sendPacket(new SystemMessage(SystemMessageId.CRITICAL_HIT_MAGIC));
-        
+
         if (isInOlympiadMode() &&
         		target instanceof L2PcInstance &&
         		((L2PcInstance)target).isInOlympiadMode() &&
         		((L2PcInstance)target).getOlympiadGameId() == getOlympiadGameId())
         {
-        	dmgDealt += damage;
+        	Olympiad.getInstance().notifyCompetitorDamage(getObjectId(), damage, getOlympiadGameId());
         }
 
 		SystemMessage sm = new SystemMessage(SystemMessageId.S1_GAVE_S2_DAMAGE_OF_S3);

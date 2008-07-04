@@ -13681,17 +13681,31 @@ public enum SystemMessageId
 	*/
 	USE_SHORTCUT_CONFIRM(2272),
 
+	
 	/**
-	* ID: 2273<br>
-	* Message: This skill cannot be learned while in the sub-class state. Please try again after changing to the main class.
+	* ID: 2303<br>
+	* Message: There are $s2 second(s) remaining in $s1's re-use time.
 	*/
-	SKILL_NOT_FOR_SUBCLASS(2273),
+	S2_SECONDS_REMAIMNING_FOR_REUSE_S1(2303),
+	
+	/**
+	* ID: 2304<br>
+	* Message: There are $s2 minute(s), $s3 second(s) remaining in $s1's re-use time.
+	*/
+	S2_MINUTES_S3_SECONDS_REMAINING_FOR_REUSE_S1(2304),
+	
+	/**
+	* ID: 2305<br>
+	* Message: There are $s2 hour(s), $s3 minute(s), and $s4 second(s) remaining in $s1's re-use time.
+	*/
+	S2_HOURS_S3_MINUTES_S4_SECONDS_REMAINING_FOR_REUSE_S1(2305),
 	
 	/**
 	* ID: 614<br>
 	* Message: $s1 : $s2<br>
 	*/
 	S1_S2(1987);
+
 
 	private int _id;
 

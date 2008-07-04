@@ -91,6 +91,7 @@ public abstract class L2Skill
     public static final int SKILL_CREATE_DWARVEN = 172;
     public static final int SKILL_CRYSTALLIZE = 248;
     public static final int SKILL_DIVINE_INSPIRATION = 1405;
+    public static final int SKILL_CLAN_LUCK = 390;
 
     public static final int SKILL_FAKE_INT = 9001;
     public static final int SKILL_FAKE_WIT = 9002;
@@ -484,6 +485,7 @@ public abstract class L2Skill
     private final String[] _negateStats;
     private final float _negatePower;
     private final int _negateId;
+    private final int _maxNegatedEffect;
     private final int _levelDepend;
 
     // Effecting area of the skill, in radius.
@@ -629,6 +631,7 @@ public abstract class L2Skill
         _negateStats = set.getString("negateStats", "").split(" ");
         _negatePower = set.getFloat("negatePower", 0.f);
         _negateId = set.getInteger("negateId", 0);
+        _maxNegatedEffect = set.getInteger("maxNegated", 0);
         _magicLevel = set.getInteger("magicLvl", SkillTreeTable.getInstance().getMinSkillLevel(_id, _level));
         _levelDepend = set.getInteger("lvlDepend", 0);
         _stat = set.getEnum("stat", Stats.class, null);
@@ -844,6 +847,11 @@ public abstract class L2Skill
     {
         return _magicLevel;
     }
+    
+    public final int getMaxNegatedEffects()
+	{
+    	return _maxNegatedEffect;
+	}
 
     public final int getLevelDepend()
     {
@@ -1545,16 +1553,29 @@ public abstract class L2Skill
 			case TARGET_ONE:
             {
                 boolean canTargetSelf = false;
-                switch(skillType)
-                {
-                    case BUFF: case HEAL: case HOT: case HEAL_PERCENT:
-                    case MANARECHARGE: case MANAHEAL: case NEGATE:
-                    case CANCEL: case REFLECT: case UNBLEED: case UNPOISON:
-                    case COMBATPOINTHEAL: case MAGE_BANE: case WARRIOR_BANE:
-                    case BETRAY: case BALANCE_LIFE: case FORCE_BUFF:
-                        canTargetSelf = true;
-                        break;
-                }
+                switch (skillType)
+				{
+					case BUFF:
+					case HEAL:
+					case HOT:
+					case HEAL_PERCENT:
+					case MANARECHARGE:
+					case MANAHEAL:
+					case NEGATE:
+					case CANCEL:
+					case CANCEL_DEBUFF:
+					case REFLECT:
+					case UNBLEED:
+					case UNPOISON:
+					case COMBATPOINTHEAL:
+					case MAGE_BANE:
+					case WARRIOR_BANE:
+					case BETRAY:
+					case BALANCE_LIFE:
+					case FORCE_BUFF:
+						canTargetSelf = true;
+						break;
+				}
 
                 // Check for null target or any other invalid target
                 if (target == null || target.isDead() || (target == activeChar && !canTargetSelf))

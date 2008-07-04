@@ -12,26 +12,39 @@
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package net.sf.l2j.gameserver.skills;
+package net.sf.l2j.gameserver.model.zone.type;
 
 import net.sf.l2j.gameserver.model.L2Character;
-import net.sf.l2j.gameserver.model.L2ItemInstance;
-import net.sf.l2j.gameserver.model.L2Skill;
-import net.sf.l2j.gameserver.model.actor.instance.L2CubicInstance;
+import net.sf.l2j.gameserver.model.zone.L2ZoneType;
 
 /**
+ * A peaceful zone
  *
- * An Env object is just a class to pass parameters to a calculator such as L2PcInstance, L2ItemInstance, Initial value.
- *
+ * @author  durgus
  */
+public class L2PeaceZone extends L2ZoneType
+{
+	public L2PeaceZone(int id)
+	{
+		super(id);
+	}
 
-public final class Env {
+	@Override
+	protected void onEnter(L2Character character)
+	{
+		character.setInsideZone(L2Character.ZONE_PEACE, true);
+	}
 
-	public L2Character    player;
-	public L2CubicInstance cubic;
-	public L2Character    target;
-	public L2ItemInstance item;
-	public L2Skill        skill;
-	public double value;
-	public double baseValue;
+	@Override
+	protected void onExit(L2Character character)
+	{
+		character.setInsideZone(L2Character.ZONE_PEACE, false);
+	}
+
+	@Override
+	protected void onDieInside(L2Character character) {}
+
+	@Override
+	protected void onReviveInside(L2Character character) {}
+
 }

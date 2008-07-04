@@ -64,12 +64,14 @@ import net.sf.l2j.gameserver.model.actor.instance.L2MinionInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2RaidBossInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2SiegeGuardInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2RiftInvaderInstance;
+import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance.TimeStamp;
 import net.sf.l2j.gameserver.model.actor.instance.L2PetInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PlayableInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2SiegeFlagInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2SiegeSummonInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2SummonInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2TrapInstance;
+import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance.TimeStamp;
 import net.sf.l2j.gameserver.model.actor.knownlist.CharKnownList;
 import net.sf.l2j.gameserver.model.actor.stat.CharStat;
 import net.sf.l2j.gameserver.model.actor.status.CharStatus;
@@ -546,21 +548,11 @@ public abstract class L2Character extends L2Object
 			return;
 		
 		spawnMe(getPosition().getX(), getPosition().getY(), getPosition().getZ());
-
+		
 		setIsTeleporting(false);
 		
-		if (_isPendingRevive) doRevive();
-
-		// Modify the position of the pet if necessary
-		if(getPet() != null)
-		{
-			getPet().setFollowStatus(false);
-			getPet().teleToLocation(getPosition().getX() + Rnd.get(-100,100), getPosition().getY() + Rnd.get(-100,100), getPosition().getZ(), false);
-			getPet().setFollowStatus(true);
-			sendPacket(new PetInfo(getPet()));
-			getPet().updateEffectIcons(true);
-		}
-
+		if (_isPendingRevive)
+			doRevive();
 	}
 
 	// =========================================================
@@ -1574,9 +1566,43 @@ public abstract class L2Character extends L2Object
 			/*
 			if (this instanceof L2PcInstance)
 			{
-				SystemMessage sm = new SystemMessage(SystemMessageId.S1_PREPARED_FOR_REUSE);
+				SystemMessage sm = null;
+				FastMap<Integer, TimeStamp> timeStamp = ((L2PcInstance)this).getReuseTimeStamp();
+				
+				if (timeStamp != null && timeStamp.containsKey(skill.getId()))
+				{
+					int seconds = (int) (timeStamp.get(skill.getId()).getRemaining()/1000);
+					int minutes = (int) (timeStamp.get(skill.getId()).getRemaining()/60000);
+					int hours = (int) (timeStamp.get(skill.getId()).getRemaining()/3600000);
+					if (hours > 0)
+					{
+						sm = new SystemMessage(SystemMessageId.S2_HOURS_S3_MINUTES_S4_SECONDS_REMAINING_FOR_REUSE_S1);
+						sm.addNumber(hours);
+						if (minutes >= 60)
+							minutes = 59;
+
+						sm.addNumber(minutes);
+					}
+					else if (minutes > 0)
+					{
+						sm = new SystemMessage(SystemMessageId.S2_MINUTES_S3_SECONDS_REMAINING_FOR_REUSE_S1);
+						sm.addNumber(minutes);
+					}
+					else if (seconds > 0)
+					{
+						sm = new SystemMessage(SystemMessageId.S2_SECONDS_REMAIMNING_FOR_REUSE_S1);
+					}
+				
+					if (seconds >= 60)
+						seconds = 59;
+					
+					sm.addNumber(seconds);
+				}
+				else
+					sm = new SystemMessage(SystemMessageId.S1_PREPARED_FOR_REUSE);
+				
 				sm.addSkillName(skill);
-				sendPacket(sm);
+                sendPacket(sm);
 			}
 			*/
 			return;
@@ -1951,7 +1977,8 @@ public abstract class L2Character extends L2Object
 		}
 
 		// Make sure that char is facing selected target
-		setHeading(Util.calculateHeadingFrom(this, target));
+		if (target != this)
+			setHeading(Util.calculateHeadingFrom(this, target));
 		
 		// For force buff skills, start the effect as long as the player is casting.
 		if(effectWhileCasting)
@@ -4364,12 +4391,6 @@ public abstract class L2Character extends L2Object
 			// If no distance to go through, the movement is canceled
 			if (distance < 1 || distance - offset  <= 0)
 			{
-				sin = 0;
-				cos = 1;
-				distance = 0;
-				x = curX;
-				y = curY;
-
 				if (Config.DEBUG) _log.fine("already in range, no movement needed.");
 
 				// Notify the AI that the L2Character is arrived at destination
@@ -4521,12 +4542,6 @@ public abstract class L2Character extends L2Object
 					|| this.isAfraid()
 					|| this instanceof L2RiftInvaderInstance))
 			{
-				sin = 0;
-				cos = 1;
-				distance = 0;
-				x = curX;
-				y = curY;
-
 				if(this instanceof L2Summon) ((L2Summon)this).setFollowStatus(false);
 				getAI().notifyEvent(CtrlEvent.EVT_ARRIVED, null);
 				getAI().setIntention(CtrlIntention.AI_INTENTION_IDLE); //needed?
@@ -4543,13 +4558,11 @@ public abstract class L2Character extends L2Object
 		m._ySpeedTicks = (float)(sin * speed / GameTimeController.TICKS_PER_SECOND);
 
 		// Calculate and set the heading of the L2Character
-		int heading = (int) (Math.atan2(-sin, -cos) * 10430.378);
-		heading += 32768;
-		setHeading(heading);
+		setHeading(Util.calculateHeadingFrom(cos, sin));
 
 		if (Config.DEBUG)
 			_log.fine("dist:"+ distance +"speed:" + speed + " ttt:" +m._ticksToMove +
-			          " dx:"+(int)m._xSpeedTicks + " dy:"+(int)m._ySpeedTicks + " heading:" + heading);
+			          " dx:"+(int)m._xSpeedTicks + " dy:"+(int)m._ySpeedTicks + " heading:" + getHeading());
 
 		m._xDestination = x;
 		m._yDestination = y;
@@ -5348,7 +5361,7 @@ public abstract class L2Character extends L2Object
 			player.sendPacket(new SystemMessage(SystemMessageId.TARGET_IN_PEACEZONE));
 			player.sendPacket(ActionFailed.STATIC_PACKET);
 		}
-		else if (player.isInOlympiadMode() && player.getTarget() != null)
+		else if (player.isInOlympiadMode() && player.getTarget() != null && player.getTarget() instanceof L2PlayableInstance)
         {
         	L2PcInstance target;
         	if (player.getTarget() instanceof L2Summon)

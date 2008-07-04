@@ -3,26 +3,32 @@
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package net.sf.l2j.gameserver.model;
 
+import java.util.Collection;
+
 import net.sf.l2j.Config;
+import net.sf.l2j.gameserver.GeoData;
+import net.sf.l2j.gameserver.Olympiad;
 import net.sf.l2j.gameserver.ai.CtrlIntention;
 import net.sf.l2j.gameserver.ai.L2CharacterAI;
 import net.sf.l2j.gameserver.ai.L2SummonAI;
 import net.sf.l2j.gameserver.datatables.SkillTable;
 import net.sf.l2j.gameserver.datatables.NpcTable;
+import net.sf.l2j.gameserver.model.L2Attackable.AggroInfo;
 import net.sf.l2j.gameserver.model.L2Skill.SkillTargetType;
 import net.sf.l2j.gameserver.model.actor.instance.L2DoorInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PcInstance;
+import net.sf.l2j.gameserver.model.actor.instance.L2PetInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2PlayableInstance;
 import net.sf.l2j.gameserver.model.actor.instance.L2SummonInstance;
 import net.sf.l2j.gameserver.model.actor.knownlist.SummonKnownList;
@@ -41,6 +47,7 @@ import net.sf.l2j.gameserver.serverpackets.PetDelete;
 import net.sf.l2j.gameserver.serverpackets.PetInfo;
 import net.sf.l2j.gameserver.serverpackets.PetStatusShow;
 import net.sf.l2j.gameserver.serverpackets.PetStatusUpdate;
+import net.sf.l2j.gameserver.serverpackets.RelationChanged;
 import net.sf.l2j.gameserver.serverpackets.StatusUpdate;
 import net.sf.l2j.gameserver.serverpackets.SystemMessage;
 import net.sf.l2j.gameserver.taskmanager.DecayTaskManager;
@@ -94,17 +101,22 @@ public abstract class L2Summon extends L2PlayableInstance
 
 		setXYZInvisible(owner.getX()+50, owner.getY()+100, owner.getZ()+100);
 	}
-    
+
     @Override
     public void onSpawn()
     {
         super.onSpawn();
-        
+
         this.setFollowStatus(true);
         this.setShowSummonAnimation(false); // addVisibleObject created the info packets with summon animation
                                               // if someone comes into range now, the animation shouldnt show any more
         this.getOwner().sendPacket(new PetInfo(this));
-        
+
+        getOwner().sendPacket(new RelationChanged(this, getOwner().getRelation(getOwner()), false));
+
+        for (L2PcInstance player : getOwner().getKnownList().getKnownPlayersInRadius(800))
+        	player.sendPacket(new RelationChanged(this, getOwner().getRelation(player), isAutoAttackable(player)));
+
         L2Party party = this.getOwner().getParty();
         if (party != null)
         {
@@ -174,6 +186,11 @@ public abstract class L2Summon extends L2PlayableInstance
     {
         return false;
     }
+    
+    public boolean isMountableOverTime()
+    {
+    	return false;
+    }
 
 	@Override
 	public void onAction(L2PcInstance player)
@@ -183,7 +200,7 @@ public abstract class L2Summon extends L2PlayableInstance
             player.sendPacket(new PetStatusShow(this));
             player.sendPacket(ActionFailed.STATIC_PACKET);
         }
-        else
+        else if (player.getTarget() != this)
         {
             if (Config.DEBUG) _log.fine("new target selected:"+getObjectId());
             player.setTarget(this);
@@ -196,6 +213,37 @@ public abstract class L2Summon extends L2PlayableInstance
 			su.addAttribute(StatusUpdate.MAX_HP, getMaxHp());
 			player.sendPacket(su);
         }
+        else if (player.getTarget() == this)
+		{
+			if (isAutoAttackable(player))
+			{
+				if (Config.GEODATA > 0)
+				{
+					if (GeoData.getInstance().canSeeTarget(player, this))
+					{
+						player.getAI().setIntention(CtrlIntention.AI_INTENTION_ATTACK, this);
+						player.onActionRequest();
+					}
+				}
+				else
+				{
+					player.getAI().setIntention(CtrlIntention.AI_INTENTION_ATTACK, this);
+					player.onActionRequest();
+				}
+			}
+			else
+			{
+				// This Action Failed packet avoids player getting stuck when clicking three or more times
+				player.sendPacket(ActionFailed.STATIC_PACKET);
+				if (Config.GEODATA > 0)
+				{
+					if (GeoData.getInstance().canSeeTarget(player, this))
+						player.getAI().setIntention(CtrlIntention.AI_INTENTION_FOLLOW, this);
+				}
+				else
+					player.getAI().setIntention(CtrlIntention.AI_INTENTION_FOLLOW, this);
+			}
+		}
     }
 
 	public long getExpForThisLevel()
@@ -296,6 +344,27 @@ public abstract class L2Summon extends L2PlayableInstance
     {
 		if (!super.doDie(killer))
 			return false;
+		
+		L2PcInstance owner = getOwner();
+		
+		if (owner != null)
+		{
+			Collection<L2Character> KnownTarget = this.getKnownList().getKnownCharacters();
+			for (L2Character TgMob : KnownTarget)
+			{
+				// get the mobs which have aggro on the this instance
+				if (TgMob instanceof L2Attackable)
+				{
+					if (((L2Attackable) TgMob).isDead())
+						continue;
+					
+					AggroInfo info = ((L2Attackable) TgMob).getAggroListRP().get(this);
+					if (info != null)
+						((L2Attackable) TgMob).addDamageHate(owner, info._damage, info._hate);
+				}
+			}
+		}
+		
 		DecayTaskManager.getInstance().addDecayTask(this);
 		return true;
 	}
@@ -414,6 +483,9 @@ public abstract class L2Summon extends L2PlayableInstance
             getKnownList().removeAllKnownObjects();
 	        owner.setPet(null);
 	        setTarget(null);
+	        
+	        if (this instanceof L2PetInstance)
+	        	((L2PetInstance)this).setIsMountableOverTime(false);
 	    }
     }
 
@@ -746,7 +818,7 @@ public abstract class L2Summon extends L2PlayableInstance
 					((L2PcInstance)target).isInOlympiadMode() &&
 					((L2PcInstance)target).getOlympiadGameId() == getOwner().getOlympiadGameId())
 			{
-				getOwner().dmgDealt += damage;
+				Olympiad.getInstance().notifyCompetitorDamage(getOwner().getObjectId(), damage, getOwner().getOlympiadGameId());
 			}
 
 			SystemMessage sm;

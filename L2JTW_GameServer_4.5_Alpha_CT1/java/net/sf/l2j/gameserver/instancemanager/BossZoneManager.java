@@ -17,7 +17,7 @@ package net.sf.l2j.gameserver.instancemanager;
 import javolution.util.FastList;
 import net.sf.l2j.gameserver.model.L2Character;
 import net.sf.l2j.gameserver.model.L2Object;
-import net.sf.l2j.gameserver.model.zone.type.L2BossZone;
+import net.sf.l2j.gameserver.model.zone.type.L2CustomZone;
 
 /**
  * 
@@ -38,25 +38,25 @@ public class BossZoneManager
         return _instance;
     }
     
-    private FastList<L2BossZone> _zones;
+    private FastList<L2CustomZone> _zones;
     
     public BossZoneManager()
     {
     }
     
-    public void addZone(L2BossZone zone)
+    public void addZone(L2CustomZone zone)
     {
         if (_zones == null)
         {
-            _zones = new FastList<L2BossZone>();
+            _zones = new FastList<L2CustomZone>();
         }
         _zones.add(zone);
     }
     
-    public final L2BossZone getZone(L2Character character)
+    public final L2CustomZone getZone(L2Character character)
     {
         if (_zones != null)
-            for (L2BossZone temp : _zones)
+            for (L2CustomZone temp : _zones)
             {
                 if (temp.isCharacterInZone(character))
                 {
@@ -66,10 +66,10 @@ public class BossZoneManager
         return null;
     }
     
-    public final L2BossZone getZone(int x, int y, int z)
+    public final L2CustomZone getZone(int x, int y, int z)
     {
         if (_zones != null)
-            for (L2BossZone temp : _zones)
+            for (L2CustomZone temp : _zones)
             {
                 if (temp.isInsideZone(x, y, z))
                 {
@@ -81,7 +81,7 @@ public class BossZoneManager
     
     public boolean checkIfInZone(String zoneType, L2Object obj)
     {
-        L2BossZone temp = getZone(obj.getX(), obj.getY(), obj.getZ());
+        L2CustomZone temp = getZone(obj.getX(), obj.getY(), obj.getZ());
         if (temp == null)
         {
             return false;

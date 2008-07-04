@@ -392,7 +392,7 @@ public class L2Attackable extends L2NpcInstance
     		return;
         if (_commandChannelTimer == null && this.isRaid())
         {
-        	if (attacker.isInParty() && attacker.getParty().isInCommandChannel()
+        	if (attacker != null && attacker.isInParty() && attacker.getParty().isInCommandChannel()
         			&& attacker.getParty().getCommandChannel().meetRaidWarCondition(this))
         	{
         		_firstCommandChannelAttacked = attacker.getParty().getCommandChannel();
@@ -996,11 +996,11 @@ public class L2Attackable extends L2NpcInstance
         return result;
     }
     
-    public FastList<L2Character> getHateList()
+    public List<L2Character> getHateList()
     {
     	if (getAggroListRP().isEmpty() || isAlikeDead()) return null;
 
-    	_hatelist = new FastList<L2Character>();
+    	List<L2Character> _hatelist = new FastList<L2Character>();
     	
     	 synchronized (getAggroList())
          {
@@ -1008,10 +1008,9 @@ public class L2Attackable extends L2NpcInstance
 	    			 
              for (AggroInfo ai : getAggroListRP().values())
              {
-            	 if (ai._attacker == null)
-            		 continue;
-            	 if	(ai._attacker.isAlikeDead() || ai._hate <= 0 || !getKnownList().knowsObject(ai._attacker) ||!ai._attacker.isVisible())
-            		 continue;
+             	if (ai == null) continue;
+            	if (ai._attacker.isAlikeDead() || !getKnownList().knowsObject(ai._attacker) ||!ai._attacker.isVisible())
+            		ai._hate = 0;
             	 _hatelist.add(ai._attacker);
              }
     		 
@@ -1428,9 +1427,11 @@ public class L2Attackable extends L2NpcInstance
 					 // Broadcast message if RaidBoss was defeated
 		             if(this instanceof L2RaidBossInstance)
 		             {
-		                 SystemMessage sm;
-		                 sm = new SystemMessage(SystemMessageId.S1_DIED_DROPPED_S3_S2);
-		                 sm.addCharName(this);
+                         // [L2J_JP EDIT - TSL START]
+                         SystemMessage sm = new SystemMessage(SystemMessageId.S1_DIED_DROPPED_S3_S2);
+                         int mobId = ((L2NpcInstance) this).getTemplate().idTemplate;
+                         sm.addNpcName(mobId);
+                         // [L2J_JP EDIT - TSL END]
 		                 sm.addItemName(item.getItemId());
 		                 sm.addNumber(item.getCount());
 		                 broadcastPacket(sm);

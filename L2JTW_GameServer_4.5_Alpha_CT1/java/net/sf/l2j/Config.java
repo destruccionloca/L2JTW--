@@ -2562,6 +2562,7 @@ public final class Config
         else if (pName.equalsIgnoreCase("ActivityTimeOfBaium")) FWB_ACTIVITYTIMEOFBAIUM = Integer.parseInt(pValue);
         else if (pName.equalsIgnoreCase("MoveAtRandom")) FWB_MOVEATRANDOM = Boolean.parseBoolean(pValue);
         else if (pName.equalsIgnoreCase("LimitUntilSleep")) FWB_LIMITUNTILSLEEP = Integer.parseInt(pValue);
+        else if (pName.equalsIgnoreCase("UseJPBossZone")) USE_JP_RULE_OF_BOSSZONE = Boolean.valueOf(pValue);
 
 
         

@@ -58,12 +58,12 @@ public class L2SepulcherNpcInstance extends L2NpcInstance
 {
     protected static Logger _log = Logger.getLogger(L2SepulcherNpcInstance.class.getName());
 
-    // 会堂門番とドアの組み?わせ(<門番のID、ドアのID>)
+    // 会堂門番とド･ﾂの組み?わせ(<門番のID、ド･ﾂのID>)
     protected static Map<Integer,Integer> _HallGateKeepers = new FastMap<Integer,Integer>();
 
     // 会堂の扉を閉めるタスク
     protected Future _CloseTask = null;
-    // 謎の?を出現させるタスク
+    // ｮﾈの?を出現させるタスク
     protected Future _SpawnNextMysteriousBoxTask = null;
     // ??スターを出現させるタスク
     protected Future _SpawnMonsterTask = null;
@@ -79,24 +79,24 @@ public class L2SepulcherNpcInstance extends L2NpcInstance
     {
         super(objectID, template);
 
-        // 会堂門番とドアの組み?わせを作成
+        // 会堂門番とド･ﾂの組み?わせを作成
         _HallGateKeepers.clear();
-        _HallGateKeepers.put(31925, 25150012);  // 征?者の霊廟：男爵の会堂門番
+        _HallGateKeepers.put(31925, 25150012);  // 征?者の霊廟：ｺ~爵の会堂門番
         _HallGateKeepers.put(31926, 25150013);  // 征?者の霊廟：子爵の会堂門番
         _HallGateKeepers.put(31927, 25150014);  // 征?者の霊廟：?爵の会堂門番
         _HallGateKeepers.put(31928, 25150015);  // 征?者の霊廟：侯爵の会堂門番
         _HallGateKeepers.put(31929, 25150016);  // 征?者の霊廟：公爵の会堂門番
-        _HallGateKeepers.put(31930, 25150002);  // 支配者の霊廟：男爵の会堂門番
+        _HallGateKeepers.put(31930, 25150002);  // 支配者の霊廟：ｺ~爵の会堂門番
         _HallGateKeepers.put(31931, 25150003);  // 支配者の霊廟：子爵の会堂門番
         _HallGateKeepers.put(31932, 25150004);  // 支配者の霊廟：?爵の会堂門番
         _HallGateKeepers.put(31933, 25150005);  // 支配者の霊廟：侯爵の会堂門番
         _HallGateKeepers.put(31934, 25150006);  // 支配者の霊廟：公爵の会堂門番
-        _HallGateKeepers.put(31935, 25150032);  // 大賢者の霊廟：男爵の会堂門番
+        _HallGateKeepers.put(31935, 25150032);  // 大賢者の霊廟：ｺ~爵の会堂門番
         _HallGateKeepers.put(31936, 25150033);  // 大賢者の霊廟：子爵の会堂門番
         _HallGateKeepers.put(31937, 25150034);  // 大賢者の霊廟：?爵の会堂門番
         _HallGateKeepers.put(31938, 25150035);  // 大賢者の霊廟：侯爵の会堂門番
         _HallGateKeepers.put(31939, 25150036);  // 大賢者の霊廟：公爵の会堂門番
-        _HallGateKeepers.put(31940, 25150022);  // 審判者の霊廟：男爵の会堂門番
+        _HallGateKeepers.put(31940, 25150022);  // 審判者の霊廟：ｺ~爵の会堂門番
         _HallGateKeepers.put(31941, 25150023);  // 審判者の霊廟：子爵の会堂門番
         _HallGateKeepers.put(31942, 25150024);  // 審判者の霊廟：?爵の会堂門番
         _HallGateKeepers.put(31943, 25150025);  // 審判者の霊廟：侯爵の会堂門番
@@ -132,7 +132,7 @@ public class L2SepulcherNpcInstance extends L2NpcInstance
         super.deleteMe();
     }
 
-    // アクシ??
+    // ･ﾂクシ??
     public void onAction(L2PcInstance player)
     {
         // Check if the L2PcInstance already target the L2NpcInstance
@@ -215,10 +215,10 @@ public class L2SepulcherNpcInstance extends L2NpcInstance
         }
     }
 
-    // アクシ??実行
+    // ･ﾂクシ??讎行
     private void doAction(L2PcInstance player)
     {
-    	// ?んでいる場?は何もしない
+    	// ?んでいる場?はﾀeもしない
         if(isDead())
         {
             player.sendPacket(ActionFailed.STATIC_PACKET);
@@ -227,7 +227,7 @@ public class L2SepulcherNpcInstance extends L2NpcInstance
         
         switch(getNpcId())
         {
-            // 謎の?ならば、?んでMobを湧かせる
+            // ｮﾈの?ならば、?んでMobを湧かせる
             case 31468:
             case 31469:
             case 31470:
@@ -254,7 +254,7 @@ public class L2SepulcherNpcInstance extends L2NpcInstance
                 	ThreadPoolManager.getInstance().scheduleEffect(new SpawnMonster(getNpcId()),3500); 
                 break;
                 
-            // 鍵の?ならば、?んで鍵をPCに渡す
+            // 鍵の?ならば、?んで鍵をPCにｹﾄす
             case 31455:
             case 31456:
             case 31457:
@@ -279,7 +279,7 @@ public class L2SepulcherNpcInstance extends L2NpcInstance
         player.sendPacket(ActionFailed.STATIC_PACKET);
     }
     
-    // チ?ット用HTMLファイ?パスの取得
+    // チ?ｪg用HTMLフﾆﾍイ?パスの取ｱﾓ
     public String getHtmlPath(int npcId, int val)
     {
         String pom = "";
@@ -295,7 +295,7 @@ public class L2SepulcherNpcInstance extends L2NpcInstance
         return _HTML_FILE_PATH + pom + ".htm";
     }
 
-    // チ?ット?表示
+    // チ?ｪg?表示
     public void showChatWindow(L2PcInstance player, int val)
     {
         String filename = getHtmlPath(getNpcId(),val);
@@ -328,7 +328,7 @@ public class L2SepulcherNpcInstance extends L2NpcInstance
                 html.replace("%playername%", player.getName());
                 player.sendPacket(html);
             }
-            // チ?ット
+            // チ?ｪg
             else if (command.startsWith("Chat"))
             {
                 int val = 0;
@@ -365,12 +365,12 @@ public class L2SepulcherNpcInstance extends L2NpcInstance
                 {
         			{
         				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-        				sm.addString("条?を?たしていないため、入場が?否されました。");
+        				sm.addString("ｱ｣ｲﾅ｡AｵLｪkｶi､J｡C");
         				player.sendPacket(sm);
         			}
                 }
             }
-            // 霊廟内に入る
+            // 霊廟�ｯに入る
             else if (command.startsWith("Entry"))
             {
             	FourSepulchersManager.getInstance().Entry(getNpcId(),player);
@@ -382,7 +382,7 @@ public class L2SepulcherNpcInstance extends L2NpcInstance
         }
     }
 
-    // ?の会堂のドアを開ける
+    // ?の会堂のド･ﾂを開ける
     public void OpenNextDoor(int npcId)
     {
         int DoorId = _HallGateKeepers.get(npcId).intValue();
@@ -394,7 +394,7 @@ public class L2SepulcherNpcInstance extends L2NpcInstance
         _CloseTask = ThreadPoolManager.getInstance().scheduleEffect(new CloseNextDoor(npcId,DoorId),10000);
     }
 
-    // 会堂のドアを閉じる
+    // 会堂のド･ﾂを閉じる
     private class CloseNextDoor implements Runnable
     {
         final DoorTable _DoorTable = DoorTable.getInstance();
@@ -418,13 +418,13 @@ public class L2SepulcherNpcInstance extends L2NpcInstance
                 _log.warning(e.getMessage());
             }
             
-            // 謎の?を出現させる(不正な進入経路からの攻略を防ぐため、ドアが閉まらないと出現しない)
+            // ｮﾈの?を出現させる(不正な進入経路からの攻略を防ﾎﾟため、ド･ﾂｸm閉まらないと出現しない)
             if(_SpawnNextMysteriousBoxTask != null) _SpawnNextMysteriousBoxTask.cancel(true);
             _SpawnNextMysteriousBoxTask = ThreadPoolManager.getInstance().scheduleEffect(new SpawnNextMysteriousBox(_NpcId),10000);
         }
     }
 
-    // 謎の?を出現させるタスク
+    // ｮﾈの?を出現させるタスク
     private class SpawnNextMysteriousBox implements Runnable
     {
     	private int _NpcId;

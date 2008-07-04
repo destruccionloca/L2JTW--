@@ -31,8 +31,8 @@ import net.sf.l2j.gameserver.taskmanager.TaskManager.ExecutedTask;
  */
 public class TaskSevenSignsUpdate extends Task
 {
-    private static final Logger _log = Logger.getLogger(TaskOlympiadSave.class.getName());
-    public static final String NAME = "SevenSignsUpdate";
+    private static final Logger _log = Logger.getLogger(TaskSevenSignsUpdate.class.getName());
+    public static final String NAME = "seven_signs_update";
 
     @Override
 	public String getName()

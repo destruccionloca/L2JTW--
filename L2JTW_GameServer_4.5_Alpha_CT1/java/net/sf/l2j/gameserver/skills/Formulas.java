@@ -398,7 +398,7 @@ public final class Formulas
 
 		private FuncAtkCritical()
 		{
-			super(Stats.CRITICAL_RATE, 0x30, null);
+			super(Stats.CRITICAL_RATE, 0x09, null);
 		}
 
 		@Override
@@ -413,6 +413,7 @@ public final class Formulas
 				env.value *= 10;
 
 			}
+			env.baseValue = env.value;
 		}
 	}
 	
@@ -1979,6 +1980,7 @@ public final class Formulas
 						multiplier = target.calcStat(Stats.DERANGEMENT_VULN, multiplier, target, null);
 						break;
 					case CONFUSION:
+					case CONFUSE_MOB_ONLY:
 						multiplier = target.calcStat(Stats.CONFUSION_VULN, multiplier, target, null);
 						break;
 					case DEBUFF:
@@ -2014,6 +2016,7 @@ public final class Formulas
 			case FEAR:
 			case BETRAY:
 			case CONFUSION:
+			case CONFUSE_MOB_ONLY:
 			case AGGREDUCE_CHAR:
 			case PARALYZE:
 				multiplier = 2 - Math.sqrt(MENbonus[target.getMEN()]);
@@ -2026,22 +2029,22 @@ public final class Formulas
 		return multiplier;
 	}
 
-	public boolean calcSkillSuccess(L2Character attacker, L2Character target, L2Skill skill, boolean ss,
-									boolean sps, boolean bss)
+	public boolean calcSkillSuccess(L2Character attacker, L2Character target, L2Skill skill, boolean ss, boolean sps, boolean bss)
 	{
 		SkillType type = skill.getSkillType();
 
- 
+
 		if (target.isRaid()
 			&& (type == SkillType.CONFUSION || type == SkillType.MUTE || type == SkillType.PARALYZE
 				|| type == SkillType.ROOT || type == SkillType.FEAR || type == SkillType.SLEEP
 				|| type == SkillType.STUN || type == SkillType.DEBUFF || type == SkillType.AGGDEBUFF))
 			return false; // these skills should not work on RaidBoss
 
+
 		int value = (int) skill.getPower();
 		int lvlDepend = skill.getLevelDepend();
 
-		if (type == SkillType.PDAM || type == SkillType.MDAM) // For additional effects on PDAM skills (like STUN, SHOCK,...)
+		if (type == SkillType.PDAM || type == SkillType.MDAM || type == SkillType.WEAPON_SA) // For additional effects on PDAM skills (like STUN, SHOCK,...)
 		{
 			value = skill.getEffectPower();
 			type = skill.getEffectType();
@@ -2069,8 +2072,8 @@ public final class Formulas
 
 		// TODO: Temporary fix for NPC skills with MagicLevel not set
 		// int lvlmodifier = (skill.getMagicLevel() - target.getLevel()) * lvlDepend;
-		int lvlmodifier = ((skill.getMagicLevel() > 0 ? skill.getMagicLevel() : attacker.getLevel()) - target.getLevel())
-			* lvlDepend;
+		int lvlmodifier = ((skill.getMagicLevel() > 0 ? skill.getMagicLevel() : attacker.getLevel()) - target.getLevel()) * lvlDepend;
+		
 		double statmodifier = calcSkillStatModifier(type, target);
 		double resmodifier = calcSkillVulnerability(target, skill);
 
@@ -2079,19 +2082,25 @@ public final class Formulas
 		else if (sps) ssmodifier = 150;
 		else if (ss) ssmodifier = 150;
 
-		int rate = (int) ((value * statmodifier + lvlmodifier) * resmodifier);
+		// Calculate BaseRate.
+		int rate = (int) ((value * statmodifier + lvlmodifier));
+
+		// Add Matk/Mdef Bonus
 		if (skill.isMagic())
-			rate = (int) (rate * Math.pow((double) attacker.getMAtk(target, skill)
-				/ target.getMDef(attacker, skill), 0.2));
+			rate = (int) (rate * Math.pow((double) attacker.getMAtk(target, skill) / target.getMDef(attacker, skill), 0.2));
 
-		if (rate > 99) rate = 99;
-		else if (rate < 1) rate = 1;
-
+		// Add Bonus for Sps/SS
 		if (ssmodifier != 100)
 		{
 			if (rate > 10000 / (100 + ssmodifier)) rate = 100 - (100 - rate) * 100 / ssmodifier;
 			else rate = rate * ssmodifier / 100;
 		}
+
+		if (rate > 99) rate = 99;
+		else if (rate < 1) rate = 1;
+
+		//Finaly apply resists.
+		rate *= resmodifier;
 
 		if (Config.DEVELOPER)
 			_log.info(skill.getName()

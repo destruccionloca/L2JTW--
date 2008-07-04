@@ -74,7 +74,7 @@ public class FourSepulchersManager
     private int _UsedEntrancePass = 7261;
     // 会堂の鍵
     private final int _HallsKey = 7260;
-	// 古いブ?ーチ
+        // 古いブ?ーチ
     private int _OldBrooch = 7262;
 
     // 状態遷移管?
@@ -101,48 +101,48 @@ public class FourSepulchersManager
 
     // 男爵の会堂テ?ポート座標[x,y,z]
     private int[][] _StartHallSpawn =
-	{
-		{181632,-85587,-7218},     // 征?者の霊廟
-		{179963,-88978,-7218},     // 支配者の霊廟
-		{173217,-86132,-7218},     // 大賢者の霊廟
-		{175608,-82296,-7218}      // 審判者の霊廟
-	};
+        {
+                {181632,-85587,-7218},     // 征?者の霊廟
+                {179963,-88978,-7218},     // 支配者の霊廟
+                {173217,-86132,-7218},     // 大賢者の霊廟
+                {175608,-82296,-7218}      // 審判者の霊廟
+        };
 
     // 霊廟管?人と男爵の会堂テ?ポート座標の組み?わせ(<管?人のID、座標[x,y,z]>)
     protected static Map<Integer,int[]> _StartHallSpawns = new FastMap<Integer,int[]>();
 
     // ハ?シ?シ?ドーの出現座標[出現パター?][霊廟][npcId,x,y,z,heading]
     private int[][][] _ShadowSpawnLoc =
-	{
-		// 出現パター?１
-		{
-			{25339,191231,-85574,-7216,33380},	// 征?者
-			{25349,189534,-88969,-7216,32768},	// 支配者
-			{25346,173195,-76560,-7215,49277},	// 大賢者
-			{25342,175591,-72744,-7215,49317}	// 審判者
-		},
-		// 出現パター?２
-		{
-			{25342,191231,-85574,-7216,33380},	// 征?者
-			{25339,189534,-88969,-7216,32768},	// 支配者
-			{25349,173195,-76560,-7215,49277},	// 大賢者　
-			{25346,175591,-72744,-7215,49317}	// 審判者
-		},
-		// 出現パター?３
-		{
-			{25346,191231,-85574,-7216,33380},	// 征?者
-			{25342,189534,-88969,-7216,32768},	// 支配者
-			{25339,173195,-76560,-7215,49277},	// 大賢者
-			{25349,175591,-72744,-7215,49317}	// 審判者
-		},
-		// 出現パター?４
-		{
-			{25349,191231,-85574,-7216,33380},	// 征?者
-			{25346,189534,-88969,-7216,32768},	// 支配者
-			{25342,173195,-76560,-7215,49277},	// 大賢者
-			{25339,175591,-72744,-7215,49317}	// 審判者
-		},
-	};
+        {
+                // 出現パター?１
+                {
+                        {25339,191231,-85574,-7216,33380},      // 征?者
+                        {25349,189534,-88969,-7216,32768},      // 支配者
+                        {25346,173195,-76560,-7215,49277},      // 大賢者
+                        {25342,175591,-72744,-7215,49317}       // 審判者
+                },
+                // 出現パター?２
+                {
+                        {25342,191231,-85574,-7216,33380},      // 征?者
+                        {25339,189534,-88969,-7216,32768},      // 支配者
+                        {25349,173195,-76560,-7215,49277},      // 大賢者　
+                        {25346,175591,-72744,-7215,49317}       // 審判者
+                },
+                // 出現パター?３
+                {
+                        {25346,191231,-85574,-7216,33380},      // 征?者
+                        {25342,189534,-88969,-7216,32768},      // 支配者
+                        {25339,173195,-76560,-7215,49277},      // 大賢者
+                        {25349,175591,-72744,-7215,49317}       // 審判者
+                },
+                // 出現パター?４
+                {
+                        {25349,191231,-85574,-7216,33380},      // 征?者
+                        {25346,189534,-88969,-7216,32768},      // 支配者
+                        {25342,173195,-76560,-7215,49277},      // 大賢者
+                        {25339,175591,-72744,-7215,49317}       // 審判者
+                },
+        };
 
     // 公爵の門番とハ?シ?シ?ドーの組み?わせ
     protected Map<Integer,L2Spawn> _ShadowSpawns = new FastMap<Integer,L2Spawn>();
@@ -172,11 +172,11 @@ public class FourSepulchersManager
 
     // 子爵の会堂の謎の?と、出現した??スターの組み?わせ
     protected Map<Integer,List<L2SepulcherMonsterInstance>> _ViscountMobs =
-    	new FastMap<Integer,List<L2SepulcherMonsterInstance>>();
+        new FastMap<Integer,List<L2SepulcherMonsterInstance>>();
 
     // 公爵の会堂の謎の?と、出現した??スターの組み?わせ
     protected Map<Integer,List<L2SepulcherMonsterInstance>> _DukeMobs =
-    	new FastMap<Integer,List<L2SepulcherMonsterInstance>>();
+        new FastMap<Integer,List<L2SepulcherMonsterInstance>>();
 
     // 鍵の?を出現させる??スターと鍵の?の組み?わせ<??スターのNpcId,鍵の?のNpcId>
     protected Map<Integer,Integer> _KeyBoxNpc = new FastMap<Integer,Integer>();
@@ -280,56 +280,56 @@ public class FourSepulchersManager
 
         // 鍵の?を出現させる??スターと鍵の?の組み?わせ
         _KeyBoxNpc.clear();
-        _KeyBoxNpc.put(18120,31455);	//ハ?シ?の?官,鍵の?
-        _KeyBoxNpc.put(18121,31455);	//ハ?シ?の?官,鍵の?
-        _KeyBoxNpc.put(18122,31455);	//ハ?シ?の?官,鍵の?
-        _KeyBoxNpc.put(18123,31455);	//ハ?シ?の?官,鍵の?
-        _KeyBoxNpc.put(18124,31456);	//ハ?シ?の?官,鍵の?
-        _KeyBoxNpc.put(18125,31456);	//ハ?シ?の?官,鍵の?
-        _KeyBoxNpc.put(18126,31456);	//ハ?シ?の?官,鍵の?
-        _KeyBoxNpc.put(18127,31456);	//ハ?シ?の?官,鍵の?
-        _KeyBoxNpc.put(18128,31457);	//ハ?シ?の?官,鍵の?
-        _KeyBoxNpc.put(18129,31457);	//ハ?シ?の?官,鍵の?
-        _KeyBoxNpc.put(18130,31457);	//ハ?シ?の?官,鍵の?
-        _KeyBoxNpc.put(18131,31457);	//ハ?シ?の?官,鍵の?
-        _KeyBoxNpc.put(18149,31458);	//墓地の甲?,鍵の?
-        _KeyBoxNpc.put(18150,31459);	//ケープゴート,鍵の?
-        _KeyBoxNpc.put(18151,31459);	//ケープゴート,鍵の?
-        _KeyBoxNpc.put(18152,31459);	//ケープゴート,鍵の?
-        _KeyBoxNpc.put(18153,31459);	//ケープゴート,鍵の?
-        _KeyBoxNpc.put(18154,31460);	//ケープゴート,鍵の?
-        _KeyBoxNpc.put(18155,31460);	//ケープゴート,鍵の?
-        _KeyBoxNpc.put(18156,31460);	//ケープゴート,鍵の?
-        _KeyBoxNpc.put(18157,31460);	//ケープゴート,鍵の?
-        _KeyBoxNpc.put(18158,31461);	//ハ?シ?の執行者,鍵の?
-        _KeyBoxNpc.put(18159,31461);	//ハ?シ?の執行者,鍵の?
-        _KeyBoxNpc.put(18160,31461);	//ハ?シ?の執行者,鍵の?
-        _KeyBoxNpc.put(18161,31461);	//ハ?シ?の執行者,鍵の?
-        _KeyBoxNpc.put(18162,31462);	//ハ?シ?の執行者,鍵の?
-        _KeyBoxNpc.put(18163,31462);	//ハ?シ?の執行者,鍵の?
-        _KeyBoxNpc.put(18164,31462);	//ハ?シ?の執行者,鍵の?
-        _KeyBoxNpc.put(18165,31462);	//ハ?シ?の執行者,鍵の?
-        _KeyBoxNpc.put(18183,31463);	//ハ?シ?の監督官,鍵の?
-        _KeyBoxNpc.put(18184,31464);	//ハ?シ?の監督官,鍵の?
-        _KeyBoxNpc.put(18212,31465);	//ハ?シ? アドミニスト?ーター,鍵の?
-        _KeyBoxNpc.put(18213,31465);	//ハ?シ? アドミニスト?ーター,鍵の?
-        _KeyBoxNpc.put(18214,31465);	//ハ?シ? アドミニスト?ーター,鍵の?
-        _KeyBoxNpc.put(18215,31465);	//ハ?シ? アドミニスト?ーター,鍵の?
-        _KeyBoxNpc.put(18216,31466);	//ハ?シ? アドミニスト?ーター,鍵の?
-        _KeyBoxNpc.put(18217,31466);	//ハ?シ? アドミニスト?ーター,鍵の?
-        _KeyBoxNpc.put(18218,31466);	//ハ?シ? アドミニスト?ーター,鍵の?
-        _KeyBoxNpc.put(18219,31466);	//ハ?シ? アドミニスト?ーター,鍵の?
+        _KeyBoxNpc.put(18120,31455);    //ハ?シ?の?官,鍵の?
+        _KeyBoxNpc.put(18121,31455);    //ハ?シ?の?官,鍵の?
+        _KeyBoxNpc.put(18122,31455);    //ハ?シ?の?官,鍵の?
+        _KeyBoxNpc.put(18123,31455);    //ハ?シ?の?官,鍵の?
+        _KeyBoxNpc.put(18124,31456);    //ハ?シ?の?官,鍵の?
+        _KeyBoxNpc.put(18125,31456);    //ハ?シ?の?官,鍵の?
+        _KeyBoxNpc.put(18126,31456);    //ハ?シ?の?官,鍵の?
+        _KeyBoxNpc.put(18127,31456);    //ハ?シ?の?官,鍵の?
+        _KeyBoxNpc.put(18128,31457);    //ハ?シ?の?官,鍵の?
+        _KeyBoxNpc.put(18129,31457);    //ハ?シ?の?官,鍵の?
+        _KeyBoxNpc.put(18130,31457);    //ハ?シ?の?官,鍵の?
+        _KeyBoxNpc.put(18131,31457);    //ハ?シ?の?官,鍵の?
+        _KeyBoxNpc.put(18149,31458);    //墓地の甲?,鍵の?
+        _KeyBoxNpc.put(18150,31459);    //ケープゴート,鍵の?
+        _KeyBoxNpc.put(18151,31459);    //ケープゴート,鍵の?
+        _KeyBoxNpc.put(18152,31459);    //ケープゴート,鍵の?
+        _KeyBoxNpc.put(18153,31459);    //ケープゴート,鍵の?
+        _KeyBoxNpc.put(18154,31460);    //ケープゴート,鍵の?
+        _KeyBoxNpc.put(18155,31460);    //ケープゴート,鍵の?
+        _KeyBoxNpc.put(18156,31460);    //ケープゴート,鍵の?
+        _KeyBoxNpc.put(18157,31460);    //ケープゴート,鍵の?
+        _KeyBoxNpc.put(18158,31461);    //ハ?シ?の執行者,鍵の?
+        _KeyBoxNpc.put(18159,31461);    //ハ?シ?の執行者,鍵の?
+        _KeyBoxNpc.put(18160,31461);    //ハ?シ?の執行者,鍵の?
+        _KeyBoxNpc.put(18161,31461);    //ハ?シ?の執行者,鍵の?
+        _KeyBoxNpc.put(18162,31462);    //ハ?シ?の執行者,鍵の?
+        _KeyBoxNpc.put(18163,31462);    //ハ?シ?の執行者,鍵の?
+        _KeyBoxNpc.put(18164,31462);    //ハ?シ?の執行者,鍵の?
+        _KeyBoxNpc.put(18165,31462);    //ハ?シ?の執行者,鍵の?
+        _KeyBoxNpc.put(18183,31463);    //ハ?シ?の監督官,鍵の?
+        _KeyBoxNpc.put(18184,31464);    //ハ?シ?の監督官,鍵の?
+        _KeyBoxNpc.put(18212,31465);    //ハ?シ? アドミニスト?ーター,鍵の?
+        _KeyBoxNpc.put(18213,31465);    //ハ?シ? アドミニスト?ーター,鍵の?
+        _KeyBoxNpc.put(18214,31465);    //ハ?シ? アドミニスト?ーター,鍵の?
+        _KeyBoxNpc.put(18215,31465);    //ハ?シ? アドミニスト?ーター,鍵の?
+        _KeyBoxNpc.put(18216,31466);    //ハ?シ? アドミニスト?ーター,鍵の?
+        _KeyBoxNpc.put(18217,31466);    //ハ?シ? アドミニスト?ーター,鍵の?
+        _KeyBoxNpc.put(18218,31466);    //ハ?シ? アドミニスト?ーター,鍵の?
+        _KeyBoxNpc.put(18219,31466);    //ハ?シ? アドミニスト?ーター,鍵の?
 
         // ケープコードとハ?シ?の執行者の組み?わせ
         _Victim.clear();
-        _Victim.put(18150,18158);	// ケープゴート,ハ?シ?の執行者
-        _Victim.put(18151,18159);	// ケープゴート,ハ?シ?の執行者
-        _Victim.put(18152,18160);	// ケープゴート,ハ?シ?の執行者
-        _Victim.put(18153,18161);	// ケープゴート,ハ?シ?の執行者
-        _Victim.put(18154,18162);	// ケープゴート,ハ?シ?の執行者
-        _Victim.put(18155,18163);	// ケープゴート,ハ?シ?の執行者
-        _Victim.put(18156,18164);	// ケープゴート,ハ?シ?の執行者
-        _Victim.put(18157,18165);	// ケープゴート,ハ?シ?の執行者
+        _Victim.put(18150,18158);       // ケープゴート,ハ?シ?の執行者
+        _Victim.put(18151,18159);       // ケープゴート,ハ?シ?の執行者
+        _Victim.put(18152,18160);       // ケープゴート,ハ?シ?の執行者
+        _Victim.put(18153,18161);       // ケープゴート,ハ?シ?の執行者
+        _Victim.put(18154,18162);       // ケープゴート,ハ?シ?の執行者
+        _Victim.put(18155,18163);       // ケープゴート,ハ?シ?の執行者
+        _Victim.put(18156,18164);       // ケープゴート,ハ?シ?の執行者
+        _Victim.put(18157,18165);       // ケープゴート,ハ?シ?の執行者
 
     }
 
@@ -357,15 +357,15 @@ public class FourSepulchersManager
                 template1 = NpcTable.getInstance().getTemplate(rset.getInt("npc_templateid"));
                 if (template1 != null)
                 {
-                	spawnDat = new L2Spawn(template1);
-                	spawnDat.setAmount(rset.getInt("count"));
-                	spawnDat.setLocx(rset.getInt("locx"));
-                	spawnDat.setLocy(rset.getInt("locy"));
-                	spawnDat.setLocz(rset.getInt("locz"));
-                	spawnDat.setHeading(rset.getInt("heading"));
-                	spawnDat.setRespawnDelay(rset.getInt("respawn_delay"));
-                	SpawnTable.getInstance().addNewSpawn(spawnDat, false);
-                	int keyNpcId = rset.getInt("key_npc_id");
+                        spawnDat = new L2Spawn(template1);
+                        spawnDat.setAmount(rset.getInt("count"));
+                        spawnDat.setLocx(rset.getInt("locx"));
+                        spawnDat.setLocy(rset.getInt("locy"));
+                        spawnDat.setLocz(rset.getInt("locz"));
+                        spawnDat.setHeading(rset.getInt("heading"));
+                        spawnDat.setRespawnDelay(rset.getInt("respawn_delay"));
+                        SpawnTable.getInstance().addNewSpawn(spawnDat, false);
+                        int keyNpcId = rset.getInt("key_npc_id");
                     _MysteriousBoxSpawns.put(keyNpcId,spawnDat);
                 }
                 else {
@@ -391,7 +391,7 @@ public class FourSepulchersManager
     // 鍵の?のspawnデータの作成
     private void InitKeyBoxSpawns()
     {
-    	L2Spawn spawnDat;
+        L2Spawn spawnDat;
         L2NpcTemplate template;
 
         for(int keyNpcId:_KeyBoxNpc.keySet())
@@ -401,15 +401,15 @@ public class FourSepulchersManager
                 template = NpcTable.getInstance().getTemplate(_KeyBoxNpc.get(keyNpcId));
                 if (template != null)
                 {
-                	spawnDat = new L2Spawn(template);
-                	spawnDat.setAmount(1);
-                	spawnDat.setLocx(0);
-                	spawnDat.setLocy(0);
-                	spawnDat.setLocz(0);
-                	spawnDat.setHeading(0);
-                	spawnDat.setRespawnDelay(3600);
-                	SpawnTable.getInstance().addNewSpawn(spawnDat, false);
-                	_KeyBoxSpawns.put(keyNpcId, spawnDat);
+                        spawnDat = new L2Spawn(template);
+                        spawnDat.setAmount(1);
+                        spawnDat.setLocx(0);
+                        spawnDat.setLocy(0);
+                        spawnDat.setLocz(0);
+                        spawnDat.setHeading(0);
+                        spawnDat.setRespawnDelay(3600);
+                        SpawnTable.getInstance().addNewSpawn(spawnDat, false);
+                        _KeyBoxSpawns.put(keyNpcId, spawnDat);
                 }
                 else {
                     _log.warning("FourSepulchersManager.InitKeyBoxSpawns: Data missing in NPC table for ID: " + _KeyBoxNpc.get(keyNpcId) + ".");
@@ -426,12 +426,12 @@ public class FourSepulchersManager
     private void LoadPhysicalMonsters()
     {
 
-    	// ??スター出現?ストを?期化
-    	_PhysicalMonsters.clear();
+        // ??スター出現?ストを?期化
+        _PhysicalMonsters.clear();
 
-    	// 読み?まれた出現?ストの?
-    	int loaded = 0;
-    	java.sql.Connection con = null;
+        // 読み?まれた出現?ストの?
+        int loaded = 0;
+        java.sql.Connection con = null;
 
         try
         {
@@ -443,8 +443,8 @@ public class FourSepulchersManager
             ResultSet rset1 = statement1.executeQuery();
             while (rset1.next())
             {
-            	// 出現する??スターの座標?スト作成の?ープ
-            	int keyNpcId = rset1.getInt("key_npc_id");
+                // 出現する??スターの座標?スト作成の?ープ
+                int keyNpcId = rset1.getInt("key_npc_id");
 
                 PreparedStatement statement2 = con.prepareStatement("SELECT id, count, npc_templateid, locx, locy, locz, heading, respawn_delay, key_npc_id FROM four_sepulchers_spawnlist Where key_npc_id = ? and spawntype = ? ORDER BY id");
                 statement2.setInt(1, keyNpcId);
@@ -462,16 +462,16 @@ public class FourSepulchersManager
                     template1 = NpcTable.getInstance().getTemplate(rset2.getInt("npc_templateid"));
                     if (template1 != null)
                     {
-                    	spawnDat = new L2Spawn(template1);
-                    	spawnDat.setAmount(rset2.getInt("count"));
-                    	spawnDat.setLocx(rset2.getInt("locx"));
-                    	spawnDat.setLocy(rset2.getInt("locy"));
-                    	spawnDat.setLocz(rset2.getInt("locz"));
-                    	spawnDat.setHeading(rset2.getInt("heading"));
-                    	spawnDat.setRespawnDelay(rset2.getInt("respawn_delay"));
-                    	SpawnTable.getInstance().addNewSpawn(spawnDat, false);
-                    	_PhysicalSpawns.add(spawnDat);
-                    	loaded++;
+                        spawnDat = new L2Spawn(template1);
+                        spawnDat.setAmount(rset2.getInt("count"));
+                        spawnDat.setLocx(rset2.getInt("locx"));
+                        spawnDat.setLocy(rset2.getInt("locy"));
+                        spawnDat.setLocz(rset2.getInt("locz"));
+                        spawnDat.setHeading(rset2.getInt("heading"));
+                        spawnDat.setRespawnDelay(rset2.getInt("respawn_delay"));
+                        SpawnTable.getInstance().addNewSpawn(spawnDat, false);
+                        _PhysicalSpawns.add(spawnDat);
+                        loaded++;
                     }
                     else {
                         _log.warning("FourSepulchersManager.LoadPhysicalMonsters: Data missing in NPC table for ID: " + rset2.getInt("npc_templateid") + ".");
@@ -480,7 +480,7 @@ public class FourSepulchersManager
 
                 rset2.close();
                 statement2.close();
-            	_PhysicalMonsters.put(keyNpcId,_PhysicalSpawns);
+                _PhysicalMonsters.put(keyNpcId,_PhysicalSpawns);
             }
 
             rset1.close();
@@ -502,12 +502,12 @@ public class FourSepulchersManager
     private void LoadMagicalMonsters()
     {
 
-    	// ??スター出現?ストを?期化
-    	_MagicalMonsters.clear();
+        // ??スター出現?ストを?期化
+        _MagicalMonsters.clear();
 
-    	// 読み?まれた出現?ストの?
-    	int loaded = 0;
-    	java.sql.Connection con = null;
+        // 読み?まれた出現?ストの?
+        int loaded = 0;
+        java.sql.Connection con = null;
 
         try
         {
@@ -519,8 +519,8 @@ public class FourSepulchersManager
             ResultSet rset1 = statement1.executeQuery();
             while (rset1.next())
             {
-            	// 出現する??スターの座標?スト作成の?ープ
-            	int keyNpcId = rset1.getInt("key_npc_id");
+                // 出現する??スターの座標?スト作成の?ープ
+                int keyNpcId = rset1.getInt("key_npc_id");
 
                 PreparedStatement statement2 = con.prepareStatement("SELECT id, count, npc_templateid, locx, locy, locz, heading, respawn_delay, key_npc_id FROM four_sepulchers_spawnlist Where key_npc_id = ? and spawntype = ? ORDER BY id");
                 statement2.setInt(1, keyNpcId);
@@ -538,16 +538,16 @@ public class FourSepulchersManager
                     template1 = NpcTable.getInstance().getTemplate(rset2.getInt("npc_templateid"));
                     if (template1 != null)
                     {
-                    	spawnDat = new L2Spawn(template1);
-                    	spawnDat.setAmount(rset2.getInt("count"));
-                    	spawnDat.setLocx(rset2.getInt("locx"));
-                    	spawnDat.setLocy(rset2.getInt("locy"));
-                    	spawnDat.setLocz(rset2.getInt("locz"));
-                    	spawnDat.setHeading(rset2.getInt("heading"));
-                    	spawnDat.setRespawnDelay(rset2.getInt("respawn_delay"));
-                    	SpawnTable.getInstance().addNewSpawn(spawnDat, false);
-                    	_MagicalSpawns.add(spawnDat);
-                    	loaded++;
+                        spawnDat = new L2Spawn(template1);
+                        spawnDat.setAmount(rset2.getInt("count"));
+                        spawnDat.setLocx(rset2.getInt("locx"));
+                        spawnDat.setLocy(rset2.getInt("locy"));
+                        spawnDat.setLocz(rset2.getInt("locz"));
+                        spawnDat.setHeading(rset2.getInt("heading"));
+                        spawnDat.setRespawnDelay(rset2.getInt("respawn_delay"));
+                        SpawnTable.getInstance().addNewSpawn(spawnDat, false);
+                        _MagicalSpawns.add(spawnDat);
+                        loaded++;
                     }
                     else {
                         _log.warning("FourSepulchersManager.LoadMagicalMonsters: Data missing in NPC table for ID: " + rset2.getInt("npc_templateid") + ".");
@@ -578,13 +578,13 @@ public class FourSepulchersManager
     private void LoadDukeMonsters()
     {
 
-    	// ??スター出現?ストを?期化
-    	_DukeFinalMobs.clear();
-    	_ArchonSpawned.clear();
+        // ??スター出現?ストを?期化
+        _DukeFinalMobs.clear();
+        _ArchonSpawned.clear();
 
-    	// 読み?まれた出現?ストの?
-    	int loaded = 0;
-    	java.sql.Connection con = null;
+        // 読み?まれた出現?ストの?
+        int loaded = 0;
+        java.sql.Connection con = null;
 
         try
         {
@@ -596,8 +596,8 @@ public class FourSepulchersManager
             ResultSet rset1 = statement1.executeQuery();
             while (rset1.next())
             {
-            	// 出現する??スターの座標?スト作成の?ープ
-            	int keyNpcId = rset1.getInt("key_npc_id");
+                // 出現する??スターの座標?スト作成の?ープ
+                int keyNpcId = rset1.getInt("key_npc_id");
 
                 PreparedStatement statement2 = con.prepareStatement("SELECT id, count, npc_templateid, locx, locy, locz, heading, respawn_delay, key_npc_id FROM four_sepulchers_spawnlist Where key_npc_id = ? and spawntype = ? ORDER BY id");
                 statement2.setInt(1, keyNpcId);
@@ -615,16 +615,16 @@ public class FourSepulchersManager
                     template1 = NpcTable.getInstance().getTemplate(rset2.getInt("npc_templateid"));
                     if (template1 != null)
                     {
-                    	spawnDat = new L2Spawn(template1);
-                    	spawnDat.setAmount(rset2.getInt("count"));
-                    	spawnDat.setLocx(rset2.getInt("locx"));
-                    	spawnDat.setLocy(rset2.getInt("locy"));
-                    	spawnDat.setLocz(rset2.getInt("locz"));
-                    	spawnDat.setHeading(rset2.getInt("heading"));
-                    	spawnDat.setRespawnDelay(rset2.getInt("respawn_delay"));
-                    	SpawnTable.getInstance().addNewSpawn(spawnDat, false);
-                    	_DukeFinalSpawns.add(spawnDat);
-                    	loaded++;
+                        spawnDat = new L2Spawn(template1);
+                        spawnDat.setAmount(rset2.getInt("count"));
+                        spawnDat.setLocx(rset2.getInt("locx"));
+                        spawnDat.setLocy(rset2.getInt("locy"));
+                        spawnDat.setLocz(rset2.getInt("locz"));
+                        spawnDat.setHeading(rset2.getInt("heading"));
+                        spawnDat.setRespawnDelay(rset2.getInt("respawn_delay"));
+                        SpawnTable.getInstance().addNewSpawn(spawnDat, false);
+                        _DukeFinalSpawns.add(spawnDat);
+                        loaded++;
                     }
                     else {
                         _log.warning("FourSepulchersManager.LoadDukeMonsters: Data missing in NPC table for ID: " + rset2.getInt("npc_templateid") + ".");
@@ -656,12 +656,12 @@ public class FourSepulchersManager
     private void LoadEmperorsGraveMonsters()
     {
 
-    	// ??スター出現?ストを?期化
-    	_EmperorsGraveNpcs.clear();
+        // ??スター出現?ストを?期化
+        _EmperorsGraveNpcs.clear();
 
-    	// 読み?まれた出現?ストの?
-    	int loaded = 0;
-    	java.sql.Connection con = null;
+        // 読み?まれた出現?ストの?
+        int loaded = 0;
+        java.sql.Connection con = null;
 
         try
         {
@@ -673,8 +673,8 @@ public class FourSepulchersManager
             ResultSet rset1 = statement1.executeQuery();
             while (rset1.next())
             {
-            	// 出現する??スターの座標?スト作成の?ープ
-            	int keyNpcId = rset1.getInt("key_npc_id");
+                // 出現する??スターの座標?スト作成の?ープ
+                int keyNpcId = rset1.getInt("key_npc_id");
 
                 PreparedStatement statement2 = con.prepareStatement("SELECT id, count, npc_templateid, locx, locy, locz, heading, respawn_delay, key_npc_id FROM four_sepulchers_spawnlist Where key_npc_id = ? and spawntype = ? ORDER BY id");
                 statement2.setInt(1, keyNpcId);
@@ -692,16 +692,16 @@ public class FourSepulchersManager
                     template1 = NpcTable.getInstance().getTemplate(rset2.getInt("npc_templateid"));
                     if (template1 != null)
                     {
-                    	spawnDat = new L2Spawn(template1);
-                    	spawnDat.setAmount(rset2.getInt("count"));
-                    	spawnDat.setLocx(rset2.getInt("locx"));
-                    	spawnDat.setLocy(rset2.getInt("locy"));
-                    	spawnDat.setLocz(rset2.getInt("locz"));
-                    	spawnDat.setHeading(rset2.getInt("heading"));
-                    	spawnDat.setRespawnDelay(rset2.getInt("respawn_delay"));
-                    	SpawnTable.getInstance().addNewSpawn(spawnDat, false);
-                    	_EmperorsGraveSpawns.add(spawnDat);
-                    	loaded++;
+                        spawnDat = new L2Spawn(template1);
+                        spawnDat.setAmount(rset2.getInt("count"));
+                        spawnDat.setLocx(rset2.getInt("locx"));
+                        spawnDat.setLocy(rset2.getInt("locy"));
+                        spawnDat.setLocz(rset2.getInt("locz"));
+                        spawnDat.setHeading(rset2.getInt("heading"));
+                        spawnDat.setRespawnDelay(rset2.getInt("respawn_delay"));
+                        SpawnTable.getInstance().addNewSpawn(spawnDat, false);
+                        _EmperorsGraveSpawns.add(spawnDat);
+                        loaded++;
                     }
                     else {
                         _log.warning("FourSepulchersManager.LoadEmperorsGraveMonsters: Data missing in NPC table for ID: " + rset2.getInt("npc_templateid") + ".");
@@ -731,10 +731,10 @@ public class FourSepulchersManager
     // ハ?シ?シ?ドーのspawnデータの作成
     protected void InitLocationShadowSpawns()
     {
-    	int locNo = Rnd.get(4);
-    	final int[] gateKeeper = {31929,31934,31939,31944};
+        int locNo = Rnd.get(4);
+        final int[] gateKeeper = {31929,31934,31939,31944};
 
-    	L2Spawn spawnDat;
+        L2Spawn spawnDat;
         L2NpcTemplate template;
 
         // 出現座標情報をク?ア
@@ -742,38 +742,38 @@ public class FourSepulchersManager
 
         // 今回の出現座標情報を作成
         for(int i=0;i<=3;i++)
-    	{
+        {
             template = NpcTable.getInstance().getTemplate(_ShadowSpawnLoc[locNo][i][0]);
             if (template != null)
             {
-            	try
-            	{
-                	spawnDat = new L2Spawn(template);
-                	spawnDat.setAmount(1);
-                	spawnDat.setLocx(_ShadowSpawnLoc[locNo][i][1]);
-                	spawnDat.setLocy(_ShadowSpawnLoc[locNo][i][2]);
-                	spawnDat.setLocz(_ShadowSpawnLoc[locNo][i][3]);
-                	spawnDat.setHeading(_ShadowSpawnLoc[locNo][i][4]);
-                	SpawnTable.getInstance().addNewSpawn(spawnDat, false);
-                	int keyNpcId = gateKeeper[i];
-                	_ShadowSpawns.put(keyNpcId,spawnDat);
-            	}
-            	catch(Exception e)
-            	{
-            		_log.warning(e.getMessage());
-            		e.printStackTrace();
-            	}
+                try
+                {
+                        spawnDat = new L2Spawn(template);
+                        spawnDat.setAmount(1);
+                        spawnDat.setLocx(_ShadowSpawnLoc[locNo][i][1]);
+                        spawnDat.setLocy(_ShadowSpawnLoc[locNo][i][2]);
+                        spawnDat.setLocz(_ShadowSpawnLoc[locNo][i][3]);
+                        spawnDat.setHeading(_ShadowSpawnLoc[locNo][i][4]);
+                        SpawnTable.getInstance().addNewSpawn(spawnDat, false);
+                        int keyNpcId = gateKeeper[i];
+                        _ShadowSpawns.put(keyNpcId,spawnDat);
+                }
+                catch(Exception e)
+                {
+                        _log.warning(e.getMessage());
+                        e.printStackTrace();
+                }
             }
             else {
                 _log.warning("FourSepulchersManager.InitLocationShadowSpawns: Data missing in NPC table for ID: " + _ShadowSpawnLoc[locNo][i][0] + ".");
             }
-    	}
+        }
     }
 
     // ハ?シ?の執行者のspawnデータの作成
     protected void InitExecutionerSpawns()
     {
-    	L2Spawn spawnDat;
+        L2Spawn spawnDat;
         L2NpcTemplate template;
 
         for(int keyNpcId:_Victim.keySet())
@@ -783,15 +783,15 @@ public class FourSepulchersManager
                 template = NpcTable.getInstance().getTemplate(_Victim.get(keyNpcId));
                 if (template != null)
                 {
-                	spawnDat = new L2Spawn(template);
-                	spawnDat.setAmount(1);
-                	spawnDat.setLocx(0);
-                	spawnDat.setLocy(0);
-                	spawnDat.setLocz(0);
-                	spawnDat.setHeading(0);
-                	spawnDat.setRespawnDelay(3600);
-                	SpawnTable.getInstance().addNewSpawn(spawnDat, false);
-                	_ExecutionerSpawns.put(keyNpcId, spawnDat);
+                        spawnDat = new L2Spawn(template);
+                        spawnDat.setAmount(1);
+                        spawnDat.setLocx(0);
+                        spawnDat.setLocy(0);
+                        spawnDat.setLocz(0);
+                        spawnDat.setHeading(0);
+                        spawnDat.setRespawnDelay(3600);
+                        SpawnTable.getInstance().addNewSpawn(spawnDat, false);
+                        _ExecutionerSpawns.put(keyNpcId, spawnDat);
                 }
                 else {
                     _log.warning("FourSepulchersManager.InitExecutionerSpawns: Data missing in NPC table for ID: " + _Victim.get(keyNpcId) + ".");
@@ -807,13 +807,13 @@ public class FourSepulchersManager
     // 受付?間かチェック
     public boolean IsEntryTime()
     {
-    	return _InEntryTime;
+        return _InEntryTime;
     }
 
     // 霊廟攻略?間かチェック
     public boolean IsAttackTime()
     {
-    	return _InAttackTime;
+        return _InAttackTime;
     }
 
     // 霊廟の申し?みが可能かどうかをチェック
@@ -828,11 +828,11 @@ public class FourSepulchersManager
         // 参加人?の確認
         else if(Config.FS_PARTY_MEMBER_COUNT > 1)    // Configでソ?での挑戦が?されていないば?い
         {
-        	// プ?イ?ーはパーティを組んでいること
-        	if(player.getParty() == null) return false;
+                // プ?イ?ーはパーティを組んでいること
+                if(player.getParty() == null) return false;
 
-        	// プ?イ?ーはパーティ?ーダーで?ること
-        	if(!player.getParty().isLeader(player)) return false;
+                // プ?イ?ーはパーティ?ーダーで?ること
+                if(!player.getParty().isLeader(player)) return false;
 
             // プ?イ?ーは規定人?以上でパーティを組んでいること
             if (player.getParty().getMemberCount() < Config.FS_PARTY_MEMBER_COUNT) return false;
@@ -842,7 +842,7 @@ public class FourSepulchersManager
                 for (L2PcInstance mem : player.getParty().getPartyMembers())
                 {
                     // パーティ??バー全員がクエスト「４つの杯」を受けていること
-                    if(mem.getQuestState(_QuestId).get("<state>") == null) return false;
+                    if(mem.getQuestState(_QuestId) == null) return false;
                     // パーティ??バー全員が「霊廟の通行証」を?っていること
                     if (mem.getInventory().getItemByItemId(_EntrancePass) == null) return false;
 
@@ -861,7 +861,7 @@ public class FourSepulchersManager
         else    // ソ?の場?
         {
             // 挑戦者はクエスト「４つの杯」を受けていること
-            if(player.getQuestState(_QuestId).get("<state>") == null) return false;
+            if(player.getQuestState(_QuestId) == null) return false;
             // 挑戦者は「霊廟の通行証」を?っていること
             if(player.getInventory().getItemByItemId(_EntrancePass) == null) return false;
 
@@ -882,195 +882,195 @@ public class FourSepulchersManager
 
     // 挑戦者パーティを登録し、男爵の会堂へテ?ポートさせる
     public void Entry(int npcId, L2PcInstance player)
-	{
-		// 挑戦者パーティを男爵の会堂へテ?ポート
-		// テ?ポート座標の取得
-		int[] Location = _StartHallSpawns.get(npcId);
-		int driftx;
-		int drifty;
+        {
+                // 挑戦者パーティを男爵の会堂へテ?ポート
+                // テ?ポート座標の取得
+                int[] Location = _StartHallSpawns.get(npcId);
+                int driftx;
+                int drifty;
 
-		// テ?ポート
-		if (Config.FS_PARTY_MEMBER_COUNT > 1) // Configでソ?での挑戦が?されていないば?い
-		{
-			// 霊廟の申し?み条?を再確認
-			if (IsEnableEntry(npcId, player))
-			{
-				List<L2PcInstance> members = new FastList<L2PcInstance>(); // テ?ポート可能な??バーの?スト
-				for (L2PcInstance mem : player.getParty().getPartyMembers())
-				{
-					// ??バーが霊廟の通行証を?っていて、生きていて、パーティ?ーダーの認識範囲内にいれば、テ?ポートさせる
-					if (!mem.isDead() && Util.checkIfInRange(700, player, mem, true))
-					{
-						members.add(mem);
-					}
-				}
+                // テ?ポート
+                if (Config.FS_PARTY_MEMBER_COUNT > 1) // Configでソ?での挑戦が?されていないば?い
+                {
+                        // 霊廟の申し?み条?を再確認
+                        if (IsEnableEntry(npcId, player))
+                        {
+                                List<L2PcInstance> members = new FastList<L2PcInstance>(); // テ?ポート可能な??バーの?スト
+                                for (L2PcInstance mem : player.getParty().getPartyMembers())
+                                {
+                                        // ??バーが霊廟の通行証を?っていて、生きていて、パーティ?ーダーの認識範囲内にいれば、テ?ポートさせる
+                                        if (!mem.isDead() && Util.checkIfInRange(700, player, mem, true))
+                                        {
+                                                members.add(mem);
+                                        }
+                                }
 
-				for (L2PcInstance mem : members)
-				{
-					// 男爵の会堂へテ?ポートする
-					driftx = Rnd.get(-80, 80);
-					drifty = Rnd.get(-80, 80);
-					mem.teleToLocation(Location[0] + driftx, Location[1] + drifty, Location[2]);
-					// 霊廟の通行証をイ?ベ?ト?から消す
-					mem.destroyItemByItemId("Quest", _EntrancePass, 1, mem,true);
-					// 古いブ?ーチを?っていなければ使用済み霊廟の通行証をイ?ベ?ト?に入れる
+                                for (L2PcInstance mem : members)
+                                {
+                                        // 男爵の会堂へテ?ポートする
+                                        driftx = Rnd.get(-80, 80);
+                                        drifty = Rnd.get(-80, 80);
+                                        mem.teleToLocation(Location[0] + driftx, Location[1] + drifty, Location[2]);
+                                        // 霊廟の通行証をイ?ベ?ト?から消す
+                                        mem.destroyItemByItemId("Quest", _EntrancePass, 1, mem,true);
+                                        // 古いブ?ーチを?っていなければ使用済み霊廟の通行証をイ?ベ?ト?に入れる
                     if (mem.getInventory().getItemByItemId(_OldBrooch) == null)
                     {
-						mem.addItem("Quest", _UsedEntrancePass, 1, mem, true);
+                                                mem.addItem("Quest", _UsedEntrancePass, 1, mem, true);
                     }
 
-					// 不正防止のため、会堂の鍵を全て消す
-					L2ItemInstance HallsKey = mem.getInventory().getItemByItemId(_HallsKey);
-	                if(HallsKey != null)
-	                {
-	                    // 会堂の鍵をイ?ベ?ト?から消す
-	                	mem.destroyItemByItemId("Quest", _HallsKey, HallsKey.getCount(), mem, true);
-	                }
-				}
+                                        // 不正防止のため、会堂の鍵を全て消す
+                                        L2ItemInstance HallsKey = mem.getInventory().getItemByItemId(_HallsKey);
+                        if(HallsKey != null)
+                        {
+                            // 会堂の鍵をイ?ベ?ト?から消す
+                                mem.destroyItemByItemId("Quest", _HallsKey, HallsKey.getCount(), mem, true);
+                        }
+                                }
 
-				// 霊廟管?人にパーティ?ーダーを関係付ける
-				_Challengers.remove(npcId);
-				_Challengers.put(npcId, player);
+                                // 霊廟管?人にパーティ?ーダーを関係付ける
+                                _Challengers.remove(npcId);
+                                _Challengers.put(npcId, player);
 
-				// 霊廟の?用状況を更新する
-				_HallInUse.remove(npcId);
-				_HallInUse.put(npcId, true);
-			}
-			else
-			{
-				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-				sm.addString("ｱ｣ｲﾅ,ｵLｪkｶi､J.");
-				player.sendPacket(sm);
-			}
-		}
-		else
-		// ソ?の場?
-		{
-			// 霊廟の申し?み条?を再確認
-			if (IsEnableEntry(npcId, player))
-			{
-				// 男爵の会堂へテ?ポートする
-				driftx = Rnd.get(-80, 80);
-				drifty = Rnd.get(-80, 80);
-				player.teleToLocation(Location[0] + driftx, Location[1] + drifty, Location[2]);
-				// 霊廟の通行証をイ?ベ?ト?から消す
-				player.destroyItemByItemId("Quest", _EntrancePass, 1, player, true);
-				// 古いブ?ーチを?っていなければ使用済み霊廟の通行証をイ?ベ?ト?に入れる
+                                // 霊廟の?用状況を更新する
+                                _HallInUse.remove(npcId);
+                                _HallInUse.put(npcId, true);
+                        }
+                        else
+                        {
+                                SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
+                                sm.addString("ｱ｣ｲﾅ｡AｵLｪkｶi､J｡C");
+                                player.sendPacket(sm);
+                        }
+                }
+                else
+                // ソ?の場?
+                {
+                        // 霊廟の申し?み条?を再確認
+                        if (IsEnableEntry(npcId, player))
+                        {
+                                // 男爵の会堂へテ?ポートする
+                                driftx = Rnd.get(-80, 80);
+                                drifty = Rnd.get(-80, 80);
+                                player.teleToLocation(Location[0] + driftx, Location[1] + drifty, Location[2]);
+                                // 霊廟の通行証をイ?ベ?ト?から消す
+                                player.destroyItemByItemId("Quest", _EntrancePass, 1, player, true);
+                                // 古いブ?ーチを?っていなければ使用済み霊廟の通行証をイ?ベ?ト?に入れる
                 if (player.getInventory().getItemByItemId(_OldBrooch) == null)
                 {
-                	player.addItem("Quest", _UsedEntrancePass, 1, player, true);
+                        player.addItem("Quest", _UsedEntrancePass, 1, player, true);
                 }
 
-				// 不正防止のため、会堂の鍵を全て消す
-				L2ItemInstance HallsKey = player.getInventory().getItemByItemId(_HallsKey);
+                                // 不正防止のため、会堂の鍵を全て消す
+                                L2ItemInstance HallsKey = player.getInventory().getItemByItemId(_HallsKey);
                 if(HallsKey != null)
                 {
                     // 会堂の鍵をイ?ベ?ト?から消す
-                	player.destroyItemByItemId("Quest", _HallsKey, HallsKey.getCount(), player, true);
+                        player.destroyItemByItemId("Quest", _HallsKey, HallsKey.getCount(), player, true);
                 }
 
                 // 霊廟管?人にパーティ?ーダーを関係付ける
-				_Challengers.remove(npcId);
-				_Challengers.put(npcId, player);
+                                _Challengers.remove(npcId);
+                                _Challengers.put(npcId, player);
 
-				// 霊廟の?用状況を更新する
-				_HallInUse.remove(npcId);
-				_HallInUse.put(npcId, true);
-			}
-			else
-			{
-				SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
-				sm.addString("ｱ｣ｲﾅ,ｵLｪkｶi､J.");
-				player.sendPacket(sm);
-			}
-		}
-	}
+                                // 霊廟の?用状況を更新する
+                                _HallInUse.remove(npcId);
+                                _HallInUse.put(npcId, true);
+                        }
+                        else
+                        {
+                                SystemMessage sm = new SystemMessage(SystemMessageId.S1_S2);
+                                sm.addString("ｱ｣ｲﾅ｡AｵLｪkｶi､J｡C");
+                                player.sendPacket(sm);
+                        }
+                }
+        }
 
     // 謎の?を出現させる
     public void SpawnMysteriousBox(int npcId)
     {
-    	if (!IsAttackTime()) return;
+        if (!IsAttackTime()) return;
 
-    	L2Spawn spawnDat = _MysteriousBoxSpawns.get(npcId);
-    	if(spawnDat != null)
-    	{
-        	_AllMobs.add(spawnDat.doSpawn());
-        	spawnDat.stopRespawn();
-    	}
+        L2Spawn spawnDat = _MysteriousBoxSpawns.get(npcId);
+        if(spawnDat != null)
+        {
+                _AllMobs.add(spawnDat.doSpawn());
+                spawnDat.stopRespawn();
+        }
     }
 
     // ??スターを出現させる
     public void SpawnMonster(int npcId)
     {
-    	if (!IsAttackTime()) return;
+        if (!IsAttackTime()) return;
 
-    	FastList<L2Spawn> MonsterList;
-    	List<L2SepulcherMonsterInstance> Mobs = new FastList<L2SepulcherMonsterInstance>();
-    	L2Spawn KeyBoxMobSpawn;
+        FastList<L2Spawn> MonsterList;
+        List<L2SepulcherMonsterInstance> Mobs = new FastList<L2SepulcherMonsterInstance>();
+        L2Spawn KeyBoxMobSpawn;
 
-    	// 物?系、?法系のどちらかを?める
-    	if(Rnd.get(2) == 0)	// 物?系
-    	{
-    		MonsterList = (FastList<L2Spawn>)_PhysicalMonsters.get(npcId);
-    	}
-    	else				// ?法系
-    	{
-    		MonsterList = (FastList<L2Spawn>)_MagicalMonsters.get(npcId);
-    	}
+        // 物?系、?法系のどちらかを?める
+        if(Rnd.get(2) == 0)     // 物?系
+        {
+                MonsterList = (FastList<L2Spawn>)_PhysicalMonsters.get(npcId);
+        }
+        else                            // ?法系
+        {
+                MonsterList = (FastList<L2Spawn>)_MagicalMonsters.get(npcId);
+        }
 
-    	// ??スターを出現させる
-    	if(MonsterList != null)
-    	{
-    		boolean SpawnKeyBoxMob = false;
-    		boolean SpawnedKeyBoxMob = false;
+        // ??スターを出現させる
+        if(MonsterList != null)
+        {
+                boolean SpawnKeyBoxMob = false;
+                boolean SpawnedKeyBoxMob = false;
 
-        	for (L2Spawn spawnDat:MonsterList)
-        	{
-        		// 子爵の会堂で鍵の?を出現させる墓地の甲?を出現させるか判定する。
-        		if(SpawnedKeyBoxMob)
-        		{
-        			SpawnKeyBoxMob = false;
-        		}
-        		else
-        		{
-            		switch(npcId)
-            		{
-            		    // 子爵の会堂の謎の?
-            		    case 31469:
-            		    case 31474:
-            		    case 31479:
-            		    case 31484:
-            		    	if(Rnd.get(48) == 0)
-            		    	{
-            		    		SpawnKeyBoxMob = true;
-            		    		_log.info("FourSepulchersManager.SpawnMonster: Set to spawn Church of Viscount Key Mob.");
-            		    	}
-            		    	break;
-        		    	default:
-        		    		SpawnKeyBoxMob = false;
-            		}
-        		}
+                for (L2Spawn spawnDat:MonsterList)
+                {
+                        // 子爵の会堂で鍵の?を出現させる墓地の甲?を出現させるか判定する。
+                        if(SpawnedKeyBoxMob)
+                        {
+                                SpawnKeyBoxMob = false;
+                        }
+                        else
+                        {
+                        switch(npcId)
+                        {
+                            // 子爵の会堂の謎の?
+                            case 31469:
+                            case 31474:
+                            case 31479:
+                            case 31484:
+                                if(Rnd.get(48) == 0)
+                                {
+                                        SpawnKeyBoxMob = true;
+                                        _log.info("FourSepulchersManager.SpawnMonster: Set to spawn Church of Viscount Key Mob.");
+                                }
+                                break;
+                                default:
+                                        SpawnKeyBoxMob = false;
+                        }
+                        }
 
-        		L2SepulcherMonsterInstance mob = null;
+                        L2SepulcherMonsterInstance mob = null;
 
-        		// 鍵の?を出現させる墓地の甲?を出現させる??
-        		if(SpawnKeyBoxMob)
-        		{
+                        // 鍵の?を出現させる墓地の甲?を出現させる??
+                        if(SpawnKeyBoxMob)
+                        {
                     try
                     {
-            			L2NpcTemplate template = NpcTable.getInstance().getTemplate(18149);
+                                L2NpcTemplate template = NpcTable.getInstance().getTemplate(18149);
                         if (template != null)
                         {
-                        	KeyBoxMobSpawn = new L2Spawn(template);
-                        	KeyBoxMobSpawn.setAmount(1);
-                        	KeyBoxMobSpawn.setLocx(spawnDat.getLocx());
-                        	KeyBoxMobSpawn.setLocy(spawnDat.getLocy());
-                        	KeyBoxMobSpawn.setLocz(spawnDat.getLocz());
-                        	KeyBoxMobSpawn.setHeading(spawnDat.getHeading());
-                        	KeyBoxMobSpawn.setRespawnDelay(3600);
-                        	SpawnTable.getInstance().addNewSpawn(KeyBoxMobSpawn, false);
-                    		mob = (L2SepulcherMonsterInstance)KeyBoxMobSpawn.doSpawn();
-                    		KeyBoxMobSpawn.stopRespawn();
+                                KeyBoxMobSpawn = new L2Spawn(template);
+                                KeyBoxMobSpawn.setAmount(1);
+                                KeyBoxMobSpawn.setLocx(spawnDat.getLocx());
+                                KeyBoxMobSpawn.setLocy(spawnDat.getLocy());
+                                KeyBoxMobSpawn.setLocz(spawnDat.getLocz());
+                                KeyBoxMobSpawn.setHeading(spawnDat.getHeading());
+                                KeyBoxMobSpawn.setRespawnDelay(3600);
+                                SpawnTable.getInstance().addNewSpawn(KeyBoxMobSpawn, false);
+                                mob = (L2SepulcherMonsterInstance)KeyBoxMobSpawn.doSpawn();
+                                KeyBoxMobSpawn.stopRespawn();
                         }
                         else {
                             _log.warning("FourSepulchersManager.SpawnMonster: Data missing in NPC table for ID: 18149");
@@ -1081,280 +1081,280 @@ public class FourSepulchersManager
                         _log.warning("FourSepulchersManager.SpawnMonster: Spawn could not be initialized: " + e);
                     }
 
-        			SpawnedKeyBoxMob = true;
-        		}
-        		else
-        		{
-            		mob = (L2SepulcherMonsterInstance)spawnDat.doSpawn();
-                	spawnDat.stopRespawn();
-        		}
+                                SpawnedKeyBoxMob = true;
+                        }
+                        else
+                        {
+                        mob = (L2SepulcherMonsterInstance)spawnDat.doSpawn();
+                        spawnDat.stopRespawn();
+                        }
 
-        		if(mob != null)
-        		{
-            		mob.MysteriousBoxId = npcId;
-            		switch(npcId)
-            		{
-            		    // 子爵の会堂の謎の?
-            		    case 31469:
-            		    case 31474:
-            		    case 31479:
-            		    case 31484:
-            		    // 公爵の会堂の謎の?
-            		    case 31472:
-            		    case 31477:
-            		    case 31482:
-            		    case 31487:
-            		    	Mobs.add(mob);
-            		}
-            		_AllMobs.add(mob);
-        		}
-        	}
+                        if(mob != null)
+                        {
+                        mob.MysteriousBoxId = npcId;
+                        switch(npcId)
+                        {
+                            // 子爵の会堂の謎の?
+                            case 31469:
+                            case 31474:
+                            case 31479:
+                            case 31484:
+                            // 公爵の会堂の謎の?
+                            case 31472:
+                            case 31477:
+                            case 31482:
+                            case 31487:
+                                Mobs.add(mob);
+                        }
+                        _AllMobs.add(mob);
+                        }
+                }
 
-        	switch(npcId)
-    		{
-    		    // 子爵の会堂の謎の?
-    		    case 31469:
-    		    case 31474:
-    		    case 31479:
-    		    case 31484:
-    		    	_ViscountMobs.put(npcId, Mobs);
-    		    	break;
+                switch(npcId)
+                {
+                    // 子爵の会堂の謎の?
+                    case 31469:
+                    case 31474:
+                    case 31479:
+                    case 31484:
+                        _ViscountMobs.put(npcId, Mobs);
+                        break;
 
-    		    // 公爵の会堂の謎の?
-    		    case 31472:
-    		    case 31477:
-    		    case 31482:
-    		    case 31487:
-    		    	_DukeMobs.put(npcId, Mobs);
-    		    	break;
-    		}
-    	}
+                    // 公爵の会堂の謎の?
+                    case 31472:
+                    case 31477:
+                    case 31482:
+                    case 31487:
+                        _DukeMobs.put(npcId, Mobs);
+                        break;
+                }
+        }
     }
 
     // 子爵の会堂の??スターの殲滅を確認する
     public synchronized boolean IsViscountMobsAnnihilated(int npcId)
     {
-    	FastList<L2SepulcherMonsterInstance> Mobs =
-    		(FastList<L2SepulcherMonsterInstance>)_ViscountMobs.get(npcId);
+        FastList<L2SepulcherMonsterInstance> Mobs =
+                (FastList<L2SepulcherMonsterInstance>)_ViscountMobs.get(npcId);
 
-    	if(Mobs == null) return true;
+        if(Mobs == null) return true;
 
-    	for(L2SepulcherMonsterInstance mob:Mobs)
-    	{
-    		if(!mob.isDead()) return false;
-    	}
+        for(L2SepulcherMonsterInstance mob:Mobs)
+        {
+                if(!mob.isDead()) return false;
+        }
 
-    	return true;
+        return true;
     }
 
     // 公爵の会堂の??スターの殲滅を確認する
     public synchronized boolean IsDukeMobsAnnihilated(int npcId)
     {
-    	FastList<L2SepulcherMonsterInstance> Mobs =
-    		(FastList<L2SepulcherMonsterInstance>)_DukeMobs.get(npcId);
+        FastList<L2SepulcherMonsterInstance> Mobs =
+                (FastList<L2SepulcherMonsterInstance>)_DukeMobs.get(npcId);
 
-    	if(Mobs == null) return true;
+        if(Mobs == null) return true;
 
-    	for(L2SepulcherMonsterInstance mob:Mobs)
-    	{
-    		if(!mob.isDead()) return false;
-    	}
+        for(L2SepulcherMonsterInstance mob:Mobs)
+        {
+                if(!mob.isDead()) return false;
+        }
 
-    	return true;
+        return true;
     }
 
     // 鍵の?を出現させる
     public void SpawnKeyBox(L2NpcInstance activeChar)
     {
-    	if (!IsAttackTime()) return;
+        if (!IsAttackTime()) return;
 
-    	L2Spawn	spawnDat = _KeyBoxSpawns.get(activeChar.getNpcId());
+        L2Spawn spawnDat = _KeyBoxSpawns.get(activeChar.getNpcId());
 
-    	if(spawnDat != null)
-    	{
-        	spawnDat.setAmount(1);
-        	spawnDat.setLocx(activeChar.getX());
-        	spawnDat.setLocy(activeChar.getY());
-        	spawnDat.setLocz(activeChar.getZ());
-        	spawnDat.setHeading(activeChar.getHeading());
-        	spawnDat.setRespawnDelay(3600);
-        	_AllMobs.add(spawnDat.doSpawn());
-        	spawnDat.stopRespawn();
+        if(spawnDat != null)
+        {
+                spawnDat.setAmount(1);
+                spawnDat.setLocx(activeChar.getX());
+                spawnDat.setLocy(activeChar.getY());
+                spawnDat.setLocz(activeChar.getZ());
+                spawnDat.setHeading(activeChar.getHeading());
+                spawnDat.setRespawnDelay(3600);
+                _AllMobs.add(spawnDat.doSpawn());
+                spawnDat.stopRespawn();
 
-    	}
+        }
     }
 
     // ハ?シ?の執行者を出現させる
     public void SpawnExecutionerOfHalisha(L2NpcInstance activeChar)
     {
-    	if (!IsAttackTime()) return;
+        if (!IsAttackTime()) return;
 
-    	L2Spawn spawnDat = _ExecutionerSpawns.get(activeChar.getNpcId());
+        L2Spawn spawnDat = _ExecutionerSpawns.get(activeChar.getNpcId());
 
-    	if(spawnDat != null)
-    	{
-    		spawnDat.setAmount(1);
-        	spawnDat.setLocx(activeChar.getX());
-        	spawnDat.setLocy(activeChar.getY());
-        	spawnDat.setLocz(activeChar.getZ());
-        	spawnDat.setHeading(activeChar.getHeading());
-        	spawnDat.setRespawnDelay(3600);
-        	_AllMobs.add(spawnDat.doSpawn());
-        	spawnDat.stopRespawn();
-    	}
+        if(spawnDat != null)
+        {
+                spawnDat.setAmount(1);
+                spawnDat.setLocx(activeChar.getX());
+                spawnDat.setLocy(activeChar.getY());
+                spawnDat.setLocz(activeChar.getZ());
+                spawnDat.setHeading(activeChar.getHeading());
+                spawnDat.setRespawnDelay(3600);
+                _AllMobs.add(spawnDat.doSpawn());
+                spawnDat.stopRespawn();
+        }
     }
 
     // ハ?シ?アドミニスト?ーターを出現させる
     public void SpawnArchonOfHalisha(int npcId)
     {
-    	if (!IsAttackTime()) return;
+        if (!IsAttackTime()) return;
 
-    	// 既に出現している場?は無?
-    	if(_ArchonSpawned.get(npcId)) return;
+        // 既に出現している場?は無?
+        if(_ArchonSpawned.get(npcId)) return;
 
-    	FastList<L2Spawn> MonsterList = (FastList<L2Spawn>)_DukeFinalMobs.get(npcId);
+        FastList<L2Spawn> MonsterList = (FastList<L2Spawn>)_DukeFinalMobs.get(npcId);
 
-    	// ??スターを出現させる
-    	if(MonsterList != null)
-    	{
-        	for (L2Spawn spawnDat:MonsterList)
-        	{
-        		L2SepulcherMonsterInstance mob = (L2SepulcherMonsterInstance)spawnDat.doSpawn();
-            	spawnDat.stopRespawn();
+        // ??スターを出現させる
+        if(MonsterList != null)
+        {
+                for (L2Spawn spawnDat:MonsterList)
+                {
+                        L2SepulcherMonsterInstance mob = (L2SepulcherMonsterInstance)spawnDat.doSpawn();
+                spawnDat.stopRespawn();
 
-        		if(mob != null)
-        		{
-            		mob.MysteriousBoxId = npcId;
-            		_AllMobs.add(mob);
-        		}
-    		}
-        	_ArchonSpawned.put(npcId, true);
-    	}
+                        if(mob != null)
+                        {
+                        mob.MysteriousBoxId = npcId;
+                        _AllMobs.add(mob);
+                        }
+                }
+                _ArchonSpawned.put(npcId, true);
+        }
     }
 
     // ウィゴットの幽霊とハ?シ?の宝?を出現させる
     public void SpawnEmperorsGraveNpc(int npcId)
     {
-    	if (!IsAttackTime()) return;
+        if (!IsAttackTime()) return;
 
-    	FastList<L2Spawn> MonsterList = (FastList<L2Spawn>)_EmperorsGraveNpcs.get(npcId);
+        FastList<L2Spawn> MonsterList = (FastList<L2Spawn>)_EmperorsGraveNpcs.get(npcId);
 
-    	// ??スターを出現させる
-    	if(MonsterList != null)
-    	{
-        	for (L2Spawn spawnDat:MonsterList)
-        	{
-        		_AllMobs.add(spawnDat.doSpawn());
-            	spawnDat.stopRespawn();
-    		}
-    	}
+        // ??スターを出現させる
+        if(MonsterList != null)
+        {
+                for (L2Spawn spawnDat:MonsterList)
+                {
+                        _AllMobs.add(spawnDat.doSpawn());
+                spawnDat.stopRespawn();
+                }
+        }
     }
 
     // ハ?シ?シ?ドーの出現座標を?定する。
     protected void LocationShadowSpawns()
     {
-    	int locNo = Rnd.get(4);
-    	_log.info("FourSepulchersManager.LocationShadowSpawns: Location index is " + locNo + ".");
-    	final int[] gateKeeper = {31929,31934,31939,31944};
+        int locNo = Rnd.get(4);
+        _log.info("FourSepulchersManager.LocationShadowSpawns: Location index is " + locNo + ".");
+        final int[] gateKeeper = {31929,31934,31939,31944};
 
-    	L2Spawn spawnDat;
+        L2Spawn spawnDat;
 
         // 今回の出現座標情報を作成
         for(int i=0;i<=3;i++)
-    	{
-        	int keyNpcId = gateKeeper[i];
-        	spawnDat = _ShadowSpawns.get(keyNpcId);
-        	spawnDat.setLocx(_ShadowSpawnLoc[locNo][i][1]);
-        	spawnDat.setLocy(_ShadowSpawnLoc[locNo][i][2]);
-        	spawnDat.setLocz(_ShadowSpawnLoc[locNo][i][3]);
-        	spawnDat.setHeading(_ShadowSpawnLoc[locNo][i][4]);
-        	_ShadowSpawns.put(keyNpcId,spawnDat);
-    	}
+        {
+                int keyNpcId = gateKeeper[i];
+                spawnDat = _ShadowSpawns.get(keyNpcId);
+                spawnDat.setLocx(_ShadowSpawnLoc[locNo][i][1]);
+                spawnDat.setLocy(_ShadowSpawnLoc[locNo][i][2]);
+                spawnDat.setLocz(_ShadowSpawnLoc[locNo][i][3]);
+                spawnDat.setHeading(_ShadowSpawnLoc[locNo][i][4]);
+                _ShadowSpawns.put(keyNpcId,spawnDat);
+        }
     }
 
     // ハ?シ?シ?ドーを出現させる
     public void SpawnShadow(int npcId)
     {
-    	if (!IsAttackTime()) return;
+        if (!IsAttackTime()) return;
 
-    	L2Spawn spawnDat = _ShadowSpawns.get(npcId);
-    	if(spawnDat != null)
-    	{
-    		L2SepulcherMonsterInstance mob = (L2SepulcherMonsterInstance)spawnDat.doSpawn();
-        	spawnDat.stopRespawn();
+        L2Spawn spawnDat = _ShadowSpawns.get(npcId);
+        if(spawnDat != null)
+        {
+                L2SepulcherMonsterInstance mob = (L2SepulcherMonsterInstance)spawnDat.doSpawn();
+                spawnDat.stopRespawn();
 
-    		if(mob != null)
-    		{
-        		mob.MysteriousBoxId = npcId;
-        		_AllMobs.add(mob);
-    		}
-    	}
+                if(mob != null)
+                {
+                        mob.MysteriousBoxId = npcId;
+                        _AllMobs.add(mob);
+                }
+        }
     }
 
     // パーティが全滅したかを確認
     public void checkAnnihilated(L2PcInstance player)
     {
-    	// 全滅した場?は５秒後に?礼者の?院へ飛ばす
-    	if(IsPartyAnnihilated(player))
-    	{
-    		_OnPartyAnnihilatedTask =
-				ThreadPoolManager.getInstance().scheduleGeneral(new OnPartyAnnihilatedTask(player),5000);
-    	}
+        // 全滅した場?は５秒後に?礼者の?院へ飛ばす
+        if(IsPartyAnnihilated(player))
+        {
+                _OnPartyAnnihilatedTask =
+                                ThreadPoolManager.getInstance().scheduleGeneral(new OnPartyAnnihilatedTask(player),5000);
+        }
     }
 
     // パーティが全滅したかを確認
     public synchronized boolean IsPartyAnnihilated(L2PcInstance player)
     {
-		if(player.getParty() != null)
-		{
-			for(L2PcInstance mem:player.getParty().getPartyMembers())
-			{
-				if(!mem.isDead())
-				{
-					return false;
-				}
-			}
-			return true;
-		}
-		else
-		{
-			return true;
-		}
+                if(player.getParty() != null)
+                {
+                        for(L2PcInstance mem:player.getParty().getPartyMembers())
+                        {
+                                if(!mem.isDead())
+                                {
+                                        return false;
+                                }
+                        }
+                        return true;
+                }
+                else
+                {
+                        return true;
+                }
     }
 
     // パーティが全滅した場?の??、?礼者の?院へ飛ばす
     public synchronized void OnPartyAnnihilated(L2PcInstance player)
     {
-		if(player.getParty() != null)
-		{
-			for(L2PcInstance mem:player.getParty().getPartyMembers())
-			{
-				if(!mem.isDead()) break;
-        		int driftX = Rnd.get(-80,80);
-        		int driftY = Rnd.get(-80,80);
-        		mem.teleToLocation(169589 + driftX,-90493 + driftY,-2914);
-			}
-		}
-		else
-		{
-    		int driftX = Rnd.get(-80,80);
-    		int driftY = Rnd.get(-80,80);
-    		player.teleToLocation(169589 + driftX,-90493 + driftY,-2914);
-    	}
+                if(player.getParty() != null)
+                {
+                        for(L2PcInstance mem:player.getParty().getPartyMembers())
+                        {
+                                if(!mem.isDead()) break;
+                        int driftX = Rnd.get(-80,80);
+                        int driftY = Rnd.get(-80,80);
+                        mem.teleToLocation(169589 + driftX,-90493 + driftY,-2914);
+                        }
+                }
+                else
+                {
+                int driftX = Rnd.get(-80,80);
+                int driftY = Rnd.get(-80,80);
+                player.teleToLocation(169589 + driftX,-90493 + driftY,-2914);
+        }
     }
 
     // 霊廟内の??スターを消す
     public void DeleteAllMobs()
     {
-    	_log.info("FourSepulchersManager.DeleteAllMobs: Try to delete " + _AllMobs.size() + " monsters.");
+        _log.info("FourSepulchersManager.DeleteAllMobs: Try to delete " + _AllMobs.size() + " monsters.");
 
-    	int delCnt = 0;
+        int delCnt = 0;
         for(L2NpcInstance mob : _AllMobs)
         {
-			try
+                        try
             {
-				mob.getSpawn().stopRespawn();
-				mob.deleteMe();
+                                mob.getSpawn().stopRespawn();
+                                mob.deleteMe();
                 delCnt++;
             }
             catch(Exception e)
@@ -1363,23 +1363,23 @@ public class FourSepulchersManager
             }
         }
         _AllMobs.clear();
-    	_log.info("FourSepulchersManager.DeleteAllMobs: Deleted " + delCnt + " monsters.");
+        _log.info("FourSepulchersManager.DeleteAllMobs: Deleted " + delCnt + " monsters.");
     }
 
     // すべての会堂のドアを閉じる
     protected void CloseAllDoors()
     {
-    	for(int doorId:_HallGateKeepers.values())
-    	{
+        for(int doorId:_HallGateKeepers.values())
+        {
             try
             {
-            	DoorTable.getInstance().getDoor(doorId).closeMe();
+                DoorTable.getInstance().getDoor(doorId).closeMe();
             }
             catch (Exception e)
             {
                 _log.warning(e.getMessage());
             }
-    	}
+        }
     }
 
     // 参加受付?間に入る
@@ -1401,8 +1401,8 @@ public class FourSepulchersManager
             // 実行されたタスクのク?ー?アップ
             if(_ChangeEntryTimeTask != null)
             {
-            	_ChangeEntryTimeTask.cancel(true);
-            	_ChangeEntryTimeTask = null;
+                _ChangeEntryTimeTask.cancel(true);
+                _ChangeEntryTimeTask = null;
             }
         }
     }
@@ -1426,8 +1426,8 @@ public class FourSepulchersManager
             // 実行されたタスクのク?ー?アップ
             if(_ChaneWarmUpTimeTask != null)
             {
-            	_ChaneWarmUpTimeTask.cancel(true);
-            	_ChaneWarmUpTimeTask = null;
+                _ChaneWarmUpTimeTask.cancel(true);
+                _ChaneWarmUpTimeTask = null;
             }
         }
     }
@@ -1460,8 +1460,8 @@ public class FourSepulchersManager
             // 実行されたタスクのク?ー?アップ
             if(_ChangeAttackTimeTask != null)
             {
-            	_ChangeAttackTimeTask.cancel(true);
-            	_ChangeAttackTimeTask = null;
+                _ChangeAttackTimeTask.cancel(true);
+                _ChangeAttackTimeTask = null;
             }
         }
     }
@@ -1482,14 +1482,14 @@ public class FourSepulchersManager
             // 攻略?のPCを?礼者の?院へ飛ばす
             for(L2PcInstance player :L2World.getInstance().getAllPlayers())
             {
-            	if (CustomZoneManager.getInstance().checkIfInZone("FourSepulcher", player) &&
-            		(player.getZ() >= -7250 && player.getZ() <= -6841) &&
-            		!player.isGM())
-            	{
-            		int driftX = Rnd.get(-80,80);
-            		int driftY = Rnd.get(-80,80);
-            		player.teleToLocation(169589 + driftX,-90493 + driftY,-2914);
-            	}
+                if (GrandBossManager.getInstance().checkIfInZone("FourSepulcher", player) &&
+                        (player.getZ() >= -7250 && player.getZ() <= -6841) &&
+                        !player.isGM())
+                {
+                        int driftX = Rnd.get(-80,80);
+                        int driftY = Rnd.get(-80,80);
+                        player.teleToLocation(169589 + driftX,-90493 + driftY,-2914);
+                }
             }
 
             // 霊廟内の??スター類を消す
@@ -1511,7 +1511,7 @@ public class FourSepulchersManager
                 Set<Integer> npcIdSet = _ArchonSpawned.keySet();
                 for(int npcId:npcIdSet)
                 {
-                	_ArchonSpawned.put(npcId, false);
+                        _ArchonSpawned.put(npcId, false);
                 }
             }
 
@@ -1522,32 +1522,32 @@ public class FourSepulchersManager
             // 実行されたタスクのク?ー?アップ
             if(_ChangeCoolDownTimeTask != null)
             {
-            	_ChangeCoolDownTimeTask.cancel(true);
-            	_ChangeCoolDownTimeTask = null;
+                _ChangeCoolDownTimeTask.cancel(true);
+                _ChangeCoolDownTimeTask = null;
             }
         }
     }
 
     // 4大霊廟で?んだ場?、パーティが全滅していれば?礼者の?院へ飛ばす
-	private class OnPartyAnnihilatedTask implements Runnable
-	{
-		L2PcInstance _player;
+        private class OnPartyAnnihilatedTask implements Runnable
+        {
+                L2PcInstance _player;
 
-		public OnPartyAnnihilatedTask(L2PcInstance player)
-		{
-			_player = player;
-		}
+                public OnPartyAnnihilatedTask(L2PcInstance player)
+                {
+                        _player = player;
+                }
 
-		public void run()
-		{
-			OnPartyAnnihilated(_player);
+                public void run()
+                {
+                        OnPartyAnnihilated(_player);
             // 実行されたタスクのク?ー?アップ
             if(_OnPartyAnnihilatedTask != null)
             {
-            	_OnPartyAnnihilatedTask.cancel(true);
-            	_OnPartyAnnihilatedTask = null;
+                _OnPartyAnnihilatedTask.cancel(true);
+                _OnPartyAnnihilatedTask = null;
             }
 
-		}
-	}
+                }
+        }
 }
